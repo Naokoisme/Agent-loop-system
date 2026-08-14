@@ -1,0 +1,1607 @@
+[
+  {
+    "case_id": "SPO2_001",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表显示Health二级菜单",
+    "steps_text": "1.点击Blood Oxygen",
+    "expected_text": "1.手表显示Blood Oxygen主页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前没有可静态确认的 Health 二级菜单 Blood Oxygen 项坐标；ENTER_PAGE 只能用于导航准备，不能替代人工点击"
+  },
+  {
+    "case_id": "SPO2_002",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已有当日血氧测量数据",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.页面显示最近血氧值与Measure按钮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_003",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表当日没有血氧测量数据",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.最近血氧值显示--",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_004",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.查看24小时柱状图和说明图标",
+    "expected_text": "1.页面显示24小时柱状图与说明图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_005",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示Blood Oxygen主页面",
+    "steps_text": "1.点击Measure按钮",
+    "expected_text": "1.Measure区域显示Measuring..",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:20508,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:20509,spo2,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "使用已验证的佩戴状态和 silent 血氧驱动，稳定保留测量中状态"
+  },
+  {
+    "case_id": "SPO2_006",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.点击说明图标",
+    "expected_text": "1.手表显示血氧说明页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:89,28,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "说明图标坐标来自当前402x256截图和BLOOD_OXYGEN标题栏共享布局"
+  },
+  {
+    "case_id": "SPO2_007",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Health二级菜单",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_008",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_009",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示Blood Oxygen主页面",
+    "steps_text": "1.点击Measure按钮",
+    "expected_text": "1.页面显示Measuring..",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:20908,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:20909,spo2,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "使用已验证的佩戴状态和 silent 血氧驱动，稳定保留测量中状态"
+  },
+  {
+    "case_id": "SPO2_010",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.振动测试仪已连接并校准",
+    "steps_text": "1.点击Measure\n2.采集启动振动波形",
+    "expected_text": "1.手表开始血氧测量\n2.振动测试仪记录一次250毫秒短振",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器"
+  },
+  {
+    "case_id": "SPO2_011",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量刚开始",
+    "steps_text": "1.观察测量值区域",
+    "expected_text": "1.测量值显示--%",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:21108,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:21109,spo2,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "silent 血氧驱动不出值，可稳定观察刚开始测量时的 --%"
+  },
+  {
+    "case_id": "SPO2_012",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.等待传感器首次出值",
+    "expected_text": "1.页面显示实时血氧数值",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8403,3500;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8404,spo2,fixed,97,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_013",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.系统灭屏时间设为5秒\n3.手动血氧测量正在运行",
+    "steps_text": "1.保持手表静止超过5秒",
+    "expected_text": "1.血氧测量页面保持亮屏",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_014",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.执行垂腕动作",
+    "expected_text": "1.血氧测量页面保持亮屏",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:8405,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_015",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.用手掌覆盖屏幕",
+    "expected_text": "1.手表退出血氧测量状态",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_016",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表结束本次测量并显示Blood Oxygen主页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_017",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表退出血氧应用页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_018",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.点击说明图标",
+    "expected_text": "1.手表显示血氧说明页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:89,28,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先建立测量中状态，再点击当前402x256 BLOOD_OXYGEN标题栏的共享说明图标"
+  },
+  {
+    "case_id": "SPO2_019",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量即将结束",
+    "steps_text": "1.等待稳定出值",
+    "expected_text": "1.手表振动250毫秒一次",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "250毫秒振动无法由手表静态截图判定，需要外部振动或加速度证据"
+  },
+  {
+    "case_id": "SPO2_020",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.等待稳定出值",
+    "expected_text": "1.主页面显示本次血氧结果",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8403,3500;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8404,spo2,fixed,97,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_021",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.等待稳定出值",
+    "expected_text": "1.本次血氧数据保存为手动测量记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前产品页面只显示数值和时间，不显示手动/自动来源；静态截图不能证明记录类型"
+  },
+  {
+    "case_id": "SPO2_022",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量尚未结束",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表不新增本次血氧有效记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8403,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8404,spo2,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:2201;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:2202;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "取消测量前的血氧记录基线",
+      "右滑取消后血氧记录未新增"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_023",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表未佩戴\n2.手表显示Blood Oxygen主页面",
+    "steps_text": "1.点击Measure按钮",
+    "expected_text": "1.手表显示佩戴提示页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8406,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8407,spo2,silent,0,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2301,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_024",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.血氧测量正在运行",
+    "steps_text": "1.持续移动佩戴手",
+    "expected_text": "1.60秒无稳定值后显示佩戴提示页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺可重复模拟持续移动并让血氧算法60秒无稳定值的传感器运动状态，不能用固定或静默数值冒充移动"
+  },
+  {
+    "case_id": "SPO2_025",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.取下手表",
+    "expected_text": "1.手表停止血氧测量",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8408,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2501,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_026",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.取下手表",
+    "expected_text": "1.设备不新增本次血氧有效记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8408,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8426,500;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "取下手表前，Blood Oxygen 主页面显示已有记录基线",
+      "取下手表并退出测量后，Blood Oxygen 主页面未新增本次有效记录"
+    ],
+    "unable": false,
+    "note": "用同一页面的前后两张截图比较记录，避免只看最终画面却没有基线"
+  },
+  {
+    "case_id": "SPO2_027",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.血氧传感器可在60秒内稳定出值",
+    "steps_text": "1.点击Measure按钮",
+    "expected_text": "1.测量在稳定出值后结束",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8401,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8402,spo2,fixed,97,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8403,3500;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8404,spo2,fixed,97,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_028",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.血氧传感器在60秒内不出值",
+    "steps_text": "1.点击Measure按钮",
+    "expected_text": "1.60秒后手表显示佩戴提示页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_029",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示血氧佩戴提示页",
+    "steps_text": "1.观察页面标题栏和提示正文",
+    "expected_text": "1.页面显示Blood Oxygen标题和当前系统时间，正文显示Make sure your watch is fitting well just above your wrist and retry.",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前无可靠的64位模拟器通用命令可建立血氧佩戴提示页；旧 BO_WEAR_TIP 通过 uint32_t 传字符串指针，存在指针截断风险"
+  },
+  {
+    "case_id": "SPO2_030",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示佩戴提示页",
+    "steps_text": "1.查看佩戴提示文案和重测按钮",
+    "expected_text": "1.页面显示佩戴提示文案与重测按钮",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前无可靠的64位模拟器通用命令可建立血氧佩戴提示页；旧 BO_WEAR_TIP 通过 uint32_t 传字符串指针，存在指针截断风险"
+  },
+  {
+    "case_id": "SPO2_031",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示佩戴提示页",
+    "steps_text": "1.点击重测按钮",
+    "expected_text": "1.页面显示Measuring..",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "重测动作依赖先可靠建立血氧佩戴提示页；当前旧 BO_WEAR_TIP 在64位模拟器有指针截断风险，不能作为稳定前置命令"
+  },
+  {
+    "case_id": "SPO2_032",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示佩戴提示页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Blood Oxygen主页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先建立 Blood Oxygen 主页面到提示页的导航历史，再验证右滑返回"
+  },
+  {
+    "case_id": "SPO2_033",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示佩戴提示页",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_034",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量已完成",
+    "steps_text": "1.等待页面按系统设置熄屏\n2.在10秒内单击实体按键",
+    "expected_text": "1.手表屏幕熄灭\n2.手表显示Blood Oxygen主页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:34001,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:34002,spo2,fixed,97,0;",
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:60;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:34003,49000;",
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:34004,screen_on;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:34005;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:34006,5500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:34007;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "按产品固定3秒倒计时和45秒测量周期等待完成，再设置5秒自动熄屏；截图覆盖完成页、黑屏及10秒内主键唤醒返回Blood Oxygen主页面",
+    "verification_points": [
+      "自动熄屏计时开始前，截图显示手动血氧测量已经完成",
+      "达到5秒自动熄屏时间后，截图显示手表屏幕熄灭",
+      "熄屏10秒内单击实体按键后，截图显示Blood Oxygen主页面"
+    ]
+  },
+  {
+    "case_id": "SPO2_035",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量已完成",
+    "steps_text": "1.等待页面按系统设置熄屏\n2.等待超过10秒\n3.单击实体按键",
+    "expected_text": "1.手表屏幕熄灭\n2.手表保持熄屏\n3.手表显示主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:35001,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:35002,spo2,fixed,97,0;",
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:60;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:35003,49000;",
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:35004,screen_on;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:35005;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:35006,5500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:35007;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:35008,11000;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:35009;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "按产品固定3秒倒计时和45秒测量周期等待完成，再设置5秒自动熄屏；截图覆盖完成页、熄屏、超过10秒仍黑屏及主键唤醒主表盘",
+    "verification_points": [
+      "自动熄屏计时开始前，截图显示手动血氧测量已经完成",
+      "达到5秒自动熄屏时间后，截图显示手表屏幕熄灭",
+      "继续等待超过10秒后，截图显示手表仍保持熄屏",
+      "单击实体按键后，截图显示主表盘"
+    ]
+  },
+  {
+    "case_id": "SPO2_036",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已产生最近7天血氧数据",
+    "steps_text": "1.重启手表",
+    "expected_text": "1.设备日志仍包含最近7天血氧数据",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+  },
+  {
+    "case_id": "SPO2_037",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.设备已恢复出厂",
+    "steps_text": "1.在App查看自动血氧测量开关",
+    "expected_text": "1.自动血氧测量开关显示关闭",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPO2_038",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴且对应传感器可采样\n3.App已开启自动血氧测量",
+    "steps_text": "1.保持佩戴超过10分钟",
+    "expected_text": "1.设备新增自动血氧测量点",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_039",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴且对应传感器可采样\n3.App已关闭自动血氧测量",
+    "steps_text": "1.保持佩戴超过10分钟",
+    "expected_text": "1.设备不新增自动血氧测量点",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_040",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表未佩戴\n3.App已开启自动血氧测量",
+    "steps_text": "1.等待一个10分钟采样点",
+    "expected_text": "1.手表不显示佩戴提示页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_041",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表未佩戴或采样信号无效\n3.App已开启自动血氧测量",
+    "steps_text": "1.等待一个10分钟采样点",
+    "expected_text": "1.待产品确认：无效血氧采样的重试与空点存储结果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPO2_042",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.同一小时存在自动血氧点与手动血氧点",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.该小时图形按PRD聚合规则显示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前通用命令不能在同一小时分别建立自动血氧点和手动血氧点，无法验证两类来源的聚合规则"
+  },
+  {
+    "case_id": "SPO2_043",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.通过血氧数据测试工具在同一小时依次生成血氧94%、96%、98%三条记录",
+    "steps_text": "1.进入Blood Oxygen主页面\n2.查看目标小时柱上显示的数值",
+    "expected_text": "1.手表显示Blood Oxygen主页面\n2.目标小时柱按三条记录算术平均显示96%",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "SPO_AUTO_AREA 只能直接设置每小时聚合值，不能注入同一小时三条原始记录；用96%预置值会绕过本用例要验证的算术平均逻辑"
+  },
+  {
+    "case_id": "SPO2_044",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已有当日血氧数据",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.柱状图按24个小时槽位展示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用24个小时槽位的通用血氧数据命令建立当日图表前置；本轮旧运行另有LLM 503，映射修改只影响后续运行"
+  },
+  {
+    "case_id": "SPO2_045",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.观察横轴左侧刻度\n2.观察横轴中间刻度\n3.观察横轴右侧刻度",
+    "expected_text": "1.左侧刻度显示00:00\n2.中间刻度显示12:00\n3.右侧刻度显示24:00",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_046",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表当日没有血氧数据",
+    "steps_text": "1.进入Blood Oxygen主页面\n2.观察图表坐标轴\n3.观察图表数据区",
+    "expected_text": "1.手表显示Blood Oxygen主页面\n2.图表显示默认空坐标轴\n3.图表不显示血氧数据柱",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_047",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.当前时间为10:00\n2.手表已有0点至10点血氧数据",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.10点之后的小时槽位不显示数据柱",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260812100000;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "统一建立10:00时刻及0点至10点数据，11点后的小时槽位显式为0"
+  },
+  {
+    "case_id": "SPO2_048",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.手表已有23:59前的血氧数据",
+    "steps_text": "1.将时间推进到次日00:00",
+    "expected_text": "1.主图切换为新一天血氧数据",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811235900;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260812000000;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,day_pass;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8448,500;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "23:59时Blood Oxygen主图显示跨日前的当日血氧数据",
+      "推进到次日00:00并触发day_pass后，主图切换为新一天血氧数据"
+    ],
+    "unable": false,
+    "note": "补齐跨日前数据基线和跨日前后双截图；现有day_pass能力已由模拟器验证"
+  },
+  {
+    "case_id": "SPO2_049",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已连续8天产生血氧数据",
+    "steps_text": "1.查看设备数据日志",
+    "expected_text": "1.设备保留最近7天血氧记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前产品Blood Oxygen界面只展示当日小时图，没有可见的7天记录日志入口；静态产品截图不能证明内部保留策略，且GUI Tree或内部日志不得作为产品判据"
+  },
+  {
+    "case_id": "SPO2_050",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表已有多个血氧区间数据",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.所有柱子使用单一主题色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用24小时血氧区域命令建立多根有效柱，再由截图判定主题色"
+  },
+  {
+    "case_id": "SPO2_051",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.当日血氧数据均不低于90%",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.Y轴最小值显示90",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_052",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.当日最低血氧值为89%",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.Y轴最小值显示80",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,95,94,93,92,91,90,89,90,91,92,93,94,95,96,97,98,97,96,95,94,93,92,91;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "通过共享24小时血氧区域命令建立当日最低值89%，不直接写Y轴显示值"
+  },
+  {
+    "case_id": "SPO2_053",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.准备100%的可控血氧数据",
+    "steps_text": "1.完成一次血氧测量",
+    "expected_text": "1.最近血氧值显示100%",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:53001,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:53002,spo2,fixed,100,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:53003,3500;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:53004,spo2,fixed,100,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:53005,45500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用现有血氧测量通用路径：固定传感器先建立输入，测量启动后再次触发固定样本回调，并覆盖3秒倒计时加45秒固定测量周期后截图检查100%结果",
+    "verification_points": ["测量完成后的截图显示最近血氧值100%"]
+  },
+  {
+    "case_id": "SPO2_054",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.当日血氧图表至少有一根有效柱",
+    "steps_text": "1.观察血氧柱从底部到顶部的颜色过渡",
+    "expected_text": "1.每根有效血氧柱使用连续渐变填充，不显示纯色块断层",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,97;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用24小时血氧区域命令建立有效柱，再由截图判定柱体渐变是否连续"
+  },
+  {
+    "case_id": "SPO2_055",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.当日血氧数据包含明显最高值和最低值",
+    "steps_text": "1.进入Blood Oxygen主页面\n2.观察图表和最近值区域",
+    "expected_text": "1.手表显示Blood Oxygen主页面\n2.页面不显示血氧最高值或最低值字段，图表不标注极值点",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_056",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量结束时间可控",
+    "steps_text": "1.将当前时间设置为测量后30秒",
+    "expected_text": "1.上次测量时间显示刚刚",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,98;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120030;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先固定时间并用持久化24小时区域命令建立最近血氧及时间戳，再用已修复的 TIME_SET 精确推进30秒；旧活动二进制尚未包含TIME_SET修复"
+  },
+  {
+    "case_id": "SPO2_057",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量结束时间可控",
+    "steps_text": "1.将当前时间设置为测量后60秒",
+    "expected_text": "1.上次测量时间显示1分钟前",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,98;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120100;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进60秒；修改待新二进制运行验证"
+  },
+  {
+    "case_id": "SPO2_058",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量结束时间可控",
+    "steps_text": "1.将当前时间设置为测量后3599秒",
+    "expected_text": "1.上次测量时间显示59分钟前",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,98;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811125959;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进3599秒；修改待新二进制运行验证"
+  },
+  {
+    "case_id": "SPO2_059",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量结束时间可控",
+    "steps_text": "1.将当前时间设置为测量后3600秒",
+    "expected_text": "1.上次测量时间显示1小时前",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:SPO_AUTO_AREA:96,97,96,95,97,98,96,97,95,96,97,98,97,96,95,97,98,96,97,95,96,97,98,98;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811130000;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进3600秒；修改待新二进制运行验证"
+  },
+  {
+    "case_id": "SPO2_060",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量发生在昨日",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.最近血氧值显示--",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_061",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量发生在昨日",
+    "steps_text": "1.进入Blood Oxygen主页面",
+    "expected_text": "1.页面不显示上次测量时间",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPO2_062",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表显示血氧说明页",
+    "steps_text": "1.观察说明页顶部",
+    "expected_text": "1.页面显示SpO2健康说明正文",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "人工前置是血氧说明页，统一使用已注册的BLOOD_OXYGEN_TIPS页面"
+  },
+  {
+    "case_id": "SPO2_063",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Blood Oxygen说明页",
+    "steps_text": "1.滚动血氧说明正文\n2.读取完整说明正文",
+    "expected_text": "1.页面滚动到后续说明内容\n2.正文说明SpO2为血氧百分比，理想范围95-100%，高海拔等因素可导致较低读数，读数仅供一般健身或健康参考",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "直达源码注册的血氧说明页，使用 SWIPE_SIM 浏览后续正文",
+    "verification_points": [
+      "最终滚动画面的后续正文同时证明页面已滚动，并可核对完整 SpO2 说明文本"
+    ]
+  },
+  {
+    "case_id": "SPO2_064",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表显示血氧说明页顶部",
+    "steps_text": "1.执行上滑",
+    "expected_text": "1.页面显示后续说明内容",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先建立说明页顶部，再执行人工上滑"
+  },
+  {
+    "case_id": "SPO2_065",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.说明页已离开顶部",
+    "steps_text": "1.执行下滑",
+    "expected_text": "1.页面显示前序说明内容",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先进入说明页并上滑离开顶部，再执行人工下滑返回前序内容"
+  },
+  {
+    "case_id": "SPO2_066",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表显示血氧说明页",
+    "steps_text": "1.旋转编码器",
+    "expected_text": "1.说明内容发生纵向滚动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "直达源码注册的血氧说明页，再用 QDEC_SET 模拟编码器滚动"
+  },
+  {
+    "case_id": "SPO2_067",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表显示血氧说明页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Blood Oxygen主页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先建立Blood Oxygen主页到说明页的导航历史，再执行人工右滑"
+  },
+  {
+    "case_id": "SPO2_068",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已产生当日血氧数据",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.App显示手表当日血氧数据",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPO2_069",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已产生多日血氧数据",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.App按日期显示最近7天血氧数据",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPO2_070",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表与App已断开连接\n2.手表已产生血氧数据",
+    "steps_text": "1.查看设备数据日志",
+    "expected_text": "1.设备本地保留断连期间血氧记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用佩戴和固定SpO2状态并真实等待稳定出值，再按5秒熄屏规则与实体主键分阶段截图"
+  },
+  {
+    "case_id": "SPO2_071",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.断连期间已产生血氧数据",
+    "steps_text": "1.恢复手表与App连接",
+    "expected_text": "1.App新增断连期间血氧记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/App: 1.恢复手表与App连接"
+  },
+  {
+    "case_id": "SPO2_072",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.前一天血氧数据尚未同步",
+    "steps_text": "1.跨日后恢复连接",
+    "expected_text": "1.App将补传血氧数据归档到前一天",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "SPO2_073",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.当日上午血氧已同步\n2.当日下午血氧尚未同步",
+    "steps_text": "1.跨日后恢复连接",
+    "expected_text": "1.App只新增下午未同步血氧记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "SPO2_074",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已产生血氧数据\n2.App同步链路不可用",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.设备端血氧历史数据保持不变",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPO2_075",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.同一批血氧数据已同步一次",
+    "steps_text": "1.再次执行App下拉同步",
+    "expected_text": "1.App不新增重复血氧记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_076",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴且对应传感器可采样\n3.App已开启自动血氧测量\n4.手表正在运动",
+    "steps_text": "1.等待一个10分钟采样点",
+    "expected_text": "1.待产品确认：运动中自动血氧测量的执行结果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPO2_077",
+    "sheet": "血氧",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
+    "steps_text": "1.从App发起OTA升级",
+    "expected_text": "1.设备不新增本次血氧有效记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_078",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴且对应传感器可采样",
+    "steps_text": "1.连续完成20次手动血氧测量",
+    "expected_text": "1.手表未出现死机或异常重启",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+  },
+  {
+    "case_id": "SPO2_079",
+    "sheet": "血氧",
+    "priority": "P1",
+    "precondition_text": "1.准备Android与iOS支持版本手机\n2.手表已产生血氧数据",
+    "steps_text": "1.分别连接Android与iOS执行同步",
+    "expected_text": "1.两平台均显示本次血氧记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPO2_080",
+    "sheet": "血氧",
+    "priority": "P2",
+    "precondition_text": "1.手表显示Blood Oxygen主页面",
+    "steps_text": "1.在默认亮度下观察最近值区域",
+    "expected_text": "1.血氧数值与单位无重叠或裁切",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  }
+]

@@ -1,0 +1,1209 @@
+{
+  "profile": "6202_W5230",
+  "sheet": "呼吸训练",
+  "cases": [
+    {
+      "case_id": "BRTH_001",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表显示主菜单",
+      "steps_text": "1.点击Breathe",
+      "expected_text": "1.手表显示Breathe设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前缺按应用语义定位并点击主菜单 Breathe 条目的通用命令；不能用 ENTER_PAGE 代替该入口操作；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "BRTH_002",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.观察Time设置项\n2.观察Rhythm设置项\n3.观察Vibration设置项\n4.观察页面底部按钮",
+      "expected_text": "1.页面显示Time设置项\n2.页面显示Rhythm设置项\n3.页面显示Vibration设置项\n4.页面显示播放按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_003",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.设备已恢复出厂",
+      "steps_text": "1.进入Breathe设置页",
+      "expected_text": "1.Time显示01 min",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_004",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.设备已恢复出厂",
+      "steps_text": "1.进入Breathe设置页",
+      "expected_text": "1.Rhythm显示Moderate",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_005",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.设备已恢复出厂",
+      "steps_text": "1.进入Breathe设置页",
+      "expected_text": "1.Vibration显示Soft",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_006",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示进入Breathe前的页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_007",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.单击实体按键",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_008",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.点击Rhythm条目",
+      "expected_text": "1.手表显示慢中快三档滚轮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Rhythm 条目范围来自当前 BREATH_TRAIN Designer：x=18..384、y=154..246；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_009",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Rhythm滚轮页",
+      "steps_text": "1.旋转编码器选中Slow",
+      "expected_text": "1.滚轮选中Slow档",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_RHYTHM,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先逆时针旋转到三档滚轮下限 Slow；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_010",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Rhythm滚轮页",
+      "steps_text": "1.旋转编码器选中Moderate",
+      "expected_text": "1.滚轮选中Moderate档",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_RHYTHM,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先归一到 Slow，再顺时针一档选择 Moderate；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_011",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Rhythm滚轮页",
+      "steps_text": "1.旋转编码器选中Fast",
+      "expected_text": "1.滚轮选中Fast档",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_RHYTHM,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先归一到 Slow，再顺时针两档选择 Fast；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_012",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.Rhythm滚轮已选中Fast",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.Breathe设置页的Rhythm显示Fast",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_013",
+      "sheet": "呼吸训练",
+      "priority": "P2",
+      "precondition_text": "1.Rhythm已设置为Slow",
+      "steps_text": "1.退出Breathe\n2.重新进入Breathe",
+      "expected_text": "1.手表显示进入前页面\n2.Rhythm仍显示Slow",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "退出动作可模拟，但当前缺按应用语义重新点击 Breathe 入口的通用命令；不能用 ENTER_PAGE 代替重新进入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_014",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.点击Time条目\n2.观察滚轮第一个档位\n3.观察滚轮第二个档位\n4.观察滚轮第三个档位",
+      "expected_text": "1.手表显示Time滚轮页\n2.第一个档位显示01分钟\n3.第二个档位显示02分钟\n4.第三个档位显示03分钟",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Time 条目范围来自当前 BREATH_TRAIN Designer：x=18..384、y=50..142；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_015",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time滚轮页",
+      "steps_text": "1.旋转编码器选中01",
+      "expected_text": "1.滚轮选中01分钟",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_TIME,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "直达Time滚轮前置后先逆时针归一到下限，复用QDEC_SET验证01分钟档；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_016",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time滚轮页",
+      "steps_text": "1.旋转编码器选中02",
+      "expected_text": "1.滚轮选中02分钟",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_TIME,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先逆时针归一到01，再顺时针一档，复用QDEC_SET验证02分钟档；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_017",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time滚轮页",
+      "steps_text": "1.旋转编码器选中03",
+      "expected_text": "1.滚轮选中03分钟",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_TIME,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先逆时针归一到01，再顺时针两档，复用QDEC_SET验证03分钟档；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_018",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.Time滚轮已选中03",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.Breathe设置页的Time显示03 min",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_019",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time滚轮页",
+      "steps_text": "1.完整滚动Time滚轮\n2.检查最小档位\n3.检查中间档位\n4.检查最大档位",
+      "expected_text": "1.滚轮不显示范围外档位\n2.最小档位显示01分钟\n3.中间档位显示02分钟\n4.最大档位显示03分钟",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN_TIME,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1901;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1902;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1903;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "复用QDEC_SET从下限逐档滚动并在01、02、03和越界尝试后分阶段截图；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "逆时针归一后，截图显示最小档位01分钟",
+        "顺时针一档后，截图显示中间档位02分钟",
+        "再顺时针一档后，截图显示最大档位03分钟",
+        "在最大档继续顺时针后，截图仍停在03且不显示范围外档位"
+      ]
+    },
+    {
+      "case_id": "BRTH_020",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe设置页",
+      "steps_text": "1.点击Vibration条目",
+      "expected_text": "1.手表显示弱中强三档滚轮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "先滚动设置页使 y=258..350 的 Vibration 条目进入可视区，再点击条目中心区域；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_021",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Vibration滚轮页",
+      "steps_text": "1.点击Soft选项",
+      "expected_text": "1.手表按Soft档强度振动一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Vibration 三档滚轮范围 y=73..211，点击首档 Soft；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_022",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Vibration滚轮页",
+      "steps_text": "1.点击Moderate选项",
+      "expected_text": "1.手表按Moderate档强度振动一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Vibration 三档滚轮范围 y=73..211，点击中档 Moderate；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_023",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Vibration滚轮页",
+      "steps_text": "1.点击Strong选项",
+      "expected_text": "1.手表按Strong档强度振动一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Vibration 三档滚轮范围 y=73..211，点击末档 Strong；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_024",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.Vibration滚轮已选中Strong",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.Breathe设置页的Vibration显示Strong",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_025",
+      "sheet": "呼吸训练",
+      "priority": "P2",
+      "precondition_text": "1.Vibration已设置为Moderate",
+      "steps_text": "1.重启手表\n2.重新进入Breathe",
+      "expected_text": "1.手表完成开机\n2.Vibration仍显示Moderate",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_026",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示Breathe设置页",
+      "steps_text": "1.点击播放按钮",
+      "expected_text": "1.手表显示Calm down或Focus on breathing提示",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "BRTH_027",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示呼吸提示语页",
+      "steps_text": "1.记录提示语页持续时间",
+      "expected_text": "1.提示语页持续3秒",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_028",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示呼吸提示语页",
+      "steps_text": "1.等待3秒",
+      "expected_text": "1.手表振动250毫秒一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_029",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示呼吸提示语页",
+      "steps_text": "1.等待3秒",
+      "expected_text": "1.手表显示Inhale训练状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_030",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示呼吸提示语页",
+      "steps_text": "1.等待提示语结束",
+      "expected_text": "1.背部心率绿灯开始工作",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "业务阶段和数值可模拟；背部传感器物理灯仍需真机 GPIO 或相机观察；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_031",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练已进入吸气阶段",
+      "steps_text": "1.观察吸气阶段文案\n2.观察吸气阶段图标",
+      "expected_text": "1.页面显示Inhale\n2.图标逐渐放大",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_032",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练已进入吸气阶段",
+      "steps_text": "1.逐帧观察吸气阶段录像",
+      "expected_text": "1.吸气阶段图标逐渐放大并连续旋转",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_033",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练即将切入吸气阶段",
+      "steps_text": "1.等待阶段切换",
+      "expected_text": "1.手表振动250毫秒一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_034",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练已进入呼气阶段",
+      "steps_text": "1.观察呼气阶段文案\n2.观察呼气阶段图标",
+      "expected_text": "1.页面显示Exhale\n2.图标逐渐缩小",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_035",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练已进入呼气阶段",
+      "steps_text": "1.逐帧观察呼气阶段录像",
+      "expected_text": "1.呼气阶段图标逐渐缩小并连续旋转",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_036",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练即将切入呼气阶段",
+      "steps_text": "1.等待阶段切换",
+      "expected_text": "1.手表振动250毫秒一次",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_037",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Slow\n3.Time已设置为01分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成6次吸气到呼气循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_038",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Moderate\n3.Time已设置为01分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成7次吸气到呼气循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_039",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Fast\n3.Time已设置为01分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成8次吸气到呼气循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_040",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Slow\n3.Time已设置为02分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成12次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_041",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Moderate\n3.Time已设置为02分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成14次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_042",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Fast\n3.Time已设置为02分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成16次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_043",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Slow\n3.Time已设置为03分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成18次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_044",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Moderate\n3.Time已设置为03分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成21次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_045",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Rhythm已设置为Fast\n3.Time已设置为03分钟",
+      "steps_text": "1.完成整段呼吸训练",
+      "expected_text": "1.页面完成24次吸气到呼气循环后跳转Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_046",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.系统灭屏时间设为5秒\n3.呼吸训练正在运行",
+      "steps_text": "1.保持手表静止超过5秒",
+      "expected_text": "1.呼吸训练页面保持亮屏",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_047",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.执行垂腕动作",
+      "expected_text": "1.呼吸训练页面保持亮屏",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_048",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.用手掌覆盖屏幕",
+      "expected_text": "1.手表退出呼吸训练状态",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_049",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.单击实体按键",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用佩戴状态和Breathe运行页前置，实体主键短按后以运行页与主表盘两张截图验证退出；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET。",
+      "verification_points": [
+        "按键前截图显示呼吸训练正在运行",
+        "单击实体按键后，截图显示主表盘"
+      ]
+    },
+    {
+      "case_id": "BRTH_050",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示Breathe设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+    },
+    {
+      "case_id": "BRTH_051",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表未佩戴\n2.呼吸训练正在运行",
+      "steps_text": "1.等待一个完整吸呼循环",
+      "expected_text": "1.页面不显示佩戴提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_052",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time已设置为01分钟",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Duration显示00:01:00",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_053",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time已设置为02分钟",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Duration显示00:02:00",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_054",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time已设置为03分钟",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Duration显示00:03:00",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_055",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.训练采样包含非零心率值与零值",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Avg HR显示非零样本的平均值",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_056",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.训练全程未产生非零心率值",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Avg HR显示--",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "一分钟等待本身可执行；当前缺少可确定建立“训练全程无非零心率样本”并从设置页真实开始、完成到小结页的通用训练会话能力，不能用直接跳转小结冒充完整训练；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_057",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.呼吸训练已完成",
+      "steps_text": "1.观察小结心率区域\n2.观察小结时长区域\n3.观察小结操作区域",
+      "expected_text": "1.页面显示Avg HR\n2.页面显示Duration\n3.页面显示重测按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_058",
+      "sheet": "呼吸训练",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Breathe Summary",
+      "steps_text": "1.点击重测按钮",
+      "expected_text": "1.手表显示呼吸提示语页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "重测按钮位于 BREATH_TRAIN_END 的 y=234 后续内容，先滚动再点击；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_059",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe Summary",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示Breathe设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "BRTH_060",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Breathe Summary",
+      "steps_text": "1.单击实体按键",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_061",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练已运行30秒",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.Breathe设置页不显示本次小结",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+    },
+    {
+      "case_id": "BRTH_062",
+      "sheet": "呼吸训练",
+      "priority": "P2",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time已设置为01分钟",
+      "steps_text": "1.连续完成3次呼吸训练",
+      "expected_text": "1.第三次训练结束后仍显示Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_063",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time为02分钟\n3.Rhythm为Fast\n4.Vibration为Strong\n5.手表显示Breathe Summary",
+      "steps_text": "1.点击重测按钮",
+      "expected_text": "1.新训练按02分钟设置启动",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "BRTH_064",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.训练过程仅产生零值心率样本",
+      "steps_text": "1.完成本次呼吸训练",
+      "expected_text": "1.Avg HR不显示0 bpm",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "一分钟等待本身可执行；SIM_SENSOR_SET的silent表示无样本，不能建立“仅产生零值样本”的不同前置条件，当前缺可复用的呼吸训练心率样本序列能力；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_065",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.从另一台手机拨打绑定手机\n2.在手机端挂断来电\n3.查看呼吸训练页面和小结",
+      "expected_text": "1.手表显示来电页面\n2.待产品确认：来电结束后返回训练页还是其他页面\n3.待产品确认：训练计时是否继续，以及是否生成小结",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "BRTH_066",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.推送一条消息",
+      "expected_text": "1.待产品确认：消息结束后的训练页面与计时结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_067",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行\n3.测试闹钟将在1分钟内响铃",
+      "steps_text": "1.等待闹钟响铃\n2.关闭闹钟\n3.查看呼吸训练页面、剩余时间和小结",
+      "expected_text": "1.手表显示闹钟响铃页\n2.待产品确认：关闭闹钟后返回训练页还是其他页面\n3.待产品确认：训练计时是否继续，以及是否生成小结",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "BRTH_068",
+      "sheet": "呼吸训练",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.Time已设置为03分钟",
+      "steps_text": "1.完整执行一次呼吸训练",
+      "expected_text": "1.训练结束后显示Breathe Summary",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "BRTH_069",
+      "sheet": "呼吸训练",
+      "priority": "P2",
+      "precondition_text": "1.准备Android与iOS支持版本手机\n2.手表已绑定配套App",
+      "steps_text": "1.分别连接Android与iOS后进入Breathe",
+      "expected_text": "1.两平台连接下手表均显示相同三项设置范围",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "BRTH_070",
+      "sheet": "呼吸训练",
+      "priority": "P2",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.呼吸训练正在运行",
+      "steps_text": "1.观察三个完整吸呼循环",
+      "expected_text": "1.图标缩放与旋转过程无黑屏闪断",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    }
+  ]
+}

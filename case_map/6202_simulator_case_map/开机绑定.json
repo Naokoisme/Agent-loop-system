@@ -1,0 +1,1766 @@
+{
+  "profile": "6202_W5230_SIMULATOR",
+  "sheet": "开机绑定",
+  "cases": [
+    {
+      "case_id": "START_001",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已恢复出厂、未绑定且关机",
+      "steps_text": "1.长按编码器3秒",
+      "expected_text": "1.播放Titan开机动画",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实体主键3000ms长按和等待本身可执行；但当前运行工作区未注册FACTORY_RESET，且恢复出厂会重启并要求执行器重连，无法可靠建立“已恢复出厂、未绑定且关机”的进入条件；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+    },
+    {
+      "case_id": "START_002",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已恢复出厂、未绑定且关机",
+      "steps_text": "1.用可编程按压治具按住编码器2.9秒后松开",
+      "expected_text": "1.手表保持关机",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "BUTTON_PRESS支持2900ms精确长按，等待也可执行；但当前运行工作区缺少可重连的恢复出厂能力，无法可靠建立“已恢复出厂、未绑定且关机”的进入条件；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_003",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已触发开机动画",
+      "steps_text": "1.观察动画首帧至结束的画面",
+      "expected_text": "1.开机动画连续显示Titan品牌Logo与三色圆环装饰",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "开机动画流程模拟器无法复现；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_004",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.振动采集仪已连接",
+      "steps_text": "1.采集手表开机时的振动波形",
+      "expected_text": "1.振动采集仪记录一次约250毫秒的短振",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/工具: 1.采集手表开机时的振动波形；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_005",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.BLE扫描工具已打开并开始记录附近设备广播",
+      "steps_text": "1.观察手表开机时的BLE扫描结果",
+      "expected_text": "1.扫描工具在开机流程开始后发现该手表的可绑定广播",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/工具: 1.观察手表开机时的BLE扫描结果；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_006",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.手表已进入开机动画",
+      "steps_text": "1.等待开机动画自然播放结束",
+      "expected_text": "1.手表自动进入语言选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测模拟器 power_off/长按开机链路不工作: 1.等待开机动画自然播放结束；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "START_007",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表曾成功绑定且未恢复出厂\n2.手表当前关机",
+      "steps_text": "1.长按编码器3秒开机，等待开机结束",
+      "expected_text": "1.手表直接进入主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用已绑定连接状态和模拟PMIC开机阈值路径，3000ms主键长按后等待开机结束并截图主表盘；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "START_008",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表当前关机",
+      "steps_text": "1.长按编码器3秒开机",
+      "expected_text": "1.手表直接进入主表盘，语言选择页不出现",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "3000ms关机态主键长按已可执行；当前缺幂等建立Pair Later且从未绑定的持久化开机状态，APP_CONNECT断开不能替代该前置；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_009",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.手表停留在任一开机引导页且屏幕已亮",
+      "steps_text": "1.保持1分钟不触摸屏幕或按键",
+      "expected_text": "1.屏幕按固定1分钟超时自动熄灭",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "一分钟等待可由SIM_WAIT执行；人工前置同时写出厂未绑定且关机、又写任一开机引导页已亮屏，状态互相矛盾，需先明确起始状态；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_010",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.手表已进入开机引导页",
+      "steps_text": "1.在引导页查找亮屏时长设置入口\n2.将其他系统页亮屏时长设为15s\n3.返回开机引导页\n4.在开机引导页保持无操作",
+      "expected_text": "1.引导页不显示可修改的亮屏时长入口\n2.其他系统页亮屏时长显示为15s\n3.手表显示开机引导页\n4.引导页在固定1分钟时熄屏",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "一分钟等待和亮屏时长设置均可执行；真正缺口是当前运行工作区不能可靠建立并重连出厂未绑定开机引导页，且需跨引导页和普通系统页核对固定超时规则；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "START_011",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.手表已进入语言选择页",
+      "steps_text": "1.观察标题、时间、列表和当前选中项",
+      "expected_text": "1.页面标题显示English对应译文Language，并显示当前时间和带滚动条的语言列表，English右侧显示绿色勾选图标",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LANGUAGE_LIST,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_012",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入语言选择页且列表位于顶部",
+      "steps_text": "1.在语言列表执行一次上滑",
+      "expected_text": "1.列表滚动位置移动到下方内容",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_013",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入语言选择页且列表不在顶部",
+      "steps_text": "1.在语言列表执行一次下滑",
+      "expected_text": "1.列表滚动位置移动到上方内容",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_014",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入语言选择页且列表可滚动",
+      "steps_text": "1.顺时针旋转编码器\n2.逆时针旋转编码器",
+      "expected_text": "1.语言列表向上滚动\n2.语言列表向下滚动",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LANGUAGE_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:90140;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:90141;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:90142;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "旋转前语言列表处于初始位置",
+        "顺时针旋转后语言列表向上滚动",
+        "逆时针旋转后语言列表向下滚动"
+      ]
+    },
+    {
+      "case_id": "START_015",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入语言选择页\n2.English处于可点击状态",
+      "steps_text": "1.点击English列表项",
+      "expected_text": "1.English被选中后手表自动进入Scan to Pair页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测点击English后跳DIAL而非Scan to Pair页(模拟器无引导上下文)；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_016",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入语言选择页\n2.当前版本仅实现English",
+      "steps_text": "1.检查阿拉伯语、越南语、印度尼西亚语等非英文项的可选状态",
+      "expected_text": "1.非英文项不提供可完成的语言切换流程，手表语言保持English",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LANGUAGE_LIST,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_017",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App支持切换至当前固件已实现的目标语言",
+      "steps_text": "1.在App切换语言以触发同步\n2.在手表设置列表查找Language入口",
+      "expected_text": "1.手表界面语言同步为App目标语言\n2.手表设置列表不显示本地Language切换入口",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App切换语言以触发同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_018",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已从语言页进入Scan to Pair页",
+      "steps_text": "1.观察页面左侧区域\n2.观察页面右侧和底部区域",
+      "expected_text": "1.左侧显示Scan to Pair和设备蓝牙名称\n2.右侧显示二维码与灰色文字Pair Later入口，页面不显示旧System Information入口",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_019",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.测试工具可读取手表MAC地址",
+      "steps_text": "1.读取页面设备名\n2.读取手表MAC地址后四位",
+      "expected_text": "1.页面设备名格式为TI_S6603_XXXX\n2.设备名XXXX与MAC地址后四位一致",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_020",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.Android手机已安装并登录配套App\n3.手机蓝牙和相机权限已开启",
+      "steps_text": "1.在App内扫描手表二维码",
+      "expected_text": "1.Android App识别设备并发起该手表的配对请求",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App内扫描手表二维码；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_021",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.iOS手机已安装并登录配套App\n3.手机蓝牙和相机权限已开启",
+      "steps_text": "1.在App内扫描手表二维码",
+      "expected_text": "1.iOS App识别设备并发起该手表的配对请求",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App内扫描手表二维码；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_022",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.配套App已登录且手机蓝牙开启",
+      "steps_text": "1.使用App扫描手表二维码",
+      "expected_text": "1.手表直接进入配对结果页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.使用App扫描手表二维码；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_023",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.测试手机未安装配套App",
+      "steps_text": "1.使用手机系统相机扫描二维码",
+      "expected_text": "1.手机打开Titan Smart World App的安装或下载引导",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.使用手机系统相机扫描二维码；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_024",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Scan to Pair页",
+      "steps_text": "1.在页面执行右滑",
+      "expected_text": "1.手表返回语言选择页并保留English选中态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测未验证QRCODE页右滑的返回目标；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_025",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Scan to Pair页",
+      "steps_text": "1.点击Pair Later",
+      "expected_text": "1.手表进入数据未保存确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测 QRCODE 页 Pair Later 按钮在屏幕外(y=345>256)且滑动是切页,不可点击；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_026",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.手机蓝牙已开启\n3.配套App已登录并进入设备搜索页",
+      "steps_text": "1.点击App搜索结果中的TI_S6603设备",
+      "expected_text": "1.手表弹出Confirm to Pair确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.点击App搜索结果中的TI_S6603设备；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_027",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.App蓝牙搜索已触发Confirm to Pair页",
+      "steps_text": "1.观察确认页内容",
+      "expected_text": "1.页面呈现Confirm to Pair标题与双按钮布局",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Confirm to Pair 页(WHETHER_TO_BIND)实测导致模拟器崩溃,无法进入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_028",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示Confirm to Pair页\n2.App保持配对请求有效",
+      "steps_text": "1.点击绿色确认按钮",
+      "expected_text": "1.手表进入显示loading动画的Pairing过渡状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_029",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示Confirm to Pair页",
+      "steps_text": "1.点击灰色取消按钮",
+      "expected_text": "1.确认页关闭并返回Scan to Pair页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_030",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示Confirm to Pair页\n2.振动采集仪已连接",
+      "steps_text": "1.采集点击绿色确认按钮时的振动波形",
+      "expected_text": "1.振动采集仪记录一次约250毫秒的短振",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.采集点击绿色确认按钮时的振动波形；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_031",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示Pairing过渡状态\n2.手机与手表连接可被测试工具中断",
+      "steps_text": "1.中断手机与手表之间的BLE信号",
+      "expected_text": "1.手表进入Pairing Failed页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.中断手机与手表之间的BLE信号；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_032",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示Confirm to Pair页\n2.App仍显示等待用户确认的配对请求",
+      "steps_text": "1.在手机端取消本次配对请求",
+      "expected_text": "1.手表关闭确认页并返回Scan to Pair页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在手机端取消本次配对请求；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_033",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.两台已登录配套App的手机均可发现手表",
+      "steps_text": "1.手机A先发起配对请求\n2.手机B随后发起配对请求\n3.在手表确认当前请求",
+      "expected_text": "1.手表显示手机A对应的首个配对请求\n2.手机B请求不替换当前确认页\n3.配对结果归属于手机A",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.手机A先发起配对请求；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_034",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.App与手表已完成配对\n2.手表进入配对成功页",
+      "steps_text": "1.观察成功页文案\n2.计时观察成功页面3秒",
+      "expected_text": "1.页面显示Pairing Successful!\n2.3秒后手表自动进入主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "3秒自动跳转依赖执行器等待能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_035",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表即将进入配对成功页\n2.振动采集仪已连接",
+      "steps_text": "1.采集配对成功页的振动波形",
+      "expected_text": "1.振动波形为250毫秒振动两次，间隔750毫秒",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:COMMON_BIND_RESULT,2;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/工具: 1.采集配对成功页的振动波形；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_036",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.App返回配对失败结果\n2.手表进入配对失败页",
+      "steps_text": "1.观察失败页文案\n2.计时观察失败页面3秒",
+      "expected_text": "1.页面显示Pairing Failed!\n2.3秒后手表自动返回Scan to Pair页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "3秒自动跳转依赖执行器等待能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_037",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表即将进入配对失败页\n2.振动采集仪已连接",
+      "steps_text": "1.采集配对失败页的振动波形",
+      "expected_text": "1.振动波形为250毫秒振动两次，间隔750毫秒",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:COMMON_BIND_RESULT,3;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/工具: 1.采集配对失败页的振动波形；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_038",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表正在显示配对成功页或配对失败页",
+      "steps_text": "1.在结果页自动跳转前执行右滑",
+      "expected_text": "1.手表返回本次结果页的上一级配对页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测未验证结果页右滑的返回目标；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_039",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已在Scan to Pair页点击Pair Later",
+      "steps_text": "1.观察页面图标、文案和按钮",
+      "expected_text": "1.页面显示蓝色圆形背景白色ⓘ图标和文案Your data will not be saved until you pair the watch. Do you want to continue?和灰色<按钮和蓝色Continue按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "数据未保存确认页(SKIP_BIND_CONFIRM)实测无法进入(Pair Later 按钮屏幕外不可点)；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_040",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示数据未保存确认页",
+      "steps_text": "1.点击左侧返回按钮",
+      "expected_text": "1.灰色<按钮响应，手表返回Scan to Pair页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "数据未保存确认页(SKIP_BIND_CONFIRM)实测无法进入(Pair Later 按钮屏幕外不可点)；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_041",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示数据未保存确认页",
+      "steps_text": "1.点击Continue",
+      "expected_text": "1.蓝色Continue按钮响应，手表进入个人信息Step 1日期设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "数据未保存确认页(SKIP_BIND_CONFIRM)实测无法进入(Pair Later 按钮屏幕外不可点)；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_042",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入个人信息设置流程",
+      "steps_text": "1.逐步进入六个个人信息设置页面",
+      "expected_text": "1.每个步骤均常驻显示6个进度圆点和当前步骤圆点高亮和标题旁ⓘ入口及底部蓝色✓确认按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "多页遍历/返回链,单用例 collect 无法覆盖全部页面；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_043",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 1日期设置页",
+      "steps_text": "1.观察默认日期和滚轮列\n2.滚动年份到最小值\n3.滚动年份到最大值\n4.查找Skip入口",
+      "expected_text": "1.页面标题显示Set Current Date ⓘ，默认呈现01/Jan/2026三列日期，当前选中值蓝色高亮\n2.年份最小值为2026\n3.年份最大值为2126\n4.页面不显示Skip入口",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "滚动到极值需未知次数滚轮操作；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: DATE_SETTING。"
+    },
+    {
+      "case_id": "START_044",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已完成Step 1至Step 6的可保存测试值设置",
+      "steps_text": "1.在Step 6点击左上角<按钮\n2.在Step 5点击左上角<按钮\n3.在Step 4点击左上角<按钮\n4.在Step 3点击左上角<按钮\n5.在Step 2点击左上角<按钮\n6.在Step 1点击左上角<按钮",
+      "expected_text": "1.手表返回Step 5，已确认身高值保持显示\n2.手表返回Step 4，保留已确认出生日期\n3.手表返回Step 3，保留已确认性别\n4.手表返回Step 2，保留已确认时间\n5.手表返回Step 1，保留已确认日期\n6.手表返回数据未保存确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "多页遍历/返回链,单用例 collect 无法覆盖全部页面；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_045",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 1日期设置页",
+      "steps_text": "1.在日期滚轮执行上滑\n2.在日期滚轮执行下滑\n3.旋转编码器调整当前列\n4.点击确认按钮",
+      "expected_text": "1.当前列切换到相邻后一个数值\n2.当前列切换到相邻前一个数值\n3.当前列随编码器按单位1渐进变化\n4.手表保存日期并进入Step 2时间设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "日滚轮范围 x=256..365、y=77..165，确认按钮范围来自当前 DATE_SETTING Designer；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "日列上滑后切换到相邻后一个数值",
+        "日列下滑后切换到相邻前一个数值",
+        "聚焦日列后编码器按单位1调整",
+        "点击确认后保存日期并进入时间设置页"
+      ]
+    },
+    {
+      "case_id": "START_046",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 2时间设置页",
+      "steps_text": "1.观察默认时间、滚轮列和单位入口\n2.提交已调整的小时与分钟",
+      "expected_text": "1.页面标题显示Set Current Time ⓘ，以小时:分钟两列呈现不可切换的24小时制00:00，当前选中值蓝色高亮，不显示Skip入口\n2.手表保存时间并进入Step 3性别页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_047",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 3性别页\n2.尚未选择任一性别",
+      "steps_text": "1.观察三个性别选项和确认按钮\n2.点击置灰确认按钮",
+      "expected_text": "1.页面标题显示Let's get to know You ⓘ，，呈现♂ Male和♀ Female和⚥ Prefer not to say三个选项与置灰确认按钮\n2.页面停留在Step 3",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_048",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 3性别页",
+      "steps_text": "1.点击Female选项\n2.点击高亮确认按钮",
+      "expected_text": "1.Female选项呈现可确认选中态\n2.手表进入Step 4出生日期页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "Female 选项呈现可确认选中态",
+        "点击高亮确认后进入出生日期页"
+      ]
+    },
+    {
+      "case_id": "START_049",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 3性别页\n2.已连接算法日志工具，可查看性别参数",
+      "steps_text": "1.使用Prefer not to say资料完成设置\n2.触发一次使用性别参数的健康指标计算",
+      "expected_text": "1.手表保存Prefer not to say选项\n2.算法日志显示本次计算采用系统默认性别参数",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.使用Prefer not to say资料完成设置；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: GENDER_EDIT。"
+    },
+    {
+      "case_id": "START_050",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 4出生日期页",
+      "steps_text": "1.观察默认日期\n2.滚动年份到最小值\n3.滚动年份到最大值",
+      "expected_text": "1.页面标题显示When were you Born? ⓘ，默认显示01/Jan/2001，当前选中值蓝色高亮\n2.年份最小值为1926\n3.年份最大值为2026",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "滚动到极值需未知次数滚轮操作；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: BIRTH_DATE_EDIT。"
+    },
+    {
+      "case_id": "START_051",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 4出生日期页\n2.设备当前日期已固定",
+      "steps_text": "1.选择恰好满18岁的出生日期\n2.点击确认按钮",
+      "expected_text": "1.出生日期显示恰好满18岁的选择值\n2.手表通过年龄校验并进入Step 5身高页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "精确日期选择需大量滚轮操作且依赖设备当前日期；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: BIRTH_DATE_EDIT；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_052",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 4出生日期页\n2.设备当前日期已固定",
+      "steps_text": "1.选择距离18岁生日还差1天的出生日期\n2.点击确认按钮",
+      "expected_text": "1.出生日期值保持当前选择\n2.手表进入年龄校验页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "精确日期选择需大量滚轮操作且依赖设备当前日期；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: BIRTH_DATE_EDIT；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_053",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入个人信息设置流程并可逐步切换",
+      "steps_text": "1.在日期步骤点击说明图标\n2.在时间步骤点击说明图标\n3.在性别步骤点击说明图标\n4.在出生日期步骤点击说明图标\n5.在身高步骤点击说明图标\n6.在体重步骤点击说明图标",
+      "expected_text": "1.说明页显示Set the correct date on your watch. It will be used until pairing. You can update it anytime in Settings. Once paired, the date will sync automatically from the app.\n2.说明页显示Set the correct time on your watch. It will be used until pairing. You can update it anytime in Settings. Once paired, the time will sync automatically from the app.\n3.说明页显示Gender is used to calculate key health and fitness metrics. Please select it accurately for best results. You can update it anytime in Settings.\n4.说明页显示Age is used to calculate key health and fitness metrics. Please select your date of birth accurately for better results. You can update it anytime in Settings. Age must be 18 or older.\n5.说明页显示Height and Weight are used to calculate key health and fitness metrics. Please select them accurately for better results. You can update them anytime in Settings.\n6.说明页显示Height and Weight are used to calculate key health and fitness metrics. Please select them accurately for better results. You can update them anytime in Settings.",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_054",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.任一个人信息说明页已打开\n2.进入说明页前已修改当前设置值",
+      "steps_text": "1.在说明页执行右滑\n2.再次打开当前步骤说明页\n3.点击说明页左侧<按钮",
+      "expected_text": "1.手表恢复进入说明页前的设置页面与数值\n2.手表再次显示当前步骤说明页\n3.手表恢复进入说明页前的设置页面与数值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+    },
+    {
+      "case_id": "START_055",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 5身高页\n2.此前性别选择Female",
+      "steps_text": "1.观察默认单位和默认值\n2.将身高滚轮设置为62cm\n3.滚动到上限\n4.向相邻档位滚动一次",
+      "expected_text": "1.页面标题显示What is your Height? ⓘ，ft模式以英尺和英寸两列显示Female默认身高5英尺0英寸，当前选中值蓝色高亮\n2.cm下限为62cm\n3.cm上限为275cm\n4.相邻档位按1单位变化",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "精确数值设置需多次滚轮操作: 2.将身高滚轮设置为62cm；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEIGHT_EDIT。"
+    },
+    {
+      "case_id": "START_056",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 5身高页\n2.当前身高为合法cm数值",
+      "steps_text": "1.点击单位按钮切换为ft\n2.再次点击单位按钮切换为cm",
+      "expected_text": "1.页面以英尺和英寸两列显示处于合法范围的换算值\n2.页面以单列厘米显示与原身高等价的换算值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "切换为 ft 后显示合法范围的英尺和英寸换算值",
+        "切回 cm 后显示与原身高等价的厘米值"
+      ]
+    },
+    {
+      "case_id": "START_057",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 5身高页\n2.此前性别选择Female",
+      "steps_text": "1.点击Skip",
+      "expected_text": "1.手表采用Female默认身高5英尺0英寸并进入单机完成页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测 Skip 按钮默认不可见(vis=False)；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEIGHT_EDIT；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_058",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 5身高页\n2.当前身高值合法",
+      "steps_text": "1.点击确认按钮",
+      "expected_text": "1.手表保存身高并进入Step 6体重页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_059",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 6体重页\n2.此前性别选择Female",
+      "steps_text": "1.观察默认单位和默认值\n2.滚动到kg下限\n3.滚动到kg上限\n4.向相邻档位滚动一次",
+      "expected_text": "1.页面标题显示What is your Weight? ⓘ，默认显示Female体重55kg，当前选中值蓝色高亮\n2.kg下限为20kg\n3.kg上限为250kg\n4.相邻档位按1单位变化",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "滚动到极值需未知次数滚轮操作；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_060",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入个人信息设置流程\n2.Step 3已选择Male",
+      "steps_text": "1.进入Step 5身高页\n2.将ft滚轮调整至最小值\n3.将ft滚轮调整至最大值\n4.进入Step 6体重页\n5.将lbs模式数值调至最小值\n6.将lbs滚轮调整至最大值",
+      "expected_text": "1.页面默认显示男性身高5英尺5英寸\n2.ft范围下限为2ft\n3.ft范围上限为9ft\n4.页面默认显示男性体重65kg\n5.lbs范围下限为44lb\n6.lbs范围上限为551lb",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_061",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 6体重页\n2.当前体重为合法kg数值",
+      "steps_text": "1.点击单位按钮切换为lbs\n2.再次点击单位按钮切换为kg",
+      "expected_text": "1.页面显示处于合法范围的磅换算值\n2.页面显示与原体重等价的千克换算值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "切换为 lbs 后显示合法范围的磅换算值",
+        "切回 kg 后显示与原体重等价的千克值"
+      ]
+    },
+    {
+      "case_id": "START_062",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 6体重页\n2.此前性别选择Female",
+      "steps_text": "1.点击Skip",
+      "expected_text": "1.手表采用Female默认体重55kg并进入单机完成页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测 Skip 按钮默认不可见(vis=False)；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_063",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入Step 6体重页\n2.当前体重值合法",
+      "steps_text": "1.点击确认按钮",
+      "expected_text": "1.手表保存体重并进入单机完成页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_064",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表处于个人信息Step 4且已修改出生日期\n2.测试电源可安全断开",
+      "steps_text": "1.断开设备电源\n2.启动恢复供电的手表",
+      "expected_text": "1.设备断电时不写入未确认步骤\n2.手表恢复到含断电前日期值的Step 4",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_065",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 2时间设置页\n2.小时列当前值为10",
+      "steps_text": "1.在小时列上滑一档\n2.观察小时列选中项样式\n3.在小时列下滑一档\n4.观察小时列选中项样式",
+      "expected_text": "1.小时列选中值切换为11\n2.小时列选中值11显示蓝色高亮\n3.小时列选中值返回10\n4.小时列选中值10显示蓝色高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
+      "verification_points": [
+        "小时列上滑后值为11且蓝色高亮",
+        "小时列下滑后返回10且蓝色高亮"
+      ]
+    },
+    {
+      "case_id": "START_066",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 4出生日期页\n2.日列当前值为10",
+      "steps_text": "1.在日列上滑一档\n2.观察日列选中项样式\n3.在日列下滑一档\n4.观察日列选中项样式",
+      "expected_text": "1.日列选中值切换为11\n2.日列选中值11显示蓝色高亮\n3.日列选中值返回10\n4.日列选中值10显示蓝色高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
+      "verification_points": [
+        "日列上滑后值为11且蓝色高亮",
+        "日列下滑后返回10且蓝色高亮"
+      ]
+    },
+    {
+      "case_id": "START_067",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 5身高页\n2.cm滚轮当前值为170",
+      "steps_text": "1.在cm滚轮上滑一档\n2.观察cm滚轮选中项样式\n3.在cm滚轮下滑一档\n4.观察cm滚轮选中项样式",
+      "expected_text": "1.当前选中值切换为171cm\n2.选中值171cm显示蓝色高亮\n3.当前选中值返回170cm\n4.选中值170cm显示蓝色高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
+      "verification_points": [
+        "cm 滚轮上滑后值为171且蓝色高亮",
+        "cm 滚轮下滑后返回170且蓝色高亮"
+      ]
+    },
+    {
+      "case_id": "START_068",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Step 6体重页\n2.kg滚轮当前值为60",
+      "steps_text": "1.在kg滚轮上滑一档\n2.观察kg滚轮选中项样式\n3.在kg滚轮下滑一档\n4.观察kg滚轮选中项样式",
+      "expected_text": "1.当前选中值切换为61kg\n2.选中值61kg显示蓝色高亮\n3.当前选中值返回60kg\n4.选中值60kg显示蓝色高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
+      "verification_points": [
+        "kg 滚轮上滑后值为61且蓝色高亮",
+        "kg 滚轮下滑后返回60且蓝色高亮"
+      ]
+    },
+    {
+      "case_id": "START_069",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.出生日期校验结果为未满18岁",
+      "steps_text": "1.观察年龄校验页",
+      "expected_text": "1.页面显示You must be 18 years or older to use this watch.和蓝色确认按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UNDER_18_TIP。"
+    },
+    {
+      "case_id": "START_070",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示年龄校验页\n2.出生日期页保留未满18岁的选择值",
+      "steps_text": "1.点击年龄校验页确认按钮\n2.再次触发年龄校验页后执行右滑",
+      "expected_text": "1.手表返回出生日期页并保留原选择值\n2.手表返回出生日期页并保留原选择值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
+      "verification_points": [
+        "确认后返回出生日期页并保留原值",
+        "再次触发年龄校验页并右滑后返回出生日期页且保留原值"
+      ]
+    },
+    {
+      "case_id": "START_071",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.个人信息设置流程已完成",
+      "steps_text": "1.观察单机完成页",
+      "expected_text": "1.页面显示Great 💪 You are all set.和蓝色Get Started按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: INFO_SETTING_COMPLETE。"
+    },
+    {
+      "case_id": "START_072",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示单机完成页",
+      "steps_text": "1.点击Get Started",
+      "expected_text": "1.手表进入主表盘并保持未绑定单机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测未验证Get Started点击后的跳转目标；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "START_073",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.设备时间可推进到首次激活后的第5天",
+      "steps_text": "1.将设备运行推进到第1周第5天的提醒时点",
+      "expected_text": "1.手表显示一次数据同步提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_074",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.第5天提醒已触发并关闭",
+      "steps_text": "1.将设备运行推进到第1周第7天的提醒时点",
+      "expected_text": "1.手表显示第二次数据同步提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_075",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.设备已运行超过两周且仍未绑定",
+      "steps_text": "1.分别推进到第2周和第3周的第5天提醒时点",
+      "expected_text": "1.每个目标时点各显示一次数据同步提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_076",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表在两个提醒时点期间保持关机",
+      "steps_text": "1.跨过两个提醒时点后开机",
+      "expected_text": "1.手表开机后只显示一次合并的数据同步提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实测模拟器 power_off/长按开机链路不工作: 1.跨过两个提醒时点后开机；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_077",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.数据同步提醒即将触发\n3.振动采集仪已连接",
+      "steps_text": "1.观察触发的数据同步提醒页面\n2.采集提醒振动波形\n3.计时观察提醒页面",
+      "expected_text": "1.页面显示Unlock the full potential of your watch. Pair it with the app to sync your data, prevent data loss, access detailed health insights, personalize settings, and track your progress.以及灰色<和蓝色Pair Now按钮\n2.振动采集值约250毫秒\n3.提醒页面显示5秒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.观察触发的数据同步提醒页面；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_078",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表从主菜单页面触发数据同步提醒",
+      "steps_text": "1.点击提醒页左侧灰色<按钮",
+      "expected_text": "1.数据同步提醒关闭，手表显示主菜单页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_079",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.设备真实运行时长尚未到首次提醒节点",
+      "steps_text": "1.将手表日期时间手动调整到首次激活后第5天之后\n2.观察真实运行未到第5天的提醒状态\n3.推进设备真实运行时长至第5天提醒节点",
+      "expected_text": "1.手表保存新的日期时间\n2.手表不因墙上时间跳变提前显示同步提醒\n3.手表在真实运行时长到达节点时显示同步提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_080",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示数据同步提醒",
+      "steps_text": "1.点击Pair Now",
+      "expected_text": "1.手表跳转到设置-System-QR to Pair二维码页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "START_081",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表曾在单机模式收到同步提醒\n2.随后已成功绑定App",
+      "steps_text": "1.推进到后续提醒时点\n2.在App解绑但不恢复出厂\n3.再次推进到后续提醒时点",
+      "expected_text": "1.已绑定状态不显示数据同步提醒\n2.手表仍保留本地数据\n3.解绑后仍不显示周期提醒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_082",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表曾完成配对且后续已解绑\n2.手表已通过Pair Later完成单机设置\n3.手表当前处于新的同步提醒周期起点\n4.设备真实运行时长可推进",
+      "steps_text": "1.将当前同步提醒周期的真实运行时长推进到第5天提醒节点",
+      "expected_text": "1.手表显示数据同步提醒，恢复出厂前的已绑定停止标记不再抑制新周期",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "需 App 数据链路: 1.将当前同步提醒周期的真实运行时长推进到第5天提醒节点；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_083",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表正显示Settings列表\n3.数据同步提醒即将触发",
+      "steps_text": "1.等待数据同步提醒触发",
+      "expected_text": "1.数据同步提醒作为全局弹窗覆盖Settings列表显示",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.等待数据同步提醒触发；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_084",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表正显示秒表计时中页面\n3.数据同步提醒即将触发",
+      "steps_text": "1.等待数据同步提醒触发\n2.等待提醒在5秒时关闭",
+      "expected_text": "1.数据同步提醒作为全局弹窗覆盖秒表页\n2.手表恢复秒表计时中页面，秒表继续计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.等待数据同步提醒触发；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_085",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.选择一个PRD明确依赖App的功能入口",
+      "steps_text": "1.点击该依赖App的功能入口",
+      "expected_text": "1.手表不进入目标功能，并显示文案To use this feature, your watch must be connected to the Titan Smart World App.以及左侧<和蓝色Pair Now按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.点击该依赖App的功能入口；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_086",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表正在显示需配对App提示页",
+      "steps_text": "1.点击Pair Now",
+      "expected_text": "1.手表跳转到设置-System-QR to Pair二维码页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_087",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表已从一个PRD明确依赖App的功能进入需配对提示页",
+      "steps_text": "1.点击Pair Now进入QR to Pair页\n2.在未完成配对时右滑退出QR to Pair页\n3.再次进入同一依赖App功能",
+      "expected_text": "1.手表显示QR to Pair二维码页\n2.手表退出二维码页，绑定状态仍为未绑定\n3.手表再次显示需配对App提示页，不进入目标功能",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_088",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示需配对App提示页",
+      "steps_text": "1.点击左侧返回按钮\n2.在再次进入的提示页执行右滑",
+      "expected_text": "1.手表返回触发提示前的上一级页面\n2.手表返回触发提示前的上一级页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_089",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示需配对App提示页",
+      "steps_text": "1.短按编码器",
+      "expected_text": "1.手表退出提示页并返回主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_090",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示需配对App提示页",
+      "steps_text": "1.主动熄屏\n2.在熄屏10秒内点亮屏幕",
+      "expected_text": "1.手表屏幕熄灭\n2.手表恢复显示需配对App提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "熄屏、10秒内等待和点亮均可执行；当前缺少可构造“需配对App提示页”及其触发来源的通用前置状态，不能用ENTER_PAGE跳到相似页面冒充；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_091",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示需配对App提示页",
+      "steps_text": "1.主动熄屏\n2.等待超过10秒后点亮屏幕",
+      "expected_text": "1.手表屏幕熄灭\n2.手表显示主表盘而非需配对App提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "熄屏、超过10秒等待和点亮均可执行；当前缺少可构造“需配对App提示页”及其返回栈的通用前置状态，无法验证超时后应返回主表盘的分支；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_092",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App",
+      "steps_text": "1.依次打开八个本地功能",
+      "expected_text": "1.八项本地功能均进入自身页面，不显示需配对App提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "多入口遍历,单用例 collect 无法覆盖；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_093",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.已取得当前版本全部App列表",
+      "steps_text": "1.记录逐项进入功能时的提示页结果",
+      "expected_text": "1.待产品确认：提供未绑定功能拦截的完整清单",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_094",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.用户从需配对App提示页点击Pair Now\n2.随后完成配对",
+      "steps_text": "1.查看配对成功页关闭后的手表页面",
+      "expected_text": "1.待产品确认：手表返回原目标功能入口或进入主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_095",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.设备可连续生成活动和健康数据",
+      "steps_text": "1.连续7天生成本地活动与健康数据",
+      "expected_text": "1.手表可查询第1天至第7天的本地数据",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.连续7天生成本地活动与健康数据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_096",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表端已设置性别、出生日期、身高和体重\n3.App账号资料与手表不同",
+      "steps_text": "1.完成手表首次绑定\n2.在App查看个人资料",
+      "expected_text": "1.手表端个人资料开始向App同步\n2.App显示手表首次绑定前保存的个人资料",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_097",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App资料与手表当前资料不同",
+      "steps_text": "1.在App提交一项个人资料修改\n2.在手表Profile页查看该项",
+      "expected_text": "1.App显示修改已保存并发起同步\n2.手表显示App修改后的资料值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App提交一项个人资料修改；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_098",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App和手表均可修改同一资料字段",
+      "steps_text": "1.在手表提交身高修改\n2.在App提交另一身高值\n3.检查双端最终值",
+      "expected_text": "1.手表新身高同步到App\n2.App后修改的身高同步到手表\n3.App和手表最终均显示App后修改的身高",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_099",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表与App已断连\n2.双端初始资料值相同",
+      "steps_text": "1.在手表修改体重\n2.在App修改体重为另一值\n3.恢复App数据连接\n4.检查双端最终值",
+      "expected_text": "1.手表本地立即显示手表修改值\n2.App本地显示App修改值\n3.App修改值最后同步到手表\n4.双端最终显示App最后完成同步的值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_100",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表与App已断连\n2.双端初始体重值相同\n3.可控制手表与App两端值的完成同步次序",
+      "steps_text": "1.在App将体重修改为测试值A\n2.恢复手表与App连接\n3.等待App体重值完成同步\n4.在手表将体重修改为测试值B\n5.等待手表体重值完成同步\n6.查看双端最终值",
+      "expected_text": "1.App显示测试值A\n2.双端连接状态显示已连接\n3.手表显示测试值A\n4.手表显示测试值B\n5.App显示测试值B\n6.双端最终体重值均为测试值B",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App将体重修改为测试值A；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_101",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.现有用户账号注册时间早于手表数据时间\n2.手机与手表UTC时间一致",
+      "steps_text": "1.完成绑定以启动历史数据同步",
+      "expected_text": "1.App接收并显示注册时间之后产生的手表数据",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.完成绑定以启动历史数据同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_102",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.现有用户账号注册时间晚于目标手表数据时间\n2.手机与手表UTC时间一致",
+      "steps_text": "1.完成绑定以启动历史数据同步",
+      "expected_text": "1.App不显示早于账号注册时间的目标手表数据",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.完成绑定以启动历史数据同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_103",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.App账号在手表使用后新注册\n2.手表存在注册前历史数据\n3.手机与手表UTC时间一致",
+      "steps_text": "1.完成绑定以启动历史数据同步",
+      "expected_text": "1.App不显示任何绑定前产生的手表历史数据",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.完成绑定以启动历史数据同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_104",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表缓存数据时间晚于手机当前时间\n2.手机与手表当前UTC时间一致",
+      "steps_text": "1.完成绑定以启动目标数据同步",
+      "expected_text": "1.App拒绝显示记录时间晚于手机当前时间的数据",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 数据链路: 1.完成绑定以启动目标数据同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_105",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手机系统时间被设置为明显错误且网络时间可用\n2.手表处于待绑定状态",
+      "steps_text": "1.在App发起绑定",
+      "expected_text": "1.App阻止历史数据同步并提示用户恢复手机时间",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App发起绑定；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_106",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表个人资料中的出生日期按错误设备时间计算为已满18岁\n3.App可将设备时间矫正为使该用户实际未满18岁的正确时间",
+      "steps_text": "1.在App完成时间矫正后的资料同步",
+      "expected_text": "1.App识别用户实际年龄不足18岁并显示修改出生日期的提示入口",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App完成时间矫正后的资料同步；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_107",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.App已安装并处于未登录状态\n2.手表处于Scan to Pair页",
+      "steps_text": "1.在App登录页查找游客登录入口\n2.在未登录状态尝试扫描手表二维码",
+      "expected_text": "1.App登录页不显示Guest或游客登录入口\n2.App显示注册或登录要求，手表绑定流程未发起",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App登录页查找游客登录入口；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_108",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表与App UTC时间差可精确设置",
+      "steps_text": "1.分别以临界值下、临界值和临界值上发起绑定同步",
+      "expected_text": "1.待产品确认：UTC时间差拒绝同步的分钟阈值与时区比较口径",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_109",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已有本地用户和健康数据",
+      "steps_text": "1.在App执行解绑\n2.检查手表本地数据和开机流程",
+      "expected_text": "1.App仅解除设备绑定关系\n2.手表保持含原数据的非首次开机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App执行解绑；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_110",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已被App解绑但未恢复出厂\n2.手表已有可核对的本地数据",
+      "steps_text": "1.使用App重新绑定同一手表\n2.检查手表原有数据",
+      "expected_text": "1.手表可重新完成绑定\n2.绑定前本地数据仍保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.使用App重新绑定同一手表；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_111",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+      "steps_text": "1.进入手表Settings列表\n2.查找Date and Time入口\n3.点击Profile入口",
+      "expected_text": "1.手表显示Settings列表\n2.列表不显示Date and Time入口\n3.手表进入个人信息设置页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_112",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已选择Pair Later，从未绑定App\n2.手表已进入Settings列表",
+      "steps_text": "1.进入Date and Time\n2.修改日期\n3.确认日期修改\n4.修改时间\n5.确认时间修改\n6.进入Profile\n7.修改一项个人资料\n8.确认个人资料修改",
+      "expected_text": "1.手表显示Date and Time设置页\n2.日期选择控件显示新日期\n3.Date副标题显示新日期\n4.时间选择控件显示新时间\n5.Time副标题显示新时间\n6.手表显示Profile列表\n7.对应资料编辑页显示新资料值\n8.Profile列表对应副标题显示新资料值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_113",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App提供重置密码动作",
+      "steps_text": "1.在App发起重置密码动作",
+      "expected_text": "1.手表进入恢复出厂流程而非仅解除App绑定",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在App发起重置密码动作；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_114",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定且存在本地数据\n2.已进入设置-System-Reset确认页",
+      "steps_text": "1.确认Reset\n2.等待恢复出厂和自动开机完成",
+      "expected_text": "1.手表显示Factory reset in progress并清空本地数据与绑定关系\n2.开机动画结束后进入语言选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "需 App 或特殊流程: 1.确认Reset；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "START_115",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表已完成恢复出厂\n2.原App仍保留旧设备页面或缓存",
+      "steps_text": "1.在原App尝试直接连接手表",
+      "expected_text": "1.原App不能用旧绑定关系直接回连，必须重新走配对流程",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.在原App尝试直接连接手表；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_116",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示Pairing过渡状态\n2.电量可降至低电提醒阈值",
+      "steps_text": "1.在配对进行中触发低电提醒",
+      "expected_text": "1.待产品确认：绑定中低电提醒的页面优先级与恢复规则",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_117",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表正在显示Pairing过渡状态\n2.充电器可用",
+      "steps_text": "1.在配对进行中连接充电器",
+      "expected_text": "1.待产品确认：绑定中插电的前台页面与配对恢复规则",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_118",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.测试工具可连续制造配对失败",
+      "steps_text": "1.连续制造5次配对失败\n2.第6次使用有效条件发起配对",
+      "expected_text": "1.每次失败均在3秒后返回可重试的Scan to Pair页\n2.第6次可进入配对成功页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_119",
+      "sheet": "开机绑定",
+      "priority": "P1",
+      "precondition_text": "1.App账号可重复绑定同一手表",
+      "steps_text": "1.连续完成10轮绑定和App解绑",
+      "expected_text": "1.10轮操作结束后设备保持可再次绑定状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.连续完成10轮绑定和App解绑；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_120",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.准备支持版本范围内的Android手机",
+      "steps_text": "1.使用Android完成开机、扫码或搜索、确认和同步主链路",
+      "expected_text": "1.Android可完成绑定并在App显示设备在线和已同步资料",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.使用Android完成开机、扫码或搜索、确认和同步主链路；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_121",
+      "sheet": "开机绑定",
+      "priority": "P0",
+      "precondition_text": "1.手表处于出厂未绑定且关机状态\n2.准备支持版本范围内的iPhone",
+      "steps_text": "1.使用iOS完成开机、扫码或搜索、确认和同步主链路",
+      "expected_text": "1.iOS可完成绑定并在App显示设备在线和已同步资料",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/工具: 1.使用iOS完成开机、扫码或搜索、确认和同步主链路；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "START_122",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入Scan to Pair页\n2.屏幕无明显污渍且亮度处于默认档",
+      "steps_text": "1.分别在约10厘米和20厘米距离扫描二维码",
+      "expected_text": "1.两种常用距离下二维码均可在无需反复对焦的情况下被识别",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:QRCODE,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "START_123",
+      "sheet": "开机绑定",
+      "priority": "P2",
+      "precondition_text": "1.可进入数据未保存确认页、六步个人信息页和同步提醒页",
+      "steps_text": "1.逐页观察长文案与控件布局",
+      "expected_text": "1.引导页文字与控件均清晰可读",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "数据未保存确认页(SKIP_BIND_CONFIRM)实测无法进入(Pair Later 按钮屏幕外不可点)；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    }
+  ]
+}

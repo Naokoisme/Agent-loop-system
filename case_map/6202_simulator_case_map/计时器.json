@@ -1,0 +1,952 @@
+{
+  "profile": "6202_W5230_SIMULATOR",
+  "sheet": "计时器",
+  "cases": [
+    {
+      "case_id": "TIMER_001",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Clock二级菜单",
+      "steps_text": "1.点击Timer",
+      "expected_text": "1.手表显示计时器预设列表页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_CAPABILITY_MISSING：当前6202模拟器产物执行ENTER_PAGE:CLOCK_SUBMENU虽返回accepted，但稳定画面仍为表盘；当前主菜单实测为扁平应用列表，无法建立原始用例要求的Clock二级菜单前置，也不能用直达TIMER_LIST冒充点击Timer。真实探索证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_001\\20260814-222712-6575a530。"
+    },
+    {
+      "case_id": "TIMER_002",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.负一屏Clock卡显示Timer入口",
+      "steps_text": "1.点击Timer图标",
+      "expected_text": "1.手表显示计时器预设列表页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "负一屏Clock卡片需要动态滚动定位Timer入口；当前共享负一屏卡片定位不稳定，不能用直达TIMER_LIST冒充点击；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_003",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.观察预设按钮",
+      "expected_text": "1.页面显示1和3和5和10和15和60分钟和加号按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:3001;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:3002;"
+      ],
+      "verification_points": [
+        "Timer预设页首屏显示1、3、5、10分钟预设",
+        "上滑后的后续画面显示15、60分钟预设和加号按钮"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Timer预设页真实双上滑路径已验证；首屏与双上滑后各采集一张独立截图。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_003\\20260814-233102-047c38a8819e49a4a7920040e5b61b2e-formal-r2。"
+    },
+    {
+      "case_id": "TIMER_004",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击1分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为1分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期包含250ms振动，静态产品截图无法验证；旧坐标还误点3分钟，不能仅修页面部分后宣称完整用例可判定；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_005",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击3分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为3分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期包含250ms振动，静态产品截图即使能确认3分钟倒计时页，也无法验证完整预期；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_006",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击5分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为5分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_007",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击10分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为10分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_008",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击15分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为15分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_009",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击60分钟预设",
+      "expected_text": "1.手表短振250ms，进入原始时长为60分钟的倒计时页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_010",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击加号按钮",
+      "expected_text": "1.页面显示时分秒滚轮和确认按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1001;"
+      ],
+      "verification_points": [
+        "点击加号后页面显示小时、分钟、秒钟滚轮以及确认按钮"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Timer列表双上滑、底部加号坐标及重复点击重试均已实测；若首次点击已进入自定义页，第二次坐标落在取消与确认按钮之间的空隙，不改变产品状态。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_010\\20260814-233154-7d603752b56a46cfb00704f7f4336219-formal-r2。"
+    },
+    {
+      "case_id": "TIMER_011",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表返回进入Timer前的页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_CAPABILITY_MISSING：当前6202已注册SWIPE_SIM:3,0在一次外部探索中成功返回主菜单，但正式Runner及随后多次独立复验均稳定停留Timer页；TP_SWIPE中部和页头坐标也均被Timer列表页面吞掉。由于无法证明右滑业务动作被稳定送达，不能把偶发返回或本轮FAIL固化为可重复映射。成功探针：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\_return_direct_probe\\20260814-230116-83927359；正式不稳定证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_011\\20260814-231338-5fefb9d21a2a44549cf6d04be50f6bb1-formal；坐标复验：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\_return_direct_probe\\20260814-232422-70de417f。",
+      "verification_points": []
+    },
+    {
+      "case_id": "TIMER_012",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Timer预设页",
+      "steps_text": "1.点击加号按钮",
+      "expected_text": "1.自定义页默认显示00小时01分钟00秒",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1201;"
+      ],
+      "verification_points": [
+        "点击加号后自定义计时页默认显示00小时01分钟00秒"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Timer列表底部加号和自定义页默认值已实测；重复点击为经验证的惯性滚动重试，第二次在已进入自定义页时落在两个按钮之间的空隙。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_012\\20260814-231438-e06782ea3f924ff2a26734ae4f3fa8fb-formal。"
+    },
+    {
+      "case_id": "TIMER_013",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.滚动小时列一整圈",
+      "expected_text": "1.小时值仅在00至23循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "完整一圈需连续覆盖00至23且截图逐值证明；当前没有通用滚轮遍历与证据压缩能力，不能用重新进入列表冒充操作；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "TIMER_014",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.滚动分钟列一整圈",
+      "expected_text": "1.分钟值仅在00至59循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "按键熄屏和10秒等待均可执行；完整预期还要求提醒振动继续且累计未满1分钟，黑屏截图无法判定振动状态；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "TIMER_015",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.滚动秒钟列一整圈",
+      "expected_text": "1.秒钟值仅在00至59循环",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "完整一圈需连续覆盖00至59且截图逐值证明；当前没有通用滚轮遍历与证据压缩能力，不能用重新进入列表冒充操作；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "TIMER_016",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.将时分秒均设为0\n2.点击确认按钮",
+      "expected_text": "1.确认按钮显示置灰\n2.手表不开始倒计时",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,241,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,241,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1601;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:300;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,241,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1300;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1602;"
+      ],
+      "verification_points": [
+        "将时、分、秒均设为00后确认按钮显示置灰",
+        "点击置灰确认按钮后仍停留在00:00:00自定义页且未开始倒计时"
+      ],
+      "unable": false,
+      "note": "6202当前自定义Timer滚轮、置灰确认按钮和无倒计时结果均已实测；点击置灰确认后再点击分钟滚轮用于确认仍停留在同一可交互页面，并等待完整重绘后截图。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_016\\20260814-231528-144dd41aeb044428a5693a75b58dfe9c-formal。"
+    },
+    {
+      "case_id": "TIMER_017",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.将时分秒设为00:00:01\n2.点击确认按钮",
+      "expected_text": "1.确认按钮可用\n2.手表短振250ms，开始1秒倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前缺可确定设置时/分/秒滚轮并建立计时器状态的 SIM_TIMER_STATE_SET 通用命令；不能用 ENTER_PAGE 代替滚轮选择与确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_018",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.将时分秒设为23:59:59\n2.点击确认按钮",
+      "expected_text": "1.确认按钮可用\n2.手表短振250ms，开始23:59:59倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前缺可确定设置时/分/秒滚轮并建立计时器状态的 SIM_TIMER_STATE_SET 通用命令；不能用 ENTER_PAGE 代替滚轮选择与确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_019",
+      "sheet": "计时器",
+      "priority": "P2",
+      "precondition_text": "1.手表显示自定义计时页且分钟列已选中",
+      "steps_text": "1.在分钟列执行上滑\n2.在分钟列执行下滑",
+      "expected_text": "1.分钟值增加1\n2.分钟值减少1",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,241,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1901;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,260,205,240,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1902;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,240,205,260,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1500;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1903;"
+      ],
+      "unable": false,
+      "note": "6202当前分钟滚轮坐标和双向手势已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，3/3截图，实际01→05→01，与原始期望的每次变化1不符，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_019\\20260814-231642-23cefdaedd3348698b71551aef908b6c-formal。",
+      "verification_points": [
+        "操作前分钟列基线值",
+        "分钟列上滑后数值增加1",
+        "分钟列下滑后数值减少1"
+      ]
+    },
+    {
+      "case_id": "TIMER_020",
+      "sheet": "计时器",
+      "priority": "P2",
+      "precondition_text": "1.手表显示自定义计时页且秒钟列已选中",
+      "steps_text": "1.旋转编码器一格",
+      "expected_text": "1.秒钟值变化1秒",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:323,241,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2001;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2002;"
+      ],
+      "unable": false,
+      "note": "6202当前秒钟滚轮坐标和编码器方向已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，旋转前后为00→01，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_020\\20260814-231742-684f417820cb4d87ad43cd18f541a06c-formal。",
+      "verification_points": [
+        "旋转前秒钟列基线值",
+        "旋转一格后秒钟值变化1秒"
+      ]
+    },
+    {
+      "case_id": "TIMER_021",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表返回预设列表，不创建计时任务",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1500;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2101;"
+      ],
+      "verification_points": [
+        "自定义计时页右滑后返回Timer预设列表且未创建计时任务"
+      ],
+      "unable": false,
+      "note": "6202当前自定义计时页和右滑手势已实测；未点击确认。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后显示Timer预设列表且无倒计时任务，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_021\\20260814-231839-8b69293f6bad42b1b3ad9cf54583291c-formal。"
+    },
+    {
+      "case_id": "TIMER_022",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示自定义计时页",
+      "steps_text": "1.单击编码器退出键",
+      "expected_text": "1.手表返回预设列表，不创建计时任务",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:600;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,429,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1200;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1500;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2201;"
+      ],
+      "verification_points": [
+        "自定义计时页单击编码器退出键后返回Timer预设列表且未创建计时任务"
+      ],
+      "unable": false,
+      "note": "6202当前自定义计时页和编码器退出键已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后实际回到表盘而非Timer预设列表，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_022\\20260814-231935-d8351337e89a451691cec9735a17f776-formal。"
+    },
+    {
+      "case_id": "TIMER_023",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.5分钟计时器正在前台运行",
+      "steps_text": "1.观察倒计时页",
+      "expected_text": "1.页面显示剩余时间和固定原始时长和剩余比例进度条和结束和暂停按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "从首屏真实点击5分钟预设，建立前台运行状态后观察；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_024",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.准备5分钟和1小时自定义计时任务",
+      "steps_text": "1.比较5分钟和1小时任务的原始时长标注",
+      "expected_text": "1.5分钟显示5:00，1小时显示1:00:00，小时和分钟字段均不补前导零",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "TIMER_025",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.59分59秒计时器正在运行",
+      "steps_text": "1.观察剩余时间",
+      "expected_text": "1.剩余时间显示MM:SS.cs格式",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Windows模拟器用通用SIM_TIMER_STATE_SET建立59:59运行状态，再经时钟子菜单真实点击计时器入口进入当前任务；待新模拟器构建后聚焦运行验证；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "剩余时间以MM:SS.cs格式显示59:59附近的倒计时"
+      ]
+    },
+    {
+      "case_id": "TIMER_026",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.1小时计时器正在运行",
+      "steps_text": "1.观察剩余时间",
+      "expected_text": "1.剩余时间显示HH:MM:SS格式，不显示百分秒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "从首屏真实点击60分钟预设，建立1小时运行状态后观察；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_027",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.10秒计时器正在运行",
+      "steps_text": "1.记录开始进度\n2.等待5秒",
+      "expected_text": "1.进度条接近满格\n2.进度条宽度约为开始时的一半",
+      "verification_points": [
+        "10秒计时器刚开始时进度条接近满格",
+        "真实等待5秒后进度条约为开始时的一半"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用通用SIM_TIMER_STATE_SET建立10秒运行态并真实等待5秒；前后两张截图判断进度变化；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_028",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在前台运行",
+      "steps_text": "1.点击暂停按钮\n2.等待3秒",
+      "expected_text": "1.手表短振250ms，显示继续按钮\n2.剩余时间保持暂停值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "等待本身可由SIM_WAIT执行；完整预期还包含截图无法判定的250ms振动，当前缺振动采集证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_029",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器处于暂停状态",
+      "steps_text": "1.点击继续按钮\n2.等待1秒",
+      "expected_text": "1.页面显示暂停按钮\n2.剩余时间从暂停值继续减少",
+      "verification_points": [
+        "继续前截图显示继续按钮且剩余时间为暂停值",
+        "点击继续并等待1秒后显示暂停按钮且剩余时间减少"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用通用暂停状态和当前计时器共享控制坐标；前后截图判断继续按钮切换及剩余时间从暂停值减少，不额外要求人工步骤未包含的暂停期连续观察；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_030",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在运行或暂停",
+      "steps_text": "1.点击结束按钮",
+      "expected_text": "1.当前计时任务结束，页面显示预设列表",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前 TIMER_STOP 是业务捷径，且缺运行/暂停前置状态构造；需要 SIM_TIMER_STATE_SET 后才能实际点击结束按钮；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_031",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器正在前台运行",
+      "steps_text": "1.等待超过系统自动灭屏时间",
+      "expected_text": "1.手表保持倒计时页亮屏",
+      "verification_points": [
+        "等待前计时器正在前台运行",
+        "超过5秒自动灭屏时间后仍保持倒计时页亮屏"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "设置5秒全局亮屏时长后真实等待6秒；截图只判断计时运行页是否仍亮；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_032",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器处于暂停状态",
+      "steps_text": "1.等待超过系统自动灭屏时间",
+      "expected_text": "1.手表保持暂停页面亮屏",
+      "verification_points": [
+        "等待前计时器处于暂停页面",
+        "超过5秒自动灭屏时间后仍保持暂停页面亮屏"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "设置5秒全局亮屏时长后真实等待6秒；截图只判断暂停页是否仍亮；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_033",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.1分钟计时器正在前台运行",
+      "steps_text": "1.执行右滑\n2.等待10秒\n3.重新进入Timer",
+      "expected_text": "1.手表退出倒计时页\n2.计时任务在后台继续\n3.页面显示约50秒剩余时间",
+      "verification_points": [
+        "右滑前1分钟计时器正在前台运行",
+        "右滑后已退出倒计时页",
+        "真实等待10秒并重新进入后剩余时间约50秒"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用通用计时器状态，从时钟子菜单真实进入并真实等待10秒；三阶段截图覆盖退出和后台继续；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_034",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.1分钟计时器正在前台运行",
+      "steps_text": "1.单击编码器\n2.等待10秒\n3.重新进入Timer",
+      "expected_text": "1.手表退出倒计时页\n2.计时任务在后台继续\n3.页面显示约50秒剩余时间",
+      "verification_points": [
+        "按键前1分钟计时器正在前台运行",
+        "单击编码器后已退出倒计时页",
+        "真实等待10秒并重新进入后剩余时间约50秒"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "实体编码器由通用BUTTON_PRESS执行，随后真实等待10秒并从时钟子菜单重新进入；三阶段截图覆盖；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "TIMER_035",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器正在前台运行",
+      "steps_text": "1.执行覆盖熄屏\n2.等待5秒\n3.单击实体按键亮屏",
+      "expected_text": "1.手表屏幕熄灭\n2.计时任务继续运行\n3.手表按全局规则显示页面，计时未丢失",
+      "verification_points": [
+        "覆盖前计时器正在前台运行",
+        "覆盖后屏幕熄灭",
+        "真实等待5秒并按键亮屏后计时器任务未丢失"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用通用计时器状态、全局screen_off事件、真实等待和实体BUTTON_PRESS；三阶段截图覆盖；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "TIMER_036",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器正在前台运行",
+      "steps_text": "1.执行垂腕动作\n2.等待5秒\n3.单击实体按键亮屏",
+      "expected_text": "1.手表屏幕熄灭\n2.计时任务继续运行\n3.手表按全局规则显示页面，计时未丢失",
+      "verification_points": [
+        "垂腕前计时器正在前台运行",
+        "垂腕后屏幕熄灭",
+        "真实等待5秒并按键亮屏后计时器任务未丢失"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用通用计时器状态、全局wrist_down事件、真实等待和实体BUTTON_PRESS；三阶段截图覆盖；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "TIMER_037",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.1秒计时器正在运行\n2.手表屏幕可处于熄灭状态",
+      "steps_text": "1.等待倒计时归零",
+      "expected_text": "1.手表点亮Time's Up页，按250ms/750ms循环振动",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "等待与Time's Up页面可执行；完整预期还要求250ms/750ms循环振动，截图唯一判据下缺振动采集证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_038",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.观察页面",
+      "expected_text": "1.页面显示Time's Up和原始时长和重置和结束按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Windows模拟器用通用SIM_TIMER_STATE_SET通过真实计时结束回调建立5分钟Time's Up状态；待新模拟器构建后聚焦运行验证；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器。",
+      "verification_points": [
+        "页面同时显示Time's Up、原始5分钟时长、重置按钮和结束按钮"
+      ]
+    },
+    {
+      "case_id": "TIMER_039",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.5分钟计时器显示Time's Up页",
+      "steps_text": "1.点击重置按钮",
+      "expected_text": "1.手表短振250ms，重新开始5分钟倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前缺5分钟Time's Up业务状态构造，且完整预期包含截图不可见的250ms振动；不能从预设页点击3分钟冒充重置；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_040",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.点击结束按钮",
+      "expected_text": "1.振动停止，页面返回预设列表",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前缺 Time's Up 前置状态构造；需要 SIM_TIMER_STATE_SET 后才能实际点击结束按钮并验证振动停止；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "TIMER_041",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.保持无操作1分钟",
+      "expected_text": "1.振动停止，页面自动返回预设列表",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_042",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.执行覆盖熄屏\n2.等待10秒",
+      "expected_text": "1.手表屏幕熄灭\n2.提醒进程继续，未超过1分钟",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "覆盖熄屏和等待可执行；熄屏截图无法证明后台提醒进程仍在继续，当前缺可见提醒状态或振动证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_043",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.单击按键使屏幕熄灭\n2.等待10秒",
+      "expected_text": "1.手表屏幕熄灭\n2.提醒振动继续，累计提醒时长未达到1分钟",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_044",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Time's Up页",
+      "steps_text": "1.执行垂腕动作",
+      "expected_text": "1.手表保持Time's Up页亮屏",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "通用SIM_TIMER_STATE_SET建立Time's Up状态，SIM_SYSTEM_EVENT复用全局垂腕事件；前后截图只判断页面仍亮且内容未退出，待新模拟器构建后聚焦运行验证；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
+      "verification_points": [
+        "垂腕前Time's Up页亮屏并完整显示",
+        "垂腕后仍保持同一Time's Up页亮屏"
+      ]
+    },
+    {
+      "case_id": "TIMER_045",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器正在运行",
+      "steps_text": "1.连续点击暂停和继续20次",
+      "expected_text": "1.页面只存在一个计时任务，剩余时间单调减少",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "真实启动3分钟任务，按暂停/继续成对点击20次；用开始、循环后、再等待1秒三张截图确认仅一个任务且时间继续减少；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
+      "verification_points": [
+        "循环操作前仅一个计时任务且正在减少",
+        "20次暂停继续后仍仅一个计时任务",
+        "再等待1秒后同一任务剩余时间继续减少"
+      ]
+    },
+    {
+      "case_id": "TIMER_046",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在后台运行",
+      "steps_text": "1.重启手表\n2.重新进入Timer",
+      "expected_text": "1.手表完成开机\n2.待产品确认：原计时任务是否恢复和剩余时间",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "TIMER_047",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手机音乐正在播放\n2.计时器正在倒计时",
+      "steps_text": "1.等待5秒\n2.查看手机音乐播放状态",
+      "expected_text": "1.计时器剩余时间减少约5秒\n2.手机音乐仍在播放",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "等待本身可由SIM_WAIT执行；最终要求查看手机音乐播放状态，当前手表截图无法判定手机侧结果；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "TIMER_048",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在后台运行",
+      "steps_text": "1.让手机收到来电\n2.等待5秒\n3.结束来电\n4.重新进入Timer",
+      "expected_text": "1.手表显示来电提醒\n2.计时任务继续\n3.来电结束\n4.剩余时间已减少约5秒",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖 App/外部: 1.让手机收到来电；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "TIMER_049",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.计时器正在前台运行",
+      "steps_text": "1.从手机发送一条通知\n2.关闭消息提醒",
+      "expected_text": "1.手表显示消息弹窗\n2.倒计时继续减少",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖 App/外部: 1.从手机发送一条通知；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "TIMER_050",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.闹钟将在1分钟内响铃\n2.计时器将在闹钟响铃期间归零",
+      "steps_text": "1.等待闹钟响铃\n2.等待计时器归零",
+      "expected_text": "1.手表显示闹钟响铃页\n2.待产品确认：闹钟与Time's Up谁显示在前台",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_051",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在后台运行\n2.App可发起OTA",
+      "steps_text": "1.在App发起固件升级\n2.在手表确认升级\n3.等待手表重启\n4.重新进入Timer",
+      "expected_text": "1.App显示升级确认\n2.手表显示OTA页面\n3.手表完成升级重启\n4.待产品确认：原计时任务是否恢复",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "TIMER_052",
+      "sheet": "计时器",
+      "priority": "P0",
+      "precondition_text": "1.计时器正在后台运行\n2.手表电量即将耗尽",
+      "steps_text": "1.等待手表低电关机\n2.接入充电器\n3.按键开机\n4.进入Timer",
+      "expected_text": "1.手表因电量耗尽关机\n2.手表显示充电页\n3.手表重新开机\n4.待产品确认：原计时任务与剩余时长是否恢复",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "TIMER_053",
+      "sheet": "计时器",
+      "priority": "P1",
+      "precondition_text": "1.手表电量和供电可支持长时测试",
+      "steps_text": "1.启动23小时自定义计时\n2.等待计时结束",
+      "expected_text": "1.计时期间手表无异常重启\n2.到点显示Time's Up页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>固件修复工作台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="返回缺陷队列">
+      <span class="brand-mark" aria-hidden="true">W30</span>
+      <span>
+        <strong>固件修复工作台</strong>
+        <small>本地修复与验证</small>
+      </span>
+    </a>
+    <nav class="primary-nav" aria-label="工作台导航">
+      <a href="/" data-nav="defects">缺陷修复</a>
+      <a href="/tests" data-nav="tests">Agent 测试</a>
+    </nav>
+    <div class="system-state"><span class="pulse-dot"></span>本地闭环已连接</div>
+  </header>
+  <main id="app" class="app-shell" aria-live="polite">
+    <section class="loading-state">
+      <div class="spinner"></div>
+      <p>正在读取本地数据…</p>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

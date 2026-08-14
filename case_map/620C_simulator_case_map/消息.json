@@ -1,0 +1,2458 @@
+[
+  {
+    "case_id": "NOTIF_001",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表处于主表盘",
+    "steps_text": "1.在主表盘执行上滑",
+    "expected_text": "1.手表显示通知列表页或No Notifications空态页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_002",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机通知权限已开启\n3.待测应用通知开关已开启",
+    "steps_text": "1.依次从一期十四类应用发送一条通知",
+    "expected_text": "1.每类通知均写入手表通知中心，显示对应应用标识",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:1,SMS,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:4,Facebook,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:15,Telegram,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:13,Skype,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:9,WhatsApp,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:18,Snapchat,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:7,Instagram,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:11,Messenger,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:24,Gmail,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:25,Outlook,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,X,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:6,LinkedIn,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:27,Teams,Test notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Other,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_003",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机通知权限已开启\n3.选择一期清单外应用",
+    "steps_text": "1.从该应用发送一条通知",
+    "expected_text": "1.手表通知中心按Others类别展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,该应用,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_004",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表固件未包含二期通知应用支持\n2.手机已安装二期清单应用",
+    "steps_text": "1.从二期清单应用发送一条通知",
+    "expected_text": "1.手表不按二期专属应用类型展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,二期清单应用,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_005",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启",
+    "steps_text": "1.从二期清单应用发送一条通知",
+    "expected_text": "1.手表通知中心显示对应二期应用通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,二期清单应用,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_006",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.YouTube通知开关已开启",
+    "steps_text": "1.从YouTube发送一条通知",
+    "expected_text": "1.手表通知中心按YouTube应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:20,YouTube,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_007",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Hotstar通知开关已开启",
+    "steps_text": "1.从Hotstar发送一条通知",
+    "expected_text": "1.手表通知中心按Hotstar应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Hotstar,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_008",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.PhonePe通知开关已开启",
+    "steps_text": "1.从PhonePe发送一条通知",
+    "expected_text": "1.手表通知中心按PhonePe应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,PhonePe,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_009",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Zomato通知开关已开启",
+    "steps_text": "1.从Zomato发送一条通知",
+    "expected_text": "1.手表通知中心按Zomato应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Zomato,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_010",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Inshorts通知开关已开启",
+    "steps_text": "1.从Inshorts发送一条通知",
+    "expected_text": "1.手表通知中心按Inshorts应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Inshorts,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_011",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.JioTV通知开关已开启",
+    "steps_text": "1.从JioTV发送一条通知",
+    "expected_text": "1.手表通知中心按JioTV应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,JioTV,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_012",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Uber通知开关已开启",
+    "steps_text": "1.从Uber发送一条通知",
+    "expected_text": "1.手表通知中心按Uber应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Uber,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_013",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Slack通知开关已开启",
+    "steps_text": "1.从Slack发送一条通知",
+    "expected_text": "1.手表通知中心按Slack应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Slack,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_014",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Spotify通知开关已开启",
+    "steps_text": "1.从Spotify发送一条通知",
+    "expected_text": "1.手表通知中心按Spotify应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Spotify,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_015",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Paytm通知开关已开启",
+    "steps_text": "1.从Paytm发送一条通知",
+    "expected_text": "1.手表通知中心按Paytm应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Paytm,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_016",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Swiggy通知开关已开启",
+    "steps_text": "1.从Swiggy发送一条通知",
+    "expected_text": "1.手表通知中心按Swiggy应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Swiggy,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_017",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Google Calendar通知开关已开启",
+    "steps_text": "1.从Google Calendar发送一条通知",
+    "expected_text": "1.手表通知中心按Google Calendar应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:17,Google Calendar,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_018",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Wynk Music通知开关已开启",
+    "steps_text": "1.从Wynk Music发送一条通知",
+    "expected_text": "1.手表通知中心按Wynk Music应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Wynk Music,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_019",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Gaana通知开关已开启",
+    "steps_text": "1.从Gaana发送一条通知",
+    "expected_text": "1.手表通知中心按Gaana应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Gaana,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_020",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Dailyhunt通知开关已开启",
+    "steps_text": "1.从Dailyhunt发送一条通知",
+    "expected_text": "1.手表通知中心按Dailyhunt应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Dailyhunt,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_021",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Amazon通知开关已开启",
+    "steps_text": "1.从Amazon发送一条通知",
+    "expected_text": "1.手表通知中心按Amazon应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:29,Amazon,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_022",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Flipkart通知开关已开启",
+    "steps_text": "1.从Flipkart发送一条通知",
+    "expected_text": "1.手表通知中心按Flipkart应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Flipkart,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_023",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Netflix通知开关已开启",
+    "steps_text": "1.从Netflix发送一条通知",
+    "expected_text": "1.手表通知中心按Netflix应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Netflix,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_024",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Prime Video通知开关已开启",
+    "steps_text": "1.从Prime Video发送一条通知",
+    "expected_text": "1.手表通知中心按Prime Video应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Prime Video,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_025",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Google Pay通知开关已开启",
+    "steps_text": "1.从Google Pay发送一条通知",
+    "expected_text": "1.手表通知中心按Google Pay应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:28,Google Pay,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_026",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Ola通知开关已开启",
+    "steps_text": "1.从Ola发送一条通知",
+    "expected_text": "1.手表通知中心按Ola应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Ola,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_027",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Pinterest通知开关已开启",
+    "steps_text": "1.从Pinterest发送一条通知",
+    "expected_text": "1.手表通知中心按Pinterest应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:8,Pinterest,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_028",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Book My Show通知开关已开启",
+    "steps_text": "1.从Book My Show发送一条通知",
+    "expected_text": "1.手表通知中心按Book My Show应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Book My Show,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_029",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Make My Trip通知开关已开启",
+    "steps_text": "1.从Make My Trip发送一条通知",
+    "expected_text": "1.手表通知中心按Make My Trip应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Make My Trip,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_030",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Fastrack Smart World通知开关已开启",
+    "steps_text": "1.从Fastrack Smart World发送一条通知",
+    "expected_text": "1.手表通知中心按Fastrack Smart World应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Fastrack Smart World,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_031",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.YouTube Music通知开关已开启",
+    "steps_text": "1.从YouTube Music发送一条通知",
+    "expected_text": "1.手表通知中心按YouTube Music应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,YouTube Music,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_032",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Drive通知开关已开启",
+    "steps_text": "1.从Drive发送一条通知",
+    "expected_text": "1.手表通知中心按Drive应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Drive,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_033",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Titan Smart World通知开关已开启",
+    "steps_text": "1.从Titan Smart World发送一条通知",
+    "expected_text": "1.手表通知中心按Titan Smart World应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Titan Smart World,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_034",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Blinkit通知开关已开启",
+    "steps_text": "1.从Blinkit发送一条通知",
+    "expected_text": "1.手表通知中心按Blinkit应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Blinkit,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_035",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Myntra通知开关已开启",
+    "steps_text": "1.从Myntra发送一条通知",
+    "expected_text": "1.手表通知中心按Myntra应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Myntra,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_036",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Zepto通知开关已开启",
+    "steps_text": "1.从Zepto发送一条通知",
+    "expected_text": "1.手表通知中心按Zepto应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Zepto,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_037",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.AJIO通知开关已开启",
+    "steps_text": "1.从AJIO发送一条通知",
+    "expected_text": "1.手表通知中心按AJIO应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,AJIO,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_038",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.aha通知开关已开启",
+    "steps_text": "1.从aha发送一条通知",
+    "expected_text": "1.手表通知中心按aha应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,aha,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_039",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.cult.fit通知开关已开启",
+    "steps_text": "1.从cult.fit发送一条通知",
+    "expected_text": "1.手表通知中心按cult.fit应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,cult.fit,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_040",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.bigbasket通知开关已开启",
+    "steps_text": "1.从bigbasket发送一条通知",
+    "expected_text": "1.手表通知中心按bigbasket应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,bigbasket,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_041",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Yono by SBI通知开关已开启",
+    "steps_text": "1.从Yono by SBI发送一条通知",
+    "expected_text": "1.手表通知中心按Yono by SBI应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Yono by SBI,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_042",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.JioSaavn通知开关已开启",
+    "steps_text": "1.从JioSaavn发送一条通知",
+    "expected_text": "1.手表通知中心按JioSaavn应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,JioSaavn,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_043",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.MyJio通知开关已开启",
+    "steps_text": "1.从MyJio发送一条通知",
+    "expected_text": "1.手表通知中心按MyJio应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,MyJio,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_044",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.iMobile Pay通知开关已开启",
+    "steps_text": "1.从iMobile Pay发送一条通知",
+    "expected_text": "1.手表通知中心按iMobile Pay应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,iMobile Pay,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_045",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Airtel通知开关已开启",
+    "steps_text": "1.从Airtel发送一条通知",
+    "expected_text": "1.手表通知中心按Airtel应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Airtel,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_046",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Rapido通知开关已开启",
+    "steps_text": "1.从Rapido发送一条通知",
+    "expected_text": "1.手表通知中心按Rapido应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Rapido,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_047",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Cricbuzz通知开关已开启",
+    "steps_text": "1.从Cricbuzz发送一条通知",
+    "expected_text": "1.手表通知中心按Cricbuzz应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Cricbuzz,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_048",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Threads通知开关已开启",
+    "steps_text": "1.从Threads发送一条通知",
+    "expected_text": "1.手表通知中心按Threads应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Threads,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_049",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Nykaa Man通知开关已开启",
+    "steps_text": "1.从Nykaa Man发送一条通知",
+    "expected_text": "1.手表通知中心按Nykaa Man应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Nykaa Man,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_050",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.HDFC通知开关已开启",
+    "steps_text": "1.从HDFC发送一条通知",
+    "expected_text": "1.手表通知中心按HDFC应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,HDFC,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_051",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已升级至包含二期通知支持的固件\n2.手机通知权限已开启\n3.Urban Company通知开关已开启",
+    "steps_text": "1.从Urban Company发送一条通知",
+    "expected_text": "1.手表通知中心按Urban Company应用名称和图标展示该通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Urban Company,Test notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_052",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表未佩戴且屏幕熄灭",
+    "steps_text": "1.从手机发送一条通知\n2.单击实体按键亮屏",
+    "expected_text": "1.手表不亮屏，不振动\n2.手表显示主表盘，不弹出消息弹窗",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8010,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:8011,screen_off;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "页面证据不能判断不振动，当前没有振动采集证据通道；不把仅有屏幕状态当成完整验收"
+  },
+  {
+    "case_id": "NOTIF_053",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表未佩戴",
+    "steps_text": "1.从手机发送一条通知\n2.从主表盘进入通知中心",
+    "expected_text": "1.手表不产生即时提醒\n2.通知列表显示刚发送的通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8012,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Saved notification;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:5301;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:5302;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "未佩戴状态收到通知后不显示即时提醒",
+      "进入通知中心后列表显示刚发送的通知"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_054",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已佩戴且屏幕熄灭",
+    "steps_text": "1.从手机发送一条通知",
+    "expected_text": "1.手表短振250ms，屏幕保持熄灭",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8013,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:8014,screen_off;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Screen off notification;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_055",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已佩戴且屏幕熄灭\n2.通知弹窗内容隐藏开关已关闭",
+    "steps_text": "1.从手机发送一条通知\n2.通知振动后等待9秒\n3.单击实体按键亮屏",
+    "expected_text": "1.手表短振，保持熄屏\n2.手表保持熄屏\n3.手表显示通知弹窗",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_056",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已佩戴且屏幕熄灭\n2.通知弹窗内容隐藏开关已关闭",
+    "steps_text": "1.从手机发送一条通知\n2.通知振动后等待10秒\n3.单击实体按键亮屏",
+    "expected_text": "1.手表短振，保持熄屏\n2.手表保持熄屏\n3.手表显示通知弹窗",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_057",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已佩戴且屏幕熄灭\n2.通知弹窗内容隐藏开关已关闭",
+    "steps_text": "1.从手机发送一条通知\n2.通知振动后等待11秒\n3.单击实体按键亮屏",
+    "expected_text": "1.手表短振，保持熄屏\n2.手表保持熄屏\n3.手表显示主表盘，不显示通知弹窗",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_058",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已佩戴且屏幕亮起\n3.通知内容隐藏开关已关闭",
+    "steps_text": "1.从手机发送一条通知",
+    "expected_text": "1.手表短振250ms，显示含通知内容的弹窗",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:8015,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:8016,screen_on;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Visible notification;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_059",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示新消息弹窗",
+    "steps_text": "1.保持无操作5秒",
+    "expected_text": "1.消息弹窗消失，返回弹窗前页面",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_060",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.隐藏通知内容已开启\n3.手表已佩戴且亮屏",
+    "steps_text": "1.从手机发送一条通知",
+    "expected_text": "1.弹窗仅显示应用图标和你收到1条新消息文案",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_061",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.隐藏通知内容已开启\n2.手表通知中心已有一条通知",
+    "steps_text": "1.点击该通知",
+    "expected_text": "1.通知详情页显示发件人和完整正文",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前实时命令无法建立隐藏通知内容已开启这一前置状态；不能只进入通知列表冒充点击通知"
+  },
+  {
+    "case_id": "NOTIF_062",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示隐藏内容消息弹窗",
+    "steps_text": "1.点击隐藏内容消息弹窗",
+    "expected_text": "1.待产品确认：点击隐藏弹窗后应打开的通知条目及具体页面名称",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_063",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App\n2.准备权限关闭或App后台或连接断开的状态",
+    "steps_text": "1.在当前依赖状态发送一条通知",
+    "expected_text": "1.待产品确认：当前依赖状态下通知的接收结果和回连补传规则",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_064",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表通知存储为空",
+    "steps_text": "1.从主表盘进入通知中心",
+    "expected_text": "1.页面显示No Notifications和灰色铃铛图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先用当前源码命令清空通知，再直达注册的 MESSAGE_LIST 验证空状态"
+  },
+  {
+    "case_id": "NOTIF_065",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.手表显示通知空态页",
+    "steps_text": "1.在页面执行右滑",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_066",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.手表显示通知空态页",
+    "steps_text": "1.单击编码器",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_067",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已有两条不同应用通知",
+    "steps_text": "1.从主表盘进入通知中心",
+    "expected_text": "1.列表显示应用名和图标和时间和发件人和正文预览和Clear All",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:3,Alice,Meeting at 10;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SEND_MSG_TEST 会真实写入通知中心，再直达 MESSAGE_LIST 核对列表字段"
+  },
+  {
+    "case_id": "NOTIF_068",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已有两条时间不同的通知",
+    "steps_text": "1.进入通知列表",
+    "expected_text": "1.时间较新的通知显示在较旧通知上方",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811090100;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Older notification;",
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811090200;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Newer notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_069",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知列表内容超过一屏",
+    "steps_text": "1.在通知列表执行上滑",
+    "expected_text": "1.列表显示下方通知条目",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_070",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知列表已离开顶部",
+    "steps_text": "1.在通知列表执行下滑",
+    "expected_text": "1.列表显示上方通知条目",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_071",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知列表内容超过一屏",
+    "steps_text": "1.旋转编码器",
+    "expected_text": "1.通知列表沿旋转方向滚动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_072",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表显示通知列表",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_073",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.通知列表存在单条未折叠通知",
+    "steps_text": "1.点击该通知卡片",
+    "expected_text": "1.手表显示对应通知详情页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Only notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部"
+  },
+  {
+    "case_id": "NOTIF_074",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.通知列表存在一条通知",
+    "steps_text": "1.向左滑动该通知卡片",
+    "expected_text": "1.卡片右侧显示红色删除按钮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_075",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知卡片已左滑露出删除按钮",
+    "steps_text": "1.在列表执行上下滚动",
+    "expected_text": "1.该通知卡片回到默认位置，删除按钮隐藏",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_076",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表通知存储为空",
+    "steps_text": "1.连续发送20条可识别通知\n2.进入通知列表",
+    "expected_text": "1.手表接收20条通知\n2.通知列表可找到全部20条通知",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 01;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 02;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 03;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 04;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 05;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 06;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 07;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 08;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 09;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 10;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 11;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 12;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 13;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 14;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 15;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 16;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 17;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 18;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 19;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 20;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7601;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7602;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "连续发送20条通知后即时提醒链路仍可响应",
+      "进入通知列表后可核对最新20条及最早通知"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_077",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已保存20条通知且可识别最早一条",
+    "steps_text": "1.发送第21条通知\n2.进入通知列表",
+    "expected_text": "1.第21条通知写入通知中心\n2.列表保留最新20条，最早一条消失",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 01;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 02;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 03;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 04;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 05;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 06;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 07;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 08;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 09;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 10;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 11;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 12;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 13;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 14;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 15;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 16;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 17;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 18;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 19;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 20;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Notification 21;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7701;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7702;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "发送第21条通知后即时提醒链路仍可响应",
+      "进入通知列表后只保留最新20条且最早一条消失"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_078",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表通知中心为空",
+    "steps_text": "1.从同一应用发送2条通知\n2.进入通知列表",
+    "expected_text": "1.手表接收2条通知\n2.列表显示一张应用名+1的堆叠卡片",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,WeChat,first;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,WeChat,second;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7801;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7802;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "同一应用连续发送2条通知后即时提醒显示最新通知",
+      "通知列表显示一张应用名+1的堆叠卡片"
+    ],
+    "unable": false,
+    "note": "SEND_MSG_TEST 写入通知中心后会弹出半屏通知；已实测需先右滑关闭，再进入 MESSAGE_LIST 查看堆叠卡"
+  },
+  {
+    "case_id": "NOTIF_079",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表通知中心为空",
+    "steps_text": "1.从同一应用发送3条通知\n2.进入通知列表",
+    "expected_text": "1.手表接收3条通知\n2.堆叠卡片显示应用名+2，预览最新一条",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,WeChat,first;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,WeChat,second;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:5,WeChat,third;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7901;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:7902;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "同一应用连续发送3条通知后即时提醒显示最新通知",
+      "通知列表堆叠卡显示应用名+2并预览最新一条"
+    ],
+    "unable": false,
+    "note": "使用 SEND_MSG_TEST 写入三条同应用通知，右滑关闭自动弹出的半屏通知，再进入 MESSAGE_LIST"
+  },
+  {
+    "case_id": "NOTIF_080",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表通知中心为空\n2.准备同一应用两条发送时间不同的通知",
+    "steps_text": "1.依次发送两条通知\n2.进入通知列表",
+    "expected_text": "1.手表接收两条通知并生成堆叠卡\n2.堆叠卡时间显示为后一条通知的时间",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811090100;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Older notification;",
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811090200;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Newer notification;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8001;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8002;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "依次发送两条通知后即时提醒显示后一条通知",
+      "通知列表堆叠卡时间显示为后一条通知的时间"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_081",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知列表存在一张折叠卡",
+    "steps_text": "1.在列表执行上滑",
+    "expected_text": "1.折叠卡保持折叠状态",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_082",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.通知列表存在含3条通知的折叠卡",
+    "steps_text": "1.点击该折叠卡",
+    "expected_text": "1.页面显示该应用3条通知，按时间倒序排列",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部"
+  },
+  {
+    "case_id": "NOTIF_083",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.同应用通知超过一屏",
+    "steps_text": "1.执行上滑\n2.执行下滑",
+    "expected_text": "1.列表显示后续同应用通知\n2.列表显示前序同应用通知",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8301;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8302;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "上滑后显示后续同应用通知",
+      "下滑后显示前序同应用通知"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_084",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.同应用通知超过一屏",
+    "steps_text": "1.旋转编码器",
+    "expected_text": "1.同应用通知列表沿旋转方向滚动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_085",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表显示同应用消息列表",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示通知总列表",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_086",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表存在包含应用名、发件人和正文的通知",
+    "steps_text": "1.进入该通知详情页",
+    "expected_text": "1.页面显示大图标和应用名和时间和发件人和正文和删除按钮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Only notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部"
+  },
+  {
+    "case_id": "NOTIF_087",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知正文超过一屏",
+    "steps_text": "1.在详情页执行上滑",
+    "expected_text": "1.页面显示正文后续内容",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,This long notification body spans multiple lines and requires scrolling.;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_088",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知详情已离开顶部",
+    "steps_text": "1.在详情页执行下滑",
+    "expected_text": "1.页面显示正文前序内容",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,This long notification body spans multiple lines and requires scrolling.;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8801;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8802;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "下滑前详情已离开顶部",
+      "下滑后页面显示正文前序内容"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_089",
+    "sheet": "消息",
+    "priority": "P2",
+    "precondition_text": "1.通知正文超过一屏",
+    "steps_text": "1.旋转编码器",
+    "expected_text": "1.通知正文沿旋转方向滚动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,This long notification body spans multiple lines and requires scrolling.;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8901;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:8902;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "旋转前通知正文位置",
+      "旋转后通知正文沿旋转方向滚动"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_090",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表显示通知详情页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表返回进入详情前的通知列表",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Return to notification list.;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "NOTIF_091",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.准备恰好800个英文字符的通知",
+    "steps_text": "1.发送该通知\n2.进入通知详情",
+    "expected_text": "1.通知写入通知中心\n2.详情正文显示全部800个英文字符",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_092",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.准备含中英文和emoji的长通知",
+    "steps_text": "1.发送超过800计数单位的通知\n2.进入通知详情",
+    "expected_text": "1.通知写入通知中心\n2.待产品确认：正文截断位置和计数口径",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_093",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.准备一条发送时间为少于1分钟的通知",
+    "steps_text": "1.进入该通知详情页",
+    "expected_text": "1.通知时间显示为刚刚格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_094",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.准备一条发送时间为10分钟的通知",
+    "steps_text": "1.进入该通知详情页",
+    "expected_text": "1.通知时间显示为10 min ago格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_095",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.准备一条发送时间为超过1小时的通知",
+    "steps_text": "1.进入该通知详情页",
+    "expected_text": "1.通知时间显示为MM/DD与时间格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_096",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.准备一条发送时间为跨年的通知",
+    "steps_text": "1.进入该通知详情页",
+    "expected_text": "1.通知时间显示为MM/DD/YYYY与时间格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "NOTIF_097",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.通知列表存在一条目标通知",
+    "steps_text": "1.左滑目标通知\n2.点击红色删除按钮\n3.点击确认按钮",
+    "expected_text": "1.目标通知显示删除入口\n2.页面显示删除确认弹窗\n3.目标通知被删除，列表刷新",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Target notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,128,50,128,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:9701;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:350,128,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:9702,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:9702;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:280,215,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:9703,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:9703;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "左滑后目标通知显示红色删除入口",
+      "点击删除入口后显示删除确认弹窗",
+      "点击确认后目标通知被删除且列表刷新"
+    ],
+    "unable": false,
+    "note": "卡片区域滑动及删除/确认坐标来自当前402x256 MESSAGE_LIST和COMMON_TITLE_BUTTON_TIP共享布局"
+  },
+  {
+    "case_id": "NOTIF_098",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.删除确认弹窗正在显示",
+    "steps_text": "1.点击取消按钮",
+    "expected_text": "1.弹窗关闭，目标通知仍在列表中",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Target notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:350,128,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:100,215,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "取消按钮区域来自当前402x256 COMMON_TITLE_BUTTON_TIP Designer静态布局"
+  },
+  {
+    "case_id": "NOTIF_099",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.删除确认弹窗正在显示\n2.系统未操作熄屏时长设为5秒",
+    "steps_text": "1.保持无操作至屏幕自动熄灭\n2.熄屏后等待11秒\n3.单击实体按键亮屏",
+    "expected_text": "1.删除确认弹窗持续显示至熄屏，不提前自动消失\n2.手表保持熄屏\n3.手表显示主表盘，目标通知未被删除",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "删除确认弹窗、等待和按键均可执行；最终主表盘截图无法同时证明目标通知未被删除，当前缺不改变人工步骤的可见状态证据"
+  },
+  {
+    "case_id": "NOTIF_100",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.通知列表存在一张同应用折叠卡",
+    "steps_text": "1.左滑该折叠卡\n2.点击删除按钮\n3.点击确认按钮",
+    "expected_text": "1.折叠卡显示删除入口\n2.页面显示删除确认弹窗\n3.该应用的整组通知从总列表消失",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,128,50,128,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10001;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:350,128,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:10002,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10002;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:280,215,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:10003,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10003;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "左滑后折叠卡显示删除入口",
+      "点击删除入口后显示删除确认弹窗",
+      "点击确认后该应用整组通知从列表消失"
+    ],
+    "unable": false,
+    "note": "卡片区域滑动及删除/确认坐标来自当前402x256 MESSAGE_LIST和COMMON_TITLE_BUTTON_TIP共享布局"
+  },
+  {
+    "case_id": "NOTIF_101",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.通知列表存在多条通知",
+    "steps_text": "1.点击Clear All\n2.点击确认按钮",
+    "expected_text": "1.页面显示清空确认弹窗\n2.全部通知被清除，页面显示No Notifications",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,220,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10101;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:280,215,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:10102,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10102;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "点击Clear All后显示清空确认弹窗",
+      "点击确认后全部通知清除并显示No Notifications"
+    ],
+    "unable": false,
+    "note": "Clear All和确认按钮区域来自当前402x256 MESSAGE_LIST及COMMON_TITLE_BUTTON_TIP Designer静态布局"
+  },
+  {
+    "case_id": "NOTIF_102",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.清空确认弹窗正在显示",
+    "steps_text": "1.点击取消按钮",
+    "expected_text": "1.弹窗关闭，原通知数量保持不变",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_MSG:;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,First notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Second notification;",
+      "srv_quick_cmd send TOP5STEP:SEND_MSG_TEST:0,Messages,Third notification;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10201;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,220,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10202;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:100,215,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:10203,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10203;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "取消前原通知数量",
+      "清空确认弹窗正在显示",
+      "取消后弹窗关闭且通知数量保持不变"
+    ],
+    "unable": false,
+    "note": "Clear All和取消按钮区域来自当前402x256 MESSAGE_LIST及COMMON_TITLE_BUTTON_TIP Designer静态布局"
+  },
+  {
+    "case_id": "NOTIF_103",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.清空确认弹窗正在显示\n2.系统未操作熄屏时长设为5秒",
+    "steps_text": "1.保持无操作至屏幕自动熄灭\n2.熄屏后等待11秒\n3.单击实体按键亮屏",
+    "expected_text": "1.清空确认弹窗持续显示至熄屏，不提前自动消失\n2.手表保持熄屏\n3.手表显示主表盘，原通知未被清空",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "清空确认弹窗、等待和按键均可执行；最终主表盘截图无法同时证明原通知未被清空，当前缺不改变人工步骤的可见状态证据"
+  },
+  {
+    "case_id": "NOTIF_104",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.删除确认弹窗正在显示",
+    "steps_text": "1.从手机发送一条新通知\n2.点击确认按钮",
+    "expected_text": "1.新通知写入通知中心\n2.仅原目标通知被删除，新通知保留",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "NOTIF_105",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.清空确认弹窗正在显示",
+    "steps_text": "1.从手机发送一条新通知\n2.点击确认按钮",
+    "expected_text": "1.新通知写入通知中心\n2.待产品确认：新通知是否被本次清空操作删除",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_106",
+    "sheet": "消息",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.勿扰模式已开启\n3.手表已佩戴",
+    "steps_text": "1.从手机发送一条通知\n2.进入通知中心",
+    "expected_text": "1.手表不弹窗，不振动\n2.通知列表显示该通知",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_107",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于省电模式",
+    "steps_text": "1.从手机发送一条通知\n2.退出省电后进入通知中心",
+    "expected_text": "1.省电期间手表不显示消息弹窗\n2.通知列表显示省电期间接收的通知",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_108",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示来电提醒页\n2.绑定手机的消息通知权限已开启",
+    "steps_text": "1.从另一台手机向绑定手机发送一条测试消息\n2.在手机端挂断来电\n3.进入消息中心",
+    "expected_text": "1.待产品确认：消息是否覆盖或排在来电提醒之后\n2.待产品确认：关闭当前页面后是否补显消息弹窗\n3.待产品确认：消息中心是否保存该通知",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_109",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示闹钟响铃页\n2.绑定手机的消息通知权限已开启",
+    "steps_text": "1.从另一台手机向绑定手机发送一条测试消息\n2.在手表关闭闹钟\n3.进入消息中心",
+    "expected_text": "1.待产品确认：消息是否覆盖或排在闹钟提醒之后\n2.待产品确认：关闭当前页面后是否补显消息弹窗\n3.待产品确认：消息中心是否保存该通知",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "NOTIF_110",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机通知权限已开启",
+    "steps_text": "1.连续发送100条通知\n2.浏览通知列表",
+    "expected_text": "1.手表持续接收通知，无异常重启\n2.列表仅保留最新20条，每条均可打开详情",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  },
+  {
+    "case_id": "NOTIF_111",
+    "sheet": "消息",
+    "priority": "P1",
+    "precondition_text": "1.准备支持版本范围内的Android和iOS手机\n2.两平台通知权限已开启",
+    "steps_text": "1.分别连接手表发送同内容通知",
+    "expected_text": "1.两平台均可使手表收到，展示通知",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)"
+  }
+]

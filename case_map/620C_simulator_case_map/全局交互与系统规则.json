@@ -1,0 +1,3596 @@
+[
+  {
+    "case_id": "GLOB_001",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示含长正文的页面",
+    "steps_text": "1.滚动About长页面",
+    "expected_text": "1.页面标题保持在顶部",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SYSTEM_INFO,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SYSTEM_INFO 是 About 真实窗口，上滑后可核对标题是否保持在顶部"
+  },
+  {
+    "case_id": "GLOB_002",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.已加载超长多语言标题测试资源",
+    "steps_text": "1.进入含超长标题的测试页面",
+    "expected_text": "1.标题区域显示滚动文字",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_003",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示含长正文的页面",
+    "steps_text": "1.进入含长正文的确认页",
+    "expected_text": "1.长正文换行显示",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_004",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示含长正文的页面",
+    "steps_text": "1.进入含长正文的确认页",
+    "expected_text": "1.确认按钮保持可见",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_005",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示内容超过一屏的页面",
+    "steps_text": "1.进入内容超过一屏的说明页",
+    "expected_text": "1.页面底部显示v图标",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_006",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示内容超过一屏的页面",
+    "steps_text": "1.在长页面上滑",
+    "expected_text": "1.页面右侧显示滚动条",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_007",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示内容超过一屏的页面",
+    "steps_text": "1.保持手指拖动长页面",
+    "expected_text": "1.滚动条滑块跟随手指位置",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待本身可执行；当前缺少可在按住期间连续更新触摸坐标的通用拖动命令，TP_SWIPE只能一次性完成滑动，无法建立“手指仍按住”的截图时点"
+  },
+  {
+    "case_id": "GLOB_008",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示内容超过一屏的页面",
+    "steps_text": "1.在长页面上滑\n2.松开手指",
+    "expected_text": "1.页面右侧显示滚动条\n2.滚动条滑块消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "GLOB_009",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.进入控制中心横向分页",
+    "expected_text": "1.页面底部显示分页圆点",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_010",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.左滑至控制中心第2页",
+    "expected_text": "1.底部第2个圆点高亮",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_011",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.用可编程触控治具滑动屏幕20%宽度",
+    "expected_text": "1.页面回弹至当前页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "GLOB_012",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.用可编程触控治具滑动屏幕30%宽度",
+    "expected_text": "1.页面切换至相邻页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "GLOB_013",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.启动页面位移与滑动动画帧率采集\n2.在控制中心第1页以匀速左滑\n3.滑动过程中保持手指接触屏幕\n4.读取滑动动画帧率分析结果",
+    "expected_text": "1.采集工具开始记录页面位移和滑动动画帧率\n2.控制中心页面开始跟随手指横向位移\n3.控制中心页面持续跟随手指横向位移\n4.帧率分析结果不低于60fps",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+  },
+  {
+    "case_id": "GLOB_014",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.用可编程触控治具横滑屏幕49%宽度",
+    "expected_text": "1.主表盘回弹至原页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前实时命令只能表达滑动方向，不能可靠构造横滑屏幕49%宽度这一精确阈值；不以 ENTER_PAGE 冒充触控动作"
+  },
+  {
+    "case_id": "GLOB_015",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.用可编程触控治具横滑屏幕51%宽度",
+    "expected_text": "1.页面吸附至目标一级页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前实时命令只能表达滑动方向，不能可靠构造横滑屏幕51%宽度这一精确阈值；不以 ENTER_PAGE 冒充触控动作"
+  },
+  {
+    "case_id": "GLOB_016",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.缓慢上滑主表盘",
+    "expected_text": "1.表盘背景模糊度随手指位移增加",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_017",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.缓慢下滑主表盘",
+    "expected_text": "1.表盘背景模糊度随手指位移增加",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_018",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.采集主表盘滑动动画",
+    "expected_text": "1.帧率分析结果不低于60fps",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+  },
+  {
+    "case_id": "GLOB_019",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.启动页面位移与滑动动画帧率采集\n2.在主表盘以匀速上滑\n3.滑动过程中保持手指接触屏幕\n4.读取滑动动画帧率分析结果",
+    "expected_text": "1.采集工具开始记录页面位移和滑动动画帧率\n2.消息中心页面开始跟随手指纵向位移\n3.消息中心页面持续跟随手指纵向位移\n4.帧率分析结果不低于60fps",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+  },
+  {
+    "case_id": "GLOB_020",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.用可编程触控治具上滑屏幕51%高度后松手\n2.返回主表盘，使用触控治具下滑屏幕51%后松手",
+    "expected_text": "1.页面自动吸附至顶部的消息中心\n2.页面自动吸附至底部的控制中心第1页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前实时命令只能表达滑动方向，不能可靠构造上滑和下滑屏幕51%这一精确阈值"
+  },
+  {
+    "case_id": "GLOB_021",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.点击设置列表选项",
+    "expected_text": "1.被点击选项出现缩放效果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "人工步骤未指定设置选项，实时源码也没有可确认的目标控件坐标；不能用 ENTER_PAGE 替代点击及瞬态缩放验证"
+  },
+  {
+    "case_id": "GLOB_022",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.长按设置列表选项",
+    "expected_text": "1.被长按选项出现缩放效果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "人工步骤未指定设置列表中的目标选项，当前源码无法确认触控坐标；不能用实体按键长按替代屏幕长按"
+  },
+  {
+    "case_id": "GLOB_023",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.在主表盘左滑",
+    "expected_text": "1.手表显示My Fitness一级视图",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_024",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.在主表盘右滑",
+    "expected_text": "1.手表显示负一屏",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_025",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表负一屏显示Weather卡片",
+    "steps_text": "1.点击负一屏Weather卡片",
+    "expected_text": "1.手表显示Weather应用页面",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_026",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示My Fitness一级视图",
+    "steps_text": "1.在My Fitness一级视图左滑\n2.在Sleep一级视图右滑",
+    "expected_text": "1.手表按固定顺序显示Sleep一级视图\n2.手表按固定顺序返回My Fitness一级视图",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:2601;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:2602;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "左滑后显示Sleep一级视图",
+      "右滑后返回My Fitness一级视图"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_027",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.在主表盘上滑",
+    "expected_text": "1.手表显示消息中心",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_028",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.在主表盘下滑",
+    "expected_text": "1.手表显示控制中心第1页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_029",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.用可编程触控治具长按主表盘2秒",
+    "expected_text": "1.手表显示Watch Faces页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_PRESS:201,128,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2901,2000;",
+      "srv_quick_cmd send TOP5STEP:TP_PRESS:201,128,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "使用实时TP_PRESS按下/释放和SIM_WAIT精确构造主表盘中心长按2秒"
+  },
+  {
+    "case_id": "GLOB_030",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在设置列表右滑",
+    "expected_text": "1.手表返回设置入口来源页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_031",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在负一屏左滑",
+    "expected_text": "1.手表返回主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_032",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在主表盘右滑",
+    "expected_text": "1.手表显示负一屏",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_033",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.已进入产品指定的特殊页面",
+    "steps_text": "1.在待确认特殊页面右滑",
+    "expected_text": "1.待产品确认页面返回响应",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "GLOB_034",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示长页面",
+    "steps_text": "1.在About页面上滑",
+    "expected_text": "1.页面内容向下方区域滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_035",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示长页面",
+    "steps_text": "1.在控制中心第1页左滑",
+    "expected_text": "1.手表显示控制中心第2页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_036",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示长页面",
+    "steps_text": "1.在设置列表左滑",
+    "expected_text": "1.设置列表保持当前内容",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_037",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在灭屏状态单击按键",
+    "expected_text": "1.手表屏幕点亮",
+    "verification_points": [
+      "按键前屏幕处于熄灭状态",
+      "单击实体按键后屏幕点亮"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:37001,screen_off;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:37002;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用通用screen_off事件建立灭屏状态，再由BUTTON_PRESS执行实体主键；前后截图判断点亮"
+  },
+  {
+    "case_id": "GLOB_038",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在主表盘单击按键",
+    "expected_text": "1.手表显示主菜单",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_039",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于一级视图",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_040",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于控制中心",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_041",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于消息中心",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_042",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于负一屏",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_043",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于主菜单",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_044",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于设置列表",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_045",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.运动进程正在运行",
+    "steps_text": "1.在运动中灭屏状态单击按键",
+    "expected_text": "1.手表显示运动中数据页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待、熄屏和实体按键均可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "GLOB_046",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.运动进程正在运行",
+    "steps_text": "1.在运动中数据页单击按键",
+    "expected_text": "1.手表显示暂停与结束按钮页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_047",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.运动进程正在运行",
+    "steps_text": "1.在暂停与结束按钮页单击按键",
+    "expected_text": "1.手表显示运动中数据页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_048",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.运动进程正在运行",
+    "steps_text": "1.在运动音乐页单击按键",
+    "expected_text": "1.手表显示运动中数据页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_049",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示来电页",
+    "steps_text": "1.在来电页单击按键",
+    "expected_text": "1.手表停止来电振动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_050",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示来电页",
+    "steps_text": "1.在来电页单击按键",
+    "expected_text": "1.手表停止播放来电铃声",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_051",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示来电页",
+    "steps_text": "1.在来电页双击按键",
+    "expected_text": "1.手机来电状态结束",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "GLOB_052",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.蓝牙通话正在进行",
+    "steps_text": "1.在通话中单击按键",
+    "expected_text": "1.手表保持通话页面",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_053",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.秒表正在计时",
+    "steps_text": "1.在秒表计时中单击按键",
+    "expected_text": "1.秒表列表新增一条计次记录",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_054",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示时钟功能页",
+    "steps_text": "1.在秒表暂停页单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_055",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.计时器正在运行",
+    "steps_text": "1.在计时器运行页单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_056",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示时钟功能页",
+    "steps_text": "1.在计时器运行页单击按键\n2.再次进入计时器",
+    "expected_text": "1.手表显示主表盘\n2.剩余时间小于返回前记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:5601,running,60,60;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:5601;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:5602;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:5602,3000;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用SIM_TIMER_STATE_SET建立60秒运行态，并用已确认的Clock子菜单Timer入口完成返回主表盘和再次进入的三阶段截图",
+    "verification_points": [
+      "按键前截图显示60秒计时器正在运行及初始剩余时间",
+      "单击实体按键后，截图显示主表盘",
+      "等待3秒并再次进入Timer后，截图显示剩余时间小于返回前记录"
+    ]
+  },
+  {
+    "case_id": "GLOB_057",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示时钟功能页",
+    "steps_text": "1.在贪睡开启的闹钟页单击按键",
+    "expected_text": "1.闹钟下次提醒时间延后10分钟",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_058",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示时钟功能页",
+    "steps_text": "1.在响铃提醒页单击按键",
+    "expected_text": "1.手表停止振动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_059",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示时钟功能页",
+    "steps_text": "1.在响铃提醒页单击按键",
+    "expected_text": "1.手表停止播放铃声",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_060",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于心率测量中",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_061",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于血氧测量中",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_062",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于压力测量中",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_063",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于呼吸训练中",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_064",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表处于一键测量中",
+    "steps_text": "1.单击按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_065",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用秒表计时，长按编码器3秒",
+    "expected_text": "1.手表显示关机重启选择页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_066",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用秒表计时，长按编码器5秒",
+    "expected_text": "1.手表显示SOS页面",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_067",
+    "sheet": "全局交互与系统规则",
+    "priority": "P0",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用秒表计时，长按编码器12秒",
+    "expected_text": "1.手表显示开机动画",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,12000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_068",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.省电模式处于开启状态",
+    "steps_text": "1.用秒表计时，长按编码器5秒",
+    "expected_text": "1.手表退出省电模式",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_069",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.省电模式处于开启状态",
+    "steps_text": "1.用秒表计时，长按编码器5秒",
+    "expected_text": "1.手表不显示SOS页面",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_070",
+    "sheet": "全局交互与系统规则",
+    "priority": "P0",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用秒表计时，长按编码器12秒",
+    "expected_text": "1.待产品确认最终触发的系统事件",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "GLOB_071",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机\n2.按键抖动治具已按测试参数设置",
+    "steps_text": "1.执行1次编码器触点抖动",
+    "expected_text": "1.手表最多显示一层关机重启选择页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+  },
+  {
+    "case_id": "GLOB_072",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在主表盘顺时针旋转编码器",
+    "expected_text": "1.手表显示消息中心",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_073",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在主表盘逆时针旋转编码器",
+    "expected_text": "1.手表显示控制中心第1页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_074",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在主菜单顺时针旋转编码器",
+    "expected_text": "1.菜单列表向上滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_075",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在主菜单逆时针旋转编码器",
+    "expected_text": "1.菜单列表向下滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_076",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在About长页顺时针旋转编码器",
+    "expected_text": "1.页面内容向上方区域滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_077",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在About长页逆时针旋转编码器",
+    "expected_text": "1.页面内容向下方区域滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_078",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在亮度页旋转编码器一格",
+    "expected_text": "1.亮度移动至相邻档位",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_ADJUST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先直达源码注册的亮度调节窗口，再用 QDEC_SET 模拟一格编码器输入"
+  },
+  {
+    "case_id": "GLOB_079",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示可滚动列表",
+    "steps_text": "1.在全屏弹窗显示时旋转编码器",
+    "expected_text": "1.弹窗下方页面位置保持不变",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "GLOB_080",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在普通页面保持5秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "等待前普通设置内页处于亮屏状态",
+      "真实等待5秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:80002,5500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "普通内页统一选用设置页，设置5秒亮屏时长并真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_081",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为5s",
+    "steps_text": "1.在普通页面保持5秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "5秒等待前普通设置内页处于亮屏状态",
+      "真实等待5秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:81001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:81002,5500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_082",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为10s",
+    "steps_text": "1.在普通页面保持10秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "10秒等待前普通设置内页处于亮屏状态",
+      "真实等待10秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:82001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:82002,10500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_083",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为15s",
+    "steps_text": "1.在普通页面保持15秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "15秒等待前普通设置内页处于亮屏状态",
+      "真实等待15秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:15;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:83001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:83002,15500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_084",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为20s",
+    "steps_text": "1.在普通页面保持20秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "20秒等待前普通设置内页处于亮屏状态",
+      "真实等待20秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:20;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:84001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:84002,20500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_085",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为30s",
+    "steps_text": "1.在普通页面保持30秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "30秒等待前普通设置内页处于亮屏状态",
+      "真实等待30秒后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:30;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:85001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:85002,30500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏"
+  },
+  {
+    "case_id": "GLOB_086",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在设置列表等待熄屏\n2.等待9秒\n3.单击按键",
+    "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到9秒\n3.手表恢复设置列表页",
+    "verification_points": [
+      "自动熄屏前显示设置列表",
+      "熄屏后真实保持9秒且屏幕仍黑",
+      "单击实体按键后恢复设置列表"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:86001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:86002,5500;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:86003,9000;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:86004;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "统一在设置页等待5秒自动熄屏，再真实保持9秒并按主键；三阶段截图判断恢复规则"
+  },
+  {
+    "case_id": "GLOB_087",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在设置列表等待熄屏\n2.等待10秒\n3.单击按键",
+    "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到10秒\n3.手表恢复设置列表页",
+    "verification_points": [
+      "自动熄屏前显示设置列表",
+      "熄屏后真实保持10秒且屏幕仍黑",
+      "单击实体按键后恢复设置列表"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:87001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:87002,5500;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:87003,10000;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:87004;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "统一在设置页等待5秒自动熄屏，再真实保持10秒并按主键；三阶段截图判断边界规则"
+  },
+  {
+    "case_id": "GLOB_088",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在设置列表等待熄屏\n2.等待11秒\n3.单击按键",
+    "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表显示主表盘",
+    "verification_points": [
+      "自动熄屏前显示设置列表",
+      "熄屏后真实保持11秒且屏幕仍黑",
+      "单击实体按键后显示主表盘"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:88001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:88002,5500;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:88003,11000;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:88004;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "统一在设置页等待5秒自动熄屏，再真实保持11秒并按主键；三阶段截图判断超时返回表盘规则"
+  },
+  {
+    "case_id": "GLOB_089",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在普通页面执行覆盖屏幕",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,screen_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_090",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在普通页面执行垂腕",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_091",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示普通内页",
+    "steps_text": "1.在普通页面执行按键熄屏",
+    "expected_text": "1.手表进入熄屏状态",
+    "verification_points": [
+      "按键前普通设置内页处于亮屏状态",
+      "单击实体按键后的实际屏幕状态"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:91001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "实体按键可由通用BUTTON_PRESS真实注入；不预设产品结果，由前后截图判定是否按预期熄屏"
+  },
+  {
+    "case_id": "GLOB_092",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在进行健康测量",
+    "steps_text": "1.保持心率测量页至测量结束",
+    "expected_text": "1.测量结束前屏幕持续亮屏",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:92001,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:92002,hr,fixed,88,0;",
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:92003,screen_on;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:92001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:92004,6500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:92002;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:92005,23500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用佩戴和固定HR传感器状态启动真实测量，并设置5秒亮屏时长；两张阶段截图覆盖测量开始及超过灭屏时间时仍亮屏，测量结束后的页面不属于本用例判据",
+    "verification_points": [
+      "计时开始前截图显示心率测量正在进行",
+      "超过5秒系统灭屏时间后截图仍显示心率测量页且屏幕亮着"
+    ]
+  },
+  {
+    "case_id": "GLOB_093",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在进行健康测量",
+    "steps_text": "1.在心率测量中执行垂腕",
+    "expected_text": "1.手表保持心率测量页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:1,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:2,hr,fixed,80,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE_MEASURE,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:3,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_094",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在进行健康测量",
+    "steps_text": "1.在心率测量中覆盖屏幕",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:1,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:2,hr,fixed,80,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE_MEASURE,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:3,screen_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_095",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在进行健康测量",
+    "steps_text": "1.在心率测量中覆盖屏幕\n2.单击按键亮屏",
+    "expected_text": "1.手表进入熄屏状态\n2.手表不再显示心率测量中页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:1,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:2,hr,fixed,80,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE_MEASURE,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:3,screen_off;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:9501;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:9502;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "覆盖屏幕后进入熄屏状态",
+      "单击按键亮屏后不再显示心率测量中页面"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_096",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.计时器正在运行",
+    "steps_text": "1.观察计时器运行一分钟",
+    "expected_text": "1.屏幕持续显示计时器运行页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:9601,60000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_097",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.计时器正在运行",
+    "steps_text": "1.在计时器运行页执行垂腕",
+    "expected_text": "1.手表保持计时器运行页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  },
+  {
+    "case_id": "GLOB_098",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.计时器正在运行",
+    "steps_text": "1.触发计时器结束提醒",
+    "expected_text": "1.提醒页面保持亮屏至1分钟边界",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发计时器结束提醒"
+  },
+  {
+    "case_id": "GLOB_099",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.计时器正在运行",
+    "steps_text": "1.在计时提醒页覆盖屏幕",
+    "expected_text": "1.振动测试仪继续记录提醒振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前源码已有数据注入命令；该用例需分场景逐步取证"
+  },
+  {
+    "case_id": "GLOB_100",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.秒表正在运行",
+    "steps_text": "1.保持秒表运行页无操作5分钟",
+    "expected_text": "1.屏幕在5分钟边界进入熄屏状态",
+    "verification_points": [
+      "等待前秒表正在前台计时且屏幕点亮",
+      "真实保持无操作5分钟后屏幕熄灭"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:289,215,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:100001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:100002,120000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:100003,120000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:100004,60000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "真实启动秒表后按SIM_WAIT单次120秒上限分三段等待满5分钟；前后截图判断5分钟边界熄屏"
+  },
+  {
+    "case_id": "GLOB_101",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为10s",
+    "steps_text": "1.在未开始页保持所设时长无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:10101,screen_on;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:10101;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:10102,10500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "将Screen Timeout设置为10秒，在未开始的Heart Rate页从亮屏基线真实等待10.5秒，以最终黑屏截图验证自动熄屏",
+    "verification_points": [
+      "等待前截图显示未开始的Heart Rate页面且屏幕亮着",
+      "保持10秒无操作后截图显示屏幕熄灭"
+    ]
+  },
+  {
+    "case_id": "GLOB_102",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示来电页",
+    "steps_text": "1.在来电页执行垂腕",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1,all_phone,1;",
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:2,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_103",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示来电页",
+    "steps_text": "1.在来电页覆盖屏幕",
+    "expected_text": "1.振动测试仪继续记录来电振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1,all_phone,1;",
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:2,screen_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_104",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机来电仍未结束",
+    "steps_text": "1.在来电页覆盖屏幕\n2.等待11秒\n3.单击按键",
+    "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表恢复来电页",
+    "verification_points": [
+      "覆盖前来电页正在显示且来电未结束",
+      "覆盖后屏幕熄灭",
+      "熄屏真实保持11秒后仍处于黑屏",
+      "单击实体按键后恢复来电页"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:104001,all_phone,1;",
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:104002;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:104003,screen_off;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:104004;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:104005,11000;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:104006;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用全连接来电事件、screen_off、真实等待和实体主键；四阶段截图判断来电页恢复"
+  },
+  {
+    "case_id": "GLOB_105",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为10s\n2.运动进程正在运行",
+    "steps_text": "1.在运动中页面保持10秒无操作",
+    "expected_text": "1.手表进入熄屏状态",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "十秒等待可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "GLOB_106",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.运动进程正在运行",
+    "steps_text": "1.等待运动页熄屏\n2.等待11秒\n3.单击按键",
+    "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表显示运动中数据页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待、熄屏和实体按键均可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "GLOB_107",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.Screen Timeout设为5s\n2.手表录音进程正在运行",
+    "steps_text": "1.在录音页面分别执行覆盖熄屏、按键熄屏和垂腕熄屏\n2.等待录音页面熄屏\n3.等待11秒\n4.单击按键\n5.读取录音文件时长",
+    "expected_text": "1.三种操作均使手表进入熄屏状态\n2.录音进程继续运行\n3.录音进程仍在运行\n4.手表显示主表盘\n5.录音文件包含熄屏期间的连续音频",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "三种熄屏、等待和实体按键均可执行；当前缺建立持续录音会话并读取录音文件时长与连续音频的通用录音能力，截图无法判定文件内容"
+  },
+  {
+    "case_id": "GLOB_108",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已设置测试闹钟",
+    "steps_text": "1.触发测试闹钟",
+    "expected_text": "1.提醒页面保持亮屏至1分钟边界",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发测试闹钟"
+  },
+  {
+    "case_id": "GLOB_109",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已设置测试闹钟",
+    "steps_text": "1.在闹钟提醒页执行垂腕",
+    "expected_text": "1.手表保持闹钟提醒页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_110",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已设置测试闹钟",
+    "steps_text": "1.在闹钟提醒页覆盖屏幕",
+    "expected_text": "1.扬声器继续播放闹钟铃声",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,screen_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "audio_event 已作为铃声输出验收"
+  },
+  {
+    "case_id": "GLOB_111",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示遥控拍照页",
+    "steps_text": "1.保持遥控拍照页一分钟无操作",
+    "expected_text": "1.屏幕持续显示遥控拍照页",
+    "verification_points": [
+      "等待前显示遥控拍照提示页",
+      "真实保持无操作1分钟后仍显示同一提示页"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CAMERA,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:111001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:111002,60000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用通用连接状态和Camera提示页并真实等待1分钟；前后截图判断页面是否持续显示"
+  },
+  {
+    "case_id": "GLOB_112",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示遥控拍照页",
+    "steps_text": "1.在遥控拍照页执行垂腕",
+    "expected_text": "1.手表保持遥控拍照页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CAMERA,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_113",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示手电筒页",
+    "steps_text": "1.保持手电筒页一分钟无操作",
+    "expected_text": "1.屏幕持续显示手电筒页",
+    "verification_points": [
+      "等待前显示Flashlight开启页",
+      "真实保持无操作1分钟后仍显示同一亮屏页"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:113001;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:113002,60000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "设置5秒全局亮屏时长后在Flashlight页真实等待1分钟；前后截图判断页面是否持续亮屏"
+  },
+  {
+    "case_id": "GLOB_114",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示手电筒页",
+    "steps_text": "1.在手电筒页执行垂腕",
+    "expected_text": "1.手表保持手电筒页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_115",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.查找手机正在进行",
+    "steps_text": "1.保持查找手机页一分钟无操作",
+    "expected_text": "1.屏幕持续显示查找手机页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器"
+  },
+  {
+    "case_id": "GLOB_116",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.在查找手机页覆盖屏幕",
+    "expected_text": "1.手机停止播放查找铃声",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器"
+  },
+  {
+    "case_id": "GLOB_117",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.保持查找手表页一分钟无操作",
+    "expected_text": "1.屏幕持续显示查找手表页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:26;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:11701,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:11701;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:11702,60000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用MSG_TEST:26真实发送查找手表业务事件，设置5秒自动熄屏后等待一分钟，以前后截图验证页面持续显示",
+    "verification_points": [
+      "等待前截图显示查找手表页",
+      "保持一分钟无操作后，截图仍显示查找手表页"
+    ]
+  },
+  {
+    "case_id": "GLOB_118",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.在查找手表页覆盖屏幕",
+    "expected_text": "1.手表退出查找手表页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:26;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,screen_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前源码命令已覆盖，并通过模拟器验证"
+  },
+  {
+    "case_id": "GLOB_119",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将语言设为中文后查看当年日期",
+    "expected_text": "1.页面显示月/日格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_120",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将语言设为英文后查看当年日期",
+    "expected_text": "1.页面显示日/月格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_121",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.系统语言为中文\n2.测试记录来自上一年度",
+    "steps_text": "1.查看跨年记录日期",
+    "expected_text": "1.页面显示年/月/日格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_122",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.系统语言为英文\n2.测试记录来自上一年度",
+    "steps_text": "1.查看跨年记录日期",
+    "expected_text": "1.页面显示日/月/年格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_123",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将系统时间设为00:00",
+    "expected_text": "1.12小时制页面显示12:00 AM",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811000000;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "TIME_MODE:0 设置12小时制，TIME_SET 使用源码要求的 YYMMDDHHmmss 格式设置午夜"
+  },
+  {
+    "case_id": "GLOB_124",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将系统时间设为12:00",
+    "expected_text": "1.12小时制页面显示12:00 PM",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "TIME_MODE:0 设置12小时制，TIME_SET 使用源码要求的 YYMMDDHHmmss 格式设置正午"
+  },
+  {
+    "case_id": "GLOB_125",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.观察标准页面顶部时间",
+    "expected_text": "1.顶部时间不显示AM或PM",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_126",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.切换语言后查看12小时制记录时间",
+    "expected_text": "1.待产品确认页面时段标识格式",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "GLOB_127",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看59秒前的有效测量值",
+    "expected_text": "1.页面显示刚刚",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_128",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看60秒前的有效测量值",
+    "expected_text": "1.页面显示1分钟前",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_129",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看59分59秒前的有效测量值",
+    "expected_text": "1.页面显示59分钟前",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_130",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看当天1小时前的有效测量值",
+    "expected_text": "1.页面显示1小时前",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_131",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看昨日的有效测量值",
+    "expected_text": "1.数值区域显示--",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_132",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.发起心率测量",
+    "expected_text": "1.测量中页面不显示上次测量时间",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:HR_SET:72;",
+      "srv_quick_cmd send TOP5STEP:WEAR_SET:13201,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:13202,hr,silent,0,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先写入历史心率，再使用 silent 传感器配置发起测量；已实测截图显示 Measuring.. 且不显示上次时间"
+  },
+  {
+    "case_id": "GLOB_133",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看一分钟内收到的消息",
+    "expected_text": "1.消息时间显示刚刚",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_134",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看10分钟前收到的消息",
+    "expected_text": "1.消息时间显示10 min ago",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_135",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看超过1小时前收到的消息",
+    "expected_text": "1.消息时间显示MM/DD, HH:MM AM/PM",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_136",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表存在可查看的历史记录",
+    "steps_text": "1.查看上一年度的通话记录",
+    "expected_text": "1.记录时间显示日期年份",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_137",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.恢复出厂后读取振动强度",
+    "expected_text": "1.振动强度页面显示弱档",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+  },
+  {
+    "case_id": "GLOB_138",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动强度设为强",
+    "steps_text": "1.触发一次系统短振",
+    "expected_text": "1.电流测试仪记录70mA",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发一次系统短振"
+  },
+  {
+    "case_id": "GLOB_139",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动强度设为弱",
+    "steps_text": "1.触发一次系统短振",
+    "expected_text": "1.电流测试仪记录40mA",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发一次系统短振"
+  },
+  {
+    "case_id": "GLOB_140",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.执行设备开机",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+  },
+  {
+    "case_id": "GLOB_141",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.执行设备关机",
+    "expected_text": "1.振动测试仪未记录振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:141,power_off;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SIM_SYSTEM_EVENT:power_off 来自 Windows 模拟器源码；motor_event 可证明关机动作期间是否触发振动"
+  },
+  {
+    "case_id": "GLOB_142",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.执行设备重启",
+    "expected_text": "1.黑屏阶段振动测试仪未记录振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:142,power_off;",
+      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:143,power_on;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用 power_off/power_on 组成模拟器重启生命周期，motor_event 记录黑屏阶段的振动事件"
+  },
+  {
+    "case_id": "GLOB_143",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.触发BLE配对确认",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发BLE配对确认"
+  },
+  {
+    "case_id": "GLOB_144",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表显示主表盘",
+    "steps_text": "1.用可编程触控治具长按主表盘2秒",
+    "expected_text": "1.手表进入Watch Faces页面，振动测试仪记录一次250ms振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "可构造屏幕长按，但预期还要求振动测试仪采集250ms振动；当前无振动证据通道，不能以页面截图替代完整验收"
+  },
+  {
+    "case_id": "GLOB_145",
+    "sheet": "全局交互与系统规则",
+    "priority": "P0",
+    "precondition_text": "1.手表未接入充电扣",
+    "steps_text": "1.将充电扣正确连接至手表",
+    "expected_text": "1.手表进入充电状态，振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "GLOB_146",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动测试仪已固定并校准\n2.App已开启运动心率过高提醒\n3.手表正在记录一项支持心率提醒的运动",
+    "steps_text": "1.通过心率数据测试工具设置一个超过运动提醒阈值的心率值\n2.读取两次振动的持续时长\n3.读取两次振动的时间间隔",
+    "expected_text": "1.振动测试仪记录两次振动\n2.两次振动的持续时长均为250ms\n3.两次振动的时间间隔为750ms",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+  },
+  {
+    "case_id": "GLOB_147",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动测试仪已固定并校准\n2.App已开启安静心率过高提醒\n3.手表处于安静心率监测时段",
+    "steps_text": "1.通过心率数据测试工具设置一个超过安静提醒阈值的心率值\n2.读取两次振动的持续时长\n3.读取两次振动的时间间隔",
+    "expected_text": "1.振动测试仪记录两次振动\n2.两次振动的持续时长均为250ms\n3.两次振动的时间间隔为750ms",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:28;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "MSG_TEST:28 触发源码中的静息心率预警；模拟器 motor_event 输出次数、持续时间和间隔"
+  },
+  {
+    "case_id": "GLOB_148",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动测试仪已固定并校准\n2.App已开启生理周期提醒\n3.当前时间已到达生理周期提醒时刻",
+    "steps_text": "1.等待手表触发生理周期提醒\n2.读取两次振动的持续时长\n3.读取两次振动的时间间隔",
+    "expected_text": "1.振动测试仪记录两次振动\n2.两次振动的持续时长均为250ms\n3.两次振动的时间间隔为750ms",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "提醒触发等待可执行；完整预期要求振动测试仪测量两次250ms振动及750ms间隔，当前无振动采集证据通道"
+  },
+  {
+    "case_id": "GLOB_149",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表尚未绑定\n2.振动测试仪已固定并校准",
+    "steps_text": "1.在App完成手表绑定",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_150",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表尚未绑定\n2.振动测试仪已固定并校准",
+    "steps_text": "1.在绑定过程中关闭手机蓝牙",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_151",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表电量为20%且未充电\n2.振动测试仪已固定并校准",
+    "steps_text": "1.用电量测试工具将电量降至19%",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:20;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:19;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "POWER_PERCENT_SET 构造20%到19%的阈值变化；模拟器 motor_event 输出振动参数"
+  },
+  {
+    "case_id": "GLOB_152",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.活动目标还差1步\n2.振动测试仪已固定并校准",
+    "steps_text": "1.佩戴手表行走1步",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SET_DAILY_TARGET:1,100;",
+      "srv_quick_cmd send TOP5STEP:SIM_ACTIVITY_SET:15201,fixed,99,0,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_ACTIVITY_SET:15202,fixed,100,0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "先准备99/100步目标数据，再注入第100步；模拟器 motor_event 输出振动参数"
+  },
+  {
+    "case_id": "GLOB_153",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.久坐提醒已开启且距离触发还差1分钟\n2.振动测试仪已固定并校准",
+    "steps_text": "1.保持静止至久坐提醒出现",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "提醒触发和等待可通过共享事件及SIM_WAIT完成；但唯一预期是振动测试仪记录两次250ms振动，产品截图无法证明振动次数和时长，需真实振动采集证据"
+  },
+  {
+    "case_id": "GLOB_154",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.喝水提醒已开启且距离触发还差1分钟\n2.振动测试仪已固定并校准",
+    "steps_text": "1.等待喝水提醒出现",
+    "expected_text": "1.振动测试仪记录两次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "喝水提醒可由共享业务事件触发；完整预期只要求振动测试仪记录两次250ms振动，当前无振动采集证据通道"
+  },
+  {
+    "case_id": "GLOB_155",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表电量为20%且未充电\n2.振动测试仪已固定并校准",
+    "steps_text": "1.用电量测试工具将电量降至19%",
+    "expected_text": "1.振动测试仪记录750ms间隔",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:20;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:19;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "POWER_PERCENT_SET 构造20%到19%的阈值变化；motor_event 可直接核对750ms间隔"
+  },
+  {
+    "case_id": "GLOB_156",
+    "sheet": "全局交互与系统规则",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已进入查找手表页面",
+    "steps_text": "1.在App点击查找手表\n2.保持无操作2分30秒",
+    "expected_text": "1.手表按250ms振动和750ms停留的强振节奏开始提醒\n2.振动测试仪记录该节奏持续2分30秒后停止",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_157",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于未佩戴状态",
+    "steps_text": "1.触发一条App消息",
+    "expected_text": "1.振动测试仪未记录振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_158",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于佩戴熄屏状态",
+    "steps_text": "1.触发一条App消息",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_159",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于佩戴亮屏状态",
+    "steps_text": "1.触发一条App消息",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+  },
+  {
+    "case_id": "GLOB_160",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表准备开始健康测量",
+    "steps_text": "1.触发血氧测量结束",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发血氧测量结束"
+  },
+  {
+    "case_id": "GLOB_161",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表准备开始健康测量",
+    "steps_text": "1.触发压力测量结束",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发压力测量结束"
+  },
+  {
+    "case_id": "GLOB_162",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表准备开始健康测量",
+    "steps_text": "1.触发呼吸相位切换",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发呼吸相位切换"
+  },
+  {
+    "case_id": "GLOB_163",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在运动",
+    "steps_text": "1.触发运动开始",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发运动开始"
+  },
+  {
+    "case_id": "GLOB_164",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在运动",
+    "steps_text": "1.触发运动暂停",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:MUSIC_CTRL:1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_165",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在运动",
+    "steps_text": "1.触发运动恢复",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发运动恢复"
+  },
+  {
+    "case_id": "GLOB_166",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表正在运动",
+    "steps_text": "1.触发运动结束",
+    "expected_text": "1.振动测试仪记录一次250ms振动",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发运动结束"
+  },
+  {
+    "case_id": "GLOB_167",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.振动测试仪已固定并校准\n2.手表正在进行按公里或小时累计的运动",
+    "steps_text": "1.使运动累计值达到1个公里或小时单位\n2.观察第1个单位完成时的弹窗\n3.读取第1次提醒的两次振动持续时长\n4.读取第1次提醒的两次振动时间间隔\n5.使运动累计值达到2个公里或小时单位\n6.观察第2个单位完成时的弹窗\n7.读取第2次提醒的两次振动持续时长\n8.读取第2次提醒的两次振动时间间隔",
+    "expected_text": "1.手表触发第1次整数单位完成提醒\n2.弹窗显示完成1个对应公里或小时单位\n3.两次振动的持续时长均为250ms\n4.两次振动的时间间隔为750ms\n5.手表触发第2次整数单位完成提醒\n6.弹窗显示完成2个对应公里或小时单位\n7.两次振动的持续时长均为250ms\n8.两次振动的时间间隔为750ms",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+  },
+  {
+    "case_id": "GLOB_168",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.触发测试来电",
+    "expected_text": "1.振动测试仪持续记录250ms振动周期",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发测试来电"
+  },
+  {
+    "case_id": "GLOB_169",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.在拨号盘点击一个数字",
+    "expected_text": "1.振动测试仪记录50ms振动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_170",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发久坐提醒弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发久坐提醒弹窗"
+  },
+  {
+    "case_id": "GLOB_171",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发喝水提醒弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发喝水提醒弹窗"
+  },
+  {
+    "case_id": "GLOB_172",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发女性健康提醒弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发女性健康提醒弹窗"
+  },
+  {
+    "case_id": "GLOB_173",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发活动达标弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发活动达标弹窗"
+  },
+  {
+    "case_id": "GLOB_174",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发运动达标弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发运动达标弹窗"
+  },
+  {
+    "case_id": "GLOB_175",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发心率预警弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发心率预警弹窗"
+  },
+  {
+    "case_id": "GLOB_176",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.对应提醒弹窗触发条件即将满足",
+    "steps_text": "1.触发血氧预警弹窗",
+    "expected_text": "1.弹窗在5秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发血氧预警弹窗"
+  },
+  {
+    "case_id": "GLOB_177",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表尚未绑定，App即将完成本次绑定",
+    "steps_text": "1.触发绑定成功弹窗",
+    "expected_text": "1.弹窗在3秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发绑定成功弹窗"
+  },
+  {
+    "case_id": "GLOB_178",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表尚未绑定，App即将上报本次绑定失败",
+    "steps_text": "1.触发绑定失败弹窗",
+    "expected_text": "1.弹窗在3秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发绑定失败弹窗"
+  },
+  {
+    "case_id": "GLOB_179",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已发起网络请求，测试网络已设为返回失败",
+    "steps_text": "1.触发网络请求失败弹窗",
+    "expected_text": "1.弹窗在3秒到达时消失",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发网络请求失败弹窗"
+  },
+  {
+    "case_id": "GLOB_180",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.已获得截断条款对应页面标识",
+    "steps_text": "1.进入产品指定的对应页面",
+    "expected_text": "1.待产品确认该页面的全局UI结果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "GLOB_181",
+    "sheet": "全局交互与系统规则",
+    "priority": "P2",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.在控制中心快速左滑后反向右滑",
+    "expected_text": "1.最终页面停留在相邻页或起始页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_182",
+    "sheet": "全局交互与系统规则",
+    "priority": "P2",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.点击屏幕边缘后立即抬起",
+    "expected_text": "1.页面保持当前页",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_183",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将系统时间回拨一小时",
+    "expected_text": "1.页面时间减少一小时",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:260811110000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用 TIME_SET 固定前置时间，再回拨一小时，避免依赖运行时当前时间"
+  },
+  {
+    "case_id": "GLOB_184",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.将系统时间推进至次年00:00",
+    "expected_text": "1.页面日期显示新年份",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:261231235900;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TIME_SET:270101000000;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用 TIME_SET 固定年末前置时间，再推进到次年午夜"
+  },
+  {
+    "case_id": "GLOB_185",
+    "sheet": "全局交互与系统规则",
+    "priority": "P0",
+    "precondition_text": "1.喝水提醒将在1分钟内触发\n2.App已打开固件升级页且手表电量高于30%",
+    "steps_text": "1.等待喝水提醒弹窗出现\n2.在App点击安装\n3.在手表确认升级",
+    "expected_text": "1.手表显示喝水提醒弹窗\n2.App显示升级确认\n3.手表切换为Firmware Update进度页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "喝水提醒弹窗和等待可执行；后续要求App固件升级页安装并确认，当前缺手机App侧操作与截图证据"
+  },
+  {
+    "case_id": "GLOB_186",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.喝水提醒将在1分钟内触发\n2.久坐提醒将在喝水提醒显示期间触发",
+    "steps_text": "1.等待喝水提醒弹窗出现\n2.等待久坐提醒到点",
+    "expected_text": "1.手表显示喝水提醒弹窗\n2.手表继续显示喝水提醒弹窗",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:23;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18601,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:18601;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:22;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18602,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用共享喝水和久坐业务事件，分阶段截图验证久坐提醒到点时喝水弹窗的优先级",
+    "verification_points": [
+      "喝水提醒触发后，截图显示喝水提醒弹窗",
+      "随后触发久坐提醒时，截图仍显示喝水提醒弹窗"
+    ]
+  },
+  {
+    "case_id": "GLOB_187",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.喝水提醒将在1分钟内触发\n2.久坐提醒将在喝水提醒显示期间触发",
+    "steps_text": "1.等待喝水提醒弹窗出现\n2.等待久坐提醒到点\n3.右滑关闭喝水提醒弹窗",
+    "expected_text": "1.手表显示喝水提醒弹窗\n2.喝水提醒弹窗保持显示\n3.手表显示久坐提醒弹窗",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:23;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18701,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:18701;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:MSG_TEST:22;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18702,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:18702;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18703,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用共享喝水和久坐业务事件，截图覆盖喝水弹窗、久坐到点仍保持、关闭后显示久坐弹窗三个阶段",
+    "verification_points": [
+      "喝水提醒触发后，截图显示喝水提醒弹窗",
+      "久坐提醒到点后，截图仍显示喝水提醒弹窗",
+      "右滑关闭喝水提醒弹窗后，截图显示久坐提醒弹窗"
+    ]
+  },
+  {
+    "case_id": "GLOB_188",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用可编程触控治具执行500次页面滑动",
+    "expected_text": "1.手表未发生异常重启",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+  },
+  {
+    "case_id": "GLOB_189",
+    "sheet": "全局交互与系统规则",
+    "priority": "P1",
+    "precondition_text": "1.手表已开机",
+    "steps_text": "1.用按压治具连续单击编码器500次",
+    "expected_text": "1.手表保持可操作",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_190",
+    "sheet": "全局交互与系统规则",
+    "priority": "P2",
+    "precondition_text": "1.准备Android与iOS支持版本手机",
+    "steps_text": "1.抽测十个标准非表盘页面右滑",
+    "expected_text": "1.每个页面均返回其上一级",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "GLOB_191",
+    "sheet": "全局交互与系统规则",
+    "priority": "P3",
+    "precondition_text": "1.手表显示待测页面",
+    "steps_text": "1.慢速拖动主表盘一级页面",
+    "expected_text": "1.页面内容持续跟随手指位置",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+  }
+]

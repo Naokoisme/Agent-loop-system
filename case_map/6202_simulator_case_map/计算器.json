@@ -1,0 +1,919 @@
+{
+  "profile": "6202_W5230_SIMULATOR",
+  "source_profile": "620C_W6830",
+  "sheet": "计算器",
+  "window_version": "5803_SBYH_FP410X502",
+  "coordinate_source": "D:\\Agent-loop-workspace\\6202_W5230\\app\\windows\\5803_SBYH_FP410X502\\gui_win_calculator.json",
+  "cases": [
+    {
+      "case_id": "CALC_001",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Utilities二级菜单",
+      "steps_text": "1.点击Calculator",
+      "expected_text": "1.页面显示数值0和四行计算键盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_PRODUCT_STATE_MISSING：2026-08-14在6202真实模拟器执行ENTER_PAGE:UTILITIES后，命令返回accepted且GUI队列processed，但新截图仍为主表盘；当前6202项目菜单配置将Calculator列为一级应用且没有Utilities二级页，无法建立原始前置条件，也不能用直达Calculator替代‘点击Calculator’。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_001_utilities_probe。"
+    },
+    {
+      "case_id": "CALC_002",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calculator",
+      "steps_text": "1.观察全部按键",
+      "expected_text": "1.键盘显示数字和小数点和四则运算和等号和AC和退格，无百分号和正负号",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_VISUAL_ONLY_ACTION_CONTRACT：原步骤只有‘观察全部按键’，现有Runner要求非空人工步骤必须有真实业务action；截图不能代替动作，也不能擅自增加原步骤没有的按键操作。2026-08-14真实Runner已采集键盘截图（可见百分号键），但因business_action_count=0判为ERROR，不能固化。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_002。"
+    },
+    {
+      "case_id": "CALC_003",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次点击1和2和3",
+      "expected_text": "1.数值区显示123",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Calculator源码坐标已核对；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_003。",
+      "verification_points": [
+        "依次点击1、2、3后，数值区显示123"
+      ]
+    },
+    {
+      "case_id": "CALC_004",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入123456789",
+      "expected_text": "1.数值区显示123456789",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Calculator源码坐标已核对；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_004。",
+      "verification_points": [
+        "依次输入123456789后，数值区完整显示123456789"
+      ]
+    },
+    {
+      "case_id": "CALC_005",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.数值区已有9位数字",
+      "steps_text": "1.点击任一数字键",
+      "expected_text": "1.数值区仍保持原9位内容，不显示提示",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Calculator源码坐标已核对；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_005。",
+      "verification_points": [
+        "已有9位数字时再点击数字键，数值区仍显示123456789且无提示"
+      ]
+    },
+    {
+      "case_id": "CALC_006",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.输入1234567.8\n2.点击数字9",
+      "expected_text": "1.数值区显示1234567.8共9位\n2.第10位输入无响应",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6001;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6002;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "2026-08-14正式Runner复跑，证据契约COMPLETE，2/2截图；产品FAIL：输入1234567.8后再点9，实际显示1234567.89，未拒绝第10个数字；证据：evidence/6202_calculator_final_20260814_1301/CALC_006。",
+      "verification_points": [
+        "数值区显示1234567.8共9位",
+        "继续点击数字9后数值区仍显示1234567.8"
+      ]
+    },
+    {
+      "case_id": "CALC_007",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器刚清空",
+      "steps_text": "1.点击小数点\n2.点击5",
+      "expected_text": "1.数值区显示0.\n2.数值区显示0.5",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:7001;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:7002;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "2026-08-14正式Runner复跑，证据契约COMPLETE，2/2截图，产品PASS；小数点与后续数字状态分别取证；证据：evidence/6202_calculator_final_20260814_1301/CALC_007。",
+      "verification_points": [
+        "数值区显示0.",
+        "数值区显示0.5"
+      ]
+    },
+    {
+      "case_id": "CALC_008",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.数值区显示1.2",
+      "steps_text": "1.点击小数点",
+      "expected_text": "1.数值区保持1.2",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Calculator源码坐标已核对；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_008。",
+      "verification_points": [
+        "数值区已有1.2时再次点击小数点，数值区仍显示1.2"
+      ]
+    },
+    {
+      "case_id": "CALC_009",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.数值区显示123",
+      "steps_text": "1.点击退格",
+      "expected_text": "1.数值区显示12",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:360,62,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "退格坐标来自6202顶部删除图标源码布局并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_009。",
+      "verification_points": [
+        "数值区显示123时点击顶部退格图标，数值区显示12"
+      ]
+    },
+    {
+      "case_id": "CALC_010",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.数值区显示7",
+      "steps_text": "1.点击退格",
+      "expected_text": "1.数值区显示0",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,221,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:360,62,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "退格坐标来自6202顶部删除图标源码布局并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_010。",
+      "verification_points": [
+        "数值区显示7时点击顶部退格图标，数值区显示0"
+      ]
+    },
+    {
+      "case_id": "CALC_011",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器已显示运算结果8",
+      "steps_text": "1.点击退格",
+      "expected_text": "1.数值区显示0，运算状态清除",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:360,62,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "退格坐标来自6202顶部删除图标源码布局并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_011。",
+      "verification_points": [
+        "运算结果8点击顶部退格图标后，数值区显示0且无待处理运算状态"
+      ]
+    },
+    {
+      "case_id": "CALC_012",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器已输入一段未完成运算",
+      "steps_text": "1.点击AC",
+      "expected_text": "1.数值区显示0，运算状态清除",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "AC坐标来自6202当前410x502 Calculator长按键中心并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_012。",
+      "verification_points": [
+        "未完成运算点击AC后，数值区显示0且运算状态清除"
+      ]
+    },
+    {
+      "case_id": "CALC_013",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次点击2和+和3和=",
+      "expected_text": "1.数值区显示5",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "四则运算坐标来自6202当前410x502 Calculator源码并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_013。",
+      "verification_points": [
+        "依次点击2、+、3、=后，数值区显示5"
+      ]
+    },
+    {
+      "case_id": "CALC_014",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次点击8和-和3和=",
+      "expected_text": "1.数值区显示5",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "四则运算坐标来自6202当前410x502 Calculator源码并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_014。",
+      "verification_points": [
+        "依次点击8、-、3、=后，数值区显示5"
+      ]
+    },
+    {
+      "case_id": "CALC_015",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次点击4和×和3和=",
+      "expected_text": "1.数值区显示12",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "四则运算坐标来自6202当前410x502 Calculator源码并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_015。",
+      "verification_points": [
+        "依次点击4、×、3、=后，数值区显示12"
+      ]
+    },
+    {
+      "case_id": "CALC_016",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次点击8和÷和2和=",
+      "expected_text": "1.数值区显示4",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "四则运算坐标来自6202当前410x502 Calculator源码并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_016。",
+      "verification_points": [
+        "依次点击8、÷、2、=后，数值区显示4"
+      ]
+    },
+    {
+      "case_id": "CALC_017",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入1.2+3.4=",
+      "expected_text": "1.数值区显示4.6",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "小数与四则运算坐标来自6202当前410x502 Calculator源码并经实际点击验证；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_017。",
+      "verification_points": [
+        "输入1.2+3.4=后，数值区显示4.6"
+      ]
+    },
+    {
+      "case_id": "CALC_018",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入8+\n2.点击乘号\n3.输入2=",
+      "expected_text": "1.最新运算符替换为乘号\n2.数值区显示16\n3.数值区保持16",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18001;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18003;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "2026-08-14正式Runner复跑，证据契约COMPLETE，2/2截图，产品PASS；结果16与等待后16分别取证；证据：evidence/6202_calculator_final_20260814_1301/CALC_018。",
+      "verification_points": [
+        "数值区显示16，证明最新乘号已替换先前加号",
+        "等待后数值区仍保持16"
+      ]
+    },
+    {
+      "case_id": "CALC_019",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入2+3\n2.点击乘号\n3.输入4=",
+      "expected_text": "1.计算器先得到5，等待新右值\n2.数值区显示20\n3.数值区保持20",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,221,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19001;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19002;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19004;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "已删除会改变原步骤的额外等号；2026-08-14正式Runner复跑，证据契约COMPLETE，3/3截图；产品FAIL：点击乘号后首个检查点实际仍显示3而非5，随后输入4并等于后显示20且保持；证据：evidence/6202_calculator_final_20260814_1301/CALC_019。",
+      "verification_points": [
+        "计算器先得到5并等待新右值",
+        "数值区显示20",
+        "等待后数值区仍保持20"
+      ]
+    },
+    {
+      "case_id": "CALC_020",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.准备结果小于10位的运算",
+      "steps_text": "1.执行运算，点击等号",
+      "expected_text": "1.数值区完整显示结果，不使用科学计数法",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "用2+3=构造小于10位结果；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_020。",
+      "verification_points": [
+        "2+3=后结果5完整显示，且未使用科学计数法"
+      ]
+    },
+    {
+      "case_id": "CALC_021",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.准备结果至少10位的运算",
+      "steps_text": "1.执行运算，点击等号",
+      "expected_text": "1.数值区使用尾数e加减指数格式显示结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "用999999999+1=构造10位结果；2026-08-14正式Runner复跑，证据契约COMPLETE，1/1截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_021。",
+      "verification_points": [
+        "999999999+1=后，数值区以尾数e加减指数格式显示结果"
+      ]
+    },
+    {
+      "case_id": "CALC_022",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.连续输入9位数字",
+      "expected_text": "1.数值区字号按可用宽度缩小，数字不溢出",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22001;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:253,221,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22002;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "单个9与9位数字分别取证比较字号；2026-08-14正式Runner复跑，证据契约COMPLETE，2/2截图，产品PASS；证据：evidence/6202_calculator_final_20260814_1301/CALC_022。",
+      "verification_points": [
+        "单个9的默认字号基线",
+        "连续输入9位后字号缩小且数字未溢出"
+      ]
+    },
+    {
+      "case_id": "CALC_023",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.准备会产生长小数的运算",
+      "steps_text": "1.执行运算，点击等号",
+      "expected_text": "1.待产品确认：四舍五入位数和最终显示值",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner以稳定AC起始状态执行1÷3=，1/1新截图显示0.333333333，evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text没有给出确认后的四舍五入位数和最终值，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle_20260814_151414/CALC_023。"
+    },
+    {
+      "case_id": "CALC_024",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.准备超大结果和极小非零结果",
+      "steps_text": "1.分别执行两组运算",
+      "expected_text": "1.待产品确认：溢出显示和科学计数指数范围",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner分别执行999999999×999999999=和1÷999999999=，2/2新截图显示1.00e+18与1e-09，evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text没有确认后的溢出规则或指数范围，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle_20260814_151414/CALC_024。"
+    },
+    {
+      "case_id": "CALC_025",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入5÷0=",
+      "expected_text": "1.数值区显示Error",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202当前410x502 Calculator坐标和除零路径已核对；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS（5÷0=后显示Error）；证据：evidence/6202_calculator_remaining_runner_20260814_150305/CALC_025。",
+      "verification_points": [
+        "依次输入5÷0=后，数值区显示Error"
+      ]
+    },
+    {
+      "case_id": "CALC_026",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示Error",
+      "steps_text": "1.点击数字键\n2.点击运算符\n3.点击AC",
+      "expected_text": "1.数值区保持Error\n2.数值区保持Error\n3.数值区恢复0",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,437,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:26000;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:26001;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:26002;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:26003;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "6202当前410x502 Calculator坐标和Error恢复路径已核对；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，4/4截图，产品FAIL：Error后点击数字显示1、再点击运算符仍显示1，均未保持Error；AC后恢复0。证据：evidence/6202_calculator_remaining_runner_20260814_150305/CALC_026。",
+      "verification_points": [
+        "操作前数值区显示Error",
+        "点击数字键后数值区保持Error",
+        "点击运算符后数值区保持Error",
+        "点击AC后数值区恢复0"
+      ]
+    },
+    {
+      "case_id": "CALC_027",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.依次输入3-5=",
+      "expected_text": "1.待产品确认：负结果的显示格式和后续运算能力",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner执行3-5=并补充探索-2+3=，2/2新截图显示-2与1，evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text没有确认后的负数格式或后续运算规则，且原steps_text未定义后续操作，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle_20260814_151414/CALC_027。"
+    },
+    {
+      "case_id": "CALC_028",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器已完成2+3=并显示5",
+      "steps_text": "1.再次点击等号",
+      "expected_text": "1.待产品确认：是否重复执行上一运算或保持5",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner先截图确认2+3=显示5，再次点击等号后新截图显示8，2/2截图、evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text没有确认应重复上一运算还是保持5，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle_20260814_151414/CALC_028。"
+    },
+    {
+      "case_id": "CALC_029",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器显示0",
+      "steps_text": "1.连续输入00012",
+      "expected_text": "1.待产品确认：显示为12或保留前导零",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner以稳定AC起始状态输入00012，1/1新截图显示12，evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text仍未确认唯一正确规则应显示12还是保留前导零，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle2_20260814_152131/CALC_029。"
+    },
+    {
+      "case_id": "CALC_030",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calculator且存在输入",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表返回进入Calculator前的页面",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:30001;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:30002;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:30003;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "6202真实模拟器已验证来源页、Calculator输入状态和右滑返回路径；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，3/3截图，产品PASS；证据：evidence/6202_calculator_remaining_runner_20260814_150305/CALC_030。",
+      "verification_points": [
+        "进入Calculator前的来源页",
+        "右滑前Calculator数值区存在输入1",
+        "右滑后返回同一来源页"
+      ]
+    },
+    {
+      "case_id": "CALC_031",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calculator且存在输入",
+      "steps_text": "1.单击编码器",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:64,365,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:31001;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:31002;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "6202真实模拟器已验证Calculator输入状态和编码器单击返回主表盘路径；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS；证据：evidence/6202_calculator_remaining_runner_20260814_150305/CALC_031。",
+      "verification_points": [
+        "单击编码器前Calculator数值区存在输入1",
+        "单击编码器后手表显示主表盘"
+      ]
+    },
+    {
+      "case_id": "CALC_032",
+      "sheet": "计算器",
+      "priority": "P0",
+      "precondition_text": "1.计算器显示非零结果",
+      "steps_text": "1.执行右滑\n2.重新进入Calculator",
+      "expected_text": "1.手表退出计算器\n2.数值区显示0，无历史结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:111,149,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,293,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:159,365,1;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:347,437,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:32000;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:32001;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:300;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:32002;"
+      ],
+      "collect": [],
+      "unable": false,
+      "note": "6202真实模拟器已验证非零结果、右滑退出和重新进入清零路径；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，3/3截图，产品PASS；证据：evidence/6202_calculator_remaining_runner_20260814_150305/CALC_032。",
+      "verification_points": [
+        "右滑前Calculator数值区显示非零结果4",
+        "右滑后手表退出计算器",
+        "重新进入后数值区显示0且无历史结果"
+      ]
+    },
+    {
+      "case_id": "CALC_033",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.手机音乐正在播放\n2.手表显示Calculator页面",
+      "steps_text": "1.依次输入1+1=\n2.查看手机音乐播放状态",
+      "expected_text": "1.计算器显示结果2\n2.手机音乐仍在播放",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_EXTERNAL_ORACLE_MISSING：2026-08-14在6202真实模拟器执行MUSIC_CTRL:0后完成1+1=，新截图明确显示2；但模拟器没有可截图或可查询的外部手机播放状态，无法验证‘手机音乐仍在播放’这一独立检查点。最小缺失能力是与本次动作关联的手机播放状态视觉证据。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_033_probe。"
+    },
+    {
+      "case_id": "CALC_034",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器存在未完成输入",
+      "steps_text": "1.让手机收到来电\n2.结束来电",
+      "expected_text": "1.手表显示来电页面\n2.待产品确认：返回Calculator后原输入是否保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_ORACLE_MISSING：2026-08-14正式Runner以MSG_TEST:1/2执行来电与结束来电，3/3新截图依次显示Calculator输入12、来电页、返回Calculator后仍为12，evidence_contract=COMPLETE、verdict=CANNOT_VERIFY；原expected_text没有确认挂断后应保留还是清除输入，不能判PASS/FAIL，也不能保留正式动作。证据：evidence/6202_calculator_remaining_oracle2_20260814_152131/CALC_034。"
+    },
+    {
+      "case_id": "CALC_035",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器存在未完成输入",
+      "steps_text": "1.从手机发送一条通知\n2.关闭消息弹窗",
+      "expected_text": "1.手表显示消息弹窗\n2.待产品确认：关闭消息后原输入是否保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_CAPABILITY_MISSING：2026-08-14在Calculator输入12后分别真实执行MSG_TEST:3、SEND_MSG_TEST:0,steve,hello和SEND_MSG_TEST:1,steve,hello，命令均accepted且GUI队列processed，但每张新截图都仍为Calculator，没有消息弹窗，因此也无法执行‘关闭消息弹窗’。最小缺失能力是能在6202模拟器触发并关闭真实通知弹窗的命令或等价外部通知注入。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_035_probe 与 CALC_035_send_msg_probe。"
+    },
+    {
+      "case_id": "CALC_036",
+      "sheet": "计算器",
+      "priority": "P1",
+      "precondition_text": "1.计算器处于初始状态",
+      "steps_text": "1.用可编程输入工具执行1000组基础四则运算",
+      "expected_text": "1.每组结果可显示，手表无异常重启",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_CAPABILITY_MISSING：2026-08-14真实Runner只执行了1组1+1=并取得结果2，不能代表原步骤要求的1000组。当前静态case_map没有1000组可编程输入、逐组结果计数以及运行期间异常重启检测的证据聚合能力；最小缺失能力是可参数化1000轮运算并输出完成计数、失败轮次和重启检测结果的执行器。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_036。"
+    },
+    {
+      "case_id": "CALC_037",
+      "sheet": "计算器",
+      "priority": "P2",
+      "precondition_text": "1.手表处于默认亮度",
+      "steps_text": "1.依次点击全部按键，观察结果区",
+      "expected_text": "1.按键触发区互不重叠，结果文字无裁切",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "BLOCKED_CAPABILITY_MISSING：2026-08-14真实Runner点击了6202当前18个可见按键中心并取得一张终态截图，但中心点击和静态视觉间距不能证明各按键触发边界互不重叠，也不能覆盖每次触发后的文字裁切状态。最小缺失能力是按键边界扫描/命中目标识别和逐键视觉取证（含默认亮度状态确认）。探索证据：evidence/6202_calculator_remaining_explore_20260814_143541/CALC_037。"
+    }
+  ]
+}

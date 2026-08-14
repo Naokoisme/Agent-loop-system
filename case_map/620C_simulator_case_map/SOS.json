@@ -1,0 +1,853 @@
+[
+  {
+    "case_id": "SOS_001",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心SOS图标",
+    "steps_text": "1.点击SOS图标",
+    "expected_text": "1.手表先检查紧急联系人和设备连接状态",
+    "verification_points": [
+      "未设置紧急联系人：显示 Sync your SOS Contact from mobile app.，不显示连接提示和联系人信息",
+      "已设置紧急联系人但 HFP 未连接：显示 Check the connection between your smart watch and the app.，不显示联系人信息",
+      "已设置紧急联系人且 HFP 已连接：显示紧急联系人姓名 QA SOS 和号码 13800138000，不显示前两种提示"
+    ],
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:101,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:102,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,184,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:106,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:101;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:104,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:103,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:107,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:102;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:105,hfp,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:108,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:109,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:103;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "当前402x256 SHORTCUT Designer确认SOS事件绑定在控制中心第2页下行第3个控件，(305,184)位于该控件内；进入后依次采集三种互斥状态"
+  },
+  {
+    "case_id": "SOS_002",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表未处于省电模式",
+    "steps_text": "1.持续按住实体按键5秒",
+    "expected_text": "1.手表先检查紧急联系人和设备连接状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:201,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:202,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:203,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:201;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:204,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:205,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:206,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:202;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:207,hfp,1;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:208,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "复用实体主键5000ms长按和SOS状态矩阵，分别截图无联系人、无HFP连接、联系人与连接均可用三种真实分支",
+    "verification_points": [
+      "无紧急联系人时，长按实体按键后的截图显示同步SOS联系人提示",
+      "已有联系人但HFP未连接时，截图显示检查手表与App连接提示",
+      "联系人和HFP连接均可用时，截图显示SOS倒计时流程"
+    ]
+  },
+  {
+    "case_id": "SOS_003",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表显示Phone中的SOS联系人列表",
+    "steps_text": "1.点击紧急联系人",
+    "expected_text": "1.手表先检查紧急联系人和设备连接状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_004",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.App未设置紧急联系人",
+    "steps_text": "1.从控制中心触发SOS",
+    "expected_text": "1.手表显示Sync your SOS Contact from mobile app.，不拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:401,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:402,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,184,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:403,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "通过当前402x256 SHORTCUT Designer确认的控制中心SOS控件触发，验证无紧急联系人分支"
+  },
+  {
+    "case_id": "SOS_005",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示未设置联系人提示页",
+    "steps_text": "1.保持无操作5秒",
+    "expected_text": "1.提示页消失，返回触发前页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:501,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:502,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,184,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:503,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:501;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:504,5500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "从控制中心真实触发无联系人提示，截图覆盖提示页基线与保持无操作5秒后的自动返回",
+    "verification_points": [
+      "等待前截图显示未设置SOS联系人提示页",
+      "保持无操作5秒后，截图显示提示页消失并返回触发前页面"
+    ]
+  },
+  {
+    "case_id": "SOS_006",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示未设置联系人提示页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表返回触发前页面，不拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_007",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.App已设置紧急联系人\n2.设备业务连接不可用",
+    "steps_text": "1.从控制中心触发SOS",
+    "expected_text": "1.手表显示Check the connection between your Smartwatch and App.，不拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:701,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:702,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,184,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:703,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "通过当前402x256 SHORTCUT Designer确认的控制中心SOS控件触发，验证已有联系人但HFP未连接分支"
+  },
+  {
+    "case_id": "SOS_008",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示未连接提示页",
+    "steps_text": "1.保持无操作5秒",
+    "expected_text": "1.提示页消失，返回触发前页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:801,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:802,hfp,0;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,184,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:803,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:801;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:804,5500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "从控制中心真实触发已有联系人但HFP未连接提示，截图覆盖提示页基线与5秒后的自动返回",
+    "verification_points": [
+      "等待前截图显示设备连接检查提示页",
+      "保持无操作5秒后，截图显示提示页消失并返回触发前页面"
+    ]
+  },
+  {
+    "case_id": "SOS_009",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示未连接提示页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表返回触发前页面，不拨号",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_010",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已设置唯一紧急联系人",
+    "steps_text": "1.从控制中心触发SOS",
+    "expected_text": "1.页面显示Initiating SOS Call in和红色3秒圆环和灰色宽取消按钮和红色宽Call Now按钮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.从控制中心触发SOS"
+  },
+  {
+    "case_id": "SOS_011",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.观察3秒倒计时",
+    "expected_text": "1.圆环数字按3和2和1顺序递减，进度同步变化",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待可由SIM_WAIT执行；当前缺可冻结或可重复定位到3、2、1三个倒计时帧的SOS倒计时状态命令，不能靠命令往返时延猜测截图时刻"
+  },
+  {
+    "case_id": "SOS_012",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.点击取消按钮",
+    "expected_text": "1.点击灰色宽取消按钮后，手表返回触发前页面，不拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_013",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.等待倒计时显示1\n2.点击取消按钮",
+    "expected_text": "1.倒计时圆环显示1\n2.SOS流程结束，手机不发起拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待本身可执行；当前缺可稳定建立并冻结在倒计时1秒帧的通用SOS状态能力，且完整预期还要求手机侧不拨号证据"
+  },
+  {
+    "case_id": "SOS_014",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.等待倒计时显示2\n2.点击取消按钮",
+    "expected_text": "1.倒计时圆环显示2\n2.SOS流程结束，手机不发起拨号",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待本身可执行；当前缺可稳定建立并冻结在倒计时2秒帧的通用SOS状态能力，且完整预期还要求手机侧不拨号证据"
+  },
+  {
+    "case_id": "SOS_015",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.点击Call Now",
+    "expected_text": "1.手表立即发起紧急呼叫，显示联系人姓名和Calling",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_016",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页",
+    "steps_text": "1.保持无操作直到倒计时结束",
+    "expected_text": "1.手表自动发起紧急呼叫，显示联系人姓名和Calling",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:1601,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1602,hfp,1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1603,500;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1601;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1604,6500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "用共享SOS联系人和HFP连接状态建立真实倒计时入口，等待倒计时结束后截图检查Calling页",
+    "verification_points": [
+      "等待前截图显示SOS倒计时页",
+      "倒计时结束后截图显示联系人姓名和Calling"
+    ]
+  },
+  {
+    "case_id": "SOS_017",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.SOS已发起且对方尚未接听",
+    "steps_text": "1.观察SOS呼出中页",
+    "expected_text": "1.页面显示联系人姓名和Calling和扬声器和挂断和静音按钮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_018",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS正在呼出或已接通",
+    "steps_text": "1.点击扬声器按钮",
+    "expected_text": "1.扬声器状态图标切换，音频输出路径变化",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_019",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS已接通",
+    "steps_text": "1.点击静音按钮",
+    "expected_text": "1.静音图标切换，本端麦克风停止向对端传音",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_020",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS正在呼出或已接通",
+    "steps_text": "1.点击挂断按钮",
+    "expected_text": "1.紧急呼叫结束，手表返回进入SOS前的页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_021",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS正在呼出\n2.紧急联系人手机可接听",
+    "steps_text": "1.在对端接听电话",
+    "expected_text": "1.手表进入标准通话中页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+  },
+  {
+    "case_id": "SOS_022",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.SOS正在呼出\n2.紧急联系人手机不接听",
+    "steps_text": "1.等待呼叫结束",
+    "expected_text": "1.手表显示标准未接通结果",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "等待本身可执行；当前模拟器没有构造SOS呼出后远端无人接听并返回标准未接通结果的通话状态事件"
+  },
+  {
+    "case_id": "SOS_023",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.App已设置1个紧急联系人",
+    "steps_text": "1.进入Phone中的SOS列表",
+    "expected_text": "1.页面仅显示该联系人，左侧为圆形头像，右侧分别显示姓名和电话号码",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:2301,1,QA SOS,13800138000;",
+      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:2302,hfp,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2303,500;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "验证已有唯一联系人且HFP已连接分支"
+  },
+  {
+    "case_id": "SOS_024",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.App未设置紧急联系人",
+    "steps_text": "1.进入Phone应用",
+    "expected_text": "1.Phone内不显示可点击的SOS联系人条目",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_025",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.手表显示紧急联系人列表",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Phone主页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SOS_026",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App未设置紧急联系人",
+    "steps_text": "1.在App添加1个紧急联系人\n2.在手表进入SOS联系人列表",
+    "expected_text": "1.App保存联系人\n2.手表显示相同姓名和号码",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令"
+  },
+  {
+    "case_id": "SOS_027",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.App已设置1个紧急联系人",
+    "steps_text": "1.尝试在App添加第二个联系人",
+    "expected_text": "1.App不创建第二个紧急联系人",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令"
+  },
+  {
+    "case_id": "SOS_028",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.双端已有紧急联系人",
+    "steps_text": "1.在App修改联系人姓名和号码\n2.在手表刷新SOS联系人列表",
+    "expected_text": "1.App保存新联系人信息\n2.手表显示修改后的姓名和号码",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令"
+  },
+  {
+    "case_id": "SOS_029",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.双端已有紧急联系人",
+    "steps_text": "1.在App删除紧急联系人\n2.在手表进入Phone",
+    "expected_text": "1.App移除联系人\n2.手表不显示SOS联系人条目",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令"
+  },
+  {
+    "case_id": "SOS_030",
+    "sheet": "SOS",
+    "priority": "P1",
+    "precondition_text": "1.App未设置紧急联系人",
+    "steps_text": "1.进入App的SOS设置页",
+    "expected_text": "1.App显示To use the SOS feature on your watch, please add an emergency contact here.文案",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令"
+  },
+  {
+    "case_id": "SOS_031",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS倒计时正在进行",
+    "steps_text": "1.断开设备业务连接",
+    "expected_text": "1.待产品确认：倒计时是否停止和页面提示和是否发起呼叫",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_032",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.紧急联系人号码不可拨\n2.设备连接可用",
+    "steps_text": "1.触发SOS自动拨号",
+    "expected_text": "1.手表不进入虚假接通状态，显示标准呼叫失败结果",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "需外部触发链路: 1.触发SOS自动拨号"
+  },
+  {
+    "case_id": "SOS_033",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表处于可响应长按按键的页面",
+    "steps_text": "1.持续按住实体按键12秒",
+    "expected_text": "1.待产品确认：SOS触发与关机流程的最终仲裁结果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_034",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表处于低电提醒状态\n2.SOS前置条件均满足",
+    "steps_text": "1.在控制中心点击SOS图标",
+    "expected_text": "1.待产品确认：是否进入SOS倒计时或拨号流程，以及前台显示SOS页还是低电弹窗",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_035",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表处于省电模式\n2.App已设置紧急联系人",
+    "steps_text": "1.持续按住实体按键5秒",
+    "expected_text": "1.手表不进入SOS倒计时页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "5000ms实体主键长按可执行；当前缺幂等建立省电模式及省电表盘的SIM_POWER_SAVING_SET，不能只长按而跳过前置状态"
+  },
+  {
+    "case_id": "SOS_036",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表处于省电模式\n2.App已设置紧急联系人\n3.设备连接可用",
+    "steps_text": "1.从主表盘下滑进入控制中心\n2.点击SOS图标",
+    "expected_text": "1.手表显示控制中心\n2.待产品确认：SOS图标是否可点击，以及点击后是否进入SOS倒计时",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_037",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.SOS正在倒计时或呼出\n2.App可发起OTA",
+    "steps_text": "1.从App发起固件升级",
+    "expected_text": "1.待产品确认：SOS与OTA的安全优先级和恢复结果",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_038",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页\n2.App已打开固件升级页且手表电量高于30%",
+    "steps_text": "1.在App点击安装\n2.在手表确认升级",
+    "expected_text": "1.App显示升级确认\n2.待产品确认：SOS页面与Firmware Update页的显示顺序",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_039",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表正在显示SOS倒计时页\n2.绑定手机的消息通知权限已开启",
+    "steps_text": "1.从另一台手机向绑定手机发送一条测试消息",
+    "expected_text": "1.待产品确认：SOS页面与消息弹窗的显示顺序",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SOS_040",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已设置紧急联系人",
+    "steps_text": "1.连续20次触发SOS完成，点击取消",
+    "expected_text": "1.每次均结束倒计时，手机不产生误拨",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前模拟器没有可验证手机端未误拨的证据通道，也没有一次性可靠执行20轮触发和取消的通用命令"
+  },
+  {
+    "case_id": "SOS_041",
+    "sheet": "SOS",
+    "priority": "P0",
+    "precondition_text": "1.准备支持版本范围内Android和iOS手机",
+    "steps_text": "1.分别完成联系人同步和SOS呼叫",
+    "expected_text": "1.两平台均可同步唯一联系人，发起SOS呼叫",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_SOS,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖Android和iOS真机App完成联系人同步与真实SOS呼叫，当前单机模拟器无法建立两平台前置状态和外部呼叫证据"
+  }
+]

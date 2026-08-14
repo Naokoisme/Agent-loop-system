@@ -1,0 +1,1371 @@
+[
+  {
+    "case_id": "CTRL_001",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在主表盘下滑",
+    "expected_text": "1.手表显示控制中心第1页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_002",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.左滑至控制中心第3页\n2.单击编码器\n3.在主表盘下滑",
+    "expected_text": "1.手表显示控制中心第3页\n2.手表返回主表盘\n3.手表显示控制中心第1页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:201;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:202;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:203;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "左滑后显示控制中心第3页",
+      "单击编码器后返回主表盘",
+      "主表盘下滑后显示控制中心第1页"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_003",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第1页",
+    "expected_text": "1.页面显示两行三列快捷图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_004",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.左滑至控制中心第2页",
+    "expected_text": "1.页面显示两行三列快捷图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_005",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.左滑至控制中心第3页",
+    "expected_text": "1.页面仅显示QR Hub图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_006",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在控制中心上滑",
+    "expected_text": "1.手表返回主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_007",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在控制中心单击编码器",
+    "expected_text": "1.手表返回主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_008",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示OCM一级视图",
+    "steps_text": "1.在OCM一级视图下滑",
+    "expected_text": "1.手表保持OCM一级视图，控制中心不显示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_009",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.负一屏已停留在页面顶部",
+    "steps_text": "1.在负一屏顶部下滑",
+    "expected_text": "1.手表保持负一屏顶部，控制中心不显示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_010",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心顶部",
+    "expected_text": "1.状态栏从左至右显示连接图标/电量/日期时间",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_011",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.将系统电量设为56%\n2.观察控制中心电量",
+    "expected_text": "1.系统电量变为56%\n2.状态栏显示56%",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:56;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_012",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表未接入充电器",
+    "steps_text": "1.接入充电器\n2.观察控制中心状态栏",
+    "expected_text": "1.手表进入充电状态\n2.电量区域显示充电图标",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07 实测: SIM_CHARGE:1 可注入充电事件(CHARGING 弹窗),但弹窗遮挡控制中心状态栏,MAIN 单击关闭弹窗会退出到 DIAL,充电图标无法可靠采集; 仍 unable"
+  },
+  {
+    "case_id": "CTRL_013",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心右上区域",
+    "expected_text": "1.状态栏显示DD/MM HH:MM",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_014",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.使用Android手机连接手表",
+    "expected_text": "1.待产品确认连接图标的颜色与图形",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "CTRL_015",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.使用iOS手机连接手表",
+    "expected_text": "1.待产品确认双连接图标的颜色与图形",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "CTRL_016",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.滑动至控制中心第1页",
+    "expected_text": "1.底部第1个分页点高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_017",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.滑动至控制中心第2页",
+    "expected_text": "1.底部第2个分页点高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_018",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.滑动至控制中心第3页",
+    "expected_text": "1.底部第3个分页点高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_019",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.从第1页左滑\n2.从第2页左滑",
+    "expected_text": "1.手表显示控制中心第2页\n2.手表显示控制中心第3页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1901;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1902;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "从第1页左滑后显示控制中心第2页",
+      "从第2页左滑后显示控制中心第3页"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_020",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第1页右滑",
+    "expected_text": "1.页面保持控制中心第1页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_021",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第3页左滑",
+    "expected_text": "1.页面保持控制中心第3页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_022",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.恢复出厂后进入控制中心",
+    "expected_text": "1.勿扰图标显示暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心"
+  },
+  {
+    "case_id": "CTRL_023",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击暗色勿扰图标",
+    "expected_text": "1.勿扰图标变为高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "勿扰图标身份按布局推断(上行第1),实测未验证高亮切换"
+  },
+  {
+    "case_id": "CTRL_024",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击高亮勿扰图标",
+    "expected_text": "1.勿扰图标变为暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "勿扰图标身份按布局推断(上行第1),实测未验证高亮切换"
+  },
+  {
+    "case_id": "CTRL_025",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.定时勿扰已开启",
+    "steps_text": "1.将系统时间推进至定时勿扰时段",
+    "expected_text": "1.勿扰图标自动高亮",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "定时勿扰时段依赖精确时间推进"
+  },
+  {
+    "case_id": "CTRL_026",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.仅定时勿扰已开启",
+    "steps_text": "1.将系统时间推进至定时勿扰结束点",
+    "expected_text": "1.勿扰图标自动变为暗色",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "定时勿扰时段依赖精确时间推进"
+  },
+  {
+    "case_id": "CTRL_027",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.定时勿扰已开启",
+    "steps_text": "1.在定时时段外点击勿扰图标",
+    "expected_text": "1.设置页All Day开关变为开启",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_028",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.定时勿扰已开启",
+    "steps_text": "1.在定时时段外点击勿扰图标",
+    "expected_text": "1.设置页Schedule开关变为关闭",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_029",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.恢复出厂后进入控制中心",
+    "expected_text": "1.亮度图标显示第3档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心"
+  },
+  {
+    "case_id": "CTRL_030",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第1档点击亮度图标",
+    "expected_text": "1.亮度图标显示第2档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "亮度图标身份按布局推断(上行第2)"
+  },
+  {
+    "case_id": "CTRL_031",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第2档点击亮度图标",
+    "expected_text": "1.亮度图标显示第3档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "亮度图标身份按布局推断(上行第2)"
+  },
+  {
+    "case_id": "CTRL_032",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第3档点击亮度图标",
+    "expected_text": "1.亮度图标显示第4档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "亮度图标身份按布局推断(上行第2)"
+  },
+  {
+    "case_id": "CTRL_033",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第4档点击亮度图标",
+    "expected_text": "1.亮度图标显示第5档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "亮度图标身份按布局推断(上行第2)"
+  },
+  {
+    "case_id": "CTRL_034",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在第5档点击亮度图标",
+    "expected_text": "1.亮度图标显示第1档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "亮度图标身份按布局推断(上行第2)"
+  },
+  {
+    "case_id": "CTRL_035",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击亮度图标切换至第4档\n2.上滑返回主表盘\n3.再次进入控制中心",
+    "expected_text": "1.亮度图标显示第4档样式\n2.手表返回主表盘\n3.亮度图标仍显示第4档样式",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:3501;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:3502;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:3503;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "verification_points": [
+      "点击亮度图标后显示第4档样式",
+      "上滑后返回主表盘",
+      "再次进入控制中心后亮度图标仍显示第4档样式"
+    ],
+    "unable": false,
+    "note": "当前402x256 SHORTCUT Designer确认亮度事件绑定在第1页control_buttons_row_1中间控件，(201,92)位于该控件内"
+  },
+  {
+    "case_id": "CTRL_036",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在设置页将亮度调整为非整档值",
+    "expected_text": "1.待产品确认控制中心图标对应档位",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "CTRL_037",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.恢复出厂后进入控制中心",
+    "expected_text": "1.抬腕亮屏图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心"
+  },
+  {
+    "case_id": "CTRL_038",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击高亮抬腕图标",
+    "expected_text": "1.抬腕亮屏图标变为暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "抬腕图标身份按布局推断(上行第3)"
+  },
+  {
+    "case_id": "CTRL_039",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.抬腕亮屏已关闭且控制中心图标为暗色",
+    "steps_text": "1.点击暗色抬腕亮屏图标",
+    "expected_text": "1.抬腕亮屏状态变为开启，图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "抬腕图标身份按布局推断(上行第3)"
+  },
+  {
+    "case_id": "CTRL_040",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在设置页关闭抬腕亮屏\n2.进入控制中心",
+    "expected_text": "1.设置页开关显示关闭\n2.抬腕亮屏图标显示暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "设置页联动操作: 1.在设置页关闭抬腕亮屏"
+  },
+  {
+    "case_id": "CTRL_041",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.恢复出厂后进入控制中心",
+    "expected_text": "1.通话蓝牙图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心"
+  },
+  {
+    "case_id": "CTRL_042",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击高亮通话蓝牙图标",
+    "expected_text": "1.通话蓝牙图标变为暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,183,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "通话BT图标身份按布局推断(下行第1),实测点击跳 SHORTCUT"
+  },
+  {
+    "case_id": "CTRL_043",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手机与手表已配对且通话蓝牙已关闭",
+    "steps_text": "1.点击暗色通话蓝牙图标",
+    "expected_text": "1.通话蓝牙状态变为开启，图标显示高亮",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,183,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "通话BT图标身份按布局推断(下行第1)"
+  },
+  {
+    "case_id": "CTRL_044",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在手机端断开BT通话连接",
+    "expected_text": "1.通话蓝牙图标显示暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/循环: 1.在手机端断开BT通话连接"
+  },
+  {
+    "case_id": "CTRL_045",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.观察控制中心第1页查找手机图标\n2.点击查找手机图标\n3.在查找手机待机页点击播放按钮",
+    "expected_text": "1.查找手机Action图标显示常亮\n2.手表进入查找手机待机页\n3.手机开始响铃",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态"
+  },
+  {
+    "case_id": "CTRL_046",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表与App处于断开状态",
+    "steps_text": "1.观察控制中心第1页查找手机图标\n2.点击查找手机图标",
+    "expected_text": "1.查找手机Action图标在断连状态仍显示常亮\n2.手表显示手机未连接提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,183,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "实测点击查找手机图标进入 NO_PAIR_TIP(未配对提示)"
+  },
+  {
+    "case_id": "CTRL_047",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第1页Settings图标\n2.点击Settings图标",
+    "expected_text": "1.Settings Action图标显示常亮\n2.手表显示设置列表页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,183,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "实测点击 Settings 图标进入 SETTING 页"
+  },
+  {
+    "case_id": "CTRL_048",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第2页",
+    "expected_text": "1.图标按省电/静音/手电筒/AOD/闹钟/SOS排列",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_049",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表已恢复出厂并进入控制中心第2页",
+    "steps_text": "1.观察第2页第1行左侧Power Saving图标",
+    "expected_text": "1.Power Saving图标位于第2页第1行左侧，显示默认关闭状态",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态"
+  },
+  {
+    "case_id": "CTRL_050",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第2页Power Saving图标\n2.点击Power Saving图标",
+    "expected_text": "1.Power Saving Action图标显示常亮\n2.手表显示省电表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "省电图标身份按 CTRL_048 顺序推断(第2页上行第1)"
+  },
+  {
+    "case_id": "CTRL_051",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.恢复出厂后进入控制中心第2页",
+    "expected_text": "1.静音图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心第2页"
+  },
+  {
+    "case_id": "CTRL_052",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击高亮静音图标",
+    "expected_text": "1.静音图标变为暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "静音图标身份按 CTRL_048 顺序推断(第2页上行第2)"
+  },
+  {
+    "case_id": "CTRL_053",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.静音已关闭且控制中心图标为暗色",
+    "steps_text": "1.点击暗色静音图标",
+    "expected_text": "1.静音状态变为开启，图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "静音图标身份按 CTRL_048 顺序推断(第2页上行第2)"
+  },
+  {
+    "case_id": "CTRL_054",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击静音图标关闭静音\n2.触发测试来电",
+    "expected_text": "1.静音图标变为暗色\n2.手表按当前铃声音量播放铃声",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备: 2.触发测试来电"
+  },
+  {
+    "case_id": "CTRL_055",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第2页Flashlight图标\n2.点击Flashlight图标",
+    "expected_text": "1.Flashlight Action图标显示常亮\n2.手表显示手电筒页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "手电筒图标身份按 CTRL_048 顺序推断(第2页上行第3)"
+  },
+  {
+    "case_id": "CTRL_056",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击AOD图标",
+    "expected_text": "1.手表显示AOD设置页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:97,184,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "AOD图标身份按 CTRL_048 顺序推断(第2页下行第1)"
+  },
+  {
+    "case_id": "CTRL_057",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在设置页开启AOD\n2.返回控制中心第2页",
+    "expected_text": "1.AOD开关显示开启\n2.AOD图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "设置页联动操作: 1.在设置页开启AOD"
+  },
+  {
+    "case_id": "CTRL_058",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.在设置页关闭AOD\n2.返回控制中心第2页",
+    "expected_text": "1.AOD开关显示关闭\n2.AOD图标显示暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "设置页联动操作: 1.在设置页关闭AOD"
+  },
+  {
+    "case_id": "CTRL_059",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.点击Alarm图标",
+    "expected_text": "1.手表显示闹钟列表页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,184,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "闹钟图标身份按 CTRL_048 顺序推断(第2页下行第2)"
+  },
+  {
+    "case_id": "CTRL_060",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.创建一个启用状态的闹钟\n2.进入控制中心第2页",
+    "expected_text": "1.闹钟保存为启用状态\n2.Alarm图标显示高亮",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "闹钟状态设置: 1.创建一个启用状态的闹钟"
+  },
+  {
+    "case_id": "CTRL_061",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.关闭全部闹钟\n2.进入控制中心第2页",
+    "expected_text": "1.全部闹钟变为关闭状态\n2.Alarm图标显示暗色",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "闹钟状态设置: 1.关闭全部闹钟"
+  },
+  {
+    "case_id": "CTRL_062",
+    "sheet": "控制中心",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已设置唯一紧急联系人",
+    "steps_text": "1.观察控制中心第2页SOS图标\n2.点击SOS图标\n3.保持无操作直至三秒倒计时结束",
+    "expected_text": "1.SOS Action图标保持常亮，背景显示红色\n2.手表显示三秒SOS倒计时页\n3.手表发起紧急联系人呼叫并显示Calling页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态"
+  },
+  {
+    "case_id": "CTRL_063",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已下发默认卡包",
+    "steps_text": "1.观察控制中心第3页QR Hub图标\n2.点击QR Hub图标",
+    "expected_text": "1.QR Hub Action图标在已配置状态显示常亮\n2.手表显示默认卡包二维码",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态"
+  },
+  {
+    "case_id": "CTRL_064",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App未添加卡包",
+    "steps_text": "1.观察控制中心第3页QR Hub图标\n2.点击QR Hub图标",
+    "expected_text": "1.QR Hub Action图标在未配置状态仍显示常亮\n2.手表显示前往App设置的提示页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态"
+  },
+  {
+    "case_id": "CTRL_065",
+    "sheet": "控制中心",
+    "priority": "P1",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.观察控制中心第3页",
+    "expected_text": "1.QR Hub之外的网格位置不显示图标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "CTRL_066",
+    "sheet": "控制中心",
+    "priority": "P2",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.连续左右滑动控制中心30轮",
+    "expected_text": "1.每次滑动仅切换相邻页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/循环: 1.连续左右滑动控制中心30轮"
+  },
+  {
+    "case_id": "CTRL_067",
+    "sheet": "控制中心",
+    "priority": "P2",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.连续切换勿扰开关20次",
+    "expected_text": "1.手表保持控制中心可操作",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/循环: 1.连续切换勿扰开关20次"
+  },
+  {
+    "case_id": "CTRL_068",
+    "sheet": "控制中心",
+    "priority": "P2",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.分别使用Android手机与iOS手机修改抬腕设置",
+    "expected_text": "1.控制中心图标在两平台测试中完成刷新",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/循环: 1.分别使用Android手机与iOS手机修改抬腕设置"
+  },
+  {
+    "case_id": "CTRL_069",
+    "sheet": "控制中心",
+    "priority": "P3",
+    "precondition_text": "1.手表显示控制中心第1页",
+    "steps_text": "1.缓慢滑动控制中心分页",
+    "expected_text": "1.页面内容跟随手指移动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,50,201,220,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,128,50,128,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  }
+]

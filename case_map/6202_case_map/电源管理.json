@@ -1,0 +1,579 @@
+{
+  "profile": "6202_W5230",
+  "sheet": "电源管理",
+  "cases": [
+    {
+      "case_id": "POWER_001",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.在设置列表长按按键3秒",
+      "expected_text": "1.手表显示关机重启选择页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "实体主键3000ms长按已由BUTTON_PRESS通用支持；若进入SOS而非关机重启选择页，应保留为产品FAIL而不是禁用用例；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_002",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.在控制中心长按按键3秒",
+      "expected_text": "1.手表显示关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "从主表盘真实进入控制中心后执行3000ms实体主键长按；错误进入SOS应作为产品FAIL暴露；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_003",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.省电模式已开启",
+      "steps_text": "1.在省电表盘长按编码器5秒",
+      "expected_text": "1.手表退出省电模式",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "5000ms实体主键长按可执行；当前缺幂等建立省电模式及省电表盘的SIM_POWER_SAVING_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+    },
+    {
+      "case_id": "POWER_004",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.用可编程按压治具按住编码器2.9秒",
+      "expected_text": "1.手表保持当前页面",
+      "verification_points": [
+        "按压前截图显示主表盘",
+        "持续按住实体主键2.9秒后截图仍显示主表盘"
+      ],
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4001;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,2900;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "BUTTON_PRESS在模拟器走按下、长按、保持、释放完整生命周期；前后截图比较2900ms边界是否保持主表盘；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_005",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.用可编程按压治具按住编码器3秒",
+      "expected_text": "1.手表显示关机重启选择页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "BUTTON_PRESS支持毫秒级主键长按，直接构造3000ms边界并由截图判断关机重启选择页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_006",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.用可编程按压治具按住编码器3.1秒",
+      "expected_text": "1.手表显示关机重启选择页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3100;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "BUTTON_PRESS支持毫秒级主键长按，直接构造3100ms边界并由截图判断关机重启选择页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_007",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.观察关机重启选择页",
+      "expected_text": "1.Restart入口显示蓝色",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LONG_PRESS_POWER_OFF_RESTART,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_008",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.观察关机重启选择页",
+      "expected_text": "1.Power Off入口显示红色",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LONG_PRESS_POWER_OFF_RESTART,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_009",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.观察关机重启选择页",
+      "expected_text": "1.Restart入口显示蓝色",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LONG_PRESS_POWER_OFF_RESTART,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_010",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页上滑",
+      "expected_text": "1.页面保持关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_011",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页下滑",
+      "expected_text": "1.页面保持关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_012",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页左滑",
+      "expected_text": "1.页面保持关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_013",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页右滑",
+      "expected_text": "1.手表返回进入电源页前的页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_014",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页旋转编码器",
+      "expected_text": "1.页面保持关机重启选择页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LONG_PRESS_POWER_OFF_RESTART,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_015",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在关机重启选择页单击编码器",
+      "expected_text": "1.手表返回主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:LONG_PRESS_POWER_OFF_RESTART,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_016",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击Restart入口",
+      "expected_text": "1.手表显示Tap to Restart确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "选择页使用LONG_PRESS_POWER_OFF_RESTART；Restart坐标来自当前402x256 Designer共享控件；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_017",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在Tap to Restart页右滑",
+      "expected_text": "1.手表返回关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_018",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击蓝色重启图标",
+      "expected_text": "1.手表进入黑屏状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "执行后模拟器进入重启/关机黑屏,会话可能中断；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_019",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击蓝色重启图标\n2.等待设备重新亮屏",
+      "expected_text": "1.手表进入黑屏状态\n2.手表显示开机动画",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "执行后模拟器进入重启/关机黑屏,会话可能中断;需等待/时序: 等待设备重新亮屏；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "POWER_020",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击蓝色重启图标\n2.等待开机动画结束",
+      "expected_text": "1.手表进入重启过程\n2.手表显示主表盘",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "执行后模拟器进入重启/关机黑屏,会话可能中断;需等待/时序: 等待开机动画结束；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "POWER_021",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击Power Off入口",
+      "expected_text": "1.手表显示Tap to Power Off确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "选择页使用LONG_PRESS_POWER_OFF_RESTART；Power Off坐标来自当前402x256 Designer共享控件；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_022",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.在Tap to Power Off页右滑",
+      "expected_text": "1.手表返回关机重启选择页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_023",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击红色关机图标",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "执行后模拟器进入重启/关机黑屏,会话可能中断；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "POWER_024",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表显示关机重启选择页",
+      "steps_text": "1.点击红色关机图标",
+      "expected_text": "1.振动测试仪未记录振动",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期依赖外部振动测试仪；手表截图不能证明未发生振动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "POWER_025",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表处于关机状态",
+      "steps_text": "1.用可编程按压治具按住编码器2.9秒",
+      "expected_text": "1.手表保持关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "模拟器关机态按键已由PMIC仿真路径消费，2900ms未达到开机阈值；以最终黑屏截图判断；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "POWER_026",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表处于关机状态",
+      "steps_text": "1.用可编程按压治具按住编码器3秒",
+      "expected_text": "1.手表显示开机动画",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "模拟器关机态按键已由PMIC仿真路径消费，3000ms达到开机阈值；由截图检查开机动画；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "POWER_027",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表处于关机状态",
+      "steps_text": "1.用可编程按压治具按住编码器3秒",
+      "expected_text": "1.振动测试仪记录一次250ms振动",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "关机态3000ms主键长按已可执行；完整预期只要求振动测试仪记录250ms振动，当前无振动采集证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_028",
+      "sheet": "电源管理",
+      "priority": "P0",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.用可编程按压治具按住编码器12秒",
+      "expected_text": "1.待产品确认最终进入的系统状态",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "12000ms实体主键长按可执行；人工预期仍是待产品确认，未定义可判定的目标系统状态；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_029",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.记录当前步数\n2.执行重启\n3.查看重启后的步数",
+      "expected_text": "1.测试记录保存当前步数\n2.手表完成重启\n3.步数与重启前一致",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "先写入固定步数，再用模拟器 power_off/power_on 生命周期并重进活动页；最终页面可合并证明开机完成与步数持久；6202首轮迁移暂不可执行：SIM_ACTIVITY_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
+      "verification_points": [
+        "power_on后活动页重新显示且步数仍为123，与重启前一致"
+      ]
+    },
+    {
+      "case_id": "POWER_030",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.进入Tap to Power Off页\n2.等待屏幕按系统时长熄灭",
+      "expected_text": "1.手表显示关机确认页\n2.手表未执行关机",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "通过3000ms实体主键长按真实进入确认链，设置5秒熄屏并以前后截图验证未执行关机；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。",
+      "verification_points": [
+        "自动熄屏前截图显示关机确认页",
+        "等待5秒熄屏后截图为黑屏，且没有出现关机完成画面"
+      ]
+    },
+    {
+      "case_id": "POWER_031",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.在关机确认页熄屏\n2.十秒内单击按键",
+      "expected_text": "1.手表进入熄屏状态\n2.手表恢复关机确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "通过3000ms实体主键长按真实进入确认链，截图覆盖确认页、自动熄屏和10秒内主键唤醒恢复确认页；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。",
+      "verification_points": [
+        "自动熄屏前截图显示关机确认页",
+        "达到5秒自动熄屏时间后，截图显示手表屏幕熄灭",
+        "熄屏10秒内单击实体按键后，截图恢复关机确认页"
+      ]
+    },
+    {
+      "case_id": "POWER_032",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表处于运动中页面",
+      "steps_text": "1.在运动中页面长按按键3秒",
+      "expected_text": "1.待产品确认运动页面的电源入口响应",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "运动页面电源入口待产品确认;预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+    },
+    {
+      "case_id": "POWER_033",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.手动连续重启20轮",
+      "expected_text": "1.每轮结束均显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "循环/重启流程模拟器不可控: 手动连续重启20轮；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_034",
+      "sheet": "电源管理",
+      "priority": "P1",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.手动连续关机开机10轮",
+      "expected_text": "1.每轮开机均显示开机动画",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "循环/重启流程模拟器不可控: 手动连续关机开机10轮；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_035",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.执行一次重启与一次关机开机",
+      "expected_text": "1.普通关机再开机和船运模式激活后，手表均显示开机绑定页",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "循环/重启流程模拟器不可控: 执行一次重启与一次关机开机；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "POWER_036",
+      "sheet": "电源管理",
+      "priority": "P2",
+      "precondition_text": "1.手表已开机",
+      "steps_text": "1.在选择页仅点击一次Power Off",
+      "expected_text": "1.手表停留在Tap to Power Off确认页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    }
+  ]
+}

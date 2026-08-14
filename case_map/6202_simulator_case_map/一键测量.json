@@ -1,0 +1,1182 @@
+{
+  "profile": "6202_W5230_SIMULATOR",
+  "sheet": "一键测量",
+  "cases": [
+    {
+      "case_id": "OCM_001",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Health二级菜单",
+      "steps_text": "1.点击OCM",
+      "expected_text": "1.手表显示One Click Measurement主页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "Health 列表第1项中心坐标来自当前 402x256 Designer：列表 y=50、行高74；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_002",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表显示OCM一级视图",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.手表进入一键测量状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_003",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.三项健康模块均无当日数据",
+      "steps_text": "1.进入OCM主页面\n2.观察HR卡片\n3.观察Stress卡片\n4.观察SpO2卡片",
+      "expected_text": "1.手表显示OCM主页面\n2.HR卡片显示--\n3.Stress卡片显示--\n4.SpO2卡片显示--",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_004",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.三项健康模块均有当日最近值",
+      "steps_text": "1.进入OCM主页面",
+      "expected_text": "1.三张卡片显示各自最近值",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_005",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM主页面",
+      "steps_text": "1.观察Heart Rate卡片\n2.观察Stress卡片\n3.观察SpO2卡片\n4.观察Measure按钮",
+      "expected_text": "1.页面显示Heart Rate卡片\n2.页面显示Stress卡片\n3.页面显示SpO2卡片\n4.页面显示Measure按钮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_006",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM主页面",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.页面显示70秒倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_007",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM主页面",
+      "steps_text": "1.点击Heart Rate图标",
+      "expected_text": "1.页面显示70秒倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_008",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM主页面",
+      "steps_text": "1.点击Stress图标",
+      "expected_text": "1.页面显示70秒倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_009",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM主页面",
+      "steps_text": "1.点击SpO2图标",
+      "expected_text": "1.页面显示70秒倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_010",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM主页面",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示Health二级菜单",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_011",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM主页面",
+      "steps_text": "1.单击实体按键",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_012",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.OCM主页面已有心率72、压力40和血氧98的最近值",
+      "steps_text": "1.进入One Click Measurement主页面\n2.观察Heart Rate卡片\n3.观察Stress卡片\n4.观察SpO2卡片",
+      "expected_text": "1.手表显示One Click Measurement主页面\n2.Heart Rate卡片显示心形ICON/Heart Rate/72bpm\n3.Stress卡片显示压力ICON/Stress/40/Normal，数值不显示单位\n4.SpO2卡片显示血氧ICON/SpO2/98%",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "ONE_CLICK_MEASURE 是当前源码注册窗口，可直接进入并截图核对三张卡片；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_013",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM主页面",
+      "steps_text": "1.观察Measure按钮\n2.点击Measure按钮",
+      "expected_text": "1.Measure按钮为深红色圆角样式\n2.手表进入70s一键测量状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_014",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM主页面",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.页面显示70s剩余时间",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_015",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.观察页面底部",
+      "expected_text": "1.页面显示Stay still while measuring..",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_016",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.系统灭屏时间设为5秒\n3.一键测量正在运行",
+      "steps_text": "1.保持手表静止超过5秒",
+      "expected_text": "1.OCM测量页面保持亮屏",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_017",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.执行垂腕动作",
+      "expected_text": "1.OCM测量页面保持亮屏",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "OCM_018",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.用手掌覆盖屏幕",
+      "expected_text": "1.手表退出一键测量状态",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_019",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.单击实体按键",
+      "expected_text": "1.手表结束本次测量并显示One Click Measurement主页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_020",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示OCM主页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_021",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.执行右滑\n2.查看心率记录\n3.查看压力记录\n4.查看血氧记录",
+      "expected_text": "1.手表显示OCM主页面\n2.心率模块不新增记录\n3.压力模块不新增记录\n4.血氧模块不新增记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+    },
+    {
+      "case_id": "OCM_022",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行\n3.Measure区域仍可触达",
+      "steps_text": "1.再次点击Measure区域",
+      "expected_text": "1.待产品确认：当前测量是否中止后重新计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "OCM_023",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表已正确佩戴",
+      "steps_text": "1.开始录屏\n2.点击Measure\n3.观察70秒倒计时",
+      "expected_text": "1.录屏开始\n2.页面显示70秒倒计时\n3.倒计时位于底部中央并逐秒减至0",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "OCM_024",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量刚开始",
+      "steps_text": "1.在测量开始后前40秒观察Heart Rate和Stress图标",
+      "expected_text": "1.Heart Rate与Stress图标处于高亮状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_025",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量刚开始",
+      "steps_text": "1.观察背部传感器",
+      "expected_text": "1.背部绿灯亮起",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "业务阶段和数值可模拟；背部传感器物理灯仍需真机 GPIO 或相机观察；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_026",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量前40秒已获得心率值",
+      "steps_text": "1.持续观察到70秒结束",
+      "expected_text": "1.Heart Rate卡片数值持续刷新",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_027",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量前40秒已获得压力值",
+      "steps_text": "1.观察Stress卡片",
+      "expected_text": "1.Stress卡片显示数值与区间标签",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_028",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量前40秒尚未获得压力值",
+      "steps_text": "1.观察Stress卡片",
+      "expected_text": "1.Stress卡片显示--",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_029",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.OCM处于前40秒且心率尚未出值",
+      "steps_text": "1.观察Heart Rate卡片",
+      "expected_text": "1.Heart Rate卡片显示--bpm",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_030",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已运行39秒",
+      "steps_text": "1.等待1秒",
+      "expected_text": "1.SpO2图标切换为高亮状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "OCM_031",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力数据测试工具可在OCM前40秒依次设置压力20、40、60",
+      "steps_text": "1.通过压力数据测试工具依次设置20、40、60\n2.持续观察至70秒测量结束",
+      "expected_text": "1.Stress卡片依次刷新20/40/60和对应区间\n2.压力值在出值后持续保留或刷新至测量结束",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/App: 1.通过压力数据测试工具依次设置20、40、60；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_032",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已进入第41秒",
+      "steps_text": "1.观察项目图标",
+      "expected_text": "1.SpO2图标处于高亮状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_033",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已进入血氧阶段",
+      "steps_text": "1.观察背部传感器",
+      "expected_text": "1.背部红灯亮起",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "业务阶段和数值可模拟；背部传感器物理灯仍需真机 GPIO 或相机观察；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_034",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量血氧阶段已获得血氧值",
+      "steps_text": "1.持续观察到70秒结束",
+      "expected_text": "1.SpO2卡片数值持续刷新",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_035",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量即将从前段切到后段",
+      "steps_text": "1.观察阶段切换",
+      "expected_text": "1.剩余时间继续递减",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_036",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.OCM已进入血氧阶段且血氧尚未出值",
+      "steps_text": "1.观察SpO2卡片",
+      "expected_text": "1.SpO2卡片显示--",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_037",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.血氧数据测试工具可在血氧阶段依次设置0和100两个边界值",
+      "steps_text": "1.通过血氧数据测试工具依次设置0和100",
+      "expected_text": "1.SpO2卡片先显示0%，后显示100%",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "依赖外部设备/App: 1.通过血氧数据测试工具依次设置0和100；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_038",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.取下手表",
+      "expected_text": "1.手表显示佩戴提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_039",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.至少一项在70秒内无法出值",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.70秒后手表显示佩戴提示页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "OCM_040",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM佩戴提示页",
+      "steps_text": "1.查看佩戴提示文案和重测按钮",
+      "expected_text": "1.页面显示固定佩戴提示文案与重测按钮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_041",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM佩戴提示页",
+      "steps_text": "1.点击重测按钮",
+      "expected_text": "1.页面重新显示70s倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_042",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.从OCM应用进入佩戴提示页",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示OCM主页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_043",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.一键测量因未佩戴进入提示页",
+      "steps_text": "1.查看心率设备记录\n2.查看压力设备记录\n3.查看血氧设备记录",
+      "expected_text": "1.心率模块无本次新记录\n2.压力模块无本次新记录\n3.血氧模块无本次新记录",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_044",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.三项均可在70秒内出值",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.70秒时页面结束测量",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "OCM_045",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.三项均可在70秒内出值",
+      "steps_text": "1.完成一次一键测量",
+      "expected_text": "1.三张卡片显示本次测量值",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_046",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示OCM测量结束页",
+      "steps_text": "1.点击Measure按钮",
+      "expected_text": "1.页面重新显示70s倒计时",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "OCM_047",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表显示OCM测量结束页",
+      "steps_text": "1.执行右滑",
+      "expected_text": "1.手表显示Health二级菜单",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_048",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完成",
+      "steps_text": "1.等待页面按系统设置熄屏\n2.在10秒内单击实体按键",
+      "expected_text": "1.手表屏幕熄灭\n2.手表显示OCM测量结束页",
+      "verification_points": [
+        "一键测量完成页在自动熄屏前完整显示",
+        "按5秒系统设置等待后屏幕熄灭",
+        "熄屏10秒内单击实体按键后恢复OCM测量结束页"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用佩戴、HR、SpO2和Stress通用状态，真实等待71秒完成测量，再按5秒熄屏规则与实体主键分阶段截图；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "OCM_049",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完成",
+      "steps_text": "1.等待页面按系统设置熄屏\n2.等待超过10秒\n3.单击实体按键",
+      "expected_text": "1.手表屏幕熄灭\n2.手表保持熄屏\n3.手表显示主表盘",
+      "verification_points": [
+        "一键测量完成页在自动熄屏前完整显示",
+        "按5秒系统设置等待后屏幕熄灭",
+        "熄屏真实保持超过10秒后仍为黑屏",
+        "单击实体按键后显示主表盘"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "复用同一完成态构造，真实等待71秒完成测量，再覆盖自动熄屏、超过10秒黑屏和主键返回表盘四阶段截图；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+    },
+    {
+      "case_id": "OCM_050",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值0",
+      "expected_text": "1.Stress卡片显示Relax",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_051",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值25",
+      "expected_text": "1.Stress卡片显示Relax",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_052",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值26",
+      "expected_text": "1.Stress卡片显示Normal",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_053",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值50",
+      "expected_text": "1.Stress卡片显示Normal",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_054",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值51",
+      "expected_text": "1.Stress卡片显示Medium",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_055",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值75",
+      "expected_text": "1.Stress卡片显示Medium",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_056",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值76",
+      "expected_text": "1.Stress卡片显示High",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_057",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.启动一键测量，在Stress阶段注入压力值99",
+      "expected_text": "1.Stress卡片显示High",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "OCM_058",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.压力注入工具已连接",
+      "steps_text": "1.分别注入压力值99和100，完成一键测量",
+      "expected_text": "1.Stress卡片最大显示99，High区间为76至99，不生成100结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_059",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入心率模块查看最近记录",
+      "expected_text": "1.Heart Rate最近值显示OCM本次结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_060",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入压力模块查看最近记录",
+      "expected_text": "1.Stress最近值显示OCM本次结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_061",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入血氧模块查看最近记录",
+      "expected_text": "1.SpO2最近值显示OCM本次结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_062",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入心率模块查看当小时图表",
+      "expected_text": "1.当小时图表包含OCM的Heart Rate结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_063",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入压力模块查看当小时图表",
+      "expected_text": "1.当小时图表包含OCM的Stress结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_064",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.进入血氧模块查看当小时图表",
+      "expected_text": "1.当小时图表包含OCM的SpO2结果",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_065",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量已完整结束",
+      "steps_text": "1.查看三模块设备记录类型",
+      "expected_text": "1.三项记录均标记为手动测量",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_066",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴且对应传感器可采样\n3.一键测量已完整结束",
+      "steps_text": "1.在App执行下拉同步\n2.查看App心率结果\n3.查看App压力结果\n4.查看App血氧结果",
+      "expected_text": "1.App完成本次同步\n2.App显示本次心率结果\n3.App显示本次压力结果\n4.App显示本次血氧结果",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_067",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表与App已断开连接",
+      "steps_text": "1.完整执行一次一键测量",
+      "expected_text": "1.设备保存本次三项手动记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_068",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.断连期间已完成一次一键测量",
+      "steps_text": "1.恢复手表与App连接",
+      "expected_text": "1.App新增本次三项健康记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖外部设备/App: 1.恢复手表与App连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_069",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.70秒内仅两项出值",
+      "steps_text": "1.等待测量超时",
+      "expected_text": "1.三模块均不新增本次记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "OCM_070",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.三项测量已完成\n3.模拟压力记录写入失败",
+      "steps_text": "1.等待测量结束",
+      "expected_text": "1.待产品确认：其余两项是否回滚或保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "OCM_071",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.已连接日志工具，可查询手动测量存储池ID",
+      "steps_text": "1.完成一次一键测量\n2.读取本次心率、压力和血氧记录的存储池标识\n3.分别在心率、压力和血氧模块完成一次手动点测\n4.读取三次独立点测记录的存储池标识",
+      "expected_text": "1.三项OCM结果均写入手动测量记录\n2.三项OCM记录使用同一手动测量存储池标识\n3.三个独立模块各新增一条手动测量记录\n4.独立点测记录的存储池标识与对应OCM记录一致",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_072",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.从另一台手机拨打绑定手机\n2.在手机端挂断来电\n3.查看OCM页面",
+      "expected_text": "1.手表显示来电页面\n2.待产品确认：来电结束后的返回页面\n3.待产品确认：测量计时与三项记录是否保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_073",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行\n3.测试闹钟将在1分钟内响铃",
+      "steps_text": "1.等待闹钟响铃\n2.关闭闹钟\n3.查看OCM页面",
+      "expected_text": "1.手表显示闹钟响铃页\n2.待产品确认：关闭闹钟后的返回页面\n3.待产品确认：测量计时与三项记录是否保留",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "OCM_074",
+      "sheet": "一键测量",
+      "priority": "P0",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.一键测量正在运行",
+      "steps_text": "1.从App发起OTA升级",
+      "expected_text": "1.本次一键测量不生成记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_075",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.手表正确佩戴且对应传感器可采样",
+      "steps_text": "1.连续完成10次一键测量",
+      "expected_text": "1.手表未出现死机或异常重启",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "HR、SpO2 和佩戴注入已具备；本用例还缺70秒阶段加速或多时点采集；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "OCM_076",
+      "sheet": "一键测量",
+      "priority": "P1",
+      "precondition_text": "1.准备Android与iOS支持版本手机\n2.手表已完成一键测量",
+      "steps_text": "1.分别连接Android与iOS执行同步",
+      "expected_text": "1.两平台均显示三项OCM结果",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "OCM_077",
+      "sheet": "一键测量",
+      "priority": "P2",
+      "precondition_text": "1.手表显示OCM主页面",
+      "steps_text": "1.观察三张卡片标题\n2.观察三张卡片数值\n3.观察三张卡片单位",
+      "expected_text": "1.卡片标题无重叠或裁切\n2.卡片数值无重叠或裁切\n3.卡片单位无重叠或裁切",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    }
+  ]
+}

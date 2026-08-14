@@ -1,0 +1,22 @@
+# Declare text and binary formats without forcing an end-of-line conversion.
+*.md text
+*.py text
+*.json text
+*.toml text
+*.yml text
+*.yaml text
+*.html text
+*.css text
+*.js text
+*.ps1 text
+*.cmd text
+*.bat text
+
+*.bmp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.xlsx binary
+*.up3 binary
+*.elf binary

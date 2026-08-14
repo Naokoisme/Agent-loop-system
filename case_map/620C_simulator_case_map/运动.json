@@ -1,0 +1,2589 @@
+[
+  {
+    "case_id": "SPORT_001",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表停留在应用菜单",
+    "steps_text": "1.点击Sports入口\n2.观察页面标题与列表区域",
+    "expected_text": "1.手表进入Multisport运动列表\n2.页面显示Multisport标题和运动项列表",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,75,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SPORT_SUBMENU 首项 Multisport 范围来自当前 Designer：y=50..100"
+  },
+  {
+    "case_id": "SPORT_002",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表运动列表为首次初始化状态",
+    "steps_text": "1.进入Multisport运动列表\n2.从首项滚动至末项\n3.统计列表运动项数量",
+    "expected_text": "1.列表首项显示Outdoor Walk\n2.列表按PRD顺序显示19项\n3.末项显示Football",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80021;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80022;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80023;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80024;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80025;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80026;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80027;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80028;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80029;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "从首屏开始每两次上滑采集一次 GUI_TREE，覆盖滚动过程和末屏；用于判定完整顺序、数量以及 Football 是否为末项，不用单张末屏代替全列表证据",
+    "verification_points": [
+      "首屏显示 Outdoor Walk，并记录首批可见运动项",
+      "滚动检查点1：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点2：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点3：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点4：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点5：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点6：记录后续可见运动项，供19项顺序与数量判定",
+      "滚动检查点7：记录后续可见运动项，供19项顺序与数量判定",
+      "末屏显示 Football 为第19项且其后没有其他运动项"
+    ]
+  },
+  {
+    "case_id": "SPORT_003",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.任一运动已设置时间目标",
+    "steps_text": "1.进入Multisport运动列表\n2.观察已设目标的运动条目\n3.查看该运动条目的运动名称\n4.查看该运动条目的当前目标\n5.查看该运动条目的设置入口",
+    "expected_text": "1.列表按当前排序展示运动条目\n2.该条目显示运动图标\n3.该条目显示运动名称\n4.该条目显示当前目标\n5.该条目显示设置入口",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_004",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.Multisport列表内容超过一屏",
+    "steps_text": "1.在列表中上滑\n2.在列表中下滑",
+    "expected_text": "1.列表向后显示后续运动项\n2.列表向前显示先前运动项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80041;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80042;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "上滑后显示后续运动项",
+      "下滑后显示先前运动项"
+    ]
+  },
+  {
+    "case_id": "SPORT_005",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.Multisport列表内容超过一屏",
+    "steps_text": "1.顺时针旋转编码器\n2.逆时针旋转编码器",
+    "expected_text": "1.列表向上滚动并显示后续运动项\n2.列表向下滚动并显示先前运动项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80051;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80052;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "顺时针旋转后列表显示后续运动项",
+      "逆时针旋转后列表显示先前运动项"
+    ]
+  },
+  {
+    "case_id": "SPORT_006",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.Multisport列表至少有一项运动",
+    "steps_text": "1.点击任一运动项右侧设置入口",
+    "expected_text": "1.手表进入该运动的Goals目标设置页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:155,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_007",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Multisport列表底部",
+    "steps_text": "1.点击Customize Sports",
+    "expected_text": "1.手表进入Customize Sports运动自定义页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,210,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "滚动19项列表至 footer 后实际点击 Customize Sports"
+  },
+  {
+    "case_id": "SPORT_008",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表停留在Multisport运动列表",
+    "steps_text": "1.在页面右滑",
+    "expected_text": "1.手表返回进入Sports前的上一级页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_009",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表停留在Multisport运动列表",
+    "steps_text": "1.按压一次编码器",
+    "expected_text": "1.手表返回主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_010",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已进入Customize Sports页面",
+    "steps_text": "1.观察页面顶部与各运动条目\n2.查看各运动项的上移控件\n3.查看各运动项的删除控件",
+    "expected_text": "1.页面顶部显示添加按钮\n2.每个运动项显示上移控件\n3.每个运动项显示删除控件",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_011",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.Customize Sports列表至少有3项",
+    "steps_text": "1.观察首个运动项的上移按钮\n2.点击首项上移按钮",
+    "expected_text": "1.首项上移按钮显示置灰\n2.首项位置保持不变",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SET_LIST_SORT,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:55,162,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_012",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.Customize Sports列表至少有4项",
+    "steps_text": "1.记录第3项名称\n2.记录第2项名称\n3.点击第3项上移按钮\n4.重新读取第2、3项运动名称\n5.重新读取其余运动项的排列顺序",
+    "expected_text": "1.已记录两项的当前顺序\n2.已记录第2项运动名称\n3.原第3项移动到原第2项位置\n4.原第2项移动到原第3项位置\n5.其他运动项顺序保持不变",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 1.记录第3项名称"
+  },
+  {
+    "case_id": "SPORT_013",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.Customize Sports列表多于3项",
+    "steps_text": "1.记录待删项前后相邻运动\n2.点击待删项删除按钮\n3.重新读取删除位置前后的运动名称",
+    "expected_text": "1.相邻运动名称与顺序已记录\n2.待删除运动项从列表消失\n3.原相邻运动保持先后顺序",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 1.记录待删项前后相邻运动"
+  },
+  {
+    "case_id": "SPORT_014",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.当前运动项少于30个",
+    "steps_text": "1.点击页面顶部添加按钮",
+    "expected_text": "1.手表进入Add Sports运动分类页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SET_LIST_SORT,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,80,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "实际点击 SPORT_SET_LIST_SORT 顶部添加区域（列表 y=46、header 高70）"
+  },
+  {
+    "case_id": "SPORT_015",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.编辑列表内容超过一屏",
+    "steps_text": "1.上滑编辑列表\n2.下滑编辑列表\n3.顺时针旋转编码器\n4.逆时针旋转编码器",
+    "expected_text": "1.页面显示后续运动条目\n2.页面显示先前运动条目\n3.页面向上滚动\n4.页面向下滚动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80151;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80152;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80153;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80154;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "上滑后显示后续运动条目",
+      "下滑后显示先前运动条目",
+      "顺时针旋转后页面向上滚动",
+      "逆时针旋转后页面向下滚动"
+    ]
+  },
+  {
+    "case_id": "SPORT_016",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表停留在Customize Sports页面",
+    "steps_text": "1.右滑返回运动列表\n2.再次进入编辑页后按压编码器",
+    "expected_text": "1.手表返回Multisport运动列表\n2.手表返回主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80161;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SET_LIST_SORT,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80162;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "右滑后返回 Multisport 运动列表",
+      "再次进入编辑页并按压编码器后返回主表盘"
+    ]
+  },
+  {
+    "case_id": "SPORT_017",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动列表已有30项",
+    "steps_text": "1.进入Customize Sports页面\n2.点击置灰的添加按钮",
+    "expected_text": "1.添加按钮显示置灰\n2.页面显示Max limit of multisports reached.提示并保持当前页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造30项运动上限状态的 SIM_SPORT_LIST_SET；不能仅进入页面代替点击置灰添加按钮"
+  },
+  {
+    "case_id": "SPORT_018",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动列表仅保留3项",
+    "steps_text": "1.进入Customize Sports页面\n2.点击任一运动的删除按钮\n3.重新统计运动列表数量",
+    "expected_text": "1.编辑页显示3个运动项\n2.页面显示运动至少保留三个\n3.运动列表数量保持3项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造仅3项运动列表的 SIM_SPORT_LIST_SET；不能仅进入页面代替删除动作"
+  },
+  {
+    "case_id": "SPORT_019",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已进入Add Sports页面",
+    "steps_text": "1.滚动浏览全部分类\n2.统计分类数量",
+    "expected_text": "1.页面按PRD展示9个运动分类\n2.分类列表中无重复项",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_020",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Add Sports页面",
+    "steps_text": "1.点击Gym Workout分类",
+    "expected_text": "1.手表进入Gym Workout分类选择页并显示对应运动项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_TYPE_CARD,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,87,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SPORT_TYPE_CARD 首行中心来自当前 Designer 列表布局"
+  },
+  {
+    "case_id": "SPORT_021",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.Add Sports分类列表超过一屏",
+    "steps_text": "1.上滑分类列表\n2.下滑分类列表\n3.旋转编码器浏览分类",
+    "expected_text": "1.页面显示后续分类\n2.页面显示先前分类\n3.列表随编码器方向滚动",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80211;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80212;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80213;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "上滑后显示后续分类",
+      "下滑后显示先前分类",
+      "编码器旋转后分类列表随方向滚动"
+    ]
+  },
+  {
+    "case_id": "SPORT_022",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表停留在Add Sports页面",
+    "steps_text": "1.右滑返回\n2.再次进入Add Sports后按压编码器",
+    "expected_text": "1.手表返回Customize Sports页面\n2.手表返回主表盘",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80221;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_TYPE_CARD,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80222;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "右滑后返回 Customize Sports",
+      "再次进入 Add Sports 并按压编码器后返回主表盘"
+    ]
+  },
+  {
+    "case_id": "SPORT_023",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Sports分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Sports分类列表\n2.列表显示Basketball 篮球/Baseball 棒球/Table Tennis 乒乓球/Tennis 网球/Squash 壁球/Hockey 曲棍球/Golf 高尔夫/Bowling 保龄球/Handball 手球/Rugby 橄榄球/Kabaddi 卡巴迪/Dodgeball 躲避球/Volleyball 排球/Beach Volleyball 沙滩排球/Sepak Takraw 藤球/Skate Board 滑板/Roller Skating 轮滑/High Jump 跳高/Long Jump 跳远",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,2;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_024",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Adventure分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Adventure分类列表\n2.列表显示Hiking 徒步/Rock Climbing 攀岩/ATV 沙滩车/Paragliding 滑翔伞",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,3;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_025",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Combat分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Combat分类列表\n2.列表显示Boxing 拳击/Karate 空手道/Judo 柔道/Wrestling 摔跤/Kickboxing 踢拳/Kung fu 武术/Taekwondo 跆拳道/Fencing 击剑/Tai Chi 太极/Sumo 相扑",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,4;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_026",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Winter Sports分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Winter Sports分类列表\n2.列表显示Skiing 滑雪/Ice Skating 滑冰/Snow Mobile 雪地摩托/Sledge 雪橇运动/Ice Hockey 冰球/Snowboarding 单板滑雪/Curling 冰壶",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,5;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_027",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Dance分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Dance分类列表\n2.列表显示Dance 舞蹈/Ballet 芭蕾/Aerobics 有氧操/Folk Dance 民族舞",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,6;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_028",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Leisure & Lifestyle分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Leisure & Lifestyle分类列表\n2.列表显示Archery 射箭/Darts 飞镖/Tug of war 拔河/Hula Hoop 呼啦圈/Kite Flying 放风筝/Fishing 钓鱼/Disc Sports 飞盘/Billiards 台球/Skipping 跳绳/Meditation 冥想/Horse Riding 马术/Trampoline 蹦床",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,7;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_029",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表显示Add Sports分类页",
+    "steps_text": "1.进入Water Sports分类\n2.读取该分类的中英文运动名称",
+    "expected_text": "1.手表显示Water Sports分类列表\n2.列表显示Boating 划船/Snorkelling 浮潜/Para Sailing 帆船/Water Polo 水球/Kayaking 皮划艇/Surfing 冲浪/Rowing 赛艇",
+    "setup": [],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,8;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树"
+  },
+  {
+    "case_id": "SPORT_030",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.目标分类含已在运动列表中的运动",
+    "steps_text": "1.进入目标分类选择页\n2.观察已添加运动的选中标识",
+    "expected_text": "1.页面展示目标分类运动清单\n2.已添加运动显示为勾选状态",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_TYPE_CARD,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,87,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "实际点击首个目标分类进入选择页"
+  },
+  {
+    "case_id": "SPORT_031",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.当前运动项少于30个\n2.目标运动当前未勾选",
+    "steps_text": "1.点击目标运动使其勾选\n2.点击确认按钮\n3.滚动至Multisport列表末尾",
+    "expected_text": "1.目标运动显示勾选\n2.手表保存选择并返回Multisport列表\n3.新增运动显示在列表最后一项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,98,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80311;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80312;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80313;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "同类运动项高104；滚动至 footer 后点击确认",
+    "verification_points": [
+      "点击目标运动后显示勾选",
+      "点击底部确认后保存并返回 Multisport",
+      "滚动到底部后新增运动显示在最后一项"
+    ]
+  },
+  {
+    "case_id": "SPORT_032",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.当前运动项多于3个\n2.目标运动当前已勾选",
+    "steps_text": "1.点击目标运动取消勾选\n2.点击确认按钮\n3.在Multisport列表查找目标运动",
+    "expected_text": "1.目标运动显示未勾选\n2.手表保存选择并返回Multisport列表\n3.Multisport列表不再显示目标运动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,98,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80321;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80322;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80323;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "同类运动项高104；滚动至 footer 后点击确认",
+    "verification_points": [
+      "点击已选目标运动后取消勾选",
+      "点击底部确认后保存并返回 Multisport",
+      "滚动列表后目标运动不再显示"
+    ]
+  },
+  {
+    "case_id": "SPORT_033",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动列表已有30项\n2.分类页存在未勾选运动",
+    "steps_text": "1.点击未勾选运动\n2.查看目标运动的勾选状态\n3.观察提示直至消失",
+    "expected_text": "1.页面显示Max limit of multisports reached.\n2.目标运动保持未勾选\n3.提示显示3秒后自动消失",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:155,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_034",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动列表已有30项\n2.分类页存在待保存新增选择",
+    "steps_text": "1.点击确认按钮\n2.返回Multisport后统计运动项\n3.在Multisport列表中查找第31项运动",
+    "expected_text": "1.页面显示Max limit of multisports reached.提示\n2.运动列表数量保持30项\n3.第31项运动未加入列表",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造30项上限及第31项待选状态的 SIM_SPORT_LIST_SET"
+  },
+  {
+    "case_id": "SPORT_035",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动列表仅保留3项\n2.分类页目标运动已勾选",
+    "steps_text": "1.点击目标运动取消勾选\n2.查看目标运动的勾选状态\n3.观察提示直至消失",
+    "expected_text": "1.页面显示运动至少保留三个\n2.目标运动保持勾选\n3.提示显示3秒后自动消失",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:155,92,1;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_036",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.分类选择列表超过一屏",
+    "steps_text": "1.上滑列表\n2.下滑列表\n3.旋转编码器\n4.右滑返回",
+    "expected_text": "1.页面显示后续运动项\n2.页面显示先前运动项\n3.列表随编码器方向滚动\n4.手表返回Add Sports页面",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,1;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80361;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80362;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80363;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80364;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "上滑后显示后续运动项",
+      "下滑后显示先前运动项",
+      "编码器旋转后列表按方向滚动",
+      "右滑后返回 Add Sports 页面"
+    ]
+  },
+  {
+    "case_id": "SPORT_037",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.目标运动从未设置过运动目标",
+    "steps_text": "1.进入目标运动的Goals页面",
+    "expected_text": "1.Goals页面显示None为当前默认目标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_038",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动A已设置10分钟目标\n2.运动B保持None目标",
+    "steps_text": "1.查看运动A列表目标\n2.查看运动B列表目标",
+    "expected_text": "1.运动A显示10分钟目标\n2.运动B仍显示None目标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_039",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.目标运动为Outdoor Run",
+    "steps_text": "1.进入Outdoor Run的Goals页面\n2.查看当前页面的Calories目标\n3.查看当前页面的Distance目标\n4.查看当前页面的None目标",
+    "expected_text": "1.页面显示Time目标\n2.页面显示Calories目标\n3.页面显示Distance目标\n4.页面显示None目标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_040",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.目标运动为Yoga",
+    "steps_text": "1.进入Yoga的Goals页面\n2.查看当前页面的Calories目标\n3.查看当前页面的None目标\n4.查看全部数据页，确认未出现Distance入口",
+    "expected_text": "1.页面显示Time目标\n2.页面显示Calories目标\n3.页面显示None目标\n4.页面不显示Distance入口",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_041",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在距离类运动Goals页面",
+    "steps_text": "1.点击Time后返回Goals\n2.点击Calories后返回Goals\n3.点击Distance",
+    "expected_text": "1.手表进入Time数值设置页\n2.手表进入Calories数值设置页\n3.手表进入Distance数值设置页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,90,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80411;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,182,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80412;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,182,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80413;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "点击 Time 后进入时间数值设置页",
+      "返回 Goals 并点击 Calories 后进入卡路里数值设置页",
+      "返回 Goals、滚动并点击 Distance 后进入距离数值设置页"
+    ]
+  },
+  {
+    "case_id": "SPORT_042",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表停留在Goals页面",
+    "steps_text": "1.在目标列表执行上滑\n2.在目标列表执行下滑\n3.旋转编码器\n4.右滑返回\n5.再次进入Goals后按压编码器",
+    "expected_text": "1.目标列表显示后续目标\n2.目标列表显示前序目标\n3.目标列表随编码器方向滚动\n4.手表返回Multisport列表\n5.手表返回主表盘",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80421;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80422;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80423;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80424;",
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;",
+      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80425;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "上滑后显示后续目标",
+      "下滑后显示前序目标",
+      "编码器旋转后目标列表滚动",
+      "右滑后返回 Multisport",
+      "再次进入 Goals 后按压编码器返回主表盘"
+    ]
+  },
+  {
+    "case_id": "SPORT_043",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.目标运动的时间目标尚未修改",
+    "steps_text": "1.从Goals点击Time\n2.读取Time页面的分钟列",
+    "expected_text": "1.Time页面小时列显示0\n2.Time页面分钟列显示10",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 2.读取Time页面的分钟列"
+  },
+  {
+    "case_id": "SPORT_044",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Time数值设置页",
+    "steps_text": "1.将小时列调整到0\n2.继续向下调整小时列\n3.将小时列调整到9\n4.继续向上调整小时列",
+    "expected_text": "1.小时列显示0\n2.小时列不出现小于0的值\n3.小时列显示9\n4.小时列不出现大于9的值",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_045",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Time数值设置页",
+    "steps_text": "1.将分钟列调到10\n2.调到20\n3.调到30\n4.调到40\n5.调到50\n6.继续向上调一档",
+    "expected_text": "1.分钟列显示10\n2.分钟列显示20\n3.分钟列显示30\n4.分钟列显示40\n5.分钟列显示50\n6.分钟列回到0",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "控件可按截图动态定位；仍需可加速等待和分段取证"
+  },
+  {
+    "case_id": "SPORT_046",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Calories数值设置页",
+    "steps_text": "1.将数值调整到50千卡\n2.逐档调整到1000千卡\n3.继续向上调整一档",
+    "expected_text": "1.页面显示50千卡\n2.调整过程每档增加50千卡并显示1000千卡\n3.数值不超过1000千卡",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_047",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在Distance数值设置页\n2.系统单位为公制",
+    "steps_text": "1.从1公里逐档调整到20公里\n2.继续浏览20公里后的选项",
+    "expected_text": "1.距离按1公里步长显示1至20公里\n2.20公里后显示半马和全马选项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 1.从1公里逐档调整到20公里"
+  },
+  {
+    "case_id": "SPORT_048",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留在任一目标数值页",
+    "steps_text": "1.在选中列上滑一档\n2.在选中列下滑一档\n3.旋转编码器调整一档",
+    "expected_text": "1.选中值增加一个规定步长\n2.选中值减少一个规定步长\n3.选中值按编码器方向变化一个规定步长",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_TIME_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80481;",
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80482;",
+      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80483;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "选中列上滑后增加一个规定步长",
+      "选中列下滑后减少一个规定步长",
+      "编码器旋转后按方向变化一个规定步长"
+    ]
+  },
+  {
+    "case_id": "SPORT_049",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.已在目标数值页选择有效目标值",
+    "steps_text": "1.点击开始按钮\n2.连续读取圆环中央的倒计时文字\n3.等待倒计时结束\n4.退出本次运动后返回Multisport列表",
+    "expected_text": "1.手表进入运动倒计时页\n2.倒计时依次显示3至GO\n3.手表进入运动中数据页\n4.对应运动条目显示刚才保存的目标",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "准备页开始按钮未定位,倒计时依赖时序"
+  },
+  {
+    "case_id": "SPORT_050",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.Multisport列表存在可启动运动",
+    "steps_text": "1.点击任一运动项\n2.连续观察倒计时\n3.回放倒计时录像，记录数字和GO的出现顺序\n4.等待GO结束",
+    "expected_text": "1.手表进入圆环倒计时页\n2.页面依次显示3至GO\n3.倒计时顺序不跳变\n4.手表进入该运动的数据页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 3.回放倒计时录像，记录数字和GO的出现顺序"
+  },
+  {
+    "case_id": "SPORT_051",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.振动强度设置为弱",
+    "steps_text": "1.启动任一运动\n2.在GO结束时记录振动",
+    "expected_text": "1.倒计时依次显示3至GO\n2.进入运动时产生一次约250ms振动",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "准备页开始按钮未定位,倒计时依赖时序"
+  },
+  {
+    "case_id": "SPORT_052",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.用户年龄设为40岁\n3.可输出指定BPM的心率模拟设备输出89BPM",
+    "steps_text": "1.持续观察心率区间条与区间名称\n2.查看全部数据页，确认未出现五个心率区间名称",
+    "expected_text": "1.实时心率显示89BPM\n2.页面不显示五个心率区间名称",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_053",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.用户年龄设为40岁\n3.心率模拟设备可输出90、108、126、144、162BPM",
+    "steps_text": "1.依次输出90、108、126、144、162BPM\n2.观察每个数值对应的区间名称",
+    "expected_text": "1.页面依次显示心率模拟设备输出的五个心率值\n2.五个心率值依次归入Warm Up至Extreme区间",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_054",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.用户年龄为40岁\n2.心率模拟设备已连接",
+    "steps_text": "1.依次输出100、120、140、160、180BPM\n2.观察实时心率区域",
+    "expected_text": "1.手表依次接收到五个模拟心率值\n2.页面显示Warm Up/Fat Burning/Aerobic/Anaerobic/Extreme五段色条，指针移动至对应区间并显示实时心率和区间名",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_055",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.已启动距离类运动且尚未产生有效运动数据",
+    "steps_text": "1.查看运动时间\n2.查看距离\n3.查看步数\n4.查看卡路里\n5.查看心率",
+    "expected_text": "1.时间显示00:00:00\n2.距离显示0.00\n3.步数显示0\n4.卡路里显示0\n5.心率显示--",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_056",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Outdoor Run并产生运动数据",
+    "steps_text": "1.观察数据页1\n2.查看运动数据页1的实时配速\n3.查看运动数据页1的总卡路里\n4.上滑切换到数据页2\n5.查看运动数据页2的平均步频\n6.查看运动数据页2的总步数",
+    "expected_text": "1.页1显示总距离\n2.页1显示实时配速\n3.页1显示总卡路里\n4.页2显示实时步频\n5.页2显示平均步频\n6.页2显示总步数",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_057",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Outdoor Cycling并产生运动数据",
+    "steps_text": "1.浏览全部运动数据页\n2.查看当前页面的心率区间\n3.查看当前页面的实时心率\n4.查看全部数据页，确认未出现距离\n5.查看全部数据页，确认未出现配速\n6.查看全部数据页，确认未出现步数\n7.查看全部数据页，确认未出现步频",
+    "expected_text": "1.页面显示总卡路里\n2.页面显示心率区间\n3.页面显示实时心率\n4.页面不显示距离\n5.页面不显示配速\n6.页面不显示步数\n7.页面不显示步频",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_058",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Yoga并产生运动数据",
+    "steps_text": "1.浏览全部运动数据页\n2.查看当前页面的心率区间\n3.查看当前页面的实时心率\n4.查看全部数据页，确认未出现距离\n5.查看全部数据页，确认未出现配速\n6.查看全部数据页，确认未出现步数\n7.查看全部数据页，确认未出现步频",
+    "expected_text": "1.页面显示总卡路里\n2.页面显示心率区间\n3.页面显示实时心率\n4.页面不显示距离\n5.页面不显示配速\n6.页面不显示步数\n7.页面不显示步频",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_059",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动数据测试工具持续提供稳定步频和心率",
+    "steps_text": "1.记录连续5秒页面数据与时间戳\n2.对比连续5秒记录中相邻两次运动数据的时间戳",
+    "expected_text": "1.运动时长逐秒增加\n2.可变运动数据每秒刷新一次",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_060",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动已持续59分50秒",
+    "steps_text": "1.观察运动时长从59:59跨到1小时",
+    "expected_text": "1.运动时长从00:59:59更新为01:00:00",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "跨越10秒的等待可执行；当前缺少可将真实运动会话已用时设置为59分50秒的通用SIM_SPORT_SESSION_SET能力，不能靠等待一小时建立前置"
+  },
+  {
+    "case_id": "SPORT_061",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动包含两张数据页的距离类运动",
+    "steps_text": "1.在数据页1上滑\n2.查看页面底部圆点指示器\n3.在数据页2下滑\n4.查看页面底部圆点指示器",
+    "expected_text": "1.手表切换到数据页2\n2.圆点指示数据页2位置\n3.手表切换回数据页1\n4.圆点指示数据页1位置",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_062",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动包含两张数据页的距离类运动",
+    "steps_text": "1.顺时针旋转编码器\n2.逆时针旋转编码器",
+    "expected_text": "1.手表切换到下一张数据页\n2.手表切换回上一张数据页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_063",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在运动中数据页",
+    "steps_text": "1.在数据页左滑\n2.记录左滑前后的运动时长",
+    "expected_text": "1.手表进入Music运动音乐控制页\n2.运动计时继续增加",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_064",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在运动中数据页",
+    "steps_text": "1.在数据页右滑",
+    "expected_text": "1.手表进入包含暂停继续和结束控件的页面",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_065",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在亮屏运动中数据页",
+    "steps_text": "1.按压一次编码器",
+    "expected_text": "1.手表进入暂停结束页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_066",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动数据页底部圆点指示已显示",
+    "steps_text": "1.停止页面操作\n2.等待3秒",
+    "expected_text": "1.满3秒后圆点指示自动隐藏\n2.运动数据继续刷新",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_067",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动正在记录且页面亮屏",
+    "steps_text": "1.覆盖屏幕使手表灭屏\n2.记录灭屏前后的运动时长\n3.等待超过10秒后按键亮屏\n4.核对亮屏后页面标题和数据，确认未返回主表盘",
+    "expected_text": "1.手表进入灭屏状态\n2.运动计时继续增加\n3.手表重新显示运动中页面\n4.手表未跳转主表盘",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_068",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动数据页圆点已因3秒无操作隐藏",
+    "steps_text": "1.左右或上下切换一次运动页面",
+    "expected_text": "1.页面底部圆点重新显示并指示当前页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_069",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Outdoor Run且当前系统时间为09:30",
+    "steps_text": "1.观察运动中页面顶部",
+    "expected_text": "1.顶部显示Outdoor Run运动ICON/HH:MM:SS格式运动时长/系统时间09:30",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_070",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n3.App用户年龄初始为20岁",
+    "steps_text": "1.通过心率模拟设备持续输出150BPM\n2.记录当前区间\n3.将App年龄修改为40岁\n4.让心率模拟设备再次输出150BPM",
+    "expected_text": "1.页面显示150BPM实时心率\n2.页面按最大心率200BPM对应边界显示区间\n3.App中用户年龄显示40岁\n4.页面按最大心率180BPM重新计算并显示更新后的区间",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_071",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表停留在运动音乐页",
+    "steps_text": "1.按压一次编码器\n2.记录返回前后的运动时长",
+    "expected_text": "1.手表返回运动中数据页\n2.运动时长保持连续",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_072",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机正在播放音乐\n3.手表停留在运动音乐页",
+    "steps_text": "1.点击暂停音乐\n2.观察运动计时是否继续递增\n3.点击播放音乐\n4.观察运动计时是否继续递增\n5.返回运动数据页",
+    "expected_text": "1.手机音乐暂停\n2.运动仍在记录\n3.手机音乐恢复播放\n4.运动仍在记录\n5.运动时长与数据未清零",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_073",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机播放列表至少有3首歌曲\n3.手表停留运动音乐页",
+    "steps_text": "1.点击上一曲\n2.点击下一曲\n3.调高音量\n4.调低音量",
+    "expected_text": "1.手机播放上一首歌曲，运动记录持续\n2.手机播放下一首歌曲，运动记录持续\n3.手机音量增加，运动记录持续\n4.手机音量降低，运动记录持续",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_074",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机正在播放音乐\n3.音频通道切换链路可用",
+    "steps_text": "1.点击音频通道按钮切换到手表\n2.再次点击切回手机",
+    "expected_text": "1.音频通道切换到手表，运动记录持续\n2.音频通道切回手机，运动记录持续",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_075",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表停留运动音乐页",
+    "steps_text": "1.浏览音乐页全部入口",
+    "expected_text": "1.页面仅提供手机音乐控制，不显示手表本地歌曲或本地音乐入口",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_INPROGRESS,2;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_076",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动已产生时长、距离、卡路里和心率数据",
+    "steps_text": "1.进入暂停结束页\n2.点击暂停按钮\n3.观察暂停后的数据页10秒\n4.记录暂停前后的距离数值\n5.记录暂停前后的卡路里数值\n6.连续记录10秒心率数值",
+    "expected_text": "1.手表返回数据页并产生一次约250ms振动\n2.暂停按钮点击后页面返回运动数据页\n3.运动时长停止累计\n4.距离停止累计\n5.卡路里停止累计\n6.心率继续刷新",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_077",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.当前运动处于暂停状态",
+    "steps_text": "1.进入暂停结束页\n2.点击继续按钮\n3.继续运动10秒\n4.对比继续运动前后的距离、卡路里等数据\n5.记录继续运动前后的已有数据",
+    "expected_text": "1.手表返回数据页并产生一次约250ms振动\n2.继续按钮点击后页面返回运动数据页\n3.运动时长恢复累计\n4.对应运动数据恢复累计\n5.已有运动数据不清零",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_078",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在暂停结束页",
+    "steps_text": "1.按压一次编码器\n2.查看返回数据页后的暂停标识和计时状态",
+    "expected_text": "1.手表返回运动中数据页\n2.当前暂停状态保持",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_079",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动已进入暂停结束页",
+    "steps_text": "1.单击结束按钮\n2.记录页面响应\n3.重新进入暂停结束页\n4.长按结束按钮\n5.记录页面响应",
+    "expected_text": "1.待产品确认：单击是否触发结束判定\n2.已记录单击结束按钮后的页面反应\n3.待产品确认：长按时长规则\n4.待产品确认：长按进度规则\n5.待产品确认：松开取消规则",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_080",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动正在记录",
+    "steps_text": "1.检查运动数据页和暂停结束页的锁屏入口\n2.按实现触发运动锁屏",
+    "expected_text": "1.待产品确认：锁屏入口所在页面与触发动作\n2.进入运动锁屏页后运动仍持续记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_081",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已进入运动锁屏页",
+    "steps_text": "1.依次上滑、下滑、左滑、右滑\n2.每次滑动后记录页面标题\n3.每次滑动后检查按钮和数据是否变化",
+    "expected_text": "1.页面保持锁屏态\n2.四次滑动均不切换页面\n3.四次滑动均不触发业务控件",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_INPROGRESS,2;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 2.每次滑动后记录页面标题"
+  },
+  {
+    "case_id": "SPORT_082",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已进入运动锁屏页",
+    "steps_text": "1.点击锁屏页\n2.在解锁页长按3秒直至圆环走满",
+    "expected_text": "1.手表进入解锁页并显示解锁圆环\n2.手表解除锁定并返回运动数据页",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_INPROGRESS,2;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80821;",
+      "srv_quick_cmd send TOP5STEP:TP_PRESS:201,128,1;",
+      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8082,3000;",
+      "srv_quick_cmd send TOP5STEP:TP_PRESS:201,128,0;",
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:80822;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "",
+    "verification_points": [
+      "点击锁屏页后进入解锁页并显示解锁圆环",
+      "持续按住屏幕3秒后解除锁定并返回运动数据页"
+    ]
+  },
+  {
+    "case_id": "SPORT_083",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已进入运动解锁页",
+    "steps_text": "1.停止操作\n2.等待3秒",
+    "expected_text": "1.满3秒后手表返回运动锁屏页\n2.运动继续记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+  },
+  {
+    "case_id": "SPORT_084",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长61秒、距离201米、卡路里1千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示End this workout?保存确认弹窗",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_085",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长60秒、距离201米、卡路里1千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示Workout is too short / data is insufficient to be recorded提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_086",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长61秒、距离200米、卡路里1千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示Workout is too short / data is insufficient to be recorded提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_087",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长61秒、距离201米、卡路里0千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示Workout is too short / data is insufficient to be recorded提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_088",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长61秒、距离200米、卡路里0千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示Workout is too short / data is insufficient to be recorded提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_089",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动时长60秒、距离201米、卡路里0千卡",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.页面显示Workout is too short / data is insufficient to be recorded提示",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_090",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动已满足正文三项保存条件\n2.End this workout?弹窗已显示",
+    "steps_text": "1.点击确认结束\n2.查看手表当前页面标题和主要内容\n3.返回Sports Records查找本次运动记录",
+    "expected_text": "1.手表振动一次\n2.手表进入Workout Summary\n3.手表生成本次运动记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造满足保存条件的运行中运动及 End this workout 弹窗的 SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "SPORT_091",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动已满足正文三项保存条件\n2.End this workout?弹窗已显示",
+    "steps_text": "1.点击取消\n2.继续运动10秒",
+    "expected_text": "1.手表返回运动数据页并恢复记录状态\n2.运动时长和数据在原值基础上继续累计",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造运行中运动及 End this workout 弹窗的 SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "SPORT_092",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.当前运动不满足正文保存条件\n2.数据过少提示已显示",
+    "steps_text": "1.点击确认结束\n2.在运动列表和App中查找本次记录",
+    "expected_text": "1.手表结束运动并返回Multisport列表\n2.手表与App均不显示本次运动记录",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+  },
+  {
+    "case_id": "SPORT_093",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.当前运动不满足正文保存条件\n2.数据过少提示已显示",
+    "steps_text": "1.点击取消\n2.继续运动10秒",
+    "expected_text": "1.手表返回运动数据页并恢复记录状态\n2.运动时长和数据在原值基础上继续累计",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺构造不满足保存条件运动及数据过少弹窗的 SIM_SPORT_SESSION_SET"
+  },
+  {
+    "case_id": "SPORT_094",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.Yoga运动时长超过1分钟且卡路里大于0",
+    "steps_text": "1.在暂停结束页触发结束",
+    "expected_text": "1.待产品确认：基础类无距离数据时使用何种保存条件和边界",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_095",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n3.App已开启运动心率预警并设置明确阈值",
+    "steps_text": "1.让心率连续高于预警值60秒\n2.观察提醒直至自动消失",
+    "expected_text": "1.手表显示心率预警页并短振两次\n2.预警页显示5秒后消失并返回运动页面",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_096",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于未佩戴状态\n3.App已开启运动心率预警",
+    "steps_text": "1.启动运动\n2.模拟达到预警条件\n3.持续观察超过1分钟",
+    "expected_text": "1.运动可继续记录其他数据\n2.心率已达到预警阈值\n3.手表不显示心率预警页面",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_097",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表当前显示心率预警页",
+    "steps_text": "1.右滑退出预警页\n2.再次触发预警后按压编码器",
+    "expected_text": "1.手表返回运动中数据页\n2.手表返回运动中数据页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_098",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用",
+    "steps_text": "1.浏览手表Multisport全部设置入口\n2.在App进入运动心率预警设置",
+    "expected_text": "1.手表端不显示心率预警阈值设置入口\n2.App显示运动心率预警配置入口",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_099",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n3.运动心率预警已触发并关闭",
+    "steps_text": "1.保持心率低于阈值30秒\n2.将心率持续保持高于阈值59秒\n3.继续保持至满60秒",
+    "expected_text": "1.手表不显示心率预警\n2.手表不显示心率预警\n3.满60秒时手表再次显示心率预警页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_100",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动心率即将满足预警条件\n3.振动测试仪已连接并校准",
+    "steps_text": "1.采集预警触发后的完整振动\n2.采集预警弹窗显示时长",
+    "expected_text": "1.手表短振两次，每次250毫秒，间隔750毫秒\n2.预警弹窗显示5秒",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器"
+  },
+  {
+    "case_id": "SPORT_101",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.当前运动设有可控目标",
+    "steps_text": "1.使当前运动进度首次达到目标50%\n2.观察提醒5秒\n3.观察运动计时是否继续递增",
+    "expected_text": "1.页面显示You are halfway there!及当前进度并短振两次\n2.提醒5秒后消失\n3.运动继续记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_102",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.当前运动设有可控目标",
+    "steps_text": "1.使当前运动进度首次达到目标100%\n2.观察提醒5秒\n3.观察运动计时是否继续递增",
+    "expected_text": "1.页面显示Goal Achieved!及目标值并短振两次\n2.提醒5秒后消失\n3.运动继续记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_103",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.系统单位为公制\n3.距离类运动正在记录",
+    "steps_text": "1.使累计距离从0.99公里达到1.00公里",
+    "expected_text": "1.页面显示累计运动1公里提醒并短振两次，5秒后返回运动页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_104",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动正在记录且时长接近1小时",
+    "steps_text": "1.使运动时长从00:59:59达到01:00:00",
+    "expected_text": "1.页面显示累计运动1小时提醒并短振两次，5秒后返回运动页",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_105",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动将在同一秒达到1公里、1小时和设定目标",
+    "steps_text": "1.触发三种达成条件\n2.观察本次弹窗队列",
+    "expected_text": "1.页面仅显示距离累计达成提醒\n2.时间累计与设定目标达成弹窗均不显示",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_106",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.目标即将达到50%\n3.振动测试仪已连接并校准",
+    "steps_text": "1.采集50%目标提醒的完整振动\n2.采集目标提醒弹窗显示时长",
+    "expected_text": "1.手表短振两次，每次250毫秒，间隔750毫秒\n2.目标提醒弹窗显示5秒",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器"
+  },
+  {
+    "case_id": "SPORT_107",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.本次运动心率最低80、最高160且持续100分20秒",
+    "steps_text": "1.查看心率曲线横轴\n2.查看心率曲线横轴的时间格式\n3.查看纵轴范围和图例\n4.读取心率图例的最小值\n5.读取心率图例的最大值\n6.读取心率图例的平均值",
+    "expected_text": "1.横轴从00:00累计到100:20\n2.横轴不显示HH格式\n3.纵轴范围显示75至165\n4.图例显示最小值80\n5.图例显示最大值160\n6.图例显示平均值",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_108",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已保存包含心率数据的有效运动",
+    "steps_text": "1.进入Workout Summary心率曲线区域",
+    "expected_text": "1.页面标题逐字显示Heart Rate Curve",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_109",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动心率数据包含五区间和低于50%最大心率的样本",
+    "steps_text": "1.触发结束运动\n2.确认保存本次运动\n3.读取各区间时长与占比\n4.记录运动小结数值",
+    "expected_text": "1.小结只统计五个有效心率区间的HH:MM:SS时长\n2.手表进入Workout Summary并保存本次运动\n3.各占比以有效区间总时长为分母\n4.各区间占比总和为100%",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_110",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动前、运动中、运动后均准备可区分的心率数据",
+    "steps_text": "1.保存运动\n2.进入Workout Summary心率区间",
+    "expected_text": "1.手表保存当次运动记录\n2.区间时长与占比仅统计运动开始至结束范围内数据，运动前后心率样本不计入",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_111",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已保存一条有效Outdoor Run运动",
+    "steps_text": "1.进入Workout Summary\n2.滚动到页面底部\n3.查看Workout Summary中的平均配速\n4.查看Workout Summary中的步数\n5.查看Workout Summary中的卡路里\n6.查看Workout Summary中的最大步频\n7.查看Workout Summary中的平均步频\n8.查看Workout Summary中的心率曲线\n9.查看Workout Summary中的心率统计\n10.查看Workout Summary中的日期时间",
+    "expected_text": "1.小结显示用时\n2.小结显示距离\n3.小结显示平均配速\n4.小结显示步数\n5.小结显示卡路里\n6.小结显示最大步频\n7.小结显示平均步频\n8.小结显示心率曲线\n9.小结显示心率统计\n10.小结显示日期时间",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_112",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已按确认规则保存一条有效基础类或骑行运动",
+    "steps_text": "1.进入Workout Summary\n2.滚动到页面底部\n3.查看Workout Summary中的心率曲线\n4.查看Workout Summary中的心率统计\n5.查看Workout Summary中的日期时间\n6.滚动查看小结全部字段，核对未出现距离\n7.滚动查看小结全部字段，核对未出现配速\n8.滚动查看小结全部字段，核对未出现步数\n9.滚动查看小结全部字段，核对未出现步频",
+    "expected_text": "1.小结显示用时\n2.小结显示卡路里\n3.小结显示心率曲线\n4.小结显示心率统计\n5.小结显示日期时间\n6.小结不显示距离\n7.小结不显示配速\n8.小结不显示步数\n9.小结不显示步频",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_113",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.Workout Summary内容超过一屏",
+    "steps_text": "1.上滑查看后续内容\n2.下滑查看先前内容\n3.旋转编码器滚动\n4.右滑返回",
+    "expected_text": "1.页面显示后续小结字段\n2.页面显示先前小结字段\n3.页面随编码器方向滚动\n4.手表返回Multisport运动列表",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺可复现多屏 Workout Summary 的 SIM_SPORT_RECORD_SET"
+  },
+  {
+    "case_id": "SPORT_114",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.距离类运动正在记录且当前单位为公制",
+    "steps_text": "1.记录当前距离和配速\n2.将系统单位改为英制\n3.返回运动数据页\n4.查看配速单位\n5.查看距离数值\n6.查看配速数值",
+    "expected_text": "1.页面显示km和每公里配速\n2.系统单位保存为英制\n3.距离单位改为mi\n4.配速单位改为每英里\n5.距离数值完成换算\n6.配速数值完成换算",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 1.记录当前距离和配速"
+  },
+  {
+    "case_id": "SPORT_115",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.系统单位为英制\n2.目标运动支持距离目标",
+    "steps_text": "1.进入Distance目标设置页\n2.查看距离目标单位",
+    "expected_text": "1.页面显示英里距离选项\n2.页面保留Full Marathon选项",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_DISTANCE_GOAL_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": "SPORT_DISTANCE_GOAL_LIST 是当前源码注册的距离目标设置页"
+  },
+  {
+    "case_id": "SPORT_116",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n3.已完成并保存一段可控心率运动",
+    "steps_text": "1.打开App本次运动详情\n2.导出或读取App心率点时间戳\n3.对比首个、末个心率点时间与运动开始、结束时间",
+    "expected_text": "1.App显示与手表同一条运动记录\n2.相邻常规心率点时间间隔为10秒\n3.首尾心率点覆盖本次运动范围",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_117",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动正在记录\n2.心率传感器暂时无法得到有效值",
+    "steps_text": "1.观察实时心率字段\n2.记录10秒内的运动时长、距离和卡路里\n3.恢复有效心率输入",
+    "expected_text": "1.实时心率显示--\n2.其他运动数据继续累计\n3.页面恢复显示有效BPM和对应心率区间",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "依赖外部设备/动态判定: 2.记录10秒内的运动时长、距离和卡路里"
+  },
+  {
+    "case_id": "SPORT_118",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在记录一段运动",
+    "steps_text": "1.关闭手机蓝牙使App数据连接断开\n2.查看手表当前页面标题和运动数据\n3.继续运动30秒\n4.重新开启手机蓝牙\n5.等待手表回连",
+    "expected_text": "1.App显示设备断开\n2.手表运动页仍保留\n3.手表运动时长和本地数据连续累计\n4.App恢复连接\n5.手表当前运动数据不清零",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_119",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.App数据连接已断开\n2.手表已完成满足保存条件的运动",
+    "steps_text": "1.在断连状态确认保存运动\n2.恢复App数据连接\n3.在App查看新增运动记录\n4.在手机端查看通话页或App记录",
+    "expected_text": "1.手表生成一条本地运动小结\n2.App恢复为已连接状态\n3.App新增一条对应运动记录\n4.App记录时长与手表小结一致",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_120",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.运动正在记录\n3.App存在可下发升级",
+    "steps_text": "1.在App发起OTA升级\n2.查看手表前台页面\n3.升级结束后查看运动记录",
+    "expected_text": "1.手表显示OTA页面\n2.待产品确认：运动进程如何变化\n3.待产品确认：本次运动记录是否保存",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_121",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正在记录运动\n2.App已打开固件升级页且手表电量高于30%",
+    "steps_text": "1.在App点击安装\n2.在手表确认升级",
+    "expected_text": "1.App显示升级确认\n2.待产品确认：运动页面与Firmware Update页的显示顺序",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_122",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动正在记录且电量可调至低电档位",
+    "steps_text": "1.触发低电提醒",
+    "expected_text": "1.待产品确认：低电提醒后的运动页面与记录规则",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_123",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正在记录运动\n2.绑定手机的消息通知权限已开启",
+    "steps_text": "1.从另一台手机向绑定手机发送一条测试消息\n2.关闭消息弹窗\n3.查看运动数据页",
+    "expected_text": "1.待产品确认：运动中是否显示消息弹窗\n2.待产品确认：关闭消息后返回哪一页\n3.待产品确认：消息期间运动时长与数据是否继续累计",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_124",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.通话蓝牙开关已开启且运动正在记录",
+    "steps_text": "1.让手机收到来电\n2.拒接或结束来电\n3.查看运动时长和当前运动页面",
+    "expected_text": "1.手表显示来电页面\n2.待产品确认：来电结束后返回运动页还是其他页面\n3.待产品确认：来电期间运动时长是否继续累计",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_125",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动正在记录\n2.闹钟将在测试期间触发",
+    "steps_text": "1.等待闹钟触发\n2.关闭闹钟提醒",
+    "expected_text": "1.闹钟提醒页按闹钟规则显示\n2.待产品确认：关闭闹钟后返回页面及运动累计规则",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_126",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.运动正在记录且电量可调至低电档位",
+    "steps_text": "1.连接充电器",
+    "expected_text": "1.待产品确认：充电接入后的运动页面与记录规则",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_127",
+    "sheet": "运动",
+    "priority": "P0",
+    "precondition_text": "1.手表正在记录运动\n2.绑定手机的消息通知权限已开启",
+    "steps_text": "1.从另一台手机向绑定手机发送一条测试消息",
+    "expected_text": "1.待产品确认：运动页面与消息弹窗的显示顺序",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "预期结果待产品确认"
+  },
+  {
+    "case_id": "SPORT_128",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.选择一项可快速建立有效数据的距离类运动",
+    "steps_text": "1.连续执行启动、倒计时和取消20次\n2.每轮操作运动页控件\n3.查看20轮运行日志\n4.第20轮操作开始、暂停、继续和取消\n5.第20次重新启动运动\n6.返回Multisport列表",
+    "expected_text": "1.20次均可完成页面流转\n2.测试期间无页面卡死\n3.测试期间无设备重启\n4.测试期间无控件失效\n5.第20次运动数据从00:00:00开始\n6.运动列表配置未被改写",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "准备页开始按钮未定位,倒计时依赖时序"
+  },
+  {
+    "case_id": "SPORT_129",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.设备电量满足长时运动测试",
+    "steps_text": "1.持续运动2小时\n2.每10分钟采集一次页面数据\n3.触发结束运动\n4.确认保存本次运动",
+    "expected_text": "1.2小时内每次页面采集均可响应\n2.运动时长单调增加\n3.运动小结可生成\n4.小结时长与测试持续时间偏差不超过采样允许误差",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_130",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.数据测试工具已载入运动字段上限数据集",
+    "steps_text": "1.把上限数据集写入当前运动\n2.查看运动数据页数值\n3.查看数值与控件位置\n4.结束当前运动\n5.打开Workout Summary\n6.查看小结数值正负号\n7.对比小结与结束前数据\n8.查看小结字段字符",
+    "expected_text": "1.页面按各字段上限展示\n2.文字不发生截断\n3.文字不覆盖相邻控件\n4.运动结束\n5.小结展示同一组上限值\n6.小结不出现负数\n7.小结不异常回零\n8.小结不出现溢出字符",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令"
+  },
+  {
+    "case_id": "SPORT_131",
+    "sheet": "运动",
+    "priority": "P1",
+    "precondition_text": "1.分别准备支持版本的Android和iOS手机",
+    "steps_text": "1.在Android配对环境完成一条运动\n2.保存本次运动\n3.在iOS配对环境完成同类型运动\n4.保存本次运动",
+    "expected_text": "1.Android App显示与手表小结一致的记录\n2.App收到手表保存的运动记录\n3.iOS App显示与手表小结一致的记录\n4.App收到手表保存的运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+  },
+  {
+    "case_id": "SPORT_132",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.系统支持中文和英文语言切换",
+    "steps_text": "1.切换系统语言为英文\n2.进入Multisport\n3.切换系统语言为中文\n4.进入Multisport",
+    "expected_text": "1.运动类型按附录英文名称展示\n2.运动类型顺序保持不变\n3.运动类型按附录中文名称展示\n4.运动类型顺序保持不变",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SPORT_133",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.屏幕亮度设置为中档",
+    "steps_text": "1.连续启动5次运动\n2.观察每次倒计时\n3.回放5次倒计时录像，逐帧查看数字和圆环是否破碎或闪烁\n4.回放5次倒计时录像，查看前一帧数字或圆环是否残留\n5.在运动数据页连续往返翻页20次\n6.录像回放20次翻页，查看文字、图标和数值是否重叠\n7.第20次翻页后再上滑、下滑各1次",
+    "expected_text": "1.倒计时圆环连续显示\n2.倒计时过程无黑屏\n3.倒计时过程无花屏\n4.倒计时过程无残影\n5.翻页期间无错页\n6.翻页期间无元素重叠\n7.翻页期间无触控失效",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "准备页开始按钮未定位,倒计时依赖时序"
+  },
+  {
+    "case_id": "SPORT_134",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.运动列表、小结均包含一屏以上内容",
+    "steps_text": "1.浏览运动列表\n2.点击首位置条目\n3.点击中间位置条目\n4.点击末位置条目\n5.浏览小结全部字段\n6.逐项读取Workout Summary的单位文字\n7.读取心率曲线图例的最小、最大和平均值\n8.读取Workout Summary顶部的日期和时间",
+    "expected_text": "1.各位置条目名称不重叠\n2.各位置目标文本不重叠\n3.各位置设置入口不重叠\n4.各位置设置入口可准确点击\n5.小结字段完整可辨识\n6.小结单位完整可辨识\n7.心率曲线图例完整可辨识\n8.日期完整可辨识",
+    "setup": [
+      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+    ],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "当前缺可复现多屏 Workout Summary 与指定记录内容的 SIM_SPORT_RECORD_SET"
+  },
+  {
+    "case_id": "SPORT_135",
+    "sheet": "运动",
+    "priority": "P2",
+    "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表充满电且关闭非测试必要功能\n3.功耗仪已连接并校准",
+    "steps_text": "1.启动距离类运动\n2.持续运动1小时\n3.查看1小时运动期间的设备日志，核对无低电重启记录\n4.导出平均电流和电量下降数据\n5.读取功耗报告的峰值电流\n6.读取功耗报告的起始电量、结束电量和下降百分比",
+    "expected_text": "1.运动全程页面保持可用\n2.运动全程传感器保持可用\n3.运动期间未发生低电重启\n4.报告生成平均电流数据\n5.报告生成峰值电流数据\n6.报告生成电量下降数据",
+    "setup": [],
+    "actions": [],
+    "collect": [
+      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
+      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
+    ],
+    "unable": true,
+    "note": "页面与业务数据可模拟；真实功耗仍需真机功耗仪"
+  }
+]

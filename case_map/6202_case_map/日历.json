@@ -1,0 +1,625 @@
+{
+  "profile": "6202_W5230",
+  "sheet": "日历",
+  "cases": [
+    {
+      "case_id": "CAL_001",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表显示Utilities二级菜单",
+      "steps_text": "1.点击Calendar",
+      "expected_text": "1.手表显示Calendar主页面和当前月份",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_002",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.系统日期为2026-04-12",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.页面左侧显示Calendar标题，居中导航行由左箭头和蓝色April和右箭头组成，右侧显示系统标准细线滚动条，下方显示星期行和日期格和12日高亮",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260412120000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先设置源码要求的12位日期时间，再进入当前注册窗口 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_003",
+      "sheet": "日历",
+      "priority": "P3",
+      "precondition_text": "1.手表显示Calendar页面",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.页面右侧显示系统标准细线滚动条",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "setup 已通过当前源码注册窗口进入 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_004",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面\n2.系统时间为10:28",
+      "steps_text": "1.观察Calendar页面标题区",
+      "expected_text": "1.页面右上角显示与系统一致的10:28",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_005",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面",
+      "steps_text": "1.观察星期表头",
+      "expected_text": "1.星期表头按S M T W T F S顺序显示",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_006",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.系统日期为当前月12日",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.12日显示蓝色实心圆背景和白色数字",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260812120000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先把日期设置为当月12日，再进入当前注册窗口 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_007",
+      "sheet": "日历",
+      "priority": "P2",
+      "precondition_text": "1.系统日期为当前月12日",
+      "steps_text": "1.观察当前月其他日期",
+      "expected_text": "1.非12日日期显示白色数字，无背景",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_008",
+      "sheet": "日历",
+      "priority": "P2",
+      "precondition_text": "1.系统时间制为12小时",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.标题栏时间显示AM或PM",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_MODE:0 设置12小时制后进入当前注册窗口 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_009",
+      "sheet": "日历",
+      "priority": "P2",
+      "precondition_text": "1.系统时间制为24小时",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.标题栏时间不显示AM或PM",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_MODE:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_MODE:1 设置24小时制后进入当前注册窗口 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_010",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面",
+      "steps_text": "1.点击任一日期",
+      "expected_text": "1.页面不显示事件详情或编辑控件",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_011",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面",
+      "steps_text": "1.单击编码器",
+      "expected_text": "1.手表显示主表盘",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_012",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.系统日期可设为2026-02-01",
+      "steps_text": "1.将系统日期设为2026-02-01\n2.进入Calendar",
+      "expected_text": "1.系统日期修改成功\n2.当月日期格显示1至28日",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260201000000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_SET 按源码格式设置 2026-02-01；最终 Calendar 标题和日期格可合并证明设时成功与平年2月天数；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "Calendar显示2026年2月且日期格为1至28日"
+      ]
+    },
+    {
+      "case_id": "CAL_013",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.系统日期可设为2028-02-01",
+      "steps_text": "1.将系统日期设为2028-02-01\n2.进入Calendar",
+      "expected_text": "1.系统日期修改成功\n2.当月日期格显示1至29日",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TIME_SET:280201000000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_SET 按源码格式设置 2028-02-01；最终 Calendar 标题和日期格可合并证明设时成功与闰年2月天数；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "Calendar显示2028年2月且日期格为1至29日"
+      ]
+    },
+    {
+      "case_id": "CAL_014",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.系统日期可设为2026-04-01",
+      "steps_text": "1.将系统日期设为2026-04-01\n2.进入Calendar",
+      "expected_text": "1.系统日期修改成功\n2.当月日期格显示1至30日",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260401000000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_SET 按源码格式设置 2026-04-01；最终 Calendar 标题和日期格可合并证明设时成功与4月天数；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "Calendar显示2026年4月且日期格为1至30日"
+      ]
+    },
+    {
+      "case_id": "CAL_015",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.系统日期可设为2026-01-01",
+      "steps_text": "1.将系统日期设为2026-01-01\n2.进入Calendar",
+      "expected_text": "1.系统日期修改成功\n2.当月日期格显示1至31日",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260101000000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_SET 按源码格式设置 2026-01-01；最终 Calendar 标题和日期格可合并证明设时成功与1月天数；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "Calendar显示2026年1月且日期格为1至31日"
+      ]
+    },
+    {
+      "case_id": "CAL_016",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.系统日期可设为2026-05-01",
+      "steps_text": "1.将系统日期设为2026-05-01\n2.进入Calendar",
+      "expected_text": "1.系统日期修改成功\n2.1日显示在星期五对应列",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260501000000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "TIME_SET 按源码格式设置 2026-05-01；最终 Calendar 标题和日期格可合并证明设时成功与星期列位置；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "verification_points": [
+        "Calendar显示2026年5月且1日位于星期五对应列"
+      ]
+    },
+    {
+      "case_id": "CAL_017",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.当前月份首周或末周存在非当月日期格",
+      "steps_text": "1.进入Calendar",
+      "expected_text": "1.非当月日期格不显示数字",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260412120000;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "使用首周包含非当月日期格的2026年4月进入 CALENDAR；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_018",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.点击左箭头",
+      "expected_text": "1.页面显示2026年3月日历，无今日高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_019",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.点击右箭头",
+      "expected_text": "1.页面显示2026年5月日历，无今日高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_020",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.逆时针旋转编码器一格",
+      "expected_text": "1.页面显示2026年3月日历",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_021",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.顺时针旋转编码器一格",
+      "expected_text": "1.页面显示2026年5月日历",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_022",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.在日历内容区执行左滑",
+      "expected_text": "1.页面显示2026年5月日历",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_023",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示2026年4月日历",
+      "steps_text": "1.在日历内容区执行右滑",
+      "expected_text": "1.页面显示2026年3月日历",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_024",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面",
+      "steps_text": "1.分别从日期区和页面边缘执行右滑",
+      "expected_text": "1.待产品确认：翻月手势区和全局退出手势区的判定",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+    },
+    {
+      "case_id": "CAL_025",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表显示2026年1月日历",
+      "steps_text": "1.点击左箭头",
+      "expected_text": "1.页面显示2025年12月日历",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_026",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表显示2026年12月日历",
+      "steps_text": "1.点击右箭头",
+      "expected_text": "1.页面显示2027年1月日历",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_027",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表未绑定配套App\n2.Calendar正在显示当前月",
+      "steps_text": "1.在设置将日期改为次月5日\n2.重新进入Calendar",
+      "expected_text": "1.系统日期保存为次月5日\n2.页面显示次月，5日高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "CAL_028",
+      "sheet": "日历",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App\n2.Calendar正在显示旧日期",
+      "steps_text": "1.触发App同步新日期\n2.重新进入Calendar",
+      "expected_text": "1.手表系统日期更新\n2.页面显示新月份和新今日高亮",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "依赖 App/外部: 1.触发App同步新日期；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "CAL_029",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示当前月日历\n2.系统时间为23:59",
+      "steps_text": "1.等待系统跨至次日00:00",
+      "expected_text": "1.今日高亮从原日期移动到次日日期",
+      "verification_points": [
+        "23:59:58时当前日期处于今日高亮",
+        "真实跨至次日00:00后今日高亮移动到次日"
+      ],
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:TIME_MODE:1;",
+        "srv_quick_cmd send TOP5STEP:TIME_SET:260812235958;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:29001;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:HOST_WAIT:29002,3000;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "先统一为24小时制，TIME_SET将时间建立在23:59分钟内的边界前2秒，SIM_WAIT真实跨日；前后截图判断高亮移动；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_030",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示2026年1月日历",
+      "steps_text": "1.连续点击右箭头12次",
+      "expected_text": "1.页面显示2027年1月日历，日期布局匹配",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "CAL_031",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.Calendar可连续翻月",
+      "steps_text": "1.持续向前翻月至产品边界\n2.持续向后翻月至产品边界",
+      "expected_text": "1.待产品确认：最小可浏览月份和越界反馈\n2.待产品确认：最大可浏览月份和越界反馈",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_032",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手机音乐正在播放\n2.手表显示Calendar页面",
+      "steps_text": "1.切换到下个月\n2.右滑退出Calendar",
+      "expected_text": "1.日历显示下一月\n2.手机音乐继续播放",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "CAL_033",
+      "sheet": "日历",
+      "priority": "P1",
+      "precondition_text": "1.手表显示Calendar主页面",
+      "steps_text": "1.用可编程触控治具交替翻月500次",
+      "expected_text": "1.页面月份计算保持连续，手表无异常重启",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "CAL_034",
+      "sheet": "日历",
+      "priority": "P2",
+      "precondition_text": "1.手表处于默认亮度\n2.当前月包含六行日期",
+      "steps_text": "1.浏览完整Calendar页面",
+      "expected_text": "1.星期和日期和今日高亮无重叠或裁切",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    }
+  ]
+}

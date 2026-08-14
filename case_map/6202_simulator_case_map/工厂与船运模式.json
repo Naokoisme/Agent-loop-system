@@ -1,0 +1,580 @@
+{
+  "profile": "6202_W5230_SIMULATOR",
+  "sheet": "工厂与船运模式",
+  "cases": [
+    {
+      "case_id": "FACT_001",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表未绑定App\n2.手表处于配对二维码页",
+      "steps_text": "1.用触控治具按0.25秒间隔点击设备名称8次",
+      "expected_text": "1.手表显示工厂模式主页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_002",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App\n2.手表处于配对二维码页",
+      "steps_text": "1.用可编程触控治具点击设备名称7次",
+      "expected_text": "1.手表保持配对二维码页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_003",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App\n2.手表处于配对二维码页",
+      "steps_text": "1.用触控治具按0.25秒间隔点击设备名称9次",
+      "expected_text": "1.手表显示工厂模式主页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_004",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表未绑定App\n2.手表处于About页",
+      "steps_text": "1.用触控治具按0.25秒间隔点击顶部标题8次",
+      "expected_text": "1.手表显示工厂模式主页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_005",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表处于About页",
+      "steps_text": "1.用触控治具按0.25秒间隔点击顶部标题8次",
+      "expected_text": "1.手表保持About页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_006",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.观察工厂模式主页",
+      "expected_text": "1.页面显示Factory Mode/Discharge/Rest&Shutdown/Rest&Ship mode",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FACTORY_TEST,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202模拟器已注册FACTORY_TEST窗口；直接进入工厂模式主页，产品结果仅按截图判定。"
+    },
+    {
+      "case_id": "FACT_007",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.保持工厂模式主页无操作十分钟",
+      "expected_text": "1.屏幕持续保持亮屏",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "十分钟等待可由SIM_WAIT分段执行；SIM_FACTORY_MODE_SET目前只切换工厂服务标志，不会进入工厂模式主页，当前窗口清单也没有可导航的工厂主页，缺少真实页面入口；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "FACT_008",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.记录进入工厂模式前步数\n2.佩戴手表步行100步\n3.读取工厂模式后的步数",
+      "expected_text": "1.测试记录保存初始步数\n2.设备完成步数采集\n3.步数大于初始记录",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_009",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击MOTOR检测项",
+      "expected_text": "1.待产品确认MOTOR检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_010",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击GSENSOR检测项",
+      "expected_text": "1.待产品确认GSENSOR检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_011",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击KEY检测项",
+      "expected_text": "1.待产品确认KEY检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_012",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击LCD检测项",
+      "expected_text": "1.待产品确认LCD检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_013",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击TP检测项",
+      "expected_text": "1.待产品确认TP检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_014",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击MIC检测项",
+      "expected_text": "1.待产品确认MIC检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_015",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击SPEAKER检测项",
+      "expected_text": "1.待产品确认SPEAKER检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_016",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击LIGHT_LEAK检测项",
+      "expected_text": "1.待产品确认LIGHT_LEAK检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_017",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击HR检测项",
+      "expected_text": "1.待产品确认HR检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_018",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于Factory Mode检测列表",
+      "steps_text": "1.点击BATTERY检测项",
+      "expected_text": "1.待产品确认BATTERY检测页的首个可观察状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+    },
+    {
+      "case_id": "FACT_019",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.观察Factory Mode检测列表",
+      "expected_text": "1.列表显示十个检测项目",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "FACT_020",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.在检测列表上滑",
+      "expected_text": "1.列表显示下方检测项目",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_021",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.在检测列表逆时针旋转编码器",
+      "expected_text": "1.列表向下滚动",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "FACT_022",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.点击Rest&Ship mode",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_023",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在语言选择页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；直接ENTER_PAGE语言页不会启动未绑定开机流程的船运模式计时器，当前缺幂等建立未绑定引导状态并启动该计时器的通用命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_024",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在配对提示页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；当前缺建立未绑定配对提示页及其船运模式计时器的通用引导状态命令，不能用直达页面冒充完整前置；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_025",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在说明提示页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；当前缺建立未绑定说明提示页及其船运模式计时器的通用引导状态命令，不能用直达页面冒充完整前置；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_026",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在About页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；直接进入About不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_027",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在二维码页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；直接进入QRCODE不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_028",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在二维码放大页保持30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；直接进入QRCODE_BIG不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_029",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.保持绑定页面29分59秒无操作",
+      "expected_text": "1.手表仍显示当前绑定页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "29分59秒等待可执行；当前缺幂等建立未绑定页面并启动船运模式30分钟边界计时器的通用命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_030",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.保持绑定页面30分钟无操作",
+      "expected_text": "1.手表进入黑屏关机状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "30分钟等待可执行；当前缺幂等建立未绑定页面并启动船运模式30分钟边界计时器的通用命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_031",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.在绑定页等待20分钟\n2.点击页面可操作控件\n3.继续等待15分钟",
+      "expected_text": "1.手表保持绑定页面\n2.页面响应本次点击\n3.手表未进入船运模式",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "20分钟和15分钟等待均可执行；当前缺可建立未绑定页、启动并在点击后重置船运模式计时器的通用引导状态能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_032",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于船运模式",
+      "steps_text": "1.短按按键",
+      "expected_text": "1.手表保持黑屏状态",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "FACT_033",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表处于船运模式",
+      "steps_text": "1.点击屏幕",
+      "expected_text": "1.手表保持黑屏状态",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_034",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表处于船运模式",
+      "steps_text": "1.接入充电器",
+      "expected_text": "1.手表显示开机激活页面",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "FACT_035",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表处于船运模式",
+      "steps_text": "1.用秒表计时，长按编码器3秒",
+      "expected_text": "1.手表显示开机动画",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    },
+    {
+      "case_id": "FACT_036",
+      "sheet": "工厂与船运模式",
+      "priority": "P0",
+      "precondition_text": "1.手表处于船运模式",
+      "steps_text": "1.接入充电器\n2.等待开机动画结束",
+      "expected_text": "1.手表开始激活\n2.手表显示适用的开机绑定页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+    },
+    {
+      "case_id": "FACT_037",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表未绑定App",
+      "steps_text": "1.点击设备名称4次\n2.切换至上一绑定页面",
+      "expected_text": "1.设备名称累计四次点击\n2.手表显示上一绑定页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+    },
+    {
+      "case_id": "FACT_038",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.在工厂模式标题连续点击8次",
+      "expected_text": "1.手表保持单层工厂模式页面",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_039",
+      "sheet": "工厂与船运模式",
+      "priority": "P1",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.重复10轮：进入Rest&Ship mode，手表黑屏后接入充电器",
+      "expected_text": "1.每轮均显示开机动画",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_040",
+      "sheet": "工厂与船运模式",
+      "priority": "P2",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.分别从二维码页与About页进入工厂模式",
+      "expected_text": "1.两次均显示同一工厂模式主页",
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+    },
+    {
+      "case_id": "FACT_041",
+      "sheet": "工厂与船运模式",
+      "priority": "P3",
+      "precondition_text": "1.手表已进入工厂模式",
+      "steps_text": "1.滚动查看全部检测项",
+      "expected_text": "1.十个检测项名称均未被截断",
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+    }
+  ]
+}

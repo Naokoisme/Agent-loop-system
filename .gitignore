@@ -1,0 +1,44 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Agent-loop runtime data and generated evidence
+.runtime/
+artifacts/
+evidence/
+history/
+logs/
+defects/
+defects_img/
+*.log
+
+# Local databases and transient state
+*.db
+*.db-wal
+*.db-shm
+
+# Build and package output
+build/
+dist/
+node_modules/
+
+# Editor, operating-system, and temporary files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
