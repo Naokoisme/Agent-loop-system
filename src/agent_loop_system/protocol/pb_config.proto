@@ -1,0 +1,320 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+//功能配置
+message _FunctionConfig {
+  /**
+   * 从低到高，依次为：
+   * 0: 佩戴方式是否戴在左手。
+   * 1: 时间格式是否24小时制。
+   * 2: 天气是否开启。
+   * 3: 加强测量是否开启。
+   */
+  bytes flags = 1;//max-size=4
+}
+
+//单位配置
+message _UnitConfig {
+  /**
+   * 从低到高，依次为：
+   * 0: 是否是公制单位。
+   * 1: 是否是摄氏度。
+   */
+  bytes flags = 1;//max-size=4
+}
+
+//目标配置
+message _GoalConfig {
+  int32 steps = 1;//步数
+  float distance = 2;//距离，单位米
+  float calories = 3;//卡路里，单位千卡
+  int32 duration = 4;//活动时长，单位秒
+  int32 number = 5;//活动时长
+  int32 sportDuration = 6;//运动时长，单位秒
+  /**
+   * 开关flag,从0开始，依次代表提醒是否开启(true)
+   * 步数
+   * 距离
+   * 卡路里
+   * 活动时长
+   * 活动次数
+   * 运动时长
+   */
+  int32 flags = 7;
+}
+
+//勿扰配置
+message _DndConfig {
+  bool isEnabled = 1;//是否开启
+  int32 mode = 2;//模式，0全天，1时间段
+  int32 periodStart = 3;//开始时间，距离0点0分的分钟数。
+  int32 periodEnd = 4;//结束时间，距离0点0分的分钟数。
+}
+
+//抬腕亮屏配置
+message _RaiseWakeupConfig {
+  bool isEnabled = 1;//是否开启
+  int32 start = 2;//开始时间
+  int32 end = 3;//结束时间
+}
+
+message _BaseMonitor {
+  bool isEnabled = 1;//是否开启
+  int32 start = 2;//开始时间
+  int32 end = 3;//结束时间
+  int32 interval = 4;//间隔时间
+}
+
+message _BaseAlarm {
+  bool isEnabled = 1;//是否开启
+  uint32 min = 2;//最小值
+  uint32 max = 3;//最大值
+}
+
+//心率配置
+message _HeartRateConfig {
+  _BaseMonitor monitor = 1;//监测配置
+  _BaseAlarm exerciseAlarm = 2;//运动心率报警
+  _BaseAlarm restingAlarm = 3;//静息心率报警
+  int32 maxThreshold = 4;//运动心率区间阈值
+}
+
+//压力配置
+message _PressureConfig {
+  _BaseMonitor monitor = 1;//监测配置
+  _BaseAlarm alarm = 2;//压力报警
+}
+
+//血氧配置
+message _BloodOxygenConfig {
+  _BaseMonitor monitor = 1;//监测配置
+  _BaseAlarm alarm = 2;//血氧报警
+}
+
+//血压配置
+message _BloodPressureConfig {
+  _BaseMonitor monitor = 1;//监测配置
+  message Alarm {
+    bool isEnabled = 1;
+    int32 sbpMin = 2;
+    int32 sbpMax = 3;
+    int32 dbpMin = 4;
+    int32 dbpMax = 5;
+  };
+  Alarm alarm = 2;
+}
+
+//女性健康配置
+message _WomenHealthConfig {
+  int32 mode = 1;//0关闭，1经期模式，2备孕模式，3孕期模式
+  int32 remindTime = 2;//提醒时间，距离0点分钟数
+  int32 remindAdvance = 3;//经期开始提前几天提醒
+  int32 remindType = 4;//孕期提醒类型，0怀孕天数，1距离预产期天数
+  int32 cycle = 5;//周期长度
+  int32 duration = 6;//经期长度
+  int32 latest = 7;//最近一次经期时间戳。距离2000年秒数
+  int32 menstruationEnd = 8;//月经结束在哪一天。
+  /**
+   * 1 经期开始
+   * 2 经期结束
+   * 4 易孕期开始
+   * 8 易孕期结束
+   */
+  int32 remindFlags = 9;//提醒flags
+}
+
+//通知配置
+message _NotificationConfig {
+  /**
+   * APP Flags配置，从低到高，依次为：
+   * 0:其他,
+   * 1:SMS,
+   * 2:QQ,
+   * 3:WECHAT,
+   * 4:FACEBOOK,
+   * 5:TWITTER,
+   * 6:LINKEDIN,
+   * 7:INSTAGRAM,
+   * 8:PINTEREST,
+   * 9:WHATSAPP,
+   * 10:LINE,
+   * 11:FACEBOOK_MESSENGER,
+   * 12:KAKAO,
+   * 13:SKYPE,
+   * 14:EMAIL,
+   * 15:TELEGRAM,
+   * 16:VIBER,
+   * 17:CALENDAR,
+   * 18:SNAPCHAT,
+   * 19:HIKE,
+   * 20:YOUTUBE,
+   * 21:APPLE_MUSIC,
+   * 22:ZOOM,
+   * 23:TIKTOK,
+   * 24:GMAIL
+   * 25:OUTLOOK
+   * 26:WHATSAPP_BUSINESS
+   * 27:Teams
+   * 28:GPay
+   * 29:AMAZON
+   * 30:ZALO
+   * 31:DING_TALK
+   * 32:LARK
+   * 33:IOS-MAIL
+   */
+  bytes flags = 1;//max-size=8
+  int32 app = 2;//app全局配置，0全关，1全开，2根据flags配置。
+  int32 telephony = 3;//电话通知配置，0 关闭，1开启
+}
+
+message _Shape {
+  int32 shape = 1;//形状. 0方形，1圆形
+  int32 width = 2;//宽度
+  int32 height = 3;//高度
+  int32 corners = 4;//圆角
+}
+
+message _DeviceInfo {
+  string project = 1;//项目号，max-len=16
+  string version = 2;//版本号，max-len=16
+  string brand = 3;//品牌，max-len=16
+  string model = 4;//型号，max-len=16
+  string serial = 5;//序列号，max-len=16
+  string mainBoard = 6;//主板号，max-len=16
+  _Shape shape = 7;//外形尺寸
+
+  /**
+   * 从低到高，依次为：
+   * 0: 心率
+   * 1: 血压
+   * 2: 血氧
+   * 3: 压力
+   * 4: 运动
+   * 5: 女性健康
+   * 6: 个性化提醒
+   * 7: bt同步联系人(不代表普通联系人功能)
+   * 8: 钱包
+   * 9: 名片
+   * 10: 体感游戏
+   * 11: 天气
+   * 12: 电子书推送
+   * 13: 音乐推送
+   * 14: 相册推送
+   * 15: 导航功能
+   * 16: 世界时钟(废弃。使用limits.worldClock>0代替)
+   * 17: 表盘推送
+   * 18: 自定义表盘
+   * 19: 祈祷
+   * 20：拍照预览
+   * 21：心率报警
+   * 22：血压报警
+   * 23：血氧报警
+   * 24：压力报警
+   * 25: 屏幕锁
+   * 26：游戏锁
+   * 27：闹钟类型(华盛达定制)
+   * 28：ICE(华盛达定制)
+   * 29：家长模式(华盛达定制)
+   * 30：课堂模式(华盛达定制)
+   * 31：任务&奖励-10个(华盛达定制)
+   * 32: 习惯-10个(华盛达定制)
+   * 33: 使用统计功能(华盛达定制)
+   * 34: 游戏
+   * 35：离线地图
+   * 36：EPO_GNSS
+   * 37: TITAN_QR_CODE(Titan定制-二维码功能)
+   */
+  bytes ability = 8;//设备能力，max-size=16
+
+  /**
+   * 活动包含哪些数据，APP首页三环显示前3个。默认为[1,2,3]
+   * 1. 步数
+   * 2. 运动时长(sport_duration)
+   * 3. 活动次数
+   * 4. 活动时长(duration)
+   * 5. 距离
+   * 6. 卡路里
+   */
+  bytes activity = 9;//活动记录配置，max-size=3
+
+  int32 sleepAlgorithm = 10;//睡眠数据处理,0公版默认，1传音算法
+
+  _Shape preview = 11;//预览外形尺寸
+
+  message Limits {
+    int32 builtInDial = 1;//内置表盘最大数量
+    int32 cloudDial = 2;//云端表盘最大数量
+    int32 alarm = 3;//闹钟最大数量
+    int32 contact = 4;//联系人最大数量
+    /**
+     * 提醒功能：长度为8的数组，依次代表久坐，喝水，吃药，自定义的个数与flag。
+     * 比如：
+     * 第0个数值，代表久坐个数。1表示支持，0为不支持。
+     * 第1个数值，代表久坐的标志位。
+     * ...
+     * 第6个数值，代表自定义的个数。
+     * 第7个数值，代表自定义的标志位。
+     *
+     * 标志位从低到高：
+     * 0位代表是否支持名称
+     * 1位代表是否支持备注
+     *
+     * 另外久坐一定不支持次数设置。
+     */
+    repeated int32 remind = 5;//max-count=8
+    int32 worldClock = 6;//世界时钟最大个数
+  }
+  Limits limits = 12;//部分限制
+
+  bytes notifications = 13;//是否支持某个Flag的通知，max-size=8
+  int32 companyId = 14;//厂商ID
+  int32 productType = 15;//产品类型 0 手表，
+  /*
+   * 自定义视频表盘和相机预览共用此字段。（v0.1.1新增）
+   * 目前，579x平台必须有这个值(没有报错)，w30平台可能没有。
+   * 用于自定义视频表盘时，全0，w30平台默认使用shape字段裁剪即可。
+   * 用于相机预览时，全0, w30平台默认使用(240,240)。
+   */
+  _Shape video = 16;
+  /**
+   * 平台类型，0：W30，1:579X
+   * 目前：
+   * 用于表盘，不同平台表盘使用不同的格式
+   */
+  int32 platform = 17;
+  /**
+   * 自定义表盘特性(flags)：
+   * bit 0:无组件（true代表无组件）
+   */
+  int32 dialFeatures = 18;
+}
+
+//所有配置
+message _Configs {
+  _DeviceInfo deviceInfo = 1;//设备信息
+  _FunctionConfig functionConfig = 2;//功能配置
+  _UnitConfig unitConfig = 3;//单位配置
+  _GoalConfig goalConfig = 4;//目标配置
+  _DndConfig dndConfig = 5;//勿扰配置
+  _RaiseWakeupConfig raiseWakeupConfig = 6;//抬腕亮屏配置
+  _HeartRateConfig heartRateConfig = 7;//心率配置
+  _PressureConfig pressureConfig = 8;//压力配置
+  _BloodOxygenConfig bloodOxygenConfig = 9;//血氧配置
+  _BloodPressureConfig bloodPressureConfig = 10;//血压配置
+  _WomenHealthConfig womenHealthConfig = 11;//女性健康配置
+  _NotificationConfig notificationConfig = 12;//通知配置
+}
+
+//通用设置响应
+message _CommonResponse {
+  int32 result = 1;//0：无失败；1：失败，其他：特殊失败码，暂无定义
+}
+
+//通用int查询参数
+message _CommonIntRequest {
+    int32 value = 1;
+}

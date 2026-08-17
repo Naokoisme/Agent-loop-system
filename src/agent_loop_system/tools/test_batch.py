@@ -1,4 +1,4 @@
-"""批量执行 case_map：每个模块复用一个 Simulator，会话外并发做 LLM 判定。"""
+"""批量执行用例：固化条目固定跑，其他条目逐条交给 Agent-loop 探索。"""
 from __future__ import annotations
 
 import argparse
@@ -12,13 +12,11 @@ from agent_loop_system.tools.case_map import (
     CaseRunResult,
     case_map_dir_for_target,
     load_case_map,
-    run_case,
 )
-from agent_loop_system.tools.simulator import SimulatorSession
 from agent_loop_system.tools.test import (
     CaseDecision,
-    get_simulator_exe,
     judge_case_result,
+    run_single_case,
     save_evidence,
 )
 
@@ -60,7 +58,7 @@ def run_batch(
     with ThreadPoolExecutor(max_workers=max(1, judge_workers)) as executor:
         for sheet_name in _sheet_names(sheets):
             cases = load_case_map(sheet_name)
-            runnable = [case for case in cases.values() if not case.unable]
+            runnable = list(cases.values())
             if max_cases is not None:
                 remaining = max_cases - executed
                 if remaining <= 0:
@@ -70,37 +68,37 @@ def run_batch(
                 continue
 
             print(f"[batch] {sheet_name}: {len(runnable)} cases")
-            session = SimulatorSession(get_simulator_exe())
-            session.start()
-            try:
-                for index, case in enumerate(runnable, start=1):
-                    case_dir = output_root / sheet_name / case.case_id
-                    screenshot_path = case_dir / "screenshot.bmp" if screenshots else None
-                    result = run_case(session, case, screenshot_path=screenshot_path)
-                    executed += 1
-                    evidence_path = case_dir / "result.json"
-                    print(
-                        f"[batch] {sheet_name} {index}/{len(runnable)} {case.case_id} "
-                        f"aborted={result.aborted} evidence={len(result.terminal_json)}"
+            for index, case in enumerate(runnable, start=1):
+                case_dir = output_root / sheet_name / case.case_id
+                screenshot_path = case_dir / "screenshot.bmp" if screenshots else None
+                result = run_single_case(
+                    sheet_name,
+                    case.case_id,
+                    str(screenshot_path) if screenshot_path else None,
+                )
+                executed += 1
+                evidence_path = case_dir / "result.json"
+                print(
+                    f"[batch] {sheet_name} {index}/{len(runnable)} {case.case_id} "
+                    f"mode={result.execution_mode} aborted={result.aborted} "
+                    f"evidence={len(result.terminal_json)}"
+                )
+                if not judge:
+                    decision = CaseDecision(
+                        verdict="CANNOT_VERIFY",
+                        reason="本次批量运行关闭了视觉判定",
                     )
-                    if not judge:
-                        decision = CaseDecision(
-                            verdict="SKIP" if result.skipped else "CANNOT_VERIFY",
-                            reason="用例标记为 unable，未执行" if result.skipped else "本次批量运行关闭了视觉判定",
-                        )
-                        save_evidence(result, decision, evidence_path)
-                        records.append({
-                            "sheet": sheet_name,
-                            "case_id": case.case_id,
-                            "verdict": decision.verdict,
-                            "reason": decision.reason,
-                            "evidence": str(evidence_path),
-                        })
-                        continue
-                    future = executor.submit(judge_case_result, result)
-                    futures[future] = (result, evidence_path)
-            finally:
-                session.stop()
+                    save_evidence(result, decision, evidence_path)
+                    records.append({
+                        "sheet": sheet_name,
+                        "case_id": case.case_id,
+                        "verdict": decision.verdict,
+                        "reason": decision.reason,
+                        "evidence": str(evidence_path),
+                    })
+                    continue
+                future = executor.submit(judge_case_result, result)
+                futures[future] = (result, evidence_path)
 
         for future in as_completed(futures):
             result, evidence_path = futures[future]

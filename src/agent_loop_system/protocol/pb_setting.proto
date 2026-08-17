@@ -1,0 +1,395 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+import "agent_loop_system/protocol/pb_config.proto";
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+//相机控制
+message _CameraAction {
+  /**
+    * 0: 退出相机
+    * 1: 进入相机
+    * 2: 拍照
+    * 3: 切换后置摄像头
+    * 4: 切换前置摄像头
+    * 5：闪光关
+    * 6：闪光自动
+    * 7：闪光开
+    * 8: 进入拍照模式
+    * 9：进入录像模式
+    * 10：变焦比最大
+    * 11：变焦比最小
+    * 12：变焦比1X
+    * 13：变焦比2X
+    * 14：变焦比3X
+    * 15：开始录像
+    * 16：结束录像
+    */
+  int32 action = 1;
+}
+
+//媒体音量
+message _MediaVolume {
+  int32 volume = 1;//音量(0~100)
+}
+
+//媒体控制
+message _MediaAction {
+  /**
+   * -1 音量加
+   * -2 音量减
+   * -3 电话通话时静音
+   * -4 电话通话时退出静音
+   * -5 播放
+   * -6 暂停
+   * -7 上一首
+   * -8 下一首
+   * 其他>=0的值，是设置具体音量值
+   */
+  sint32 action = 1;
+}
+
+//音乐信息
+message _MusicInfo {
+  string title = 1;//音乐名称，max-len=64
+  string artist = 2;//艺术家，max-len=64
+  int32 duration = 3;//播放时长，毫秒
+}
+
+//音乐状态
+message _MusicState {
+  int32 state = 1;//播放状态，0停止，1播放中，2暂停
+  int32 position = 2;//播放位置，毫秒
+  float speed = 3;//播放速度
+}
+
+//闹钟Item
+message _AlarmItem {
+  int32 id = 1;//闹钟ID。比如最大闹钟10个，那么合理的id为[0,9)
+  bool isEnabled = 2;//是否启用
+  int32 hour = 3;//小时
+  int32 minute = 4;//分钟
+  int32 repeat = 5;//重复。从低到高位，分别表示周一到周日
+  string label = 6;//闹钟名称，max-len=63
+  int32 type = 7;//闹钟类型
+}
+
+//闹钟列表
+message _AlarmList {
+  repeated _AlarmItem items = 1;//闹钟列表，max_count=10
+}
+
+//联系人Item
+message _ContactItem {
+  string name = 1;//联系人名称，max-len=31
+  string phone = 2;//联系人电话，max-len=31
+}
+
+//普通联系人列表
+message _ContactCommon {
+  repeated _ContactItem items = 1;//联系人列表，max_count=14
+}
+
+//紧急联系人列表
+message _ContactEmergency {
+  bool isEnabled = 1;//是否启用
+  repeated _ContactItem items = 2;//联系人列表，max_count=14
+}
+
+//提醒Item
+message _RemindItem {
+  /**
+   * 提醒ID
+   * 0: 久坐提醒
+   * 1: 喝水提醒
+   * 2: 吃药提醒
+   * [0-31]是预定义类型。
+   * 自定义提醒从32开始
+   */
+  int32 id = 1;
+  bool isEnabled = 2;//是否启用
+  string name = 3;//提醒名称，max-len=32
+  string note = 4;//提醒备注，max-len=64
+  message Dnd {
+    bool isEnabled = 1;//是否启用
+    int32 start = 2;//开始时间，距离0点分钟数
+    int32 end = 3;//结束时间，距离0点分钟数
+  }
+  Dnd dnd = 5;//免打扰
+  int32 mode = 6;//提醒模式,0按次数,1按周期
+  repeated int32 times = 7;//当mode=TIMES时，每次提醒时间点。max_count=10
+  int32 start = 8;//当mode=PERIOD时，开始时间，距离0点分钟数
+  int32 end = 9;//当mode=PERIOD时，结束时间，距离0点分钟数
+  int32 interval = 10;//当mode=PERIOD时，间隔时间，分钟
+  int32 repeat = 11;//重复。从低到高位，分别表示周一到周日
+}
+
+//提醒列表
+message _RemindList {
+  repeated _RemindItem items = 1;//提醒列表，max_count=10
+}
+
+//天气信息
+message _Weather {
+  string city = 1;//城市名称，max-len=31
+  int32 updateTime = 2;//更新时间，距离2000年始的秒数
+  int32 code = 3;//天气类别(大分类)
+  int32 tempMin = 4;//最低温度,单位摄氏度
+  int32 tempMax = 5;//最高温度,单位摄氏度
+  int32 tempCurrent = 6;//当前温度,单位摄氏度
+  int32 pressure = 7;//气压,单位百帕
+  /**
+   * 空气质量
+   * 0.优
+   * 1:良
+   * 2:轻度污染
+   * 3:中度污染
+   * 4:重度污染
+   * 5:严重污染
+   */
+  int32 quality = 8;
+  int32 humidity = 9;//湿度,百分比（% ）
+  /**
+    * 紫外线强度
+    * 0：无
+    * 1-2：很弱
+    * 3-4：弱
+    * 5-6：中等
+    * 7-8：强
+    * 9-10：很强
+    * 11：极强
+   */
+  int32 ultraviolet = 10;
+  float windAngle = 11;//风向角度，0-360
+  int32 windScale = 12;//风力，1-17
+  float windSpeed = 13;//风速，单位千米/小时
+  float visibility = 14;//能见度，单位千米
+  int32 type = 15;//天气类型(小类型)
+  int32 codeN = 16;//天气类别-夜间(大分类)
+  int32 typeN = 17;//天气类型-夜间(小类型)
+  int32 sunrise = 18;//日出时间，距离2000年始的秒数
+  int32 sunset = 19;//日落时间，距离2000年始的秒数
+}
+
+message _WeatherDay {
+  int32 timestamp = 1;//时间戳，距离2000年始的秒数
+  int32 code = 2;//天气类别(大分类)
+  int32 type = 3;//天气类型(小类型)
+  int32 tempMin = 4;//最低温度，单位摄氏度
+  int32 tempMax = 5;//最高温度，单位摄氏度
+  int32 codeN = 6;//天气类别-夜间(大分类)
+  int32 typeN = 7;//天气类型-夜间(小类型)
+  int32 pressure = 8;//气压,单位百帕（v0.1.1新增）
+  float windAngle = 9;//风向角度，0-360（v0.1.1新增）
+  float visibility = 10;//能见度，单位千米（v0.1.1新增）
+}
+
+message _WeatherDayList {
+  repeated _WeatherDay items = 1;//未来天气列表，max_count=7
+}
+
+message _WeatherHour {
+  int32 timestamp = 1;//时间戳，距离2000年始的秒数
+  int32 code = 2;//天气类别(大分类)
+  int32 type = 3;//天气代码(小类型)
+  int32 tempCurrent = 4;//当前温度，单位摄氏度
+  int32 codeN = 5;//天气类别-夜间(大分类)
+  int32 typeN = 6;//天气类型-夜间(小类型)
+}
+
+message _WeatherHourList {
+  repeated _WeatherHour items = 1;//未来天气列表，max_count=12
+}
+
+//部分数据变更
+message _SomeDataChange {
+  /**
+   * 0 保留，不使用
+   * 1 闹钟变更
+   * 2 表盘变更
+   * 3 祈祷配置变更
+   */
+  int32 type = 1;
+}
+
+//表盘Item
+message _DialItem {
+  uint64 id = 1;//表盘Id
+  bool is_builtin = 2;//是否是内置表盘
+  bool is_select = 3;//是否是当前选中的表盘
+}
+
+//表盘列表
+message _DialList {
+  repeated _DialItem items = 1;//表盘列表，max_count=100
+}
+
+//表盘id
+message _DialId {
+  uint64 id = 1;//表盘Id
+}
+
+//世界时钟Item
+message _WorldClockItem {
+  string city = 1;//城市名称，max-len=31
+  string zoneId = 2;//Zone id，max-len=31
+  int32 zoneOffset = 3;//Zone offet,毫秒
+}
+
+//世界时钟List
+message _WorldClockList {
+  repeated _WorldClockItem items = 1;//世界时钟列表，max_count=10
+}
+
+//祈祷配置
+message _PrayerConfig {
+  bool isEnabled = 1;//总开关
+  repeated bool items = 2;//每个类型的开关，max_count=7
+}
+
+//祈祷每天数据
+message _PrayerDay {
+  int32 timestamp = 1;//这一天的时间，距离2000年始的秒数
+  repeated int32 items = 2;//每个类型的时刻(距离0点的分钟偏移数)，max_count=7
+}
+
+//祈祷数据列表
+message _PrayerDayList {
+  repeated _PrayerDay days = 1;//每天数据，max_count=7
+}
+
+//屏幕锁
+message _LockObj {
+  bool isEnabled = 1;//是否启用
+  bytes password = 2;//密码(ASCII码)，max_size=6
+  int32 start = 3;//开始时间(距离0点的分钟偏移数)
+  int32 end = 4;//结束时间(距离0点的分钟偏移数)
+}
+
+//离线地图授权信息
+message _OfflineMapAuthInfo {
+  string key = 1;//开放平台key，max-len=127
+  string license = 2;//授权license，max-len=255
+  string device = 3;//设备唯一标识，如果未授权，此字段返回空，max-len=127
+  int32 area = 4;//区域。0境内，1境外
+  string zoom = 5;//期望缩放级别，如"12,15,16"，max-len=31
+}
+
+message _QrCodeSet {
+  /**
+   * 钱包(高位0x00是钱包)
+   *     0x0000:QQ
+   *     0x0001:Wechat
+   *     0x0002:Alipay
+   *     0x0003:Paypal
+   *     0x0004:Paytm
+   *     0x0005:PhonePe
+   *     0x0006:Gpay
+   *     0x0007:BHIM
+   *     0x0008:MOMO
+   *     0x0009:Zalo
+   *     0x0064:Custom(低位>=0x64的是自定义，目前仅有1个)
+   *
+   * 名片(高位0x01是名片)
+   *     0x0100:QQ
+   *     0x0101:Wechat
+   *     0x0102:Alipay
+   *     0x0103:Facebook
+   *     0x0104:WhatsApp
+   *     0x0105:X
+   *     0x0106:Instagram
+   *     0x0107:Line
+   *     0x0108:Skype
+   *     0x0109:Email
+   *     0x010A:Phone
+   *     0x010B:Linkedin
+   *     0x010C:FacebookMessenger
+   *     0x010D:Snapchat
+   *     0x0164:Custom(低位>=0x64的是自定义，目前仅有1个)
+   *
+   * TITAN_QR_CODE(高位0x02,Titan定制-二维码功能)
+   *     0x0200:UPI
+   *     0x0201:WIFI
+   *     0x0202:Movie
+   */
+  int32 type = 1;
+  int32 hash = 2;//content的哈希值。APP传过去，下次拿这个验证有没有改动
+  string content = 3;//max_length:511
+}
+
+message _QrCodeStatus {
+  int32 type = 1;
+  int32 hash = 2;
+}
+
+message _QrCodeStatusList {
+  repeated _QrCodeStatus items = 1;//每天数据，max_count=20。暂时20吧，其实可以放更多，但应该用不到
+}
+
+message _EpoTimeInfo {
+  int32 validTime = 1;//有效时间，距离2000年始的秒数
+  int32 updateTime = 2;//更新时间，距离2000年始的秒数
+}
+
+message _AiResult {
+  /**
+   * 类型：
+   * 0：原文（AI问答/对话是问题，翻译是原文）
+   * 1：结果（AI问答/对话是答案，翻译是译文）
+   * 2：表盘图片
+   */
+  int32 type = 1;
+  /**
+   * 状态
+   * 0：成功
+   * 1：授权错误
+   * 2：网络错误
+   * 3：APP不支持
+   * 4: ASR无法识别
+   * 0xFF:其他错误
+   */
+  int32 error = 2;
+  /**
+   * 文本。
+   * 如果error是成功，且type是带文本的，是文本内容。
+   * 如果error是错误，则是错误描述，如果设备没有处理此error类型，可以使用此描述代替。
+   */
+  string text = 3;//max-len=799
+  /**
+   * text可能是流式
+   * 此文本是否结束
+   */
+  int32 isCompleted = 4;
+}
+
+message _AiMessage {
+  /**
+   * 类型：
+   * 0：AI问答请求答案
+   * 1：AI表盘请求图片。带shape参数
+   * 2：AI表盘请求表盘
+   */
+  int32 type = 1;
+  /**
+   * 文本。
+   * 如果error是成功，且type是带文本的，是文本内容。
+   * 如果error是错误，则是错误描述，如果设备没有处理此error类型，可以使用此描述代替。
+   */
+  _Shape shape = 2;
+}
+
+message _TestBatteryInfo {
+  int32 percent = 1;  // 电量百分比
+  int32 charging = 2; // 充电状态
+  int32 voltage = 3;  // 电压，单位 mV
+}
+
+message _TestDeviceInfo {
+  string deviceName = 1;//设备名称,如果为空，则不更改此项，max-len=15
+  string bluetoothName = 2;//蓝牙名称,如果为空，则不更改此项，max-len=15
+  string model = 3;//型号,如果为空，则不更改此项，max-len=15
+  string version = 4;//版本号,如果为空，则不更改此项，如1.2.0，max-len=15
+}

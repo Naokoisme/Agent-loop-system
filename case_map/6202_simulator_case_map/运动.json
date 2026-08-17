@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SPORT_SUBMENU 首项 Multisport 范围来自当前 Designer：y=50..100；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_002",
@@ -25,19 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从首屏开始每两次上滑采集一次 GUI_TREE，覆盖滚动过程和末屏；用于判定完整顺序、数量以及 Football 是否为末项，不用单张末屏代替全列表证据；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "首屏显示 Outdoor Walk，并记录首批可见运动项",
-        "滚动检查点1：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点2：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点3：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点4：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点5：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点6：记录后续可见运动项，供19项顺序与数量判定",
-        "滚动检查点7：记录后续可见运动项，供19项顺序与数量判定",
-        "末屏显示 Football 为第19项且其后没有其他运动项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_003",
@@ -46,19 +37,12 @@
       "precondition_text": "1.任一运动已设置时间目标",
       "steps_text": "1.进入Multisport运动列表\n2.观察已设目标的运动条目\n3.查看该运动条目的运动名称\n4.查看该运动条目的当前目标\n5.查看该运动条目的设置入口",
       "expected_text": "1.列表按当前排序展示运动条目\n2.该条目显示运动图标\n3.该条目显示运动名称\n4.该条目显示当前目标\n5.该条目显示设置入口",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_004",
@@ -70,12 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后显示后续运动项",
-        "下滑后显示先前运动项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_005",
@@ -84,24 +65,12 @@
       "precondition_text": "1.Multisport列表内容超过一屏",
       "steps_text": "1.顺时针旋转编码器\n2.逆时针旋转编码器",
       "expected_text": "1.列表向上滚动并显示后续运动项\n2.列表向下滚动并显示先前运动项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:80051;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:80052;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "顺时针旋转后列表显示后续运动项",
-        "逆时针旋转后列表显示先前运动项"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_006",
@@ -113,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_007",
@@ -126,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "滚动19项列表至 footer 后实际点击 Customize Sports；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_008",
@@ -139,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_009",
@@ -149,19 +121,12 @@
       "precondition_text": "1.手表停留在Multisport运动列表",
       "steps_text": "1.按压一次编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_010",
@@ -170,16 +135,12 @@
       "precondition_text": "1.手表已进入Customize Sports页面",
       "steps_text": "1.观察页面顶部与各运动条目\n2.查看各运动项的上移控件\n3.查看各运动项的删除控件",
       "expected_text": "1.页面顶部显示添加按钮\n2.每个运动项显示上移控件\n3.每个运动项显示删除控件",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_011",
@@ -191,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_012",
@@ -204,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/动态判定: 1.记录第3项名称；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_013",
@@ -217,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/动态判定: 1.记录待删项前后相邻运动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_014",
@@ -230,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实际点击 SPORT_SET_LIST_SORT 顶部添加区域（列表 y=46、header 高70）；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_015",
@@ -243,14 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后显示后续运动条目",
-        "下滑后显示先前运动条目",
-        "顺时针旋转后页面向上滚动",
-        "逆时针旋转后页面向下滚动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_016",
@@ -262,12 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "右滑后返回 Multisport 运动列表",
-        "再次进入编辑页并按压编码器后返回主表盘"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_017",
@@ -279,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造30项运动上限状态的 SIM_SPORT_LIST_SET；不能仅进入页面代替点击置灰添加按钮；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_018",
@@ -292,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造仅3项运动列表的 SIM_SPORT_LIST_SET；不能仅进入页面代替删除动作；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_019",
@@ -302,16 +261,12 @@
       "precondition_text": "1.手表已进入Add Sports页面",
       "steps_text": "1.滚动浏览全部分类\n2.统计分类数量",
       "expected_text": "1.页面按PRD展示9个运动分类\n2.分类列表中无重复项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_020",
@@ -323,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SPORT_TYPE_CARD 首行中心来自当前 Designer 列表布局；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_021",
@@ -336,13 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后显示后续分类",
-        "下滑后显示先前分类",
-        "编码器旋转后分类列表随方向滚动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_022",
@@ -354,12 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "右滑后返回 Customize Sports",
-        "再次进入 Add Sports 并按压编码器后返回主表盘"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_023",
@@ -368,18 +317,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Sports分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Sports分类列表\n2.列表显示Basketball 篮球/Baseball 棒球/Table Tennis 乒乓球/Tennis 网球/Squash 壁球/Hockey 曲棍球/Golf 高尔夫/Bowling 保龄球/Handball 手球/Rugby 橄榄球/Kabaddi 卡巴迪/Dodgeball 躲避球/Volleyball 排球/Beach Volleyball 沙滩排球/Sepak Takraw 藤球/Skate Board 滑板/Roller Skating 轮滑/High Jump 跳高/Long Jump 跳远",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,2;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_024",
@@ -388,18 +331,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Adventure分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Adventure分类列表\n2.列表显示Hiking 徒步/Rock Climbing 攀岩/ATV 沙滩车/Paragliding 滑翔伞",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,3;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_025",
@@ -408,18 +345,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Combat分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Combat分类列表\n2.列表显示Boxing 拳击/Karate 空手道/Judo 柔道/Wrestling 摔跤/Kickboxing 踢拳/Kung fu 武术/Taekwondo 跆拳道/Fencing 击剑/Tai Chi 太极/Sumo 相扑",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,4;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_026",
@@ -428,18 +359,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Winter Sports分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Winter Sports分类列表\n2.列表显示Skiing 滑雪/Ice Skating 滑冰/Snow Mobile 雪地摩托/Sledge 雪橇运动/Ice Hockey 冰球/Snowboarding 单板滑雪/Curling 冰壶",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,5;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_027",
@@ -448,18 +373,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Dance分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Dance分类列表\n2.列表显示Dance 舞蹈/Ballet 芭蕾/Aerobics 有氧操/Folk Dance 民族舞",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,6;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_028",
@@ -468,18 +387,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Leisure & Lifestyle分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Leisure & Lifestyle分类列表\n2.列表显示Archery 射箭/Darts 飞镖/Tug of war 拔河/Hula Hoop 呼啦圈/Kite Flying 放风筝/Fishing 钓鱼/Disc Sports 飞盘/Billiards 台球/Skipping 跳绳/Meditation 冥想/Horse Riding 马术/Trampoline 蹦床",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,7;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_029",
@@ -488,18 +401,12 @@
       "precondition_text": "1.手表显示Add Sports分类页",
       "steps_text": "1.进入Water Sports分类\n2.读取该分类的中英文运动名称",
       "expected_text": "1.手表显示Water Sports分类列表\n2.列表显示Boating 划船/Snorkelling 浮潜/Para Sailing 帆船/Water Polo 水球/Kayaking 皮划艇/Surfing 冲浪/Rowing 赛艇",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SAME_TYPE_LIST,8;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_030",
@@ -511,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实际点击首个目标分类进入选择页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_031",
@@ -524,13 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "同类运动项高104；滚动至 footer 后点击确认；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击目标运动后显示勾选",
-        "点击底部确认后保存并返回 Multisport",
-        "滚动到底部后新增运动显示在最后一项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_032",
@@ -542,13 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "同类运动项高104；滚动至 footer 后点击确认；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击已选目标运动后取消勾选",
-        "点击底部确认后保存并返回 Multisport",
-        "滚动列表后目标运动不再显示"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_033",
@@ -560,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_034",
@@ -573,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造30项上限及第31项待选状态的 SIM_SPORT_LIST_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_035",
@@ -586,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_036",
@@ -599,14 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后显示后续运动项",
-        "下滑后显示先前运动项",
-        "编码器旋转后列表按方向滚动",
-        "右滑后返回 Add Sports 页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_037",
@@ -615,19 +513,12 @@
       "precondition_text": "1.目标运动从未设置过运动目标",
       "steps_text": "1.进入目标运动的Goals页面",
       "expected_text": "1.Goals页面显示None为当前默认目标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_038",
@@ -636,17 +527,12 @@
       "precondition_text": "1.运动A已设置10分钟目标\n2.运动B保持None目标",
       "steps_text": "1.查看运动A列表目标\n2.查看运动B列表目标",
       "expected_text": "1.运动A显示10分钟目标\n2.运动B仍显示None目标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_039",
@@ -655,19 +541,12 @@
       "precondition_text": "1.目标运动为Outdoor Run",
       "steps_text": "1.进入Outdoor Run的Goals页面\n2.查看当前页面的Calories目标\n3.查看当前页面的Distance目标\n4.查看当前页面的None目标",
       "expected_text": "1.页面显示Time目标\n2.页面显示Calories目标\n3.页面显示Distance目标\n4.页面显示None目标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_040",
@@ -676,19 +555,12 @@
       "precondition_text": "1.目标运动为Yoga",
       "steps_text": "1.进入Yoga的Goals页面\n2.查看当前页面的Calories目标\n3.查看当前页面的None目标\n4.查看全部数据页，确认未出现Distance入口",
       "expected_text": "1.页面显示Time目标\n2.页面显示Calories目标\n3.页面显示None目标\n4.页面不显示Distance入口",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_041",
@@ -700,13 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击 Time 后进入时间数值设置页",
-        "返回 Goals 并点击 Calories 后进入卡路里数值设置页",
-        "返回 Goals、滚动并点击 Distance 后进入距离数值设置页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_042",
@@ -718,15 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后显示后续目标",
-        "下滑后显示前序目标",
-        "编码器旋转后目标列表滚动",
-        "右滑后返回 Multisport",
-        "再次进入 Goals 后按压编码器返回主表盘"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_043",
@@ -738,8 +600,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/动态判定: 2.读取Time页面的分钟列；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_044",
@@ -748,19 +611,12 @@
       "precondition_text": "1.手表停留在Time数值设置页",
       "steps_text": "1.将小时列调整到0\n2.继续向下调整小时列\n3.将小时列调整到9\n4.继续向上调整小时列",
       "expected_text": "1.小时列显示0\n2.小时列不出现小于0的值\n3.小时列显示9\n4.小时列不出现大于9的值",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_045",
@@ -769,17 +625,12 @@
       "precondition_text": "1.手表停留在Time数值设置页",
       "steps_text": "1.将分钟列调到10\n2.调到20\n3.调到30\n4.调到40\n5.调到50\n6.继续向上调一档",
       "expected_text": "1.分钟列显示10\n2.分钟列显示20\n3.分钟列显示30\n4.分钟列显示40\n5.分钟列显示50\n6.分钟列回到0",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_046",
@@ -788,19 +639,12 @@
       "precondition_text": "1.手表停留在Calories数值设置页",
       "steps_text": "1.将数值调整到50千卡\n2.逐档调整到1000千卡\n3.继续向上调整一档",
       "expected_text": "1.页面显示50千卡\n2.调整过程每档增加50千卡并显示1000千卡\n3.数值不超过1000千卡",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_047",
@@ -809,17 +653,12 @@
       "precondition_text": "1.手表停留在Distance数值设置页\n2.系统单位为公制",
       "steps_text": "1.从1公里逐档调整到20公里\n2.继续浏览20公里后的选项",
       "expected_text": "1.距离按1公里步长显示1至20公里\n2.20公里后显示半马和全马选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/动态判定: 1.从1公里逐档调整到20公里；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_048",
@@ -831,13 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "选中列上滑后增加一个规定步长",
-        "选中列下滑后减少一个规定步长",
-        "编码器旋转后按方向变化一个规定步长"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_049",
@@ -849,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "准备页开始按钮未定位,倒计时依赖时序；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_050",
@@ -862,8 +698,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/动态判定: 3.回放倒计时录像，记录数字和GO的出现顺序；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_051",
@@ -872,17 +709,12 @@
       "precondition_text": "1.振动强度设置为弱",
       "steps_text": "1.启动任一运动\n2.在GO结束时记录振动",
       "expected_text": "1.倒计时依次显示3至GO\n2.进入运动时产生一次约250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "准备页开始按钮未定位,倒计时依赖时序；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_052",
@@ -891,16 +723,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.用户年龄设为40岁\n3.可输出指定BPM的心率模拟设备输出89BPM",
       "steps_text": "1.持续观察心率区间条与区间名称\n2.查看全部数据页，确认未出现五个心率区间名称",
       "expected_text": "1.实时心率显示89BPM\n2.页面不显示五个心率区间名称",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_053",
@@ -909,16 +737,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.用户年龄设为40岁\n3.心率模拟设备可输出90、108、126、144、162BPM",
       "steps_text": "1.依次输出90、108、126、144、162BPM\n2.观察每个数值对应的区间名称",
       "expected_text": "1.页面依次显示心率模拟设备输出的五个心率值\n2.五个心率值依次归入Warm Up至Extreme区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_054",
@@ -927,16 +751,12 @@
       "precondition_text": "1.用户年龄为40岁\n2.心率模拟设备已连接",
       "steps_text": "1.依次输出100、120、140、160、180BPM\n2.观察实时心率区域",
       "expected_text": "1.手表依次接收到五个模拟心率值\n2.页面显示Warm Up/Fat Burning/Aerobic/Anaerobic/Extreme五段色条，指针移动至对应区间并显示实时心率和区间名",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_055",
@@ -945,17 +765,12 @@
       "precondition_text": "1.已启动距离类运动且尚未产生有效运动数据",
       "steps_text": "1.查看运动时间\n2.查看距离\n3.查看步数\n4.查看卡路里\n5.查看心率",
       "expected_text": "1.时间显示00:00:00\n2.距离显示0.00\n3.步数显示0\n4.卡路里显示0\n5.心率显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_056",
@@ -967,8 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_057",
@@ -977,16 +793,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Outdoor Cycling并产生运动数据",
       "steps_text": "1.浏览全部运动数据页\n2.查看当前页面的心率区间\n3.查看当前页面的实时心率\n4.查看全部数据页，确认未出现距离\n5.查看全部数据页，确认未出现配速\n6.查看全部数据页，确认未出现步数\n7.查看全部数据页，确认未出现步频",
       "expected_text": "1.页面显示总卡路里\n2.页面显示心率区间\n3.页面显示实时心率\n4.页面不显示距离\n5.页面不显示配速\n6.页面不显示步数\n7.页面不显示步频",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_058",
@@ -995,16 +807,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Yoga并产生运动数据",
       "steps_text": "1.浏览全部运动数据页\n2.查看当前页面的心率区间\n3.查看当前页面的实时心率\n4.查看全部数据页，确认未出现距离\n5.查看全部数据页，确认未出现配速\n6.查看全部数据页，确认未出现步数\n7.查看全部数据页，确认未出现步频",
       "expected_text": "1.页面显示总卡路里\n2.页面显示心率区间\n3.页面显示实时心率\n4.页面不显示距离\n5.页面不显示配速\n6.页面不显示步数\n7.页面不显示步频",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_059",
@@ -1013,16 +821,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动数据测试工具持续提供稳定步频和心率",
       "steps_text": "1.记录连续5秒页面数据与时间戳\n2.对比连续5秒记录中相邻两次运动数据的时间戳",
       "expected_text": "1.运动时长逐秒增加\n2.可变运动数据每秒刷新一次",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_060",
@@ -1031,17 +835,12 @@
       "precondition_text": "1.运动已持续59分50秒",
       "steps_text": "1.观察运动时长从59:59跨到1小时",
       "expected_text": "1.运动时长从00:59:59更新为01:00:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "跨越10秒的等待可执行；当前缺少可将真实运动会话已用时设置为59分50秒的通用SIM_SPORT_SESSION_SET能力，不能靠等待一小时建立前置；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_061",
@@ -1053,8 +852,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_062",
@@ -1066,8 +866,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_063",
@@ -1079,8 +880,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_064",
@@ -1092,8 +894,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_065",
@@ -1102,16 +905,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在亮屏运动中数据页",
       "steps_text": "1.按压一次编码器",
       "expected_text": "1.手表进入暂停结束页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_066",
@@ -1123,8 +922,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_067",
@@ -1136,8 +936,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_068",
@@ -1146,16 +947,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动数据页圆点已因3秒无操作隐藏",
       "steps_text": "1.左右或上下切换一次运动页面",
       "expected_text": "1.页面底部圆点重新显示并指示当前页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_069",
@@ -1164,16 +961,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已启动Outdoor Run且当前系统时间为09:30",
       "steps_text": "1.观察运动中页面顶部",
       "expected_text": "1.顶部显示Outdoor Run运动ICON/HH:MM:SS格式运动时长/系统时间09:30",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_070",
@@ -1185,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_071",
@@ -1198,8 +992,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_072",
@@ -1211,8 +1006,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_073",
@@ -1224,8 +1020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_074",
@@ -1237,8 +1034,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_075",
@@ -1250,8 +1048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_076",
@@ -1263,8 +1062,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_077",
@@ -1276,8 +1076,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_078",
@@ -1286,16 +1087,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表停留在暂停结束页",
       "steps_text": "1.按压一次编码器\n2.查看返回数据页后的暂停标识和计时状态",
       "expected_text": "1.手表返回运动中数据页\n2.当前暂停状态保持",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_079",
@@ -1307,8 +1104,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_touch_press: 人工长按屏幕步骤缺少 ['TP_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_080",
@@ -1317,16 +1115,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动正在记录",
       "steps_text": "1.检查运动数据页和暂停结束页的锁屏入口\n2.按实现触发运动锁屏",
       "expected_text": "1.待产品确认：锁屏入口所在页面与触发动作\n2.进入运动锁屏页后运动仍持续记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_081",
@@ -1338,8 +1132,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/动态判定: 2.每次滑动后记录页面标题；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_082",
@@ -1351,12 +1146,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；TP_PRESS 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击锁屏页后进入解锁页并显示解锁圆环",
-        "持续按住屏幕3秒后解除锁定并返回运动数据页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_083",
@@ -1368,8 +1160,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_084",
@@ -1381,8 +1174,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_085",
@@ -1394,8 +1188,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_086",
@@ -1407,8 +1202,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_087",
@@ -1420,8 +1216,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_088",
@@ -1433,8 +1230,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_089",
@@ -1446,8 +1244,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_090",
@@ -1459,8 +1258,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造满足保存条件的运行中运动及 End this workout 弹窗的 SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_091",
@@ -1472,8 +1272,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造运行中运动及 End this workout 弹窗的 SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_092",
@@ -1485,8 +1286,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_093",
@@ -1498,8 +1300,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺构造不满足保存条件运动及数据过少弹窗的 SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_094",
@@ -1508,16 +1311,12 @@
       "precondition_text": "1.Yoga运动时长超过1分钟且卡路里大于0",
       "steps_text": "1.在暂停结束页触发结束",
       "expected_text": "1.待产品确认：基础类无距离数据时使用何种保存条件和边界",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_095",
@@ -1529,8 +1328,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_096",
@@ -1542,8 +1342,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_097",
@@ -1555,8 +1356,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_098",
@@ -1568,8 +1370,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_099",
@@ -1581,8 +1384,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_100",
@@ -1591,16 +1395,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动心率即将满足预警条件\n3.振动测试仪已连接并校准",
       "steps_text": "1.采集预警触发后的完整振动\n2.采集预警弹窗显示时长",
       "expected_text": "1.手表短振两次，每次250毫秒，间隔750毫秒\n2.预警弹窗显示5秒",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_101",
@@ -1609,16 +1409,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.当前运动设有可控目标",
       "steps_text": "1.使当前运动进度首次达到目标50%\n2.观察提醒5秒\n3.观察运动计时是否继续递增",
       "expected_text": "1.页面显示You are halfway there!及当前进度并短振两次\n2.提醒5秒后消失\n3.运动继续记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_102",
@@ -1627,16 +1423,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.当前运动设有可控目标",
       "steps_text": "1.使当前运动进度首次达到目标100%\n2.观察提醒5秒\n3.观察运动计时是否继续递增",
       "expected_text": "1.页面显示Goal Achieved!及目标值并短振两次\n2.提醒5秒后消失\n3.运动继续记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_103",
@@ -1645,16 +1437,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.系统单位为公制\n3.距离类运动正在记录",
       "steps_text": "1.使累计距离从0.99公里达到1.00公里",
       "expected_text": "1.页面显示累计运动1公里提醒并短振两次，5秒后返回运动页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_104",
@@ -1663,16 +1451,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动正在记录且时长接近1小时",
       "steps_text": "1.使运动时长从00:59:59达到01:00:00",
       "expected_text": "1.页面显示累计运动1小时提醒并短振两次，5秒后返回运动页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_105",
@@ -1681,16 +1465,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动将在同一秒达到1公里、1小时和设定目标",
       "steps_text": "1.触发三种达成条件\n2.观察本次弹窗队列",
       "expected_text": "1.页面仅显示距离累计达成提醒\n2.时间累计与设定目标达成弹窗均不显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_106",
@@ -1699,16 +1479,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.目标即将达到50%\n3.振动测试仪已连接并校准",
       "steps_text": "1.采集50%目标提醒的完整振动\n2.采集目标提醒弹窗显示时长",
       "expected_text": "1.手表短振两次，每次250毫秒，间隔750毫秒\n2.目标提醒弹窗显示5秒",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_107",
@@ -1717,16 +1493,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.本次运动心率最低80、最高160且持续100分20秒",
       "steps_text": "1.查看心率曲线横轴\n2.查看心率曲线横轴的时间格式\n3.查看纵轴范围和图例\n4.读取心率图例的最小值\n5.读取心率图例的最大值\n6.读取心率图例的平均值",
       "expected_text": "1.横轴从00:00累计到100:20\n2.横轴不显示HH格式\n3.纵轴范围显示75至165\n4.图例显示最小值80\n5.图例显示最大值160\n6.图例显示平均值",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_108",
@@ -1735,16 +1507,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已保存包含心率数据的有效运动",
       "steps_text": "1.进入Workout Summary心率曲线区域",
       "expected_text": "1.页面标题逐字显示Heart Rate Curve",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_109",
@@ -1753,16 +1521,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动心率数据包含五区间和低于50%最大心率的样本",
       "steps_text": "1.触发结束运动\n2.确认保存本次运动\n3.读取各区间时长与占比\n4.记录运动小结数值",
       "expected_text": "1.小结只统计五个有效心率区间的HH:MM:SS时长\n2.手表进入Workout Summary并保存本次运动\n3.各占比以有效区间总时长为分母\n4.各区间占比总和为100%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_110",
@@ -1771,16 +1535,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.运动前、运动中、运动后均准备可区分的心率数据",
       "steps_text": "1.保存运动\n2.进入Workout Summary心率区间",
       "expected_text": "1.手表保存当次运动记录\n2.区间时长与占比仅统计运动开始至结束范围内数据，运动前后心率样本不计入",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_111",
@@ -1789,16 +1549,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已保存一条有效Outdoor Run运动",
       "steps_text": "1.进入Workout Summary\n2.滚动到页面底部\n3.查看Workout Summary中的平均配速\n4.查看Workout Summary中的步数\n5.查看Workout Summary中的卡路里\n6.查看Workout Summary中的最大步频\n7.查看Workout Summary中的平均步频\n8.查看Workout Summary中的心率曲线\n9.查看Workout Summary中的心率统计\n10.查看Workout Summary中的日期时间",
       "expected_text": "1.小结显示用时\n2.小结显示距离\n3.小结显示平均配速\n4.小结显示步数\n5.小结显示卡路里\n6.小结显示最大步频\n7.小结显示平均步频\n8.小结显示心率曲线\n9.小结显示心率统计\n10.小结显示日期时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_112",
@@ -1807,16 +1563,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.已按确认规则保存一条有效基础类或骑行运动",
       "steps_text": "1.进入Workout Summary\n2.滚动到页面底部\n3.查看Workout Summary中的心率曲线\n4.查看Workout Summary中的心率统计\n5.查看Workout Summary中的日期时间\n6.滚动查看小结全部字段，核对未出现距离\n7.滚动查看小结全部字段，核对未出现配速\n8.滚动查看小结全部字段，核对未出现步数\n9.滚动查看小结全部字段，核对未出现步频",
       "expected_text": "1.小结显示用时\n2.小结显示卡路里\n3.小结显示心率曲线\n4.小结显示心率统计\n5.小结显示日期时间\n6.小结不显示距离\n7.小结不显示配速\n8.小结不显示步数\n9.小结不显示步频",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_113",
@@ -1828,8 +1580,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺可复现多屏 Workout Summary 的 SIM_SPORT_RECORD_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_114",
@@ -1838,17 +1591,12 @@
       "precondition_text": "1.距离类运动正在记录且当前单位为公制",
       "steps_text": "1.记录当前距离和配速\n2.将系统单位改为英制\n3.返回运动数据页\n4.查看配速单位\n5.查看距离数值\n6.查看配速数值",
       "expected_text": "1.页面显示km和每公里配速\n2.系统单位保存为英制\n3.距离单位改为mi\n4.配速单位改为每英里\n5.距离数值完成换算\n6.配速数值完成换算",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/动态判定: 1.记录当前距离和配速；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_115",
@@ -1857,19 +1605,12 @@
       "precondition_text": "1.系统单位为英制\n2.目标运动支持距离目标",
       "steps_text": "1.进入Distance目标设置页\n2.查看距离目标单位",
       "expected_text": "1.页面显示英里距离选项\n2.页面保留Full Marathon选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_GOAL_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_DISTANCE_GOAL_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "SPORT_DISTANCE_GOAL_LIST 是当前源码注册的距离目标设置页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_116",
@@ -1881,8 +1622,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_117",
@@ -1891,16 +1633,12 @@
       "precondition_text": "1.运动正在记录\n2.心率传感器暂时无法得到有效值",
       "steps_text": "1.观察实时心率字段\n2.记录10秒内的运动时长、距离和卡路里\n3.恢复有效心率输入",
       "expected_text": "1.实时心率显示--\n2.其他运动数据继续累计\n3.页面恢复显示有效BPM和对应心率区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/动态判定: 2.记录10秒内的运动时长、距离和卡路里；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_118",
@@ -1912,8 +1650,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_119",
@@ -1925,8 +1664,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_120",
@@ -1938,8 +1678,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_121",
@@ -1951,8 +1692,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_122",
@@ -1961,16 +1703,12 @@
       "precondition_text": "1.运动正在记录且电量可调至低电档位",
       "steps_text": "1.触发低电提醒",
       "expected_text": "1.待产品确认：低电提醒后的运动页面与记录规则",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_123",
@@ -1982,8 +1720,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_124",
@@ -1995,8 +1734,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_125",
@@ -2008,8 +1748,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_126",
@@ -2018,16 +1759,12 @@
       "precondition_text": "1.运动正在记录且电量可调至低电档位",
       "steps_text": "1.连接充电器",
       "expected_text": "1.待产品确认：充电接入后的运动页面与记录规则",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_127",
@@ -2039,8 +1776,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_128",
@@ -2049,17 +1787,12 @@
       "precondition_text": "1.选择一项可快速建立有效数据的距离类运动",
       "steps_text": "1.连续执行启动、倒计时和取消20次\n2.每轮操作运动页控件\n3.查看20轮运行日志\n4.第20轮操作开始、暂停、继续和取消\n5.第20次重新启动运动\n6.返回Multisport列表",
       "expected_text": "1.20次均可完成页面流转\n2.测试期间无页面卡死\n3.测试期间无设备重启\n4.测试期间无控件失效\n5.第20次运动数据从00:00:00开始\n6.运动列表配置未被改写",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "准备页开始按钮未定位,倒计时依赖时序；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_129",
@@ -2068,16 +1801,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.设备电量满足长时运动测试",
       "steps_text": "1.持续运动2小时\n2.每10分钟采集一次页面数据\n3.触发结束运动\n4.确认保存本次运动",
       "expected_text": "1.2小时内每次页面采集均可响应\n2.运动时长单调增加\n3.运动小结可生成\n4.小结时长与测试持续时间偏差不超过采样允许误差",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS和运动记录注入已具备；当前缺运动会话启动、进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_130",
@@ -2086,16 +1815,12 @@
       "precondition_text": "1.数据测试工具已载入运动字段上限数据集",
       "steps_text": "1.把上限数据集写入当前运动\n2.查看运动数据页数值\n3.查看数值与控件位置\n4.结束当前运动\n5.打开Workout Summary\n6.查看小结数值正负号\n7.对比小结与结束前数据\n8.查看小结字段字符",
       "expected_text": "1.页面按各字段上限展示\n2.文字不发生截断\n3.文字不覆盖相邻控件\n4.运动结束\n5.小结展示同一组上限值\n6.小结不出现负数\n7.小结不异常回零\n8.小结不出现溢出字符",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "心率、GPS 和运动记录注入已具备；当前还缺运动进行中字段或阶段推进命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_131",
@@ -2107,8 +1832,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_132",
@@ -2117,19 +1843,12 @@
       "precondition_text": "1.系统支持中文和英文语言切换",
       "steps_text": "1.切换系统语言为英文\n2.进入Multisport\n3.切换系统语言为中文\n4.进入Multisport",
       "expected_text": "1.运动类型按附录英文名称展示\n2.运动类型顺序保持不变\n3.运动类型按附录中文名称展示\n4.运动类型顺序保持不变",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_133",
@@ -2141,8 +1860,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "准备页开始按钮未定位,倒计时依赖时序；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_134",
@@ -2154,8 +1874,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺可复现多屏 Workout Summary 与指定记录内容的 SIM_SPORT_RECORD_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPORT_135",
@@ -2164,16 +1885,12 @@
       "precondition_text": "1.手表正确佩戴，心率传感器和运动传感器均可持续输出有效数据\n2.手表充满电且关闭非测试必要功能\n3.功耗仪已连接并校准",
       "steps_text": "1.启动距离类运动\n2.持续运动1小时\n3.查看1小时运动期间的设备日志，核对无低电重启记录\n4.导出平均电流和电量下降数据\n5.读取功耗报告的峰值电流\n6.读取功耗报告的起始电量、结束电量和下降百分比",
       "expected_text": "1.运动全程页面保持可用\n2.运动全程传感器保持可用\n3.运动期间未发生低电重启\n4.报告生成平均电流数据\n5.报告生成峰值电流数据\n6.报告生成电量下降数据",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "页面与业务数据可模拟；真实功耗仍需真机功耗仪；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

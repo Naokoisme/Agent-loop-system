@@ -62,7 +62,7 @@ class CaseMapExecutionTest(unittest.TestCase):
     def test_target_specific_loader_does_not_fall_back(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            simulator = root / "620C_case_map"
+            simulator = root / "620C_simulator_case_map"
             hardware = root / "6202_case_map"
             simulator.mkdir()
             hardware.mkdir()
@@ -110,7 +110,7 @@ class CaseMapExecutionTest(unittest.TestCase):
                         profile="6202_W5230_SIMULATOR",
                     )
 
-    def test_unsupported_sheet_is_loaded_as_unable_without_commands(self) -> None:
+    def test_legacy_unsupported_sheet_preserves_case_for_dynamic_execution(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             simulator = Path(temporary)
             (simulator / "removed.json").write_text(
@@ -135,9 +135,9 @@ class CaseMapExecutionTest(unittest.TestCase):
                     profile="6202_W5230_SIMULATOR",
                 )["REMOVED_001"]
 
-            self.assertTrue(loaded.unable)
-            self.assertEqual(loaded.setup + loaded.actions + loaded.collect, [])
-            self.assertIn("项目未启用该模块", loaded.note)
+            self.assertFalse(loaded.unable)
+            self.assertEqual(loaded.setup, [":ENTER_PAGE:REMOVED,0"])
+            self.assertEqual(loaded.collect, [":HOST_SCREENSHOT:1"])
 
     def test_setup_and_action_wait_for_processed_before_continuing(self) -> None:
         session = _FakeSession()
@@ -212,15 +212,18 @@ class CaseMapExecutionTest(unittest.TestCase):
         self.assertIn("固件返回 rejected", result.setup_errors[0])
         self.assertEqual(len(session.calls), 1)
 
-    def test_unable_case_is_not_executed(self) -> None:
+    def test_legacy_unable_flag_does_not_gate_fixed_execution(self) -> None:
         session = _FakeSession()
         result = run_case(
             session,
             CaseEntry(case_id="DEMO_003", unable=True, actions=[":TP_CLICK:1,1,1"]),
         )
 
-        self.assertTrue(result.skipped)
-        self.assertEqual(session.calls, [])
+        self.assertFalse(result.skipped)
+        self.assertEqual(session.calls[0], (":TP_CLICK:1,1,1", {}))
+        self.assertTrue(session.calls[1][0].startswith(":GUI_PING:"))
+        self.assertEqual(session.calls[1][1]["expected_type"], "gui_ack")
+        self.assertEqual(session.calls[1][1]["expected_status"], "processed")
 
     def test_sim_wait_uses_duration_aware_timeout(self) -> None:
         session = _FakeSession()
@@ -454,29 +457,19 @@ class CaseMapExecutionTest(unittest.TestCase):
             [item["code"] for item in result.evidence_contract["issues"]],
         )
 
-    def test_620c_sos_gold_cases_satisfy_the_generic_evidence_contract(self) -> None:
+    def test_620c_unsolidified_cases_have_no_fixed_mapping(self) -> None:
         cases = load_case_map(
             "SOS",
             target="simulator",
             profile="620C_W6830",
         )
-        with tempfile.TemporaryDirectory() as temporary, mock.patch(
-            "agent_loop_system.tools.case_map.time.sleep"
-        ):
-            for case_id in ("SOS_001", "SOS_005"):
-                result = run_case(
-                    _FakeSession(),
-                    cases[case_id],
-                    screenshot_path=Path(temporary) / f"{case_id}.bmp",
-                )
-                self.assertTrue(
-                    result.evidence_contract["complete"],
-                    (case_id, result.evidence_contract["issues"]),
-                )
-                self.assertEqual(
-                    result.evidence_contract["captured_screenshots"],
-                    len(cases[case_id].verification_points),
-                )
+        for case_id in ("SOS_001", "SOS_005"):
+            case = cases[case_id]
+            self.assertFalse(case.is_promoted)
+            self.assertEqual(case.setup, [])
+            self.assertEqual(case.actions, [])
+            self.assertEqual(case.collect, [])
+            self.assertEqual(case.verification_points, [])
 
     def test_screen_off_gui_tree_still_captures_the_verdict_screenshot(self) -> None:
         session = _FakeSession(unavailable_screen_off=True)
@@ -498,6 +491,93 @@ class CaseMapExecutionTest(unittest.TestCase):
             self.assertEqual(result.screenshots[0]["label"], "屏幕保持熄灭")
             self.assertTrue(Path(result.screenshots[0]["path"]).is_file())
             self.assertEqual(result.collect_errors, [])
+
+
+class RunnerSelectionTest(unittest.TestCase):
+    def test_unsolidified_mapping_uses_agent_exploration_without_replay_flag(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        case = CaseEntry(
+            case_id="DYNAMIC_001",
+            sheet="演示",
+            steps_text="完成原始操作",
+            expected_text="显示结果",
+            actions=[":TP_CLICK:1,1,1"],
+        )
+        expected = mock.sentinel.dynamic_result
+        with (
+            mock.patch.object(test_tool, "load_case_map", return_value={case.case_id: case}),
+            mock.patch.object(
+                test_tool,
+                "_run_agent_exploration",
+                return_value=expected,
+            ) as explore,
+            mock.patch.object(test_tool, "SimulatorSession") as simulator,
+        ):
+            result = test_tool.run_single_case(
+                "演示",
+                case.case_id,
+                "D:/evidence/dynamic.bmp",
+                target="simulator",
+                case_map_profile="620C_W6830",
+            )
+
+        self.assertIs(result, expected)
+        explore.assert_called_once_with(
+            case,
+            screenshot_path="D:/evidence/dynamic.bmp",
+            target="simulator",
+        )
+        simulator.assert_not_called()
+
+    def test_candidate_replay_and_promoted_mappings_use_fixed_runner(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        class LifecycleSession(_FakeSession):
+            def __init__(self) -> None:
+                super().__init__()
+                self.started = False
+                self.stopped = False
+
+            def start(self) -> None:
+                self.started = True
+
+            def stop(self) -> None:
+                self.stopped = True
+
+        for mapping_status, expected_mode in (
+            ("", "candidate_mapping"),
+            ("PROMOTED", "fixed_mapping"),
+        ):
+            with self.subTest(mapping_status=mapping_status or "candidate"):
+                case = CaseEntry(
+                    case_id="FIXED_001",
+                    sheet="演示",
+                    actions=[":TP_CLICK:1,1,1"],
+                    mapping_status=mapping_status,
+                )
+                session = LifecycleSession()
+                with (
+                    mock.patch.object(
+                        test_tool,
+                        "load_case_map",
+                        return_value={case.case_id: case},
+                    ),
+                    mock.patch.object(test_tool, "SimulatorSession", return_value=session),
+                ):
+                    result = test_tool.run_single_case(
+                        "演示",
+                        case.case_id,
+                        "D:/evidence/fixed.bmp",
+                        target="simulator",
+                        case_map_profile="6202_W5230_SIMULATOR",
+                        candidate_replay=not bool(mapping_status),
+                    )
+
+                self.assertEqual(result.execution_mode, expected_mode)
+                self.assertTrue(session.started)
+                self.assertTrue(session.stopped)
+                self.assertTrue(any(raw.startswith(":TP_CLICK:") for raw, _ in session.calls))
 
 
 if __name__ == "__main__":

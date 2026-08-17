@@ -1,4 +1,4 @@
-"""6202 真机诊断所使用的只读源码与命令能力配置。"""
+"""真机诊断所使用的项目源码与命令能力配置。"""
 from __future__ import annotations
 
 import os
@@ -11,11 +11,15 @@ from agent_loop_system.tools.hardware_serial import dangerous_command_reason
 
 _PROJECT_RE = re.compile(r"^\s*set\(\s*PROJECT\s+([^\s)]+)\s*\)", re.MULTILINE)
 DEFAULT_HARDWARE_PROJECT = "6202_W5230"
+_APP_QUICK_CMD_PATHS = {
+    "6202_W5230": Path("app/comm/TuoBu/quick_cmd/gui_comm_quick_cmd.c"),
+    "6204_W5230": Path("app/comm/quick_cmd/gui_comm_quick_cmd.c"),
+}
 
 
 @dataclass(frozen=True, slots=True)
 class HardwareTargetConfig:
-    """已经核对为当前 6202 工程的只读源码位置。"""
+    """已核对项目身份且源码根与隔离工作区一致的真机配置。"""
 
     source_root: Path
     project: str
@@ -41,46 +45,44 @@ class HardwareTargetConfig:
 
     @property
     def app_quick_cmd(self) -> Path:
-        return (
-            self.source_root
-            / "app"
-            / "comm"
-            / "TuoBu"
-            / "quick_cmd"
-            / "gui_comm_quick_cmd.c"
-        )
+        relative = _APP_QUICK_CMD_PATHS.get(self.project)
+        if relative is None:
+            raise ValueError(f"尚未登记的真机项目: {self.project}")
+        return self.source_root / relative
 
     @classmethod
     def from_env(cls) -> "HardwareTargetConfig":
         root_value = os.environ.get("W30_HARDWARE_SOURCE_ROOT", "").strip()
         if not root_value:
             raise ValueError(
-                "W30_HARDWARE_SOURCE_ROOT 未配置，无法核对 6202 真机命令表"
+                "W30_HARDWARE_SOURCE_ROOT 未配置，无法核对真机命令表"
             )
         workspace_value = os.environ.get(
             "W30_HARDWARE_WORKSPACE_ROOT", ""
         ).strip()
         if not workspace_value:
             raise ValueError(
-                "W30_HARDWARE_WORKSPACE_ROOT 未配置，无法确认 6202 隔离工作区"
+                "W30_HARDWARE_WORKSPACE_ROOT 未配置，无法确认真机隔离工作区"
             )
         expected_project = (
             os.environ.get("W30_HARDWARE_PROJECT", "").strip()
             or DEFAULT_HARDWARE_PROJECT
         )
+        if expected_project not in _APP_QUICK_CMD_PATHS:
+            raise ValueError(f"尚未登记的真机项目: {expected_project}")
         source_root = Path(root_value).resolve()
         workspace_root = Path(workspace_value).resolve()
         if source_root != workspace_root:
             raise ValueError(
                 "HARDWARE_WORKSPACE_CONFLICT: W30_HARDWARE_SOURCE_ROOT "
-                f"必须指向 6202 隔离工作区 {workspace_root}"
+                f"必须指向当前真机隔离工作区 {workspace_root}"
             )
         if not source_root.is_dir():
-            raise ValueError(f"6202 真机源码目录不存在: {source_root}")
+            raise ValueError(f"真机源码目录不存在: {source_root}")
 
         active_config = source_root / "app" / "ProjectConfig.cmake"
         if not active_config.is_file():
-            raise ValueError(f"6202 真机源码缺少当前项目配置: {active_config}")
+            raise ValueError(f"真机源码缺少当前项目配置: {active_config}")
         match = _PROJECT_RE.search(
             active_config.read_text(encoding="utf-8", errors="replace")
         )
@@ -95,7 +97,7 @@ class HardwareTargetConfig:
         required = (result.command_source, result.project_cmake, result.app_quick_cmd)
         missing = [str(path) for path in required if not path.is_file()]
         if missing:
-            raise ValueError("6202 真机源码能力文件缺失: " + ", ".join(missing))
+            raise ValueError("真机源码能力文件缺失: " + ", ".join(missing))
         return result
 
 
@@ -116,7 +118,7 @@ def hardware_command_allowed(command_name: str) -> tuple[bool, str | None]:
 
 
 def load_hardware_command_capabilities(config: HardwareTargetConfig):
-    """直接从当前 6202 源码提取命令表，不复用 620C 缓存目录。"""
+    """直接从当前真机源码提取命令表，不复用其他项目缓存目录。"""
 
     from sim_tools.extract_kb import extract_command_capabilities
 
@@ -124,7 +126,7 @@ def load_hardware_command_capabilities(config: HardwareTargetConfig):
 
 
 def build_hardware_agent_knowledge(config: HardwareTargetConfig) -> str:
-    """为单步复现 Agent 生成当前 6202 的命令和页面目录。"""
+    """为单步复现 Agent 生成当前真机项目的命令和页面目录。"""
 
     from sim_tools.extract_kb import extract_commands, extract_windows
 
@@ -145,9 +147,9 @@ def build_hardware_agent_knowledge(config: HardwareTargetConfig) -> str:
         app_quick_cmd=config.app_quick_cmd,
     )
     return (
-        "## 当前 6202 真机命令与参数（从源码即时提取）\n"
+        f"## 当前 {config.project} 真机命令与参数（从源码即时提取）\n"
         + "\n".join(command_lines)
-        + "\n\n## 当前 6202 注册页面\n"
+        + f"\n\n## 当前 {config.project} 注册页面\n"
         + windows
     )
 

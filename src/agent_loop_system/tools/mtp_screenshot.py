@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -19,6 +20,7 @@ import sys
 import tempfile
 import threading
 import time
+import xml.etree.ElementTree as ET
 import zlib
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -42,8 +44,20 @@ CAPTURE_REQUEST = "screenshot_capture_file"
 CAPTURE_COMMAND = "SCREENSHOT_CAPTURE_FILE"
 EXPECTED_WIDTH = 410
 EXPECTED_HEIGHT = 502
+PROJECT_SCREEN_GEOMETRY = {
+    "6202_W5230": (EXPECTED_WIDTH, EXPECTED_HEIGHT),
+    "6204_W5230": (466, 466),
+}
 DEFAULT_USB_TIMEOUT = 30.0
 DEFAULT_MTP_TIMEOUT = 30.0
+_CLIXML_PREFIX = "#< CLIXML"
+_CLIXML_ESCAPE_RE = re.compile(r"_x([0-9A-Fa-f]{4})_")
+_MAX_POWERSHELL_ERROR_LENGTH = 2_000
+_POWERSHELL_PREAMBLE = r"""
+$ProgressPreference = 'SilentlyContinue'
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [Console]::OutputEncoding
+""".strip()
 
 
 class MtpScreenshotError(RuntimeError):
@@ -60,6 +74,102 @@ class MtpScreenshotDeviceError(MtpScreenshotError):
 
 class MtpScreenshotValidationError(MtpScreenshotError, ValueError):
     """下载文件或固件回执不符合协议。"""
+
+
+def _expected_geometry(
+    expected_width: int | None, expected_height: int | None
+) -> tuple[int, int]:
+    if expected_width is None and expected_height is None:
+        project = os.environ.get("W30_HARDWARE_PROJECT", "6202_W5230").strip()
+        try:
+            return PROJECT_SCREEN_GEOMETRY[project]
+        except KeyError as exc:
+            raise ValueError(
+                f"未知真机项目 {project or '未设置'}，请显式提供截图宽高"
+            ) from exc
+    if expected_width is None or expected_height is None:
+        raise ValueError("expected_width and expected_height must be set together")
+    if (
+        not isinstance(expected_width, int)
+        or isinstance(expected_width, bool)
+        or not isinstance(expected_height, int)
+        or isinstance(expected_height, bool)
+        or expected_width <= 0
+        or expected_height <= 0
+    ):
+        raise ValueError("expected screenshot geometry must be positive integers")
+    return int(expected_width), int(expected_height)
+
+
+def _decode_clixml_escapes(value: str) -> str:
+    return _CLIXML_ESCAPE_RE.sub(
+        lambda match: chr(int(match.group(1), 16)),
+        value,
+    )
+
+
+def _xml_local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def _powershell_error_detail(value: str | None) -> str:
+    """Return useful PowerShell diagnostics without serialized progress records."""
+
+    text = (value or "").strip()
+    if not text:
+        return ""
+
+    marker = text.find(_CLIXML_PREFIX)
+    if marker < 0:
+        detail = text
+    else:
+        messages: list[str] = []
+        plain_prefix = text[:marker].strip()
+        if plain_prefix:
+            messages.append(plain_prefix)
+
+        xml_payload = text[marker + len(_CLIXML_PREFIX) :].strip()
+        try:
+            root = ET.fromstring(xml_payload)
+        except ET.ParseError:
+            if not messages:
+                messages.append("PowerShell returned unreadable encoded diagnostics")
+        else:
+            for item in root:
+                if str(item.attrib.get("S", "")).casefold() == "progress":
+                    continue
+
+                item_messages: list[str] = []
+                if _xml_local_name(str(item.tag)) == "S" and item.text:
+                    item_messages.append(item.text)
+                for element in item.iter():
+                    if element is item or not element.text:
+                        continue
+                    stream = str(element.attrib.get("S", "")).casefold()
+                    if _xml_local_name(str(element.tag)) == "ToString" or stream == "error":
+                        item_messages.append(element.text)
+                if not item_messages:
+                    combined = " ".join(
+                        fragment.strip()
+                        for fragment in item.itertext()
+                        if fragment.strip()
+                    )
+                    if combined:
+                        item_messages.append(combined)
+                messages.extend(item_messages)
+
+        decoded: list[str] = []
+        seen: set[str] = set()
+        for message in messages:
+            normalized = _decode_clixml_escapes(message).strip()
+            if normalized and normalized not in seen:
+                seen.add(normalized)
+                decoded.append(normalized)
+        detail = "\n".join(decoded)
+
+    if len(detail) > _MAX_POWERSHELL_ERROR_LENGTH:
+        detail = f"{detail[:_MAX_POWERSHELL_ERROR_LENGTH]}..."
+    return detail
 
 
 class MtpSystem(Protocol):
@@ -169,7 +279,8 @@ class WindowsMtpSystem:
     ) -> str:
         if os.name != "nt":
             raise MtpScreenshotError("MTP screenshot currently supports Windows only")
-        encoded = base64.b64encode(script.encode("utf-16le")).decode("ascii")
+        wrapped_script = f"{_POWERSHELL_PREAMBLE}\n{script}"
+        encoded = base64.b64encode(wrapped_script.encode("utf-16le")).decode("ascii")
         env = os.environ.copy()
         if extra_env:
             env.update(extra_env)
@@ -177,10 +288,13 @@ class WindowsMtpSystem:
             completed = self._runner(
                 [
                     self._powershell,
+                    "-NoLogo",
                     "-NoProfile",
                     "-NonInteractive",
                     "-ExecutionPolicy",
                     "Bypass",
+                    "-OutputFormat",
+                    "Text",
                     "-EncodedCommand",
                     encoded,
                 ],
@@ -195,7 +309,14 @@ class WindowsMtpSystem:
         except subprocess.TimeoutExpired as exc:
             raise MtpScreenshotTimeoutError("Windows MTP operation timed out") from exc
         if completed.returncode != 0:
-            detail = (completed.stderr or completed.stdout or "unknown error").strip()
+            detail = _powershell_error_detail(completed.stderr)
+            if not detail:
+                detail = _powershell_error_detail(completed.stdout)
+            if not detail:
+                detail = (
+                    f"PowerShell exited with code {completed.returncode} "
+                    "without diagnostics"
+                )
             raise MtpScreenshotError(f"Windows MTP operation failed: {detail}")
         return completed.stdout.strip()
 
@@ -538,6 +659,8 @@ def capture_mtp_screenshot(
     usb_timeout: float = DEFAULT_USB_TIMEOUT,
     mtp_timeout: float = DEFAULT_MTP_TIMEOUT,
     overwrite: bool = False,
+    expected_width: int | None = None,
+    expected_height: int | None = None,
     mtp_system: MtpSystem | None = None,
     transport_factory: Callable[[], Any] | None = None,
 ) -> MtpScreenshotResult:
@@ -546,6 +669,9 @@ def capture_mtp_screenshot(
     capture_timeout = _positive_timeout("capture_timeout", capture_timeout)
     usb_timeout = _positive_timeout("usb_timeout", usb_timeout)
     mtp_timeout = _positive_timeout("mtp_timeout", mtp_timeout)
+    expected_width, expected_height = _expected_geometry(
+        expected_width, expected_height
+    )
     if sequence is None:
         sequence = time.time_ns() % 2_147_483_646 + 1
     file_name = capture_filename(sequence)
@@ -608,7 +734,11 @@ def capture_mtp_screenshot(
                 downloaded = system.copy_capture(
                     Path(temporary_dir), file_name=file_name, timeout=mtp_timeout
                 )
-            bmp = validate_bmp(downloaded)
+            bmp = validate_bmp(
+                downloaded,
+                expected_width=expected_width,
+                expected_height=expected_height,
+            )
             if receipt is not None:
                 _validate_receipt(receipt, bmp, file_name=file_name)
             os.replace(downloaded, output)
@@ -651,6 +781,8 @@ class MtpCaptureProvider:
         sequence_start: int | None = None,
         usb_timeout: float = DEFAULT_USB_TIMEOUT,
         mtp_timeout: float = DEFAULT_MTP_TIMEOUT,
+        expected_width: int | None = None,
+        expected_height: int | None = None,
         mtp_system: MtpSystem | None = None,
     ) -> None:
         if serial_session is None:
@@ -661,6 +793,9 @@ class MtpCaptureProvider:
         self.serial_session = serial_session
         self.usb_timeout = _positive_timeout("usb_timeout", usb_timeout)
         self.mtp_timeout = _positive_timeout("mtp_timeout", mtp_timeout)
+        self.expected_width, self.expected_height = _expected_geometry(
+            expected_width, expected_height
+        )
         self.mtp_system = mtp_system or WindowsMtpSystem()
         self._next_sequence = sequence_start
         self._last_sequence: int | None = None
@@ -711,6 +846,8 @@ class MtpCaptureProvider:
                     usb_timeout=self.usb_timeout,
                     mtp_timeout=self.mtp_timeout,
                     overwrite=False,
+                    expected_width=self.expected_width,
+                    expected_height=self.expected_height,
                     mtp_system=self.mtp_system,
                     transport_factory=lambda: transport,
                 )
@@ -759,6 +896,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--capture-timeout", type=float, default=20.0)
     parser.add_argument("--usb-timeout", type=float, default=DEFAULT_USB_TIMEOUT)
     parser.add_argument("--mtp-timeout", type=float, default=DEFAULT_MTP_TIMEOUT)
+    parser.add_argument("--expected-width", type=int)
+    parser.add_argument("--expected-height", type=int)
     parser.add_argument("--overwrite", action="store_true")
     return parser
 
@@ -775,6 +914,8 @@ def main(argv: list[str] | None = None) -> int:
             usb_timeout=args.usb_timeout,
             mtp_timeout=args.mtp_timeout,
             overwrite=args.overwrite,
+            expected_width=args.expected_width,
+            expected_height=args.expected_height,
         )
     except (MtpScreenshotError, SerialTransportError, OSError, ValueError) as exc:
         print(

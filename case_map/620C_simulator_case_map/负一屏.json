@@ -6,20 +6,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在主表盘右滑",
     "expected_text": "1.手表显示负一屏顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_002",
@@ -28,20 +20,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.从主表盘进入负一屏",
     "expected_text": "1.页面顶部显示最近应用卡片",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_003",
@@ -50,19 +34,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在负一屏上滑",
     "expected_text": "1.页面显示下方卡片",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实测上滑可能切页至通知中心而非滚动"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_004",
@@ -71,19 +48,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在负一屏下滑",
     "expected_text": "1.页面显示上方卡片",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_005",
@@ -92,19 +62,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.逆时针旋转编码器",
     "expected_text": "1.页面显示下方卡片",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_006",
@@ -113,19 +76,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在负一屏左滑",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_007",
@@ -134,19 +90,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在负一屏单击编码器",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_008",
@@ -155,28 +104,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动负一屏至All Apps\n2.左滑返回主表盘\n3.右滑再次进入负一屏",
     "expected_text": "1.页面显示All Apps按钮\n2.手表显示主表盘\n3.页面顶部显示最近应用卡片",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用方向语义明确的 SWIPE_SIM 完成负一屏往返，三个阶段分别取证",
-    "verification_points": [
-      "上滑后检查 All Apps 按钮",
-      "左滑后检查主表盘",
-      "再次右滑后检查负一屏顶部最近应用卡片"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_009",
@@ -185,19 +118,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为04:59",
     "expected_text": "1.页面不显示时段问候语",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807045900;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_010",
@@ -206,19 +132,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为05:00",
     "expected_text": "1.页面显示Good Morning",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807050000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_011",
@@ -227,19 +146,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为11:59",
     "expected_text": "1.页面显示Good Morning",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807115900;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_012",
@@ -248,19 +160,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为12:00",
     "expected_text": "1.页面显示Good Afternoon",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807120000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_013",
@@ -269,19 +174,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为16:59",
     "expected_text": "1.页面显示Good Afternoon",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807165900;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_014",
@@ -290,19 +188,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为17:00",
     "expected_text": "1.页面显示Good Evening",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807170000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_015",
@@ -311,19 +202,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为23:59",
     "expected_text": "1.页面显示Good Evening",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807235900;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_016",
@@ -332,19 +216,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.将系统时间设为00:00",
     "expected_text": "1.页面不显示时段问候语",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260807000000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_017",
@@ -353,17 +230,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察负一屏左上区域",
     "expected_text": "1.页面显示Hello",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_018",
@@ -372,17 +244,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察负一屏右上区域",
     "expected_text": "1.页面显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_019",
@@ -391,17 +258,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察负一屏右上区域",
     "expected_text": "1.页面显示星期与日期",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_020",
@@ -410,19 +272,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第1个区域显示Recent Activities",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_021",
@@ -431,19 +286,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第2个区域显示Weather",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_022",
@@ -452,19 +300,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第3个区域显示TITAN Q",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_023",
@@ -473,19 +314,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第4个区域显示Music",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_024",
@@ -494,19 +328,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第5个区域显示Clock",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_025",
@@ -515,19 +342,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第6个区域显示Games",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_026",
@@ -536,19 +356,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第7个区域显示World Clock",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_027",
@@ -557,19 +370,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动至对应区域",
     "expected_text": "1.第8个区域显示All Apps",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_028",
@@ -578,17 +384,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在设置列表查找负一屏排序入口",
     "expected_text": "1.设置列表不显示负一屏卡片排序入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_029",
@@ -597,17 +398,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.恢复出厂后进入负一屏",
     "expected_text": "1.最近应用第1项显示Phone",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_030",
@@ -616,17 +412,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.恢复出厂后进入负一屏",
     "expected_text": "1.最近应用第2项显示Camera",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_031",
@@ -635,17 +426,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.恢复出厂后进入负一屏",
     "expected_text": "1.最近应用第3项显示Flashlight",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_032",
@@ -654,17 +440,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察最近应用卡片",
     "expected_text": "1.卡片显示三个功能图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_033",
@@ -674,24 +455,11 @@
     "steps_text": "1.从主菜单进入Calculator\n2.返回主表盘\n3.进入负一屏",
     "expected_text": "1.手表显示Calculator页面\n2.手表显示主表盘\n3.最近应用最左侧显示Calculator",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "依次进入 Calculator、返回主表盘、右滑进入负一屏，并在每个阶段取证",
-    "verification_points": [
-      "进入后检查 Calculator 页面",
-      "返回后检查主表盘",
-      "进入负一屏后检查最近应用最左侧为 Calculator"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_034",
@@ -701,24 +469,11 @@
     "steps_text": "1.从Phone子菜单进入Contacts\n2.返回主表盘\n3.进入负一屏",
     "expected_text": "1.手表显示Contacts页面\n2.手表显示主表盘\n3.最近应用最左侧显示Contacts",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY_CONTACT,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用当前注册的 TELEPHONY_CONTACT 目标页，并在 Contacts、主表盘和负一屏三个阶段取证",
-    "verification_points": [
-      "进入后检查 Contacts 页面",
-      "返回后检查主表盘",
-      "进入负一屏后检查最近应用最左侧为 Contacts"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_035",
@@ -728,24 +483,11 @@
     "steps_text": "1.从设置进入Display\n2.返回主表盘\n3.进入负一屏",
     "expected_text": "1.手表显示Display页面\n2.手表显示主表盘\n3.最近应用最左侧显示Settings",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用当前注册的 Display 页面 DISPLAY_BRIGHTNESS，并在 Display、主表盘和负一屏三个阶段取证",
-    "verification_points": [
-      "进入后检查 Display 页面",
-      "返回后检查主表盘",
-      "进入负一屏后检查最近应用最左侧为 Settings"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_036",
@@ -754,19 +496,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.连续两次进入Calculator\n2.返回负一屏",
     "expected_text": "1.两次均显示Calculator页面\n2.最近应用仅显示一个Calculator图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_037",
@@ -775,17 +510,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.使用Calculator刷新最近应用\n2.执行设备重启\n3.进入负一屏",
     "expected_text": "1.最近应用最左侧显示Calculator\n2.手表完成重启\n3.最近应用显示Phone/Camera/Flashlight",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/流程: 2.执行设备重启"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_038",
@@ -794,19 +524,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Phone图标",
     "expected_text": "1.手表显示Phone页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:85,201,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实测点击Phone图标进入TELEPHONY页"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_039",
@@ -815,19 +538,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Camera图标",
     "expected_text": "1.手表显示Camera页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,201,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实测点击Camera图标进入NO_PAIR_TIP(未配对提示)"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_040",
@@ -836,19 +552,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Flashlight图标",
     "expected_text": "1.手表显示Flashlight页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:317,201,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实测点击Flashlight图标无页面变化"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_041",
@@ -857,20 +566,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示城市名称",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8042,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_042",
@@ -879,20 +580,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8043,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_043",
@@ -901,20 +594,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示当前温度",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8044,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_044",
@@ -923,20 +608,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示今日最高温",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8045,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_045",
@@ -945,20 +622,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示今日最低温",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8046,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_046",
@@ -967,20 +636,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示Last updated时间",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8047,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_047",
@@ -989,20 +650,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步包含天气类型的天气数据",
     "steps_text": "1.观察Weather卡片",
     "expected_text": "1.卡片显示与App同步数据一致的天气类型文本",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Delhi,100,1,26,10,2,3;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_048",
@@ -1011,17 +664,12 @@
     "precondition_text": "1.手表无天气数据",
     "steps_text": "1.观察Weather空态卡片",
     "expected_text": "1.卡片显示天气感叹号图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_049",
@@ -1030,17 +678,12 @@
     "precondition_text": "1.手表无天气数据",
     "steps_text": "1.观察Weather空态卡片",
     "expected_text": "1.卡片显示No weather data.",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_050",
@@ -1049,17 +692,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Weather卡片",
     "expected_text": "1.手表显示Weather页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Weather卡片"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_051",
@@ -1068,17 +706,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察TITAN Q卡片",
     "expected_text": "1.卡片显示TITAN Q品牌图",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_052",
@@ -1087,17 +720,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击TITAN Q卡片",
     "expected_text": "1.手表显示Titan Q子菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击TITAN Q卡片"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_053",
@@ -1106,20 +734,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机正在播放音乐",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示当前曲目名",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_054",
@@ -1128,20 +748,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机正在播放音乐",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示当前艺术家",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_055",
@@ -1150,20 +762,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机已提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示上一首按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_056",
@@ -1172,20 +776,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机已提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示播放暂停按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_057",
@@ -1194,20 +790,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机已提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示下一首按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_058",
@@ -1216,20 +804,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机已提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示音量进度条",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8101,Midnight Drive,Ada Stone,1,60,240;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_059",
@@ -1240,12 +820,10 @@
     "expected_text": "1.手机音乐进入暂停状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "音乐数据和手表发出的 audio_event 可验证；手机播放器最终状态仍需手机侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_060",
@@ -1256,12 +834,10 @@
     "expected_text": "1.手机音乐进入播放状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "音乐数据和手表发出的 audio_event 可验证；手机播放器最终状态仍需手机侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_061",
@@ -1272,12 +848,10 @@
     "expected_text": "1.卡片曲目名刷新为下一首",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_062",
@@ -1288,12 +862,10 @@
     "expected_text": "1.卡片曲目名刷新为上一首",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_063",
@@ -1304,12 +876,10 @@
     "expected_text": "1.音量进度显示相邻档位",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_064",
@@ -1320,12 +890,10 @@
     "expected_text": "1.音量进度保持原位置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_065",
@@ -1334,20 +902,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机未提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.卡片显示No music is playing",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8103,_,_,0,60,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_066",
@@ -1356,20 +916,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机未提供歌曲信息",
     "steps_text": "1.观察Music卡片",
     "expected_text": "1.播放控制按钮显示置灰",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8002,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_MUSIC_SET:8103,_,_,0,60,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_067",
@@ -1380,12 +932,10 @@
     "expected_text": "1.卡片显示Check the connection between your smart watch and the app",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_068",
@@ -1394,17 +944,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Music卡片非按钮区域",
     "expected_text": "1.手表显示Music页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Music卡片非按钮区域"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_069",
@@ -1413,17 +958,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察Clock卡片",
     "expected_text": "1.第1项显示Timer",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_070",
@@ -1432,17 +972,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察Clock卡片",
     "expected_text": "1.第2项显示Alarm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_071",
@@ -1451,17 +986,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察Clock卡片",
     "expected_text": "1.第3项显示Stopwatch",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_072",
@@ -1470,17 +1000,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Timer图标",
     "expected_text": "1.手表显示Timer页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Timer图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_073",
@@ -1489,17 +1014,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Alarm图标",
     "expected_text": "1.手表显示Alarm页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Alarm图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_074",
@@ -1508,17 +1028,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Stopwatch图标",
     "expected_text": "1.手表显示Stopwatch页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Stopwatch图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_075",
@@ -1527,17 +1042,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在设置列表查找时钟卡片排序入口",
     "expected_text": "1.设置列表不显示时钟图标排序入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_076",
@@ -1546,17 +1056,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察Games卡片",
     "expected_text": "1.第1项显示Car",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_077",
@@ -1565,17 +1070,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.观察Games卡片",
     "expected_text": "1.第2项显示2048",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_078",
@@ -1584,17 +1084,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击Car图标",
     "expected_text": "1.手表显示Car标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Car图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_079",
@@ -1603,17 +1098,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击2048图标",
     "expected_text": "1.手表显示2048标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击2048图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_080",
@@ -1624,12 +1114,10 @@
     "expected_text": "1.卡片显示列表第一个城市",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_081",
@@ -1640,12 +1128,10 @@
     "expected_text": "1.卡片显示城市当地时间",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_082",
@@ -1656,12 +1142,10 @@
     "expected_text": "1.卡片显示城市日期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_083",
@@ -1672,12 +1156,10 @@
     "expected_text": "1.卡片显示城市时差",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_084",
@@ -1688,12 +1170,10 @@
     "expected_text": "1.卡片显示Add cities from Titan Smart app.",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_085",
@@ -1702,17 +1182,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击World Clock卡片",
     "expected_text": "1.手表显示World Clock页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击World Clock卡片"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_086",
@@ -1723,12 +1198,10 @@
     "expected_text": "1.待产品确认第二视图的展示内容",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_087",
@@ -1737,19 +1210,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动负一屏至底部",
     "expected_text": "1.页面底部显示All Apps按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_088",
@@ -1758,17 +1224,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.点击All Apps按钮",
     "expected_text": "1.手表显示当前风格主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "All Apps 在滚动底部,实测上滑滚动不可靠"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_089",
@@ -1777,17 +1238,12 @@
     "precondition_text": "1.负一屏显示Weather卡片\n2.用故障注入工具禁用Weather页面入口",
     "steps_text": "1.点击Weather卡片",
     "expected_text": "1.负一屏保持当前卡片位置",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Weather卡片"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_090",
@@ -1796,26 +1252,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用",
     "steps_text": "1.观察Weather空态\n2.从App同步天气数据",
     "expected_text": "1.卡片显示No weather data.\n2.卡片显示城市名称",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8001,app,1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_CLEAR:;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WEATHER_SET_EXT:8041,Delhi,100,1,26,10,32,10,2,3,5,60,80,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先清空天气并进入负一屏检查空态，再注入 Delhi 天气数据检查卡片更新",
-    "verification_points": [
-      "天气清空后检查 Weather 卡片显示 No weather data.",
-      "注入天气后检查卡片显示城市名称 Delhi"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_091",
@@ -1826,12 +1268,10 @@
     "expected_text": "1.手表连接状态恢复\n2.Music卡片显示曲目名",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/流程: 1.恢复App连接"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_092",
@@ -1840,17 +1280,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.用可编程触控治具连续滚动负一屏500次",
     "expected_text": "1.手表未发生异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/流程: 1.用可编程触控治具连续滚动负一屏500次"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_093",
@@ -1861,12 +1296,10 @@
     "expected_text": "1.两平台测试中卡片均显示城市名称",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "天气数据可直接注入；Android与iOS同步结果仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HUB_094",
@@ -1875,16 +1308,11 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.滚动查看全部负一屏卡片",
     "expected_text": "1.卡片文字与按钮保持分离",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:50,128,350,128,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

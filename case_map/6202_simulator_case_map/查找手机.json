@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "FPHONE_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "FPHONE_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "FPHONE_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "FPHONE_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_008",
@@ -103,12 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "真实点击播放按钮启动查找手机，设置5秒熄屏后等待6.5秒，以前后截图验证查找中页是否保持亮屏；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "等待前截图显示查找手机正在进行的页面",
-        "等待超过5秒自动熄屏时长后，截图仍显示查找中页且屏幕亮着"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_009",
@@ -120,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_010",
@@ -133,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_011",
@@ -146,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_012",
@@ -159,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_013",
@@ -172,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_014",
@@ -185,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "29秒等待可执行；完整预期只描述手机仍在响铃，当前手表截图无法判定手机侧音频状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_015",
@@ -198,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "30秒等待可执行；完整预期只描述手机已停止响铃，当前手表截图无法判定手机侧音频状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_016",
@@ -211,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "31秒等待可执行；完整预期只描述手机已停止响铃，当前手表截图无法判定手机侧音频状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_017",
@@ -224,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_018",
@@ -237,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_019",
@@ -250,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_020",
@@ -263,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "FPHONE_021",
@@ -276,13 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过同一播放控件开始后再次点击建立暂停态，截图覆盖暂停基线、10秒无操作和垂腕后三个阶段；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "等待前截图显示查找手机暂停页",
-        "保持暂停页10秒不操作后，截图仍显示暂停页且屏幕亮着",
-        "执行垂腕动作后，截图仍显示暂停页且屏幕亮着"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_022",
@@ -294,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "APP_CONNECT 会更新连接状态并发送源码中的 APP 连接状态事件；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_023",
@@ -307,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "APP_CONNECT 会更新连接状态并发送源码中的 APP 连接状态事件；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_024",
@@ -320,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_025",
@@ -333,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_026",
@@ -346,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_027",
@@ -359,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "熄屏事件和等待可执行，手表黑屏也可截图；但预期同时要求手机停止响铃，当前无手机侧音频/状态观察器，单凭手表截图不能完整判决；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_028",
@@ -372,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实体按键熄屏可执行；完整预期还要求手机停止响铃，黑屏后的手表截图无法判定手机侧音频状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_029",
@@ -385,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_030",
@@ -398,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_031",
@@ -411,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FPHONE_032",
@@ -424,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

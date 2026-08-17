@@ -1,112 +1,144 @@
-# case_map — 按目标隔离的测试用例操作映射
+# case_map 数据合同
 
-> 用途：让 `case_map.py` 按 `setup -> actions -> collect` 执行用例。
-> last_verified: 2026-08-14
+更新时间：2026-08-17
 
-## 目录隔离
+## 一句话规则
 
-```text
-case_map/
-├─ 620C_case_map/              # 620C_W6830 Windows Simulator
-├─ 6202_case_map/              # 6202_W5230 真机
-└─ 6202_simulator_case_map/    # 6202_W5230 Windows Simulator
+3164 条用例全部可以从前端交给 Runner。`PROMOTED` 用例按固化步骤执行；没有固化步骤的用例由 Agent-loop 在本次运行中临时探索。临时探索只写运行历史，不得改变外部探索状态，也不得自动写回正式步骤。
+
+## 目录与当前基线
+
+| profile | 目录 | 全部 | 外部已探索 | 已探索未固化 | 已固化 |
+|---|---|---:|---:|---:|---:|
+| `620C_W6830` | `620C_simulator_case_map` | 3164 | 0 | 0 | 0 |
+| `6202_W5230` | `6202_case_map` | 3164 | 11 | 11 | 0 |
+| `6202_W5230_SIMULATOR` | `6202_simulator_case_map` | 3164 | 563 | 465 | 98 |
+
+每个目录包含 40 个模块 JSON 和一份 `external_execution_history.jsonl`。目标之间不得复制命令、坐标、页面、证据或结论，也不得在缺文件时回退到另一套目录。
+
+## 成熟度只有两个事实源
+
+前端的“外部探索与固化”分类只读取下面两个地方。
+
+### 1. 外部探索账本
+
+目标目录中的 `external_execution_history.jsonl` 只回答：这条用例是否被 Agent-loop 之外的外部 Agent 完整探索过。
+
+一条用例一行、`case_id` 唯一，最小格式如下：
+
+```json
+{"case_id":"CALC_003","sheet":"计算器","target":"6202_W5230","last_verified":"2026-08-17","evidence_root":"D:/Agent-loop-system","evidence_paths":["evidence/batch/CALC_003/result.json"]}
 ```
 
-- `profile=620C_W6830` 读取 `620C_case_map`。
-- `profile=6202_W5230` 读取 `6202_case_map`。
-- `profile=6202_W5230_SIMULATOR` 读取 `6202_simulator_case_map`。
-- 两个模拟器 profile 都复用 `target=simulator` 传输，但源码、产物和 case_map 彼此隔离。
-- 目标目录缺少模块时必须明确报错，不得回退另一套映射。
-- 两套映射保留相同 `case_id`，运行结果另带 target，不使用 `HW_` 改写用例编号。
+只写事实字段：
 
-## 数据原则
+- `case_id`、`sheet`、`target`
+- `last_verified`
+- `evidence_root` 和本轮真实 `evidence_paths`
 
-- 每个 sheet 一个 JSON，用例原文保留在 `precondition_text`、`steps_text`、`expected_text`。
-- JSON 是经过审核的数据，不再由 `translate_*.py` 批量生成。
-- 命令名和窗口名必须来自当前 `W30_SOURCE_ROOT/W30_PROJECT` 的真实源码。
-- 参数含义由固件 handler 定义；本地只检查命令格式、128 字节限制、注入风险、是否注册及是否明确不可用。
-- 坐标必须来自当前界面的 GUI 树和实际点击验证，不从历史脚本猜测。
-- 截图是产品 PASS/FAIL/CANNOT_VERIFY 的唯一判决证据；GUI 树、命令回执和日志只用于诊断页面、操作、时序与环境。
-- 6202 映射不得包含 `SIM_*`、`SCREENSHOT_PRINT`；检查点使用 `GUI_TREE`，截图由真机会话通过 MTP 保存。
-- 6202 模拟器映射同样不得借用 620C 的 `SIM_*`；检查点统一使用 `HOST_SCREENSHOT` 捕获真实窗口像素，产品结论只看截图。
-- 6202 需要纯主机等待时使用 `HOST_WAIT:milliseconds`，执行器只在主机等待，不向固件发送该伪命令。
-- 6202 坐标必须来自当前 `6202_W5230` 窗口版本源码并经真机点击复核，不能复用620C坐标。
-- Windows 模拟器的步数、界面 Cal 和距离统一使用 `SIM_ACTIVITY_SET:seq,profile,steps,calories,distance`；`STEP/CALORIES/DISTANCE` 只保留给非 Windows 真机测试兼容，禁止新增到 case_map。
-- `SIM_ACTIVITY_SET` 的卡路里单位是界面显示的 Cal，不是旧 `CALORIES` 命令使用的千倍内部值；活动时长仍使用 `EXERCISE_TIME`。
-- QR Hub 的 UPI、WiFi、Movie 测试数据统一使用 `SIM_QR_HUB_SET:seq,upi|wifi|movie,content`；`content=-` 清空该类型。该命令仅在 Windows 模拟器注册，写入与 App 同一套钱包卡片存储并发送真实刷新事件。
-- `TIME_SET` 接受 `YYMMDDHHMMSS`（12 位，年份按 2000～2099 解释）和 `YYYYMMDDHHMMSS`（14 位）；不再把 12 位年份误读成前四位。
-- 当前天气的完整模拟数据使用 `SIM_WEATHER_SET_EXT:seq,city,code,type,current,min,max,visibility,uv,wind_scale,wind_speed,humidity,aqi,future_days`。该命令仅在 Windows 模拟器注册，通过天气服务的保存/刷新路径建立最高低温、风速、湿度、AQI 与多日预报；`future_days` 为 0～7。
-- OTA 进度和阶段事件使用 `SIM_OTA_EVENT:seq,start|complete|fail|cancel` 或 `SIM_OTA_EVENT:seq,progress,0..100`。该命令仅在 Windows 模拟器注册，发送真实 OTA 服务事件，不直接改页面控件。
-- 工厂模式业务状态使用 `SIM_FACTORY_MODE_SET:seq,0|1`。该命令仅在 Windows 模拟器注册，通过工厂服务切换模式；它不直接打开页面，页面进入仍使用真实操作路径，必要时由通用 `ENTER_PAGE` 只负责导航。
-- 用户设置前置状态使用 `SIM_USER_SETTING_SET:seq,setting,value`。该命令仅在 Windows 模拟器注册；`setting` 支持 `dnd_enable`、`dnd_mode`、`dnd_start`、`dnd_end`、`mute`、`wrist_wake`、`aod_enable`，以及 Profile 使用的 `gender`（0女/1男/2未知）、`height`（0表示未配置，或62..275cm）、`weight`（0表示未配置，或1..500kg整数测试值）、`length_unit`（0公制/1英制）、`weight_unit`（0公制/1英制）、`birth_year`（1900..2099）。命令只建立前置业务状态，并通过已有设置/用户资料事件刷新；页面操作仍使用真实点击、滑动或编码器输入，不会向手机 App 同步测试状态。
-- 运动记录前置使用 `CLEAR_ALL_SPORT_RECORD` 清空后，再用 `SET_SPORT_RECORD_DATA:sport_id[,count]` 创建 1..20 条同类型记录；`count` 省略时为 1。该命令只在 PC 模拟器测试路径注册，批量创建仍逐条走真实运动记录保存接口，不直接修改运动记录列表控件。
-- 编码器命令 `QDEC_SET:is_inc[,repeat_count]` 支持可选的 `1..256` 次重复输入；省略次数时保持单步行为。它用于长滚轮的通用边界操作，不直接改写滚轮值。
-- 实体按键统一使用 `BUTTON_PRESS:key_index,press_type,press_time`：`press_type=1` 单击、`2` 完整长按（`press_time` 为毫秒，模拟器按顺序发送按下、长按、保持、释放）、`3` 双击、`4` 仅按下、`5` 长按释放。普通长按优先使用类型2；需要在持续按住期间截图时，才使用类型4和类型5分开控制。执行器会按类型2的持续时间放宽命令超时。
-- Windows模拟器处于熄屏时，首个 `BUTTON_PRESS` 只用于点亮屏幕，不再同时把该次按键送给当前页面；这与真实设备的首键唤醒语义一致。
-- 屏幕长按不是实体按键长按：使用 `TP_PRESS:x,y,1` 按下、`SIM_WAIT` 保持、`TP_PRESS:x,y,0` 释放。
-- `SIM_WAIT:seq,milliseconds` 支持 0～120000ms；更长等待拆成多个不超过120000ms的片段。执行器按等待时长动态放宽命令超时，不再使用固定5秒超时误杀长等待。
-- `SIM_WAIT`、`GUI_PING`、`GUI_TREE`、`SCREENSHOT_PRINT`、`GUI_STATE` 等等待/观察命令不得改变亮灭屏状态；主动交互命令仍沿用原有的唤醒行为。
-- 计时器前置状态使用 `SIM_TIMER_STATE_SET:seq,idle|running|paused|finished,total_seconds,remain_seconds`。该命令仅在 Windows 模拟器注册，通过共享计时器业务模块构造状态，不直接写页面控件；`idle` 要求两个时间均为 0，`running/paused` 要求 `1 <= remain_seconds <= total_seconds <= 86400`，`finished` 要求 `remain_seconds=0`，并走真实计时结束回调进入提醒态。
-- 闹钟前置状态使用 `SIM_ALARM_SET:seq,index,hour,minute,repeat_mask,status`。该命令仅在 Windows 模拟器注册，`index` 为 0～9，按索引写入共享闹钟列表并发送真实闹钟刷新事件；需要空列表时先用 `CLEAN_ALARM`。它不直接操作或伪造页面控件。
-- 历史通话记录使用 `SIM_CALL_RECORD_SET:seq,name,number,type,age_seconds`。该命令仅在 Windows 模拟器注册，以当前 RTC 为基准写入指定秒数前的记录并复用真实保存/刷新路径；`name=_` 表示无备注。它只建立历史记录，不能代替真实手机来电、接听、拒接、Active Call 或双向音频。
-- `SET_CONTACTS_TEST_DATA` 的 `name=_` 表示无备注联系人，写入电话簿时名称为空，不再把下划线显示到联系人列表。
+不要在账本重复写 `mapping_status`、PASS/FAIL、固化结论、运行次数、`unable` 或资格说明。这些字段会与正式映射和运行历史漂移。
 
-## JSON 结构
+只有探索到达明确终点才登记：完成原始步骤并取得证据，或者用当前目标的源码与实际执行证明确认了具体能力/外部判据缺口。尚未执行到业务动作、基础设施中断、只选中了用例或只阅读了旧记录，都不算外部探索完成。
+
+### 2. 正式 case_map
+
+40 个模块 JSON 只回答：Runner 应当怎样执行已经固化的路径。
+
+正式固化条目必须同时满足：
+
+- `mapping_status` 精确等于 `PROMOTED`
+- `setup`、`actions`、`collect` 和 `verification_points` 来自当前目标的真实探索
+- `actions` 至少有一个原始业务动作
+- 正式 Runner 已用新证据目录复跑
+- 每个视觉检查点有一张独立新截图，证据合同完整
+- 最终截图结论为 PASS 或明确的产品 FAIL
+
+产品 FAIL 可以固化正确路径；CANNOT_VERIFY、ERROR、缺图、步骤中断或候选已变化不能固化。
+
+未固化条目长期状态必须是：四组执行字段为空、没有 `mapping_status`。`unable` 是旧字段，不再参与分类或运行入口；新流程不得用它表达“未探索”或“未固化”。
+
+模块 JSON 顶层也不得再使用 `supported`、`execution_supported` 或 `unavailable_reason` 充当入口闸门。能力缺口由 Agent-loop 本次运行形成 CANNOT_VERIFY 或 ERROR，不产生第六种用例成熟度。
+
+## 分类如何计算
+
+```text
+全部用例
+├─ 尚未外部探索：case_id 不在外部探索账本
+└─ 已经外部探索：case_id 在外部探索账本
+   ├─ 已探索但未固化：没有精确的 mapping_status=PROMOTED
+   └─ 已固化、Agent-loop 可执行：mapping_status=PROMOTED
+```
+
+数据必须满足：每个 `PROMOTED` 用例都已存在于同目标的外部探索账本。
+
+运行结果是另一条独立轴：未运行、PASS、FAIL、CANNOT_VERIFY、ERROR。它来自 `history/tests` 的最近一次 Agent-loop 运行，不参与上面的成熟度分类。
+
+## Runner 选择规则
+
+普通前端、单条和批量 Runner 按以下顺序选择执行方式：
+
+1. `mapping_status=PROMOTED`：执行固化步骤。
+2. 其余情况：由 Agent-loop 根据 `precondition_text`、`steps_text`、`expected_text` 临时探索；即使 JSON 正处于候选复跑窗口，普通运行也不把候选当成固化步骤。
+
+外部 Agent 独占用例并做正式准入复跑时，才可以显式传 `--candidate-replay`，让 Runner 执行尚未晋升的临时候选 `actions`。前端和普通批量不传这个参数。复跑失败、ERROR、CANNOT_VERIFY 或任务中断时，必须立即清空候选四组字段；不得把候选长期留在 JSON。Agent-loop 临时探索产生的命令只进入本次运行历史，不写入账本或 case_map。
+
+## 外部 Agent 统一工作流
+
+按目标使用对应技能：
+
+- 6202 真机：`C:\Users\Administrator\.codex\skills\explore-agent-loop-hardware-cases\SKILL.md`
+- Windows Simulator：`C:\Users\Administrator\.codex\skills\explore-agent-loop-simulator-cases\SKILL.md`
+
+仓库本 README 和用户当轮明确要求优先于技能中的旧状态字段说明。
+
+| 目标 | 候选步骤写入 | 外部探索事实写入 | 正式复跑参数 |
+|---|---|---|---|
+| 620C 模拟器 | `620C_simulator_case_map/<模块>.json` | `620C_simulator_case_map/external_execution_history.jsonl` | `--target simulator --case-map-profile 620C_W6830` |
+| 6202 模拟器 | `6202_simulator_case_map/<模块>.json` | `6202_simulator_case_map/external_execution_history.jsonl` | `--target simulator --case-map-profile 6202_W5230_SIMULATOR` |
+| 6202 真机 | `6202_case_map/<模块>.json` | `6202_case_map/external_execution_history.jsonl` | `--target hardware --case-map-profile 6202_W5230` |
+
+候选正式复跑统一使用：
+
+```powershell
+python -m agent_loop_system.tools.test `
+  --sheet <模块> --case-id <CASE_ID> `
+  <上表正式复跑参数> --candidate-replay `
+  --result-file <本轮唯一证据目录>/result.json `
+  --screenshot-path <本轮唯一证据目录>/screenshot.bmp
+```
+
+Simulator 和真机仍分别遵守对应技能中的环境、会话、截图和证据门禁；上面的统一命令只规定数据入口与 Runner 选择方式，不允许跨目标复用命令或证据。
+
+每条用例按同一顺序处理：
+
+1. 锁定 profile、模块 JSON、case_id、当前目标源码/产物和唯一证据目录。
+2. 先查本目标的 `external_execution_history.jsonl`；已有记录默认不重复探索，除非用户要求复测、目标版本变化或原证据不足。
+3. 原样保留 `case_id`、`precondition_text`、`steps_text`、`expected_text`，只在当前目标真实探索，不从另一目标猜命令或坐标。
+4. 探索到明确终点后，在本目标账本新增或更新该 case_id；证据路径必须指向本轮真实文件。
+5. 能形成候选时，临时写入该 case 的 `setup/actions/collect/verification_points`，但先不要写 `PROMOTED`。
+6. 用正式 Runner、全新证据目录和显式 `--candidate-replay` 复跑候选。
+7. 准入通过才写精确的 `mapping_status: "PROMOTED"`；未通过立即清空候选，但保留外部探索账本记录。
+8. 最后核对 JSON 可解析、账本 case_id 唯一、PROMOTED 是账本子集、截图与检查点一一对应。
+
+外部 Agent 只写自己锁定的目标和 case_id，不改另一套 case_map，不把 Agent-loop 自身运行历史反填成“外部探索”，也不修改人工预期来制造 PASS。
+
+## 用例 JSON 保留字段
 
 ```json
 {
-  "case_id": "HR_008",
-  "sheet": "心率",
+  "case_id": "CALC_003",
+  "sheet": "计算器",
   "priority": "P0",
   "precondition_text": "原始前置条件",
-  "steps_text": "原始步骤",
-  "expected_text": "原始预期",
-  "setup": [
-    "srv_quick_cmd send TOP5STEP:WEAR_SET:9601,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:9602,hr,silent,0,0;",
-    "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-  ],
-  "actions": ["srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"],
-  "collect": [
-    "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-    "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-  ],
+  "steps_text": "原始操作步骤",
+  "expected_text": "原始预期结果",
+  "setup": [],
+  "actions": [],
+  "collect": [],
+  "verification_points": [],
   "unable": false,
-  "note": "命令和坐标的核查说明"
+  "note": ""
 }
 ```
 
-## 执行规则
-
-- `setup`：先准备业务数据，再进入目标页面。
-- `actions`：触发用例需要的操作。
-- 每条 setup/action 后，执行器自动发 `GUI_PING` 并等待 `processed`；`accepted` 只代表入队。
-- `ENTER_PAGE` 的处理回执早于窗口动画结束；执行器在屏障后统一等待 1 秒，再发送下一条输入，避免吞掉第一下触控。
-- `collect`：收集截图和 GUI 树；不要把“最后一条必须是 GUI_TREE”当成阻断规则。
-- `unable=true`：`actions` 必须为空，`note` 写清真实原因。不得保留虚假命令来伪装可执行。
-
-## unable 的真实边界
-
-下列情况可以标记 unable：
-
-- 必须依赖手机 App、BLE、扫码、真实传感器或可编程电源。
-- 当前源码没有所需的数据注入或触发命令。
-- 只能通过未验证的屏幕外坐标或猜测操作达到。
-- 用例要求的外部设计稿、Designer/Figma 信息尚未接入。
-
-“脚本没写规则”、“当时没找到窗口”、“还没实测”不是永久 unable 理由，应先对照当前源码和实际模拟器复核。
-
-## 维护和验证
-
-1. 从当前真实源码生成能力目录：`.\.venv\Scripts\python.exe -m sim_tools.extract_kb`。
-2. 逐条检查 JSON 命令格式、命令注册、窗口注册和明确不可用状态。
-3. 用模拟器跑代表性 case，核对截图、GUI 树和固件回执。
-4. 修改坐标时，必须重新采集目标界面，不得复用其他页面的“看起来差不多”坐标。
-5. 全量单测：`.\.venv\Scripts\python.exe -m unittest discover -s tests -v`。
-
-## 当前工具
-
-- `sim_tools/extract_kb.py`：只从当前固件源码提取命令和窗口能力。
-- `sim_tools/collect.py`：采集 GUI 状态/树和坐标证据。
-- `sim_tools/sim_client.py`：模拟器通信工具。
-- `src/agent_loop_system/tools/case_map.py`：执行已审核的 JSON。
+`note` 只写映射本身无法从字段看出的短说明，不复制分类、verdict 或账本内容。

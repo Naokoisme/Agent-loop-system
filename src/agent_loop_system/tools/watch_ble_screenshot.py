@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 BLE_SCREENSHOT_COMMAND = 0x7F01
-BLE_SCREENSHOT_PROTOCOL_VERSION = 1
+BLE_SCREENSHOT_PROTOCOL_VERSION = 2
 BLE_SCREENSHOT_CHUNK_SIZE = 960
 BLE_SCREENSHOT_MAX_FILE_SIZE = 1024 * 1024
 
@@ -25,6 +25,8 @@ BLE_SCREENSHOT_START = 1
 BLE_SCREENSHOT_DATA = 2
 BLE_SCREENSHOT_END = 3
 BLE_SCREENSHOT_ERROR = 4
+BLE_SCREENSHOT_ACK = 5
+BLE_SCREENSHOT_COMPLETE_ACK = 0xFFFF
 
 EXPECTED_SCREENSHOT_WIDTH = 410
 EXPECTED_SCREENSHOT_HEIGHT = 502
@@ -34,6 +36,7 @@ _START = struct.Struct("<BBIIHH")
 _DATA = struct.Struct("<BBIHIH")
 _END = struct.Struct("<BBIIIH")
 _ERROR = struct.Struct("<BBIH")
+_ACK = struct.Struct("<BBIH")
 
 REMOTE_ERROR_NAMES = {
     1: "invalid_request",
@@ -83,12 +86,29 @@ class WatchBleScreenshot:
         return len(self.data)
 
 
+@dataclass(frozen=True, slots=True)
+class WatchBleScreenshotFeedResult:
+    """The cumulative ACK to send, plus a newly completed screenshot if any."""
+
+    next_chunk: int
+    screenshot: WatchBleScreenshot | None = None
+
+
 def _validate_uint32(name: str, value: int) -> None:
     if isinstance(value, bool) or not isinstance(value, int):
         raise WatchBleScreenshotProtocolError(f"{name} must be an integer")
     if not 0 <= value <= 0xFFFFFFFF:
         raise WatchBleScreenshotProtocolError(
             f"{name} must be between 0 and 4294967295"
+        )
+
+
+def _validate_uint16(name: str, value: int) -> None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise WatchBleScreenshotProtocolError(f"{name} must be an integer")
+    if not 0 <= value <= 0xFFFF:
+        raise WatchBleScreenshotProtocolError(
+            f"{name} must be between 0 and 65535"
         )
 
 
@@ -100,6 +120,19 @@ def encode_screenshot_request(sequence: int) -> bytes:
         BLE_SCREENSHOT_PROTOCOL_VERSION,
         BLE_SCREENSHOT_REQUEST,
         sequence,
+    )
+
+
+def encode_screenshot_ack(sequence: int, next_chunk: int) -> bytes:
+    """Encode a cumulative stop-and-wait acknowledgement for command ``0x7F01``."""
+
+    _validate_uint32("sequence", sequence)
+    _validate_uint16("next_chunk", next_chunk)
+    return _ACK.pack(
+        BLE_SCREENSHOT_PROTOCOL_VERSION,
+        BLE_SCREENSHOT_ACK,
+        sequence,
+        next_chunk,
     )
 
 
@@ -144,13 +177,14 @@ def _validate_bmp(data: bytes) -> tuple[int, int, bool, int]:
 
 
 class WatchBleScreenshotAssembler:
-    """Strictly assemble START -> ordered DATA -> END messages."""
+    """Idempotently assemble START -> ordered DATA -> END messages."""
 
     __slots__ = (
         "sequence",
         "_buffer",
         "_chunk_count",
         "_chunk_size",
+        "_completed_crc32",
         "_file_size",
         "_finished",
         "_next_chunk",
@@ -162,12 +196,18 @@ class WatchBleScreenshotAssembler:
         self._buffer: bytearray | None = None
         self._chunk_count = 0
         self._chunk_size = 0
+        self._completed_crc32: int | None = None
         self._file_size = 0
         self._next_chunk = 0
         self._finished = False
 
-    def feed(self, payload: bytes) -> WatchBleScreenshot | None:
-        """Consume one screenshot payload; return the image after a valid END."""
+    def feed(self, payload: bytes) -> WatchBleScreenshotFeedResult | None:
+        """Consume one payload and return the cumulative ACK for this request.
+
+        A payload for another sequence is ignored. Duplicate START, DATA, and
+        END payloads are idempotent when their metadata and bytes match the
+        already accepted stream.
+        """
 
         try:
             raw = memoryview(payload).cast("B").tobytes()
@@ -187,7 +227,7 @@ class WatchBleScreenshotAssembler:
             # A late packet from an earlier request must not corrupt the active
             # reconstruction. There is only one active capture per connection.
             return None
-        if self._finished:
+        if self._finished and message_type != BLE_SCREENSHOT_END:
             raise WatchBleScreenshotProtocolError("screenshot message arrived after END")
 
         if message_type == BLE_SCREENSHOT_ERROR:
@@ -207,13 +247,11 @@ class WatchBleScreenshotAssembler:
             f"unexpected screenshot message type {message_type}"
         )
 
-    def _feed_start(self, raw: bytes) -> None:
+    def _feed_start(self, raw: bytes) -> WatchBleScreenshotFeedResult:
         if len(raw) != _START.size:
             raise WatchBleScreenshotProtocolError(
                 "screenshot START payload has an invalid length"
             )
-        if self._buffer is not None:
-            raise WatchBleScreenshotProtocolError("duplicate screenshot START")
         _, _, _, file_size, chunk_size, chunk_count = _START.unpack(raw)
         if not 54 <= file_size <= BLE_SCREENSHOT_MAX_FILE_SIZE:
             raise WatchBleScreenshotProtocolError(
@@ -228,13 +266,23 @@ class WatchBleScreenshotAssembler:
             raise WatchBleScreenshotProtocolError(
                 f"START declares {chunk_count} chunks; {expected_count} are required"
             )
+        if self._buffer is not None:
+            if (
+                file_size != self._file_size
+                or chunk_size != self._chunk_size
+                or chunk_count != self._chunk_count
+            ):
+                raise WatchBleScreenshotProtocolError(
+                    "duplicate screenshot START metadata does not match"
+                )
+            return WatchBleScreenshotFeedResult(next_chunk=0)
         self._file_size = file_size
         self._chunk_size = chunk_size
         self._chunk_count = chunk_count
         self._buffer = bytearray()
-        return None
+        return WatchBleScreenshotFeedResult(next_chunk=0)
 
-    def _feed_data(self, raw: bytes) -> None:
+    def _feed_data(self, raw: bytes) -> WatchBleScreenshotFeedResult:
         if self._buffer is None:
             raise WatchBleScreenshotProtocolError("screenshot DATA arrived before START")
         if len(raw) < _DATA.size:
@@ -246,13 +294,15 @@ class WatchBleScreenshotAssembler:
             raise WatchBleScreenshotProtocolError(
                 "screenshot DATA length does not match its header"
             )
-        if index != self._next_chunk:
+        if index >= self._chunk_count:
             raise WatchBleScreenshotProtocolError(
-                f"screenshot chunk index {index} arrived; expected {self._next_chunk}"
+                f"screenshot chunk index {index} is outside the declared range"
             )
-        if offset != len(self._buffer):
+        expected_offset = index * self._chunk_size
+        if offset != expected_offset:
             raise WatchBleScreenshotProtocolError(
-                f"screenshot chunk offset {offset} arrived; expected {len(self._buffer)}"
+                f"screenshot chunk {index} offset {offset} arrived; "
+                f"expected {expected_offset}"
             )
         remaining = self._file_size - offset
         expected_length = min(self._chunk_size, remaining)
@@ -261,11 +311,25 @@ class WatchBleScreenshotAssembler:
                 f"screenshot chunk {index} has {data_length} bytes; "
                 f"expected {expected_length}"
             )
-        self._buffer.extend(raw[_DATA.size :])
-        self._next_chunk += 1
-        return None
+        data = raw[_DATA.size :]
+        if index < self._next_chunk:
+            if bytes(self._buffer[offset : offset + data_length]) != data:
+                raise WatchBleScreenshotProtocolError(
+                    f"duplicate screenshot chunk {index} data does not match"
+                )
+            return WatchBleScreenshotFeedResult(next_chunk=self._next_chunk)
+        if index > self._next_chunk:
+            return WatchBleScreenshotFeedResult(next_chunk=self._next_chunk)
 
-    def _feed_end(self, raw: bytes) -> WatchBleScreenshot:
+        if offset != len(self._buffer):
+            raise WatchBleScreenshotProtocolError(
+                f"screenshot chunk offset {offset} arrived; expected {len(self._buffer)}"
+            )
+        self._buffer.extend(data)
+        self._next_chunk += 1
+        return WatchBleScreenshotFeedResult(next_chunk=self._next_chunk)
+
+    def _feed_end(self, raw: bytes) -> WatchBleScreenshotFeedResult:
         if len(raw) != _END.size:
             raise WatchBleScreenshotProtocolError(
                 "screenshot END payload has an invalid length"
@@ -273,6 +337,18 @@ class WatchBleScreenshotAssembler:
         if self._buffer is None:
             raise WatchBleScreenshotProtocolError("screenshot END arrived before START")
         _, _, _, file_size, expected_crc, chunk_count = _END.unpack(raw)
+        if self._finished:
+            if (
+                file_size != self._file_size
+                or chunk_count != self._chunk_count
+                or expected_crc != self._completed_crc32
+            ):
+                raise WatchBleScreenshotProtocolError(
+                    "duplicate screenshot END metadata does not match"
+                )
+            return WatchBleScreenshotFeedResult(
+                next_chunk=BLE_SCREENSHOT_COMPLETE_ACK
+            )
         if file_size != self._file_size or chunk_count != self._chunk_count:
             raise WatchBleScreenshotProtocolError(
                 "screenshot END metadata does not match START"
@@ -295,17 +371,21 @@ class WatchBleScreenshotAssembler:
                 f"PC=0x{actual_crc:08x}"
             )
         width, height, top_down, payload_crc32 = _validate_bmp(data)
+        self._completed_crc32 = actual_crc
         self._finished = True
-        return WatchBleScreenshot(
-            sequence=self.sequence,
-            data=data,
-            crc32=actual_crc,
-            payload_crc32=payload_crc32,
-            chunk_size=self._chunk_size,
-            chunk_count=self._chunk_count,
-            width=width,
-            height=height,
-            top_down=top_down,
+        return WatchBleScreenshotFeedResult(
+            next_chunk=BLE_SCREENSHOT_COMPLETE_ACK,
+            screenshot=WatchBleScreenshot(
+                sequence=self.sequence,
+                data=data,
+                crc32=actual_crc,
+                payload_crc32=payload_crc32,
+                chunk_size=self._chunk_size,
+                chunk_count=self._chunk_count,
+                width=width,
+                height=height,
+                top_down=top_down,
+            ),
         )
 
 

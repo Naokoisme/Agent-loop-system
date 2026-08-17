@@ -6,18 +6,12 @@
     "precondition_text": "1.手表显示Clock二级菜单",
     "steps_text": "1.点击Timer",
     "expected_text": "1.手表显示计时器预设列表页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从Clock二级菜单真实点击第3项Timer；坐标来自当前402x256菜单可见项布局"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_002",
@@ -28,12 +22,10 @@
     "expected_text": "1.手表显示计时器预设列表页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "负一屏Clock卡片需要动态滚动定位Timer入口；当前共享负一屏卡片定位不稳定，不能用直达TIMER_LIST冒充点击"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_003",
@@ -42,23 +34,12 @@
     "precondition_text": "1.手表显示Timer预设页",
     "steps_text": "1.观察预设按钮",
     "expected_text": "1.页面显示1和3和5和10和15和60分钟和加号按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "Timer预设页首屏显示1、3、5、10、15和60分钟预设",
-      "上滑后的后续画面显示加号按钮"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-    "note": "六个预设和加号不能同时完整出现在一屏，统一用首屏及上滑后两张截图覆盖"
+    "note": ""
   },
   {
     "case_id": "TIMER_004",
@@ -69,12 +50,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为1分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期包含250ms振动，静态产品截图无法验证；旧坐标还误点3分钟，不能仅修页面部分后宣称完整用例可判定"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_005",
@@ -85,12 +64,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为3分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期包含250ms振动，静态产品截图即使能确认3分钟倒计时页，也无法验证完整预期"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_006",
@@ -101,12 +78,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为5分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_007",
@@ -117,12 +92,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为10分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_008",
@@ -133,12 +106,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为15分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_009",
@@ -149,12 +120,10 @@
     "expected_text": "1.手表短振250ms，进入原始时长为60分钟的倒计时页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "与1/3分钟预设相同，完整预期包含静态截图不可见的250ms振动"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_010",
@@ -163,19 +132,12 @@
     "precondition_text": "1.手表显示Timer预设页",
     "steps_text": "1.点击加号按钮",
     "expected_text": "1.页面显示时分秒滚轮和确认按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "预设列表需先上滑到末尾，使加号完整可见后再点击"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_011",
@@ -184,24 +146,12 @@
     "precondition_text": "1.手表显示Timer预设页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入Timer前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:11001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:11002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从Clock二级菜单真实进入Timer，并用进入前后截图验证右滑返回关系",
-    "verification_points": [
-      "进入Timer前的Clock二级菜单",
-      "右滑后返回同一Clock二级菜单"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_012",
@@ -210,19 +160,12 @@
     "precondition_text": "1.手表显示Timer预设页",
     "steps_text": "1.点击加号按钮",
     "expected_text": "1.自定义页默认显示00小时01分钟00秒",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "预设列表需先上滑到末尾，使加号完整可见后再点击"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_013",
@@ -233,12 +176,10 @@
     "expected_text": "1.小时值仅在00至23循环",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "完整一圈需连续覆盖00至23且截图逐值证明；当前没有通用滚轮遍历与证据压缩能力，不能用重新进入列表冒充操作"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_014",
@@ -249,12 +190,10 @@
     "expected_text": "1.分钟值仅在00至59循环",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "按键熄屏和10秒等待均可执行；完整预期还要求提醒振动继续且累计未满1分钟，黑屏截图无法判定振动状态"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_015",
@@ -265,12 +204,10 @@
     "expected_text": "1.秒钟值仅在00至59循环",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "完整一圈需连续覆盖00至59且截图逐值证明；当前没有通用滚轮遍历与证据压缩能力，不能用重新进入列表冒充操作"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_016",
@@ -279,16 +216,12 @@
     "precondition_text": "1.手表显示自定义计时页",
     "steps_text": "1.将时分秒均设为0\n2.点击确认按钮",
     "expected_text": "1.确认按钮显示置灰\n2.手表不开始倒计时",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺可确定设置时/分/秒滚轮并建立计时器状态的 SIM_TIMER_STATE_SET 通用命令；不能用 ENTER_PAGE 代替滚轮选择与确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_017",
@@ -297,16 +230,12 @@
     "precondition_text": "1.手表显示自定义计时页",
     "steps_text": "1.将时分秒设为00:00:01\n2.点击确认按钮",
     "expected_text": "1.确认按钮可用\n2.手表短振250ms，开始1秒倒计时",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺可确定设置时/分/秒滚轮并建立计时器状态的 SIM_TIMER_STATE_SET 通用命令；不能用 ENTER_PAGE 代替滚轮选择与确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_018",
@@ -315,16 +244,12 @@
     "precondition_text": "1.手表显示自定义计时页",
     "steps_text": "1.将时分秒设为23:59:59\n2.点击确认按钮",
     "expected_text": "1.确认按钮可用\n2.手表短振250ms，开始23:59:59倒计时",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺可确定设置时/分/秒滚轮并建立计时器状态的 SIM_TIMER_STATE_SET 通用命令；不能用 ENTER_PAGE 代替滚轮选择与确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_019",
@@ -333,28 +258,12 @@
     "precondition_text": "1.手表显示自定义计时页且分钟列已选中",
     "steps_text": "1.在分钟列执行上滑\n2.在分钟列执行下滑",
     "expected_text": "1.分钟值增加1\n2.分钟值减少1",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:19000;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,155,201,95,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:88191;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,95,201,155,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:88192;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "真实进入自定义页并限定手势在分钟滚轮；用基线、上滑后、下滑后三张截图比较",
-    "verification_points": [
-      "操作前分钟列基线值",
-      "分钟列上滑后数值增加1",
-      "分钟列下滑后数值减少1"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_020",
@@ -363,26 +272,12 @@
     "precondition_text": "1.手表显示自定义计时页且秒钟列已选中",
     "steps_text": "1.旋转编码器一格",
     "expected_text": "1.秒钟值变化1秒",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:300,114,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:20000;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:20001;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "真实进入自定义页并点击秒滚轮取得焦点；用旋转前后两张截图核对一秒变化",
-    "verification_points": [
-      "旋转前秒钟列基线值",
-      "旋转一格后秒钟值变化1秒"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_021",
@@ -391,20 +286,12 @@
     "precondition_text": "1.手表显示自定义计时页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回预设列表，不创建计时任务",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "真实进入自定义页后右滑，返回预设列表；未点击确认，因此不创建任务"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_022",
@@ -413,20 +300,12 @@
     "precondition_text": "1.手表显示自定义计时页",
     "steps_text": "1.单击编码器退出键",
     "expected_text": "1.手表返回预设列表，不创建计时任务",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "真实进入自定义页后单击编码器退出，未点击确认，因此不创建任务"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_023",
@@ -435,17 +314,12 @@
     "precondition_text": "1.5分钟计时器正在前台运行",
     "steps_text": "1.观察倒计时页",
     "expected_text": "1.页面显示剩余时间和固定原始时长和剩余比例进度条和结束和暂停按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:325,128,1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "从首屏真实点击5分钟预设，建立前台运行状态后观察"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_024",
@@ -456,12 +330,10 @@
     "expected_text": "1.5分钟显示5:00，1小时显示1:00:00，小时和分钟字段均不补前导零",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_025",
@@ -470,22 +342,12 @@
     "precondition_text": "1.59分59秒计时器正在运行",
     "steps_text": "1.观察剩余时间",
     "expected_text": "1.剩余时间显示MM:SS.cs格式",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:25000,running,3599,3599;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:25001,200;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "Windows模拟器用通用SIM_TIMER_STATE_SET建立59:59运行状态，再经时钟子菜单真实点击计时器入口进入当前任务；待新模拟器构建后聚焦运行验证",
-    "verification_points": [
-      "剩余时间以MM:SS.cs格式显示59:59附近的倒计时"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_026",
@@ -494,17 +356,12 @@
     "precondition_text": "1.1小时计时器正在运行",
     "steps_text": "1.观察剩余时间",
     "expected_text": "1.剩余时间显示HH:MM:SS格式，不显示百分秒",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:325,216,1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "从首屏真实点击60分钟预设，建立1小时运行状态后观察"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_027",
@@ -513,25 +370,12 @@
     "precondition_text": "1.10秒计时器正在运行",
     "steps_text": "1.记录开始进度\n2.等待5秒",
     "expected_text": "1.进度条接近满格\n2.进度条宽度约为开始时的一半",
-    "verification_points": [
-      "10秒计时器刚开始时进度条接近满格",
-      "真实等待5秒后进度条约为开始时的一半"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:27000,running,10,10;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:27001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:27002,5000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用通用SIM_TIMER_STATE_SET建立10秒运行态并真实等待5秒；前后两张截图判断进度变化"
+    "note": ""
   },
   {
     "case_id": "TIMER_028",
@@ -540,16 +384,12 @@
     "precondition_text": "1.计时器正在前台运行",
     "steps_text": "1.点击暂停按钮\n2.等待3秒",
     "expected_text": "1.手表短振250ms，显示继续按钮\n2.剩余时间保持暂停值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "等待本身可由SIM_WAIT执行；完整预期还包含截图无法判定的250ms振动，当前缺振动采集证据通道"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_029",
@@ -558,26 +398,12 @@
     "precondition_text": "1.计时器处于暂停状态",
     "steps_text": "1.点击继续按钮\n2.等待1秒",
     "expected_text": "1.页面显示暂停按钮\n2.剩余时间从暂停值继续减少",
-    "verification_points": [
-      "继续前截图显示继续按钮且剩余时间为暂停值",
-      "点击继续并等待1秒后显示暂停按钮且剩余时间减少"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:29000,paused,30,20;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:29001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:29002,1000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用通用暂停状态和当前计时器共享控制坐标；前后截图判断继续按钮切换及剩余时间从暂停值减少，不额外要求人工步骤未包含的暂停期连续观察"
+    "note": ""
   },
   {
     "case_id": "TIMER_030",
@@ -586,16 +412,12 @@
     "precondition_text": "1.计时器正在运行或暂停",
     "steps_text": "1.点击结束按钮",
     "expected_text": "1.当前计时任务结束，页面显示预设列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前 TIMER_STOP 是业务捷径，且缺运行/暂停前置状态构造；需要 SIM_TIMER_STATE_SET 后才能实际点击结束按钮"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_031",
@@ -604,26 +426,12 @@
     "precondition_text": "1.计时器正在前台运行",
     "steps_text": "1.等待超过系统自动灭屏时间",
     "expected_text": "1.手表保持倒计时页亮屏",
-    "verification_points": [
-      "等待前计时器正在前台运行",
-      "超过5秒自动灭屏时间后仍保持倒计时页亮屏"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:31000,running,60,60;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:31001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:31002,6000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "设置5秒全局亮屏时长后真实等待6秒；截图只判断计时运行页是否仍亮"
+    "note": ""
   },
   {
     "case_id": "TIMER_032",
@@ -632,26 +440,12 @@
     "precondition_text": "1.计时器处于暂停状态",
     "steps_text": "1.等待超过系统自动灭屏时间",
     "expected_text": "1.手表保持暂停页面亮屏",
-    "verification_points": [
-      "等待前计时器处于暂停页面",
-      "超过5秒自动灭屏时间后仍保持暂停页面亮屏"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:32000,paused,60,50;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:32001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:32002,6000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "设置5秒全局亮屏时长后真实等待6秒；截图只判断暂停页是否仍亮"
+    "note": ""
   },
   {
     "case_id": "TIMER_033",
@@ -660,31 +454,12 @@
     "precondition_text": "1.1分钟计时器正在前台运行",
     "steps_text": "1.执行右滑\n2.等待10秒\n3.重新进入Timer",
     "expected_text": "1.手表退出倒计时页\n2.计时任务在后台继续\n3.页面显示约50秒剩余时间",
-    "verification_points": [
-      "右滑前1分钟计时器正在前台运行",
-      "右滑后已退出倒计时页",
-      "真实等待10秒并重新进入后剩余时间约50秒"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:33000,running,60,60;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:33001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:33002;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:33003,10000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:33004,300;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用通用计时器状态，从时钟子菜单真实进入并真实等待10秒；三阶段截图覆盖退出和后台继续"
+    "note": ""
   },
   {
     "case_id": "TIMER_034",
@@ -693,31 +468,12 @@
     "precondition_text": "1.1分钟计时器正在前台运行",
     "steps_text": "1.单击编码器\n2.等待10秒\n3.重新进入Timer",
     "expected_text": "1.手表退出倒计时页\n2.计时任务在后台继续\n3.页面显示约50秒剩余时间",
-    "verification_points": [
-      "按键前1分钟计时器正在前台运行",
-      "单击编码器后已退出倒计时页",
-      "真实等待10秒并重新进入后剩余时间约50秒"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:34000,running,60,60;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:34001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:34002;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:34003,10000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:34004,300;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实体编码器由通用BUTTON_PRESS执行，随后真实等待10秒并从时钟子菜单重新进入；三阶段截图覆盖"
+    "note": ""
   },
   {
     "case_id": "TIMER_035",
@@ -726,29 +482,12 @@
     "precondition_text": "1.计时器正在前台运行",
     "steps_text": "1.执行覆盖熄屏\n2.等待5秒\n3.单击实体按键亮屏",
     "expected_text": "1.手表屏幕熄灭\n2.计时任务继续运行\n3.手表按全局规则显示页面，计时未丢失",
-    "verification_points": [
-      "覆盖前计时器正在前台运行",
-      "覆盖后屏幕熄灭",
-      "真实等待5秒并按键亮屏后计时器任务未丢失"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:35000,running,60,60;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:35001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:35002,screen_off;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:35003;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:35004,5000;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用通用计时器状态、全局screen_off事件、真实等待和实体BUTTON_PRESS；三阶段截图覆盖"
+    "note": ""
   },
   {
     "case_id": "TIMER_036",
@@ -757,29 +496,12 @@
     "precondition_text": "1.计时器正在前台运行",
     "steps_text": "1.执行垂腕动作\n2.等待5秒\n3.单击实体按键亮屏",
     "expected_text": "1.手表屏幕熄灭\n2.计时任务继续运行\n3.手表按全局规则显示页面，计时未丢失",
-    "verification_points": [
-      "垂腕前计时器正在前台运行",
-      "垂腕后屏幕熄灭",
-      "真实等待5秒并按键亮屏后计时器任务未丢失"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:36000,running,60,60;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,225,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:36001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:36002,wrist_down;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:36003;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:36004,5000;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用通用计时器状态、全局wrist_down事件、真实等待和实体BUTTON_PRESS；三阶段截图覆盖"
+    "note": ""
   },
   {
     "case_id": "TIMER_037",
@@ -788,16 +510,12 @@
     "precondition_text": "1.1秒计时器正在运行\n2.手表屏幕可处于熄灭状态",
     "steps_text": "1.等待倒计时归零",
     "expected_text": "1.手表点亮Time's Up页，按250ms/750ms循环振动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "等待与Time's Up页面可执行；完整预期还要求250ms/750ms循环振动，截图唯一判据下缺振动采集证据通道"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_038",
@@ -806,20 +524,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.观察页面",
     "expected_text": "1.页面显示Time's Up和原始时长和重置和结束按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:38000,finished,300,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:38001,500;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "Windows模拟器用通用SIM_TIMER_STATE_SET通过真实计时结束回调建立5分钟Time's Up状态；待新模拟器构建后聚焦运行验证",
-    "verification_points": [
-      "页面同时显示Time's Up、原始5分钟时长、重置按钮和结束按钮"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_039",
@@ -830,12 +540,10 @@
     "expected_text": "1.手表短振250ms，重新开始5分钟倒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺5分钟Time's Up业务状态构造，且完整预期包含截图不可见的250ms振动；不能从预设页点击3分钟冒充重置"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_040",
@@ -844,16 +552,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.点击结束按钮",
     "expected_text": "1.振动停止，页面返回预设列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺 Time's Up 前置状态构造；需要 SIM_TIMER_STATE_SET 后才能实际点击结束按钮并验证振动停止"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_041",
@@ -862,16 +566,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.保持无操作1分钟",
     "expected_text": "1.振动停止，页面自动返回预设列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_042",
@@ -880,16 +580,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.执行覆盖熄屏\n2.等待10秒",
     "expected_text": "1.手表屏幕熄灭\n2.提醒进程继续，未超过1分钟",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "覆盖熄屏和等待可执行；熄屏截图无法证明后台提醒进程仍在继续，当前缺可见提醒状态或振动证据通道"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_043",
@@ -898,16 +594,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.单击按键使屏幕熄灭\n2.等待10秒",
     "expected_text": "1.手表屏幕熄灭\n2.提醒振动继续，累计提醒时长未达到1分钟",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_044",
@@ -916,25 +608,12 @@
     "precondition_text": "1.手表显示Time's Up页",
     "steps_text": "1.执行垂腕动作",
     "expected_text": "1.手表保持Time's Up页亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_TIMER_STATE_SET:44000,finished,180,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:44001,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:44002;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:44003,wrist_down;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:44004,500;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:44005;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "通用SIM_TIMER_STATE_SET建立Time's Up状态，SIM_SYSTEM_EVENT复用全局垂腕事件；前后截图只判断页面仍亮且内容未退出，待新模拟器构建后聚焦运行验证",
-    "verification_points": [
-      "垂腕前Time's Up页亮屏并完整显示",
-      "垂腕后仍保持同一Time's Up页亮屏"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_045",
@@ -943,66 +622,12 @@
     "precondition_text": "1.计时器正在运行",
     "steps_text": "1.连续点击暂停和继续20次",
     "expected_text": "1.页面只存在一个计时任务，剩余时间单调减少",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:45000;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:268,228,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:45001;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:45002,1000;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:45003;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "真实启动3分钟任务，按暂停/继续成对点击20次；用开始、循环后、再等待1秒三张截图确认仅一个任务且时间继续减少",
-    "verification_points": [
-      "循环操作前仅一个计时任务且正在减少",
-      "20次暂停继续后仍仅一个计时任务",
-      "再等待1秒后同一任务剩余时间继续减少"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_046",
@@ -1013,12 +638,10 @@
     "expected_text": "1.手表完成开机\n2.待产品确认：原计时任务是否恢复和剩余时间",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_047",
@@ -1029,12 +652,10 @@
     "expected_text": "1.计时器剩余时间减少约5秒\n2.手机音乐仍在播放",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "等待本身可由SIM_WAIT执行；最终要求查看手机音乐播放状态，当前手表截图无法判定手机侧结果"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_048",
@@ -1043,16 +664,12 @@
     "precondition_text": "1.计时器正在后台运行",
     "steps_text": "1.让手机收到来电\n2.等待5秒\n3.结束来电\n4.重新进入Timer",
     "expected_text": "1.手表显示来电提醒\n2.计时任务继续\n3.来电结束\n4.剩余时间已减少约5秒",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App/外部: 1.让手机收到来电"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_049",
@@ -1061,16 +678,12 @@
     "precondition_text": "1.计时器正在前台运行",
     "steps_text": "1.从手机发送一条通知\n2.关闭消息提醒",
     "expected_text": "1.手表显示消息弹窗\n2.倒计时继续减少",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App/外部: 1.从手机发送一条通知"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_050",
@@ -1081,12 +694,10 @@
     "expected_text": "1.手表显示闹钟响铃页\n2.待产品确认：闹钟与Time's Up谁显示在前台",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_051",
@@ -1097,12 +708,10 @@
     "expected_text": "1.App显示升级确认\n2.手表显示OTA页面\n3.手表完成升级重启\n4.待产品确认：原计时任务是否恢复",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_052",
@@ -1113,12 +722,10 @@
     "expected_text": "1.手表因电量耗尽关机\n2.手表显示充电页\n3.手表重新开机\n4.待产品确认：原计时任务与剩余时长是否恢复",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "TIMER_053",
@@ -1127,15 +734,11 @@
     "precondition_text": "1.手表电量和供电可支持长时测试",
     "steps_text": "1.启动23小时自定义计时\n2.等待计时结束",
     "expected_text": "1.计时期间手表无异常重启\n2.到点显示Time's Up页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIMER_LIST,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "统一用 all_phone 建立 App/HFP 连接，再从 Titan Q 真实点击 AI Voice；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "未绑定前置必须使用 APP_CONNECT:0；进入后直接截图完整未绑定页；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立未绑定页，再真实点击可见 Pair Now；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先保留绑定关系再断开 App 业务通道，覆盖已绑定但业务连接不可用的共享状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先形成已绑定但未连接页，再执行右滑；恢复后重新进入由后续独立用例验证；6202首轮迁移暂不可执行：SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "all_phone 同时建立 App 与 HFP，进入后截图绿色语音球及 Tap to speak；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_008",
@@ -100,26 +107,12 @@
       "precondition_text": "1.手表显示AI Voice待机页",
       "steps_text": "1.保持无操作1分钟",
       "expected_text": "1.手表屏幕熄灭",
-      "verification_points": [
-        "等待前AI Voice待机页处于亮屏状态",
-        "真实保持无操作1分钟后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:30;",
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:8001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:8002,60000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先复用App连接状态建立AI Voice待机页，设置30秒亮屏时长并真实等待1分钟；前后截图判断是否熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "VOICE_009",
@@ -131,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_010",
@@ -144,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_011",
@@ -157,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前缺手机语音助手返回可播报音频的外部输入，且扬声器播出内容不能由手表截图判定；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_012",
@@ -170,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前缺建立AI Voice正在播报回复状态及播报完成业务事件的通用命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_013",
@@ -183,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_014",
@@ -196,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_015",
@@ -206,19 +205,12 @@
       "precondition_text": "1.AI Voice正在监听或播报",
       "steps_text": "1.断开设备业务连接",
       "expected_text": "1.当前会话结束，页面显示未连接提示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "APP_CONNECT 会更新连接状态并发送源码中的 APP 连接状态事件；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_016",
@@ -230,13 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先形成已绑定但 App 业务断开页，再恢复 app 通道、退出并重新进入；修改待新运行验证；6202首轮迁移暂不可执行：SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "恢复设备业务连接",
-        "右滑后退出未连接页",
-        "重新进入 AI Voice 后显示待机页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_017",
@@ -248,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_018",
@@ -261,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_019",
@@ -274,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_020",
@@ -287,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_021",
@@ -300,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_022",
@@ -313,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_023",
@@ -326,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_024",
@@ -339,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_025",
@@ -349,16 +345,12 @@
       "precondition_text": "1.手表勿扰模式已开启\n2.设备连接可用",
       "steps_text": "1.启动AI Voice，获取语音回复",
       "expected_text": "1.待产品确认：助手播报是否受勿扰限制",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_026",
@@ -370,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "VOICE_027",
@@ -383,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

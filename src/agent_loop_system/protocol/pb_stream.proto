@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+message _H264Head {
+  int32 fps = 1;//fps
+  int32 w = 2;//宽
+  int32 h = 3;//高
+  int32 db_en = 4;//是否启用db
+  int32 pref = 5;//是否带P帧
+}
+
+message _OpusHead {
+  int32 sampling = 1;//采样率,一般是16000
+  int32 frame_ms = 2;//帧间隔,毫秒,一般是40ms
+  int32 channel = 3;//0:单声道 1：双声道。一般是单声道
+  int32 bitrate = 4;//码率。一般是16000
+}
+
+message _OpusEnd {
+  /**
+   * 0:正常结束
+   * 1:空间不足
+   * 2:异常退出
+   */
+  int32 result = 1;
+}
+
+//发送文件头数据
+message _FileHead {
+  /**
+   * 真实路径使用"/"开头。
+   * 虚拟路径文件夹定义如下：
+   * ota
+   * dials_push
+   * music
+   * sport
+   */
+  string path = 1;//max_len=127。文件路径(music/xx.mp3)
+  int64 crc32 = 2;//整个文件的crc32校验码
+  int32 size = 3;//单位bytes
+}
+
+//发送文件头数据响应
+message _FileHeadResponse {
+  /**
+   * 0:正常
+   * 1:设备空间不足
+   * 2:设备忙
+   * 3:文件已经存在，无需传输。
+   * 4:文件读写错误
+   */
+  int32 result = 1;
+  int32 old_size = 2;//历史文件大小,断点续传可以直接offset这个文件上
+  int64 old_crc32 = 3;//历史文件已接收部分的crc32
+  int32 package_size = 4;//每包数据大小。即每次_FileData.data的size,目前规定最大960
+  int32 package_count = 5;//每接收到几包，设备响应一次。
+}
+
+//文件数据
+message _FileData {
+  int32 offset = 1;//当前偏移
+  bytes data = 2;//max_size=960
+}
+
+//文件数据响应,传输错误，传输结束，达到回复大小时，设备会主动上报
+message _FileDataResponse {
+  /**
+   * 0:正常
+   * 1:offset错误，需从上一帧重传
+   * 2:文件不合法(比如OTA文件不适用于此手表)，需中断传输
+   * 3:对端未进入接收文件流程，需中断传输
+   * 4:文件读写错误，需中断传输
+   */
+  int32 result = 1;
+  int32 file_size = 2;//当前已接收size
+  int64 file_crc32 = 3;//当前已接收的crc32
+}
+
+/**
+ * 文件路径。
+ * 关于文件路径/名称限制：
+ * 1. 文件夹名长度最大32字节(C语言32字节，有效字符31个)
+ * 2. 文件名长度最大64字节(C语言64字节，有效字符63个)
+ * 3. 路径最多嵌套两层，如music/1.mp3，或者music/1/2.mp3
+ * 4. 路径长度最大128字节（两层文件夹+文件名,最大32+32+64）
+ */
+message _FilePath {
+  string path = 1;//max_len=127
+}
+
+//文件夹空间信息
+message _DirSpace {
+  uint64 total = 1;//总空间，字节，未知为0
+  uint64 free = 2;//剩余空间，字节，未知为0
+}
+
+//文件信息
+message _FileInfo {
+  string path = 1;//max_len=127
+  int32 size = 2;//文件大小，字节，未知为0
+}
+
+//返回某个文件夹下文件。如果有嵌套文件夹，请铺开作为一个不嵌套的list。
+message _FileList {
+  repeated _FileInfo files = 1;//max_count=7
+}
+
+//文件操作
+message _FileOperation {
+  string path = 1;//max_len=127
+  /**
+   * 0. 删除某个文件
+   * 1. 清空某个文件夹
+   * 2. 其他操作，可能会导致文件变更。对端需要刷新文件列表
+   */
+  int32 op = 2;
+}
+
+//GPS头
+message _GPSHead {
+  int32 status = 1;//状态 0：关闭  1：开启
+  int32 interval = 2; //gps的传输间隔，单位:秒
+}
+
+//GPS数据
+message _GPSData {
+  /**
+   * INVALID = 0;      // 无效定位
+   * GPS_FIX = 1;      // GPS定位
+   * NET_FIX = 2;      // 网络定位
+   * SIMULATION = 3;   // 模拟模式
+   */
+  int32 fix_status = 1;//定位状态
+
+  int32 longitude = 2;//经度 *1000000
+
+  int32 latitude = 3; //纬度 *1000000
+
+  int32 signal = 4;// 信号强度(0-100) 30以下为弱 60以下为良
+
+  int32 hdop = 5; // 定位精度（水平精度因子HDOP，单位：米）
+
+  int32 timestamp = 6;// 时间戳，距离2000年始的秒数
+
+  int32 altitude = 7; //海拔(米)
+}
+
+//通用字节数组数据
+message _BytesData {
+  bytes data = 1;//max_size=960
+}

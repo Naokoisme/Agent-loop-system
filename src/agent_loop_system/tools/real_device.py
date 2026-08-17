@@ -350,9 +350,9 @@ class RealDeviceSession:
 
     The 24-hour firmware test session is an external batch precondition.
     ``start`` never starts, renews, or stops that lease.  It only opens the
-    transport, waits for ``GUI_PING`` to be processed, then samples one capture
-    frame as the baseline.  The baseline is not written as evidence; every later
-    screenshot must use a strictly newer provider frame.
+    transport and waits for ``GUI_PING`` to be processed.  Capture providers
+    allocate a new positive sequence for every requested evidence frame, so
+    startup does not take an unused baseline screenshot.
     """
 
     def __init__(
@@ -430,8 +430,7 @@ class RealDeviceSession:
                     "GUI_PING handshake did not reach gui_ack/processed "
                     f"(type={handshake_type!r}, status={handshake_status!r})"
                 )
-            baseline = self.capture_provider.capture(timeout=self.capture_timeout)
-            self._frame_sequence = int(baseline.metadata.sequence)
+            self._frame_sequence = 0
             self._started = True
         except BaseException as exc:
             try:
@@ -499,7 +498,7 @@ class RealDeviceSession:
         if not self._started:
             raise RuntimeError("real device session not started")
         if self._frame_sequence is None:
-            raise RuntimeError("capture baseline is unavailable")
+            raise RuntimeError("capture sequence is unavailable")
 
         evidence_path = Path(output_path).resolve()
         raw_path = self._capture_sidecar_path(evidence_path)

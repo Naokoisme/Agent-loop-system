@@ -1,4 +1,4 @@
-"""Minimal Windows BLE GATT client for the watch App authentication protocol.
+"""Windows BLE GATT client for the watch new-platform PB protocol.
 
 The firmware may still gate authentication on Bluetooth state outside this
 GATT transport.  A successful GATT connection alone is therefore not treated
@@ -14,26 +14,38 @@ import json
 import secrets
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Iterable, Sequence
+from typing import Any, Awaitable, Callable, Iterable, Sequence, TypeVar
+
+from google.protobuf.message import Message
 
 from agent_loop_system.tools.watch_app_protocol import (
+    APP_MAX_DATA_LENGTH,
     BIND_COMMAND,
     LOGIN_COMMAND,
     WatchAppFrame,
     WatchAppFrameDecoder,
+    WatchAppMessage,
+    WatchAppMessageAssembler,
     WatchAppProtocolError,
     WatchAuthRequest,
     WatchAuthResponse,
     decode_auth_response,
+    decode_protobuf,
+    encode_multipart_chunks,
     encode_auth_request,
     encode_frame,
+    encode_protobuf,
+    validate_protobuf,
 )
 from agent_loop_system.tools.watch_ble_screenshot import (
     BLE_SCREENSHOT_COMMAND,
+    BLE_SCREENSHOT_COMPLETE_ACK,
     WatchBleScreenshot,
     WatchBleScreenshotAssembler,
+    WatchBleScreenshotFeedResult,
     WatchBleScreenshotProtocolError,
     WatchBleScreenshotRemoteError as WatchBleScreenshotProtocolRemoteError,
+    encode_screenshot_ack,
     encode_screenshot_request,
     write_verified_screenshot,
 )
@@ -44,6 +56,24 @@ WATCH_WRITE_UUID = "0000ff02-0000-1000-8000-00805f9b34fb"
 WATCH_NOTIFY_UUID = "0000ff03-0000-1000-8000-00805f9b34fb"
 DEFAULT_NAME_PREFIX = "oraimo Watch Tank N"
 BLOCKED_BY_CLASSIC_BT_GATE = "BLOCKED_BY_CLASSIC_BT_GATE"
+
+
+_MessageT = TypeVar("_MessageT", bound=Message)
+
+
+def _encode_pb_payload(message: Message) -> bytes:
+    try:
+        validate_protobuf(message)
+        return encode_protobuf(message)
+    except WatchAppProtocolError as exc:
+        raise WatchBleProtocolError(str(exc)) from exc
+
+
+def _decode_pb_payload(data: bytes, message_type: type[_MessageT]) -> _MessageT:
+    try:
+        return decode_protobuf(data, message_type)
+    except WatchAppProtocolError as exc:
+        raise WatchBleProtocolError(str(exc)) from exc
 
 
 class WatchBleError(RuntimeError):
@@ -293,7 +323,7 @@ def select_watch(
 
 
 class WatchBleClient:
-    """Single-connection, single-exchange BLE App-protocol client."""
+    """One BLE connection with sequence-routed concurrent PB exchanges."""
 
     def __init__(
         self,
@@ -313,12 +343,22 @@ class WatchBleClient:
         self._write_characteristic: object | None = None
         self._notify_characteristic: object | None = None
         self._decoder = WatchAppFrameDecoder()
-        self._pending: asyncio.Future[WatchAppFrame] | None = None
-        self._pending_command: int | None = None
-        self._pending_sequence: int | None = None
+        self._message_assembler = WatchAppMessageAssembler()
+        self._pending_requests: dict[
+            tuple[int, int], asyncio.Future[WatchAppMessage]
+        ] = {}
+        self._notifications: asyncio.Queue[WatchAppMessage] = asyncio.Queue(
+            maxsize=256
+        )
+        self._dropped_notifications = 0
         self._screenshot_future: asyncio.Future[WatchBleScreenshot] | None = None
         self._screenshot_assembler: WatchBleScreenshotAssembler | None = None
-        self._exchange_lock = asyncio.Lock()
+        self._screenshot_ack_queue: (
+            asyncio.Queue[WatchBleScreenshotFeedResult | None] | None
+        ) = None
+        self._screenshot_ack_task: asyncio.Task[None] | None = None
+        self._write_lock = asyncio.Lock()
+        self._screenshot_lock = asyncio.Lock()
         self._next_sequence = 0
         self._closed = False
         self._disconnected = False
@@ -332,6 +372,37 @@ class WatchBleClient:
             and getattr(self._client, "is_connected", False)
             and not self._disconnected
         )
+
+    @property
+    def _pending(self) -> asyncio.Future[WatchAppMessage] | None:
+        """Legacy single-request view retained for existing diagnostics/tests."""
+
+        if len(self._pending_requests) != 1:
+            return None
+        return next(iter(self._pending_requests.values()))
+
+    @property
+    def pending_exchange_count(self) -> int:
+        return len(self._pending_requests)
+
+    @property
+    def dropped_notification_count(self) -> int:
+        return self._dropped_notifications
+
+    def _allocate_sequence(self) -> int:
+        active_sequences = {sequence for _, sequence in self._pending_requests}
+        for _ in range(0x10000):
+            sequence = self._next_sequence
+            self._next_sequence = (sequence + 1) & 0xFFFF
+            if sequence not in active_sequences:
+                return sequence
+        raise WatchBleProtocolError("all PB sequence ids are currently in use")
+
+    def _fail_pending_exchanges(self, error: BaseException) -> None:
+        for pending in tuple(self._pending_requests.values()):
+            if not pending.done():
+                pending.set_exception(error)
+        self._pending_requests.clear()
 
     async def connect(self, *, pair: bool = False) -> None:
         if self.connected:
@@ -372,6 +443,9 @@ class WatchBleClient:
             self._write_characteristic = write
             self._notify_characteristic = notify
             self._decoder = WatchAppFrameDecoder()
+            self._message_assembler = WatchAppMessageAssembler()
+            self._notifications = asyncio.Queue(maxsize=256)
+            self._dropped_notifications = 0
             await self._client.start_notify(notify, self._on_notification)
             self._notify_started = True
         except WatchBleError:
@@ -383,59 +457,150 @@ class WatchBleClient:
 
     def _on_disconnected(self, _client: object) -> None:
         self._disconnected = True
-        pending = self._pending
-        if pending is not None and not pending.done():
-            pending.set_exception(
-                WatchBleDisconnectedError("watch disconnected during exchange")
-            )
+        self._fail_pending_exchanges(
+            WatchBleDisconnectedError("watch disconnected during exchange")
+        )
         screenshot = self._screenshot_future
         if screenshot is not None and not screenshot.done():
             screenshot.set_exception(
                 WatchBleDisconnectedError("watch disconnected during screenshot")
             )
+        self._screenshot_assembler = None
 
     def _on_notification(self, _sender: object, data: bytearray) -> None:
-        pending = self._pending
         screenshot = self._screenshot_future
-        if (pending is None or pending.done()) and (
-            screenshot is None or screenshot.done()
-        ):
-            return
+        screenshot_active = bool(
+            self._screenshot_assembler is not None
+            and self._screenshot_ack_queue is not None
+        )
         try:
             frames = self._decoder.feed(bytes(data))
         except (WatchAppProtocolError, ValueError) as exc:
             error = WatchBleProtocolError(str(exc))
-            if pending is not None and not pending.done():
-                pending.set_exception(error)
+            self._fail_pending_exchanges(error)
             if screenshot is not None and not screenshot.done():
                 screenshot.set_exception(error)
+                self._screenshot_assembler = None
             self._decoder = WatchAppFrameDecoder()
+            self._message_assembler = WatchAppMessageAssembler()
             return
         for frame in frames:
-            if (
-                pending is not None
-                and not pending.done()
-                and frame.command == self._pending_command
-                and frame.sequence == self._pending_sequence
-            ):
-                pending.set_result(frame)
-            if (
-                screenshot is not None
-                and not screenshot.done()
+            try:
+                message = self._message_assembler.feed(frame)
+            except WatchAppProtocolError as exc:
+                error = WatchBleProtocolError(str(exc))
+                self._fail_pending_exchanges(error)
+                if screenshot is not None and not screenshot.done():
+                    screenshot.set_exception(error)
+                    self._screenshot_assembler = None
+                self._message_assembler = WatchAppMessageAssembler()
+                return
+
+            is_screenshot_frame = bool(
+                screenshot_active
                 and frame.command == BLE_SCREENSHOT_COMMAND
                 and self._screenshot_assembler is not None
-            ):
+                and self._screenshot_ack_queue is not None
+            )
+            if is_screenshot_frame:
                 try:
                     result = self._screenshot_assembler.feed(frame.payload)
                 except WatchBleScreenshotProtocolRemoteError as exc:
-                    screenshot.set_exception(WatchBleScreenshotRemoteError(exc))
+                    if screenshot is not None and not screenshot.done():
+                        screenshot.set_exception(WatchBleScreenshotRemoteError(exc))
+                    self._screenshot_assembler = None
                 except WatchBleScreenshotProtocolError as exc:
-                    screenshot.set_exception(WatchBleProtocolError(str(exc)))
+                    if screenshot is not None and not screenshot.done():
+                        screenshot.set_exception(WatchBleProtocolError(str(exc)))
+                    self._screenshot_assembler = None
                 else:
                     if result is not None:
-                        screenshot.set_result(result)
+                        self._screenshot_ack_queue.put_nowait(result)
+
+            if message is None:
+                continue
+            pending = self._pending_requests.get(
+                (message.command, message.sequence)
+            )
+            if pending is not None and not pending.done():
+                pending.set_result(message)
+            elif not is_screenshot_frame:
+                if self._notifications.full():
+                    self._notifications.get_nowait()
+                    self._notifications.task_done()
+                    self._dropped_notifications += 1
+                self._notifications.put_nowait(message)
+
+    async def _write_screenshot_acks(
+        self,
+        *,
+        capture_sequence: int,
+        outer_sequence: int,
+        queue: asyncio.Queue[WatchBleScreenshotFeedResult | None],
+        screenshot: asyncio.Future[WatchBleScreenshot],
+    ) -> None:
+        """Write screenshot ACKs in notification order on one BLE task."""
+
+        try:
+            while True:
+                result = await queue.get()
+                try:
+                    if result is None:
+                        return
+                    await self._write_app_frame(
+                        WatchAppFrame(
+                            command=BLE_SCREENSHOT_COMMAND,
+                            sequence=outer_sequence,
+                            payload=encode_screenshot_ack(
+                                capture_sequence,
+                                result.next_chunk,
+                            ),
+                        )
+                    )
+                    if result.screenshot is not None:
+                        if result.next_chunk != BLE_SCREENSHOT_COMPLETE_ACK:
+                            raise WatchBleProtocolError(
+                                "completed screenshot has a non-final ACK"
+                            )
+                        if not screenshot.done():
+                            screenshot.set_result(result.screenshot)
+                finally:
+                    queue.task_done()
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            if not screenshot.done():
+                error = WatchBleConnectionError(
+                    f"BLE screenshot ACK write failed: {exc}"
+                )
+                error.__cause__ = exc
+                screenshot.set_exception(error)
+            self._screenshot_assembler = None
+
+    async def _stop_screenshot_ack_writer(self, *, drain: bool) -> None:
+        """Detach and stop the per-capture ACK writer without leaking a task."""
+
+        task = self._screenshot_ack_task
+        queue = self._screenshot_ack_queue
+        self._screenshot_ack_task = None
+        self._screenshot_ack_queue = None
+        if task is None:
+            return
+        if not task.done():
+            if drain and queue is not None:
+                queue.put_nowait(None)
+            else:
+                task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
     async def _write_app_frame(self, frame: WatchAppFrame) -> None:
+        async with self._write_lock:
+            await self._write_app_frame_unlocked(frame)
+
+    async def _write_app_frame_unlocked(self, frame: WatchAppFrame) -> None:
         if not self.connected or self._client is None:
             raise WatchBleConnectionError("watch is not connected")
         if self._write_characteristic is None or not self._notify_started:
@@ -461,14 +626,235 @@ class WatchBleClient:
                 response=False,
             )
 
+    async def _write_app_message(
+        self,
+        command: int,
+        sequence: int,
+        payload: bytes,
+        *,
+        flags: int = 0,
+    ) -> None:
+        """Write one complete App payload that fits the single-frame limit."""
+
+        if len(payload) > APP_MAX_DATA_LENGTH:
+            raise WatchAppProtocolError(
+                f"App payload is {len(payload)} bytes; single-frame limit is "
+                f"{APP_MAX_DATA_LENGTH}. Use semantic multipart chunks"
+            )
+        await self._write_app_frames(
+            (
+                WatchAppFrame(
+                    command=command,
+                    sequence=sequence,
+                    payload=payload,
+                    flags=flags,
+                ),
+            )
+        )
+
+    async def _write_app_frames(
+        self, frames: tuple[WatchAppFrame, ...]
+    ) -> None:
+        async with self._write_lock:
+            for frame in frames:
+                await self._write_app_frame_unlocked(frame)
+
+    async def _write_multipart_message(
+        self,
+        command: int,
+        sequence: int,
+        chunks: tuple[bytes, ...],
+        *,
+        flags: int = 0,
+    ) -> None:
+        await self._write_app_frames(
+            encode_multipart_chunks(
+                command,
+                sequence,
+                chunks,
+                flags=flags,
+            )
+        )
+
+    async def send(
+        self,
+        command: int,
+        payload: bytes = b"",
+        *,
+        flags: int = 0,
+    ) -> int:
+        """Send a normal non-blocking PB command and return its sequence id."""
+
+        if not self.connected:
+            raise WatchBleConnectionError("watch is not connected")
+        sequence = self._allocate_sequence()
+        try:
+            await self._write_app_message(
+                command,
+                sequence,
+                payload,
+                flags=flags,
+            )
+        except WatchAppProtocolError as exc:
+            raise WatchBleProtocolError(str(exc)) from exc
+        except WatchBleError:
+            raise
+        except Exception as exc:
+            raise WatchBleConnectionError(f"BLE send failed: {exc}") from exc
+        return sequence
+
+    async def send_multipart(
+        self,
+        command: int,
+        chunks: list[bytes] | tuple[bytes, ...],
+        *,
+        flags: int = 0,
+    ) -> int:
+        """Send independently valid semantic object/list fragments."""
+
+        if not self.connected:
+            raise WatchBleConnectionError("watch is not connected")
+        if not isinstance(chunks, (list, tuple)):
+            raise WatchBleProtocolError("chunks must be a list or tuple of bytes")
+        sequence = self._allocate_sequence()
+        try:
+            await self._write_multipart_message(
+                command,
+                sequence,
+                tuple(chunks),
+                flags=flags,
+            )
+        except WatchAppProtocolError as exc:
+            raise WatchBleProtocolError(str(exc)) from exc
+        except WatchBleError:
+            raise
+        except Exception as exc:
+            raise WatchBleConnectionError(f"BLE send failed: {exc}") from exc
+        return sequence
+
+    async def send_protobuf(
+        self,
+        command: int,
+        message: Message | None = None,
+        *,
+        flags: int = 0,
+    ) -> int:
+        """Serialize and send a normal non-blocking PB command."""
+
+        payload = b"" if message is None else _encode_pb_payload(message)
+        return await self.send(command, payload, flags=flags)
+
+    async def send_protobuf_chunks(
+        self,
+        command: int,
+        messages: list[Message] | tuple[Message, ...],
+        *,
+        flags: int = 0,
+    ) -> int:
+        """Send semantic multipart PB objects that are valid independently."""
+
+        if not isinstance(messages, (list, tuple)):
+            raise WatchBleProtocolError(
+                "messages must be a list or tuple of protobuf messages"
+            )
+        return await self.send_multipart(
+            command,
+            tuple(_encode_pb_payload(message) for message in messages),
+            flags=flags,
+        )
+
+    async def receive(self, *, timeout: float | None = None) -> WatchAppMessage:
+        """Receive the next complete unsolicited Device PB message."""
+
+        if timeout is not None and timeout <= 0:
+            raise ValueError("timeout must be positive")
+        try:
+            if timeout is None:
+                message = await self._notifications.get()
+            else:
+                message = await asyncio.wait_for(
+                    self._notifications.get(), timeout
+                )
+        except asyncio.TimeoutError as exc:
+            raise WatchBleTimeoutError(
+                "timed out waiting for an unsolicited PB message",
+                code="NOTIFICATION_TIMEOUT",
+            ) from exc
+        self._notifications.task_done()
+        return message
+
+    async def receive_protobuf(
+        self,
+        message_type: type[_MessageT],
+        *,
+        timeout: float | None = None,
+    ) -> tuple[WatchAppMessage, _MessageT]:
+        """Receive a Device message and decode its protobuf payload."""
+
+        message = await self.receive(timeout=timeout)
+        return message, _decode_pb_payload(message.payload, message_type)
+
     async def exchange(
         self,
         command: int,
         payload: bytes,
         *,
         timeout: float | None = None,
-    ) -> WatchAppFrame:
+    ) -> WatchAppMessage:
         return await self._exchange(command, payload, timeout=timeout)
+
+    async def exchange_multipart(
+        self,
+        command: int,
+        chunks: list[bytes] | tuple[bytes, ...],
+        *,
+        timeout: float | None = None,
+    ) -> WatchAppMessage:
+        """Run a blocking request made of valid semantic object/list chunks."""
+
+        if not isinstance(chunks, (list, tuple)):
+            raise WatchBleProtocolError("chunks must be a list or tuple of bytes")
+        return await self._exchange(
+            command,
+            b"",
+            timeout=timeout,
+            multipart_chunks=tuple(chunks),
+        )
+
+    async def exchange_protobuf(
+        self,
+        command: int,
+        request: Message | None,
+        response_type: type[_MessageT],
+        *,
+        timeout: float | None = None,
+    ) -> _MessageT:
+        """Run an App blocking request with generated protobuf messages."""
+
+        payload = b"" if request is None else _encode_pb_payload(request)
+        response = await self.exchange(command, payload, timeout=timeout)
+        return _decode_pb_payload(response.payload, response_type)
+
+    async def exchange_protobuf_chunks(
+        self,
+        command: int,
+        requests: list[Message] | tuple[Message, ...],
+        response_type: type[_MessageT],
+        *,
+        timeout: float | None = None,
+    ) -> _MessageT:
+        """Run a blocking request with semantic multipart PB objects."""
+
+        if not isinstance(requests, (list, tuple)):
+            raise WatchBleProtocolError(
+                "requests must be a list or tuple of protobuf messages"
+            )
+        response = await self.exchange_multipart(
+            command,
+            tuple(_encode_pb_payload(request) for request in requests),
+            timeout=timeout,
+        )
+        return _decode_pb_payload(response.payload, response_type)
 
     async def _exchange(
         self,
@@ -477,7 +863,8 @@ class WatchBleClient:
         *,
         timeout: float | None,
         after_write: Callable[[float], Awaitable[None]] | None = None,
-    ) -> WatchAppFrame:
+        multipart_chunks: tuple[bytes, ...] | None = None,
+    ) -> WatchAppMessage:
         if not self.connected or self._client is None:
             raise WatchBleConnectionError("watch is not connected")
         if self._write_characteristic is None or not self._notify_started:
@@ -486,61 +873,77 @@ class WatchBleClient:
         if wait_seconds <= 0:
             raise ValueError("timeout must be positive")
 
-        async with self._exchange_lock:
-            if not self.connected:
-                raise WatchBleDisconnectedError("watch disconnected before exchange")
-            sequence = self._next_sequence
-            self._next_sequence = (sequence + 1) & 0xFFFF
-            loop = asyncio.get_running_loop()
-            deadline = loop.time() + wait_seconds
-            pending: asyncio.Future[WatchAppFrame] = loop.create_future()
-            self._pending = pending
-            self._pending_command = command
-            self._pending_sequence = sequence
-            try:
-                await self._write_app_frame(
+        if not self.connected:
+            raise WatchBleDisconnectedError("watch disconnected before exchange")
+        sequence = self._allocate_sequence()
+        try:
+            if multipart_chunks is None:
+                if len(payload) > APP_MAX_DATA_LENGTH:
+                    raise WatchAppProtocolError(
+                        f"App payload is {len(payload)} bytes; single-frame "
+                        f"limit is {APP_MAX_DATA_LENGTH}. Use semantic "
+                        "multipart chunks"
+                    )
+                frames = (
                     WatchAppFrame(
                         command=command,
                         sequence=sequence,
                         payload=payload,
-                    )
+                    ),
                 )
-                if after_write is not None:
+            else:
+                frames = encode_multipart_chunks(
+                    command,
+                    sequence,
+                    multipart_chunks,
+                )
+        except WatchAppProtocolError as exc:
+            raise WatchBleProtocolError(str(exc)) from exc
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + wait_seconds
+        pending: asyncio.Future[WatchAppMessage] = loop.create_future()
+        request_key = (command, sequence)
+        self._pending_requests[request_key] = pending
+        try:
+            if after_write is None:
+                await self._write_app_frames(frames)
+            else:
+                async with self._write_lock:
+                    for frame in frames:
+                        await self._write_app_frame_unlocked(frame)
                     remaining = deadline - loop.time()
                     if remaining <= 0:
                         raise WatchBlePairingTimeoutError(
                             "BLE pairing could not start before bind timed out"
                         )
                     await after_write(remaining)
-                remaining = deadline - loop.time()
-                if remaining <= 0:
-                    raise WatchBleTimeoutError(
-                        f"timed out waiting for command=0x{command:04x} "
-                        f"sequence={sequence}"
-                    )
-                try:
-                    return await asyncio.wait_for(pending, remaining)
-                except asyncio.TimeoutError as exc:
-                    raise WatchBleTimeoutError(
-                        f"timed out waiting for command=0x{command:04x} "
-                        f"sequence={sequence}"
-                    ) from exc
-            except WatchBleError:
-                raise
-            except Exception as exc:
-                raise WatchBleConnectionError(f"BLE exchange failed: {exc}") from exc
-            finally:
-                # A disconnect can complete the response future while a
-                # separate write/pairing error is already being propagated.
-                # Consume or cancel it so asyncio does not report an orphaned
-                # exception after the exchange has ended.
-                if pending.done() and not pending.cancelled():
-                    pending.exception()
-                else:
-                    pending.cancel()
-                self._pending = None
-                self._pending_command = None
-                self._pending_sequence = None
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                raise WatchBleTimeoutError(
+                    f"timed out waiting for command=0x{command:04x} "
+                    f"sequence={sequence}"
+                )
+            try:
+                return await asyncio.wait_for(pending, remaining)
+            except asyncio.TimeoutError as exc:
+                raise WatchBleTimeoutError(
+                    f"timed out waiting for command=0x{command:04x} "
+                    f"sequence={sequence}"
+                ) from exc
+        except WatchBleError:
+            raise
+        except Exception as exc:
+            raise WatchBleConnectionError(f"BLE exchange failed: {exc}") from exc
+        finally:
+            # A disconnect can complete the response future while a separate
+            # write/pairing error is already being propagated. Consume or
+            # cancel it so asyncio does not report an orphaned exception.
+            if pending.done() and not pending.cancelled():
+                pending.exception()
+            else:
+                pending.cancel()
+            if self._pending_requests.get(request_key) is pending:
+                del self._pending_requests[request_key]
 
     async def capture_screenshot(
         self,
@@ -559,17 +962,29 @@ class WatchBleClient:
         except WatchBleScreenshotProtocolError as exc:
             raise WatchBleProtocolError(str(exc)) from exc
 
-        async with self._exchange_lock:
+        async with self._screenshot_lock:
             if not self.connected:
                 raise WatchBleDisconnectedError(
                     "watch disconnected before screenshot request"
                 )
-            outer_sequence = self._next_sequence
-            self._next_sequence = (outer_sequence + 1) & 0xFFFF
+            outer_sequence = self._allocate_sequence()
             loop = asyncio.get_running_loop()
             screenshot: asyncio.Future[WatchBleScreenshot] = loop.create_future()
             self._screenshot_future = screenshot
             self._screenshot_assembler = WatchBleScreenshotAssembler(capture_sequence)
+            ack_queue: asyncio.Queue[
+                WatchBleScreenshotFeedResult | None
+            ] = asyncio.Queue()
+            self._screenshot_ack_queue = ack_queue
+            self._screenshot_ack_task = asyncio.create_task(
+                self._write_screenshot_acks(
+                    capture_sequence=capture_sequence,
+                    outer_sequence=outer_sequence,
+                    queue=ack_queue,
+                    screenshot=screenshot,
+                ),
+                name=f"watch-ble-screenshot-ack-{capture_sequence}",
+            )
             try:
                 await self._write_app_frame(
                     WatchAppFrame(
@@ -612,12 +1027,18 @@ class WatchBleClient:
                     f"BLE screenshot exchange failed: {exc}"
                 ) from exc
             finally:
+                completed = bool(
+                    screenshot.done()
+                    and not screenshot.cancelled()
+                    and screenshot.exception() is None
+                )
+                self._screenshot_assembler = None
+                await self._stop_screenshot_ack_writer(drain=completed)
                 if screenshot.done() and not screenshot.cancelled():
                     screenshot.exception()
                 else:
                     screenshot.cancel()
                 self._screenshot_future = None
-                self._screenshot_assembler = None
 
     async def _pair_after_bind_write(self, timeout: float) -> None:
         client = self._client
@@ -709,12 +1130,15 @@ class WatchBleClient:
         if self._closed and self._client is None:
             return
         self._closed = True
-        pending = self._pending
-        if pending is not None and not pending.done():
-            pending.set_exception(WatchBleDisconnectedError("BLE client closed"))
+        self._fail_pending_exchanges(
+            WatchBleDisconnectedError("BLE client closed")
+        )
         screenshot = self._screenshot_future
         if screenshot is not None and not screenshot.done():
             screenshot.set_exception(WatchBleDisconnectedError("BLE client closed"))
+        self._screenshot_assembler = None
+        self._message_assembler.reset()
+        await self._stop_screenshot_ack_writer(drain=False)
         client = self._client
         notify_characteristic = self._notify_characteristic
         self._client = None

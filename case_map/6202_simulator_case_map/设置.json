@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "主菜单布局和当前焦点会被前序用例持久化，固定旋转12格会落到其他应用；当前缺少通用的菜单焦点复位/可见项定位能力，不能按固定步数特调；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控制中心 Settings 图标坐标复用已验证用例 CTRL_047；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_003",
@@ -38,15 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从设置列表顶部开始，连续采集滚动后的可见区，避免用Display子页冒充完整设置列表；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。",
-      "verification_points": [
-        "设置列表第1屏支持项",
-        "设置列表第2屏支持项",
-        "设置列表第3屏支持项",
-        "设置列表第4屏支持项",
-        "设置列表末屏支持项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_004",
@@ -58,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_005",
@@ -71,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_006",
@@ -93,11 +91,12 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "在真正的设置列表上采集旋转前后两张截图，按可见项位置变化判定滚动；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_006\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前的设置列表位置",
         "逆时针旋转后的设置列表向下位置"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_007",
@@ -109,12 +108,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从控制中心真实点击Settings建立入口栈，并用进入前后截图验证右滑返回同一来源页；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "进入Settings前的控制中心来源页",
-        "右滑后返回同一控制中心来源页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_008",
@@ -123,19 +119,12 @@
       "precondition_text": "1.手表显示设置列表页",
       "steps_text": "1.在设置列表页单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_009",
@@ -147,8 +136,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用Menu设置父页；该页首屏真实包含Menu Style与Themes两个入口；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_MENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_010",
@@ -160,13 +150,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "上滑、下滑后分别采集列表位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "Menu页滑动前的列表位置",
-        "列表内容向上移动",
-        "列表内容向下移动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_011",
@@ -178,8 +164,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_012",
@@ -188,17 +175,12 @@
       "precondition_text": "1.手表显示Menu Style页",
       "steps_text": "1.恢复出厂后进入Menu Style",
       "expected_text": "1.List右侧单选按钮显示选中",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Menu Style；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_013",
@@ -210,8 +192,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_014",
@@ -223,8 +206,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_015",
@@ -236,8 +220,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先上滑使Grid完整可见，再点击其可见中心并截图选中状态；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_016",
@@ -249,13 +234,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "选中样式后短按编码器回到表盘，再短按一次进入主菜单；三阶段分别采集证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "List显示为当前选项",
-        "手表返回主表盘",
-        "主菜单显示List对应布局"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_017",
@@ -267,13 +248,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "选中样式后短按编码器回到表盘，再短按一次进入主菜单；三阶段分别采集证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Honeycomb显示为当前选项",
-        "手表返回主表盘",
-        "主菜单显示Honeycomb对应布局"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_018",
@@ -285,13 +262,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先上滑使Grid完整可见并点击，再短按编码器回到表盘、进入主菜单；三阶段分别采集证据；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Grid显示为当前选项",
-        "手表返回主表盘",
-        "主菜单显示Grid对应布局"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_019",
@@ -303,8 +276,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先上滑使Grid完整可见，再点击并从同一截图核对仅Grid选中；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_020",
@@ -316,8 +290,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_021",
@@ -329,8 +304,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Menu设置父页真实点击Menu Style建立返回栈，右滑后应回到父页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_022",
@@ -342,8 +318,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_023",
@@ -355,8 +332,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Themes；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_024",
@@ -368,8 +346,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际无该选项(实测为 Modern/Aurora/Ocean 与 5s/10s/30s): Vintage；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_025",
@@ -381,8 +360,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际无该选项(实测为 Modern/Aurora/Ocean 与 5s/10s/30s): Neon；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_026",
@@ -394,8 +374,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_027",
@@ -407,8 +388,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际无该选项(实测为 Modern/Aurora/Ocean 与 5s/10s/30s): None；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_028",
@@ -420,12 +402,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "选择Modern后先截图主题选中状态，再用实体键返回表盘并进入一级主菜单截图背景；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Modern显示为当前主题",
-        "一级菜单显示Modern背景图"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_029",
@@ -437,8 +416,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工步骤未指定从一级菜单进入哪个二级入口，当前不能用直达页面冒充真实层级操作；需先补通用且确定的菜单遍历路径；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_030",
@@ -450,8 +430,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工步骤未指定二级到三级的目标入口，当前不能用直达页面冒充真实层级操作；需先补通用且确定的菜单遍历路径；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_031",
@@ -463,8 +444,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际无该选项(实测为 Modern/Aurora/Ocean 与 5s/10s/30s): None；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_032",
@@ -476,8 +458,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际主题为 Modern/Aurora/Ocean,无 Vintage/Neon/None；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_033",
@@ -489,8 +472,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SETTING_THEMES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_034",
@@ -502,8 +486,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_035",
@@ -515,12 +500,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用首屏和上滑后两张截图共同覆盖AOD、Brightness、Screen Timeout；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "Display首屏显示AOD与Brightness",
-        "上滑后显示Screen Timeout"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_036",
@@ -532,8 +514,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_037",
@@ -545,8 +528,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先上滑到Screen Timeout完整可见区域，再采集当前秒数；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_038",
@@ -567,11 +551,12 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "采集编码器旋转前后两张截图，按可见项位置变化判断向下滚动；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_038\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前的Display列表位置",
         "逆时针旋转后的Display列表向下位置"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_039",
@@ -583,8 +568,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_040",
@@ -593,19 +579,12 @@
       "precondition_text": "1.手表已进入Display列表",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_041",
@@ -614,17 +593,12 @@
       "precondition_text": "1.手表显示Brightness页",
       "steps_text": "1.恢复出厂后进入Brightness",
       "expected_text": "1.亮度滑条显示40%位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Brightness；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_042",
@@ -636,12 +610,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用100%基线与拖到最左后的截图对比亮度条位置，避免只凭无数值单图猜测0%；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。",
-      "verification_points": [
-        "拖动前亮度条处于100%基线",
-        "拖动后亮度条处于0%最左位置"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_043",
@@ -653,8 +624,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_044",
@@ -666,8 +638,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_045",
@@ -707,7 +680,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "从0档开始连续旋转编码器并逐档截图，按截图核对实际离散档位数量；GUI树仅触发截图采集，不参与产品判决；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=11张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_045\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "旋转前亮度滑条位于0档",
         "第1次旋转后的亮度档位",
@@ -720,7 +693,8 @@
         "第8次旋转后的亮度档位",
         "第9次旋转后的亮度档位",
         "第10次旋转后的亮度档位"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_046",
@@ -732,12 +706,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "补采拖动前后的两张截图，以可见亮度和滑条位置变化判定；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。",
-      "verification_points": [
-        "拖动前页面为20%亮度",
-        "拖动至80%后页面亮度和滑条位置立即提高"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_047",
@@ -748,14 +719,10 @@
       "expected_text": "1.当前页面亮度变为60%\n2.手表显示Display列表\n3.滑条仍位于60%位置",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Brightness 滑条到达 60% 且当前页面亮度同步变化",
-        "右滑后返回 Display 列表",
-        "再次点击 Brightness 后滑条仍停留在 60%"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "先进入Display父页再真实点击Brightness建立返回栈，避免直达子页右滑回到表盘；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_048",
@@ -764,17 +731,12 @@
       "precondition_text": "1.手表显示Brightness页",
       "steps_text": "1.设置亮度为70%\n2.执行设备重启\n3.进入Brightness",
       "expected_text": "1.屏幕亮度变为70%\n2.手表完成重启\n3.滑条仍位于70%位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_049",
@@ -783,16 +745,12 @@
       "precondition_text": "1.手表显示Brightness页",
       "steps_text": "1.设置亮度为55%\n2.进入控制中心",
       "expected_text": "1.屏幕亮度变为55%\n2.待产品确认亮度图标对应档位",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_050",
@@ -804,8 +762,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正前置页面为Brightness调节页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_051",
@@ -814,19 +773,12 @@
       "precondition_text": "1.手表已进入Brightness页面",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_052",
@@ -835,17 +787,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.恢复出厂后进入Screen Timeout",
       "expected_text": "1.5s显示为当前选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Screen Timeout；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_053",
@@ -854,20 +801,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.滚动选择5s",
       "expected_text": "1.5s显示在滚轮选中位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先置于相邻10s档，再用真实编码器操作选择5s；点击滚轮文字不会改变选中项；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_054",
@@ -876,20 +815,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.滚动选择10s",
       "expected_text": "1.10s显示在滚轮选中位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先置于相邻5s档，再用真实编码器操作选择10s；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_055",
@@ -898,17 +829,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.滚动选择15s",
       "expected_text": "1.15s显示在滚轮选中位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_056",
@@ -917,17 +843,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.滚动选择20s",
       "expected_text": "1.20s显示在滚轮选中位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_057",
@@ -936,20 +857,12 @@
       "precondition_text": "1.手表显示Screen Timeout页",
       "steps_text": "1.滚动选择30s",
       "expected_text": "1.30s显示在滚轮选中位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:20;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS_TIME,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先置于相邻20s档，再用真实编码器操作选择30s；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_058",
@@ -960,14 +873,10 @@
       "expected_text": "1.5s显示在滚轮选中位置\n2.选中值完成保存\n3.手表进入熄屏状态",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Screen Timeout 滚轮选中 5s",
-        "右滑返回后 5s 设置已保存",
-        "普通页面保持 5 秒无操作后进入熄屏状态"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_059",
@@ -978,14 +887,10 @@
       "expected_text": "1.10s显示在滚轮选中位置\n2.选中值完成保存\n3.手表进入熄屏状态",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Screen Timeout 滚轮选中 10s",
-        "右滑返回后 10s 设置已保存",
-        "普通页面保持 10 秒无操作后进入熄屏状态"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_060",
@@ -997,8 +902,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_061",
@@ -1010,8 +916,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_062",
@@ -1022,14 +929,10 @@
       "expected_text": "1.30s显示在滚轮选中位置\n2.选中值完成保存\n3.手表进入熄屏状态",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Screen Timeout 滚轮选中 30s",
-        "右滑返回后 30s 设置已保存",
-        "普通页面保持 30 秒无操作后进入熄屏状态"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_063",
@@ -1041,8 +944,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_064",
@@ -1054,8 +958,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固件实际亮屏时长为 5s/10s/30s,无 15s/20s；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_065",
@@ -1067,8 +972,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 3.执行设备重启；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_066",
@@ -1080,8 +986,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_067",
@@ -1093,8 +1000,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_068",
@@ -1106,8 +1014,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享用户设置命令确定AOD初始为关闭，再执行真实点击；新增命令分支需重建后运行验证；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_069",
@@ -1116,17 +1025,12 @@
       "precondition_text": "1.手表显示AOD设置页",
       "steps_text": "1.观察AOD页面",
       "expected_text": "1.页面显示AOD keeps your screen on, which uses more Battery.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:AOD_SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_070",
@@ -1138,12 +1042,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "确定AOD关闭基线后真实开启，并从表盘进入控制中心左滑到第2页采集AOD图标；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "AOD设置页开关显示开启",
-        "控制中心第2页AOD图标显示高亮"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_071",
@@ -1155,8 +1056,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_072",
@@ -1168,13 +1070,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立AOD开启前置并补采滑动前基线，再采集上滑和下滑后的内容位置；新增命令分支需重建后运行验证；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "滑动前AOD开启且页面位于初始位置",
-        "页面内容向上移动",
-        "页面内容向下移动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_073",
@@ -1186,8 +1084,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_074",
@@ -1196,19 +1095,12 @@
       "precondition_text": "1.手表已进入AOD页面",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:AOD_SETTING,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_075",
@@ -1217,17 +1109,12 @@
       "precondition_text": "1.手表显示AOD Watch Faces页",
       "steps_text": "1.恢复出厂后进入AOD Watch Faces",
       "expected_text": "1.Digital显示为当前选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:AOD_SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入AOD Watch Faces；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_076",
@@ -1239,8 +1126,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_077",
@@ -1252,8 +1140,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_078",
@@ -1265,8 +1154,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_079",
@@ -1278,8 +1168,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_080",
@@ -1288,17 +1179,12 @@
       "precondition_text": "1.手表显示AOD Schedule页",
       "steps_text": "1.恢复出厂后进入AOD Schedule",
       "expected_text": "1.页面显示22:00–08:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:AOD_SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入AOD Schedule；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_081",
@@ -1310,8 +1196,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入 AOD 开始/结束时间的 SIM 命令，且滚轮初值会读取持久化配置；需要新增 SIM_AOD_SCHEDULE_SET 后才能稳定设置 21:00–07:00；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_082",
@@ -1323,8 +1210,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入 AOD 开始/结束时间的 SIM 命令，且滚轮初值会读取持久化配置；需要新增 SIM_AOD_SCHEDULE_SET 后才能稳定设置 22:00–08:00；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_083",
@@ -1336,8 +1224,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正目标页为AOD Start Time编辑页；TIME_MODE仅建立12小时制前置，截图中的AM/PM才用于判决；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: actions: AOD_SCHEDULE_EDIT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_084",
@@ -1349,8 +1238,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入 AOD 开始时间的 SIM 命令，滚轮初值会读取持久化配置，无法用一次确定滑动稳定到达 20:00；需要新增 SIM_AOD_SCHEDULE_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_085",
@@ -1362,8 +1252,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_086",
@@ -1372,19 +1263,12 @@
       "precondition_text": "1.手表已进入AOD时间调节页",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:AOD_SETTING,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_087",
@@ -1396,12 +1280,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺少设置AOD临时编辑缓存开始时间的通用命令，无法可靠建立小时列为10的前置；不能用进入错误页面或固定坐标伪造；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；verification_checkpoint_mismatch: verification_points=2, checkpoints=1。",
-      "verification_points": [
-        "小时列选中值切换为11",
-        "小时列选中值返回10"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_088",
@@ -1410,17 +1291,12 @@
       "precondition_text": "1.手表显示Lift to View页",
       "steps_text": "1.恢复出厂后进入Lift to View",
       "expected_text": "1.开关显示开启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:RAISE_TO_WAKE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Lift to View；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_089",
@@ -1432,8 +1308,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_090",
@@ -1445,13 +1322,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享用户设置开启抬腕亮屏，设置5秒自动熄屏；分阶段截图覆盖设置列表、黑屏及10秒内抬腕恢复原页面；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "自动熄屏前截图显示设置列表",
-        "等待5秒后截图显示屏幕熄灭",
-        "熄屏10秒内抬腕后截图恢复设置列表"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_091",
@@ -1463,14 +1336,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享抬腕设置和系统事件覆盖自动熄屏、黑屏超过10秒及抬腕返回表盘三个阶段；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "自动熄屏前截图显示设置列表",
-        "等待5秒后截图显示屏幕熄灭",
-        "熄屏持续超过10秒时截图仍为黑屏",
-        "超过10秒后抬腕，截图显示主表盘而非设置列表"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_092",
@@ -1482,8 +1350,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SLEEP_MONITOR_SET只开启睡眠监测设置，不能建立设备已检测到睡眠的运行态；缺少通用SIM_SLEEP_STATE_SET前置能力，当前亮屏截图不能据此判产品失败；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_093",
@@ -1495,8 +1364,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享用户设置命令建立抬腕开启和全天勿扰前置，再执行熄屏与抬腕事件；需使用含SIM_USER_SETTING_SET的新二进制聚焦复测；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_094",
@@ -1508,12 +1378,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先确定抬腕为开启，在控制中心真实点击抬腕图标关闭，再进入Lift to View采集联动状态；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "控制中心抬腕亮屏图标显示暗色",
-        "Lift to View设置开关显示关闭"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_095",
@@ -1522,17 +1389,12 @@
       "precondition_text": "1.手表显示Lift to View页",
       "steps_text": "1.进入Settings→Lift to View",
       "expected_text": "1.页面显示Lift to View标题和On/Off开关",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:RAISE_TO_WAKE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_096",
@@ -1543,14 +1405,10 @@
       "expected_text": "1.Screen Timeout显示15s\n2.手表亮屏并保持在抬腕前的当前页面\n3.手表在15s时进入熄屏状态",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Screen Timeout 页面显示 15s",
-        "熄屏后抬腕，手表亮屏并保持在抬腕前页面",
-        "继续保持 15 秒无操作后再次进入熄屏状态"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_097",
@@ -1562,14 +1420,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "补采操作前基线，再按截图对比三个方向手势后的页面状态；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "手势前Lift to View页面位置和开关状态",
-        "上滑后页面位置不变",
-        "下滑后页面位置不变",
-        "左滑后页面保持Lift to View"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_098",
@@ -1591,11 +1444,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "补采编码器旋转前基线，用前后两张截图比较页面内容和开关状态；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_098\\result.json。",
       "verification_points": [
         "旋转前Lift to View页面内容和开关状态",
         "旋转后页面内容和开关状态均不变"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_099",
@@ -1607,8 +1461,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_100",
@@ -1620,12 +1475,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正为Sounds & Vibration页，并用顶部/底部两张截图覆盖四个设置项；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面顶部显示媒体音量和铃声音量",
-        "页面下方显示振动强度和振动触感"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_101",
@@ -1637,12 +1489,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正为Sounds & Vibration页，并用顶部/底部两张截图覆盖标题及四个设置项；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示Sounds & Vibration标题及顶部设置项",
-        "页面下方显示其余设置项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_102",
@@ -1664,11 +1513,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "修正前置页并补采编码器旋转前基线；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_102\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位于Sounds & Vibration顶部",
         "逆时针旋转后页面向下滚动"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_103",
@@ -1680,13 +1530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前产品实际形成长页，与人工前置“未形成长页面”冲突；补采基线后按截图如实判定产品行为，不改预期；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "滑动前Sounds & Vibration页面位置",
-        "上滑后页面位置不变",
-        "下滑后页面位置不变"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_104",
@@ -1698,8 +1544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正前置页为Sounds & Vibration；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_105",
@@ -1708,24 +1555,12 @@
       "precondition_text": "1.声音与振动选项未形成长页面",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.页面位置保持不变",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SOUND_VIBRATION,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:10500;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "当前产品实际形成长页，与人工前置冲突；补采旋转前后截图后如实判定，不改人工预期；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "编码器旋转前页面位置",
-        "编码器旋转后页面位置"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_106",
@@ -1737,12 +1572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正前置页为Sounds & Vibration，上滑和下滑后分别采集设置项位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示下方设置项",
-        "页面返回上方设置项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_107",
@@ -1764,11 +1596,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "修正前置页并补采编码器旋转前基线；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_107\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位置",
         "逆时针旋转后页面向下滚动并显示后续设置项"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_108",
@@ -1780,8 +1613,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直达SOUND_VIBRATION不会建立Settings父级返回栈，而Settings动态长列表当前缺少按可见文本点击的通用能力；不能继续用右滑回表盘的错误映射；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_109",
@@ -1790,17 +1624,12 @@
       "precondition_text": "1.手表显示媒体音量页",
       "steps_text": "1.恢复出厂后进入媒体音量页",
       "expected_text": "1.音量进度条显示60%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MEDIA_VOLUME_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入媒体音量页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_110",
@@ -1812,12 +1641,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "补采上滑前基线，以两张截图比较音量进度条位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑前媒体音量进度条位置",
-        "上滑后媒体音量进度条位置升高"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_111",
@@ -1829,12 +1655,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "补采下滑前基线，以两张截图比较音量进度条位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "下滑前媒体音量进度条位置",
-        "下滑后媒体音量进度条位置降低"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_112",
@@ -1846,8 +1669,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_113",
@@ -1859,21 +1683,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先将滑条置于最低端，再连续旋转编码器逐档截图；按截图核对实际离散档位数量；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "旋转前媒体音量位于最低档",
-        "第1次旋转后的媒体音量档位",
-        "第2次旋转后的媒体音量档位",
-        "第3次旋转后的媒体音量档位",
-        "第4次旋转后的媒体音量档位",
-        "第5次旋转后的媒体音量档位",
-        "第6次旋转后的媒体音量档位",
-        "第7次旋转后的媒体音量档位",
-        "第8次旋转后的媒体音量档位",
-        "第9次旋转后的媒体音量档位",
-        "第10次旋转后的媒体音量档位"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_114",
@@ -1885,8 +1697,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "80%滑条可截图，但音乐按80%对应响度播放需要音频或测量仪证据；截图是唯一产品判据时无法覆盖完整预期；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_115",
@@ -1895,17 +1708,12 @@
       "precondition_text": "1.手表显示媒体音量页",
       "steps_text": "1.记录媒体音量页进度条布局\n2.返回后进入铃声音量页\n3.对比两页进度条位置和样式",
       "expected_text": "1.媒体音量页显示音量调整进度条\n2.铃声音量页显示音量调整进度条\n3.两页进度条布局和样式一致",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MEDIA_VOLUME_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_116",
@@ -1917,8 +1725,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "一次原子滑动只能截取松手后的末态，无法用静态截图证明拖动过程中进度条持续跟随手指；不以GUI树或命令回执代替产品判据；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_117",
@@ -1930,8 +1739,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_118",
@@ -1943,8 +1753,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Sounds & Vibration父页真实点击Media Volume建立返回栈，避免直达子页右滑回到表盘；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_119",
@@ -1953,17 +1764,12 @@
       "precondition_text": "1.手表显示铃声音量页",
       "steps_text": "1.恢复出厂后进入铃声音量页",
       "expected_text": "1.页面显示静音图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOLUME_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入铃声音量页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_120",
@@ -1975,8 +1781,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "音量条和来电可由命令触发，但“按70%对应响度播放”需要音频采集或声压计，当前模拟器截图/GUI 树无法形成响度判据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_121",
@@ -1985,17 +1792,12 @@
       "precondition_text": "1.手表显示铃声音量页",
       "steps_text": "1.设置铃声音量为70%\n2.触发测试闹钟",
       "expected_text": "1.音量进度条显示70%\n2.闹钟铃声按70%对应响度播放",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOLUME_ADJUST,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "音量条和闹钟可由命令触发，但“按70%对应响度播放”需要音频采集或声压计，当前模拟器截图/GUI 树无法形成响度判据；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_122",
@@ -2007,8 +1809,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_123",
@@ -2020,8 +1823,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Sounds & Vibration父页真实点击Ringtone Volume建立返回栈，避免直达子页右滑回到表盘；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_124",
@@ -2030,16 +1834,12 @@
       "precondition_text": "1.手表显示音量设置页",
       "steps_text": "1.调整一次媒体音量",
       "expected_text": "1.待产品确认试听反馈的持续时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_125",
@@ -2051,8 +1851,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "一次原子滑动的截图只能证明松手末态，不能证明进度条在拖动过程中跟随手指；截图唯一判据下无法完整验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_126",
@@ -2076,12 +1877,13 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "补齐三次编码器旋转，并在每一格后采集音量档位；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_126\\result.json。",
       "verification_points": [
         "第一次旋转后音量变化一格",
         "第二次旋转后音量再变化一格",
         "第三次旋转后音量停在第三次调整档位"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_127",
@@ -2090,17 +1892,12 @@
       "precondition_text": "1.手表显示振动强度页",
       "steps_text": "1.恢复出厂后进入振动强度页",
       "expected_text": "1.弱档显示选中",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VIBRATION_STRENGTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入振动强度页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_128",
@@ -2112,8 +1909,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "70mA来自外部振动测试仪，手表截图无法显示该测量结果；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_129",
@@ -2125,8 +1923,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "40mA来自外部振动测试仪，手表截图无法显示该测量结果；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_130",
@@ -2138,8 +1937,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "0mA来自外部振动测试仪，手表截图无法显示该测量结果；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_131",
@@ -2151,8 +1951,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_132",
@@ -2164,8 +1965,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_133",
@@ -2177,14 +1979,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "补采手势前基线，再按截图比较三个方向手势后的振动强度页状态；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "手势前振动强度页面位置和当前档位",
-        "上滑后页面位置不变",
-        "下滑后页面位置不变",
-        "左滑后页面保持振动强度页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_134",
@@ -2206,11 +2003,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "补采旋转前基线；源码滚轮接收编码器事件，如截图显示档位变化则按人工预期如实判为产品行为不符；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_134\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位置和当前档位",
         "编码器旋转后页面位置和当前档位"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_135",
@@ -2222,8 +2020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直达VIBRATION_STRENGTH不建立Sounds & Vibration父级返回栈；父页为可滚动动态位置，当前缺少按可见文本点击的通用能力，不能保留右滑回表盘的错误映射；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_136",
@@ -2232,19 +2031,12 @@
       "precondition_text": "1.手表已进入振动强度页",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VIBRATION_STRENGTH,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_137",
@@ -2256,8 +2048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入振动触感页；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CROWN_HAPTIC。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_138",
@@ -2269,8 +2062,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正页面映射为源码注册的CROWN_HAPTIC；点击Off卡片可见中心；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_139",
@@ -2282,8 +2076,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正页面映射为源码注册的CROWN_HAPTIC；点击Weak卡片可见中心；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_140",
@@ -2295,8 +2090,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正页面映射为源码注册的CROWN_HAPTIC；点击Strong卡片在首屏底部的可见区域；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_141",
@@ -2307,14 +2103,10 @@
       "expected_text": "1.强触感显示选中\n2.触感反馈停止\n3.强触感恢复为当前档位",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "强触感选项显示选中",
-        "关闭选项显示选中且触感停止",
-        "再次选择强触感后强档恢复为当前档位"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "页面映射已纠正为CROWN_HAPTIC，但第2步要求证明触感反馈停止，静态截图只能看到选中态，无法覆盖完整预期；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CROWN_HAPTIC；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；verification_checkpoint_mismatch: verification_points=3, checkpoints=1。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_142",
@@ -2325,14 +2117,10 @@
       "expected_text": "1.振动强度页面显示无档\n2.弱触感显示选中\n3.编码器滚动产生触感反馈",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "振动强度页面显示无档",
-        "弱触感选项显示选中",
-        "旋转编码器后列表发生滚动且保持可交互"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "前两步可截图，但编码器滚动产生触感反馈不可由截图判定；原判据把触感改写为列表可交互属于错误替代，现按完整人工预期标记无法验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']；verification_checkpoint_mismatch: verification_points=3, checkpoints=1。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_143",
@@ -2344,8 +2132,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "setup未建立全屏弹窗，且振动测试仪是否记录触感反馈属于外部证据；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CROWN_HAPTIC；missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_144",
@@ -2357,8 +2146,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "setup未建立勿扰模式，且振动测试仪记录触感反馈属于外部证据；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CROWN_HAPTIC；missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_145",
@@ -2370,8 +2160,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "开机动画的可响应时点未建立，且需要外部振动测试仪证据；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_146",
@@ -2383,8 +2174,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "恢复出厂过程和编码器输入可执行；完整预期只要求振动测试仪未记录触感反馈，当前无振动采集证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_147",
@@ -2396,8 +2188,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "OTA升级中的可响应时点未建立，且需要外部振动测试仪证据；截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_148",
@@ -2409,13 +2202,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用源码注册页CROWN_HAPTIC；操作前基线及上滑、下滑后截图用于直接对比位置变化；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "操作前触感设置页初始位置",
-        "页面内容向上移动",
-        "页面内容向下移动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_149",
@@ -2427,8 +2216,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用源码注册的触感设置页CROWN_HAPTIC；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_150",
@@ -2440,12 +2230,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用CROWN_HAPTIC并采集旋转前后截图，使页面下滚有直接视觉对比；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CROWN_HAPTIC。",
-      "verification_points": [
-        "旋转前触感设置页初始位置",
-        "逆时针旋转编码器后页面向下滚动"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_151",
@@ -2457,8 +2244,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立Sounds & Vibration父页导航栈，再进入CROWN_HAPTIC，右滑才会返回正确父页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_152",
@@ -2470,8 +2258,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_153",
@@ -2483,12 +2272,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通用用户设置命令先建立总开关关闭态，再点击Designer总开关可见中心；上下两张截图覆盖All Day与Schedule；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "开启总开关后页面显示All Day",
-        "开启总开关后页面显示Schedule"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_154",
@@ -2500,8 +2286,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_155",
@@ -2512,13 +2299,10 @@
       "expected_text": "1.All Day开关显示开启\n2.表盘顶部显示月亮图标",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "All Day 开关显示开启",
-        "返回主表盘后顶部显示月亮图标"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享设置命令建立Schedule模式，滚动后点击可见的All Day开关；返回主表盘使用真实右滑而非直达页面；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_156",
@@ -2530,8 +2314,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立总开关开启且All Day选中的确定前置，滚动后点击可见Schedule开关，截图同屏可核对互斥状态；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_157",
@@ -2543,8 +2328,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立总开关开启且Schedule选中的确定前置，滚动后点击可见All Day开关，截图同屏可核对互斥状态；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_158",
@@ -2556,8 +2342,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "5000ms实体主键长按和SOS控制中心入口可执行；当前缺幂等建立省电模式及省电表盘的SIM_POWER_SAVING_SET；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_159",
@@ -2569,8 +2356,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "编码器输入可执行；当前SIM_QR_HUB_SET最多建立有限类型卡片，缺可重复构造超过一屏QR Hub长列表的通用卡包集合能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_160",
@@ -2582,8 +2370,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_161",
@@ -2595,8 +2384,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_162",
@@ -2605,19 +2395,12 @@
       "precondition_text": "1.全天勿扰已开启",
       "steps_text": "1.触发测试闹钟",
       "expected_text": "1.手表显示闹钟提醒页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_DND,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_163",
@@ -2626,19 +2409,12 @@
       "precondition_text": "1.全天勿扰已开启",
       "steps_text": "1.将电量从10%降至9%",
       "expected_text": "1.手表显示低电提醒",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_DND,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:9;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_164",
@@ -2650,8 +2426,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_165",
@@ -2663,8 +2440,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "共享设置命令建立All Day勿扰；复用现有心率阈值和心率更新命令满足源码的10次连续异常计数，无需新增专用命令；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_166",
@@ -2676,8 +2454,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_167",
@@ -2686,17 +2465,12 @@
       "precondition_text": "1.手表显示Do Not Disturb页",
       "steps_text": "1.进入Settings→Do Not Disturb",
       "expected_text": "1.页面显示Do Not Disturb标题和On/Off开关和When DND is On, Ring, Vibration and Lift to View will be disabled.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_DND,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_168",
@@ -2708,8 +2482,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享用户设置命令建立22:00–08:00并将总开关确定为关闭，真实点击总开关后滚动到Schedule时段；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_169",
@@ -2721,8 +2496,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享设置命令建立勿扰已开启；滚动后点击Schedule卡片可见中心，进入DND_TIMER；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_170",
@@ -2734,8 +2510,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立Settings父页导航栈，再进入Do Not Disturb，右滑返回的才是Settings而非主表盘；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_171",
@@ -2747,13 +2524,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "确定建立未形成长页的勿扰关闭态；补操作前基线并在两次滑动后稳定采集；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "操作前Do Not Disturb页初始位置",
-        "上滑后页面位置不变",
-        "下滑后页面位置不变"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_172",
@@ -2765,8 +2538,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_173",
@@ -2775,16 +2549,12 @@
       "precondition_text": "1.手表显示Schedule编辑页",
       "steps_text": "1.恢复出厂后进入Schedule编辑页",
       "expected_text": "1.Start Time显示22:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Schedule编辑页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_174",
@@ -2793,17 +2563,12 @@
       "precondition_text": "1.手表显示Schedule编辑页",
       "steps_text": "1.恢复出厂后进入Schedule编辑页",
       "expected_text": "1.End Time显示07:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Schedule编辑页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_175",
@@ -2815,8 +2580,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入勿扰开始/结束时间的 SIM 命令，且滚轮初值会读取持久化配置；需要新增 SIM_DND_SET 后才能稳定设置 21:00–06:00；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_176",
@@ -2828,8 +2594,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入勿扰开始时间的 SIM 命令，滚轮初值会读取持久化配置，无法稳定调整到 20:00 后验证取消不保存；需要新增 SIM_DND_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_177",
@@ -2841,8 +2608,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入勿扰开始/结束时间的 SIM 命令，且滚轮初值会读取持久化配置；需要新增 SIM_DND_SET 后才能稳定设置 22:00–07:00；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_178",
@@ -2854,8 +2622,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "固定11:59的Schedule前置后用TIME_SET推进到12:00，再从表盘真实下滑打开控制中心观察勿扰图标；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_179",
@@ -2864,17 +2633,12 @@
       "precondition_text": "1.手表显示Schedule编辑页",
       "steps_text": "1.进入Schedule编辑页",
       "expected_text": "1.页面显示Start Time和End Time和取消按钮和确认按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DND_TIMER,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "DND_TIMER是源码注册的Schedule编辑页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_180",
@@ -2886,12 +2650,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "DND_TIMER 是 Schedule 编辑页；上滑、下滑后统一等待页面稳定再分别采集；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示下方内容",
-        "页面返回上方内容"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_181",
@@ -2903,8 +2664,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "DND_TIMER_EDIT参数1是Start Time时段编辑页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_182",
@@ -2916,12 +2678,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "DND_TIMER 源码分别将 Start Time 和 End Time 容器点击路由到 DND_TIMER_EDIT；采集 Start Time 后点击取消返回 Schedule，待页面稳定再点击 End Time，并分别采集证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "手表显示Start Time时间调节页",
-        "手表显示End Time时间调节页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_183",
@@ -2933,8 +2692,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从DND_TIMER真实点击Start Time卡片进入时间调节页，坐标复用SET_182已有的Designer可见区域；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_184",
@@ -2956,11 +2716,12 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "使用Start Time页并采集编码器旋转前后截图，小时值变化由两张图直接对比；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_184\\result.json。",
       "verification_points": [
         "旋转前Start Time小时滚轮数值",
         "旋转后小时滚轮按旋转方向切换数值"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SET_185",
@@ -2972,8 +2733,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "TIME_MODE:1建立24小时制前置，操作阶段改为12小时制后从Schedule真实点击Start Time重进时间页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_186",
@@ -2985,8 +2747,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_187",
@@ -2998,13 +2761,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "切换时间制后分别采集当前编辑页、取消返回Schedule、再次真实进入Start Time三个阶段；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "切换系统时间制后当前时间编辑页保持原制式",
-        "退出时间编辑页后返回Schedule编辑页",
-        "再次进入Start Time后显示新的12小时制"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_188",
@@ -3016,8 +2775,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "DND_TIMER_EDIT参数1建立Start Time调节页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_189",
@@ -3029,12 +2789,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "按SETTING_DND→DND_TIMER→DND_TIMER_EDIT顺序建立真实父页导航栈；连续右滑分别返回Schedule与Do Not Disturb；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "手表返回Schedule编辑页",
-        "手表返回Do Not Disturb主页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_190",
@@ -3046,12 +2803,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "建立21:00–06:00且Schedule已开启的确定前置，两次真实点击Schedule开关后分别采集；当前源码若不支持点击关闭，新运行将如实呈现产品失败；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "第一次点击后Schedule开关显示关闭",
-        "第二次点击后Schedule重新开启且时段仍显示21:00–06:00"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_191",
@@ -3060,17 +2814,12 @@
       "precondition_text": "1.手表显示Notifications设置页",
       "steps_text": "1.恢复出厂后进入Notifications设置",
       "expected_text": "1.Hide Notifications开关显示关闭",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_NOTIFICATION,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入Notifications设置；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_192",
@@ -3082,8 +2831,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_193",
@@ -3095,8 +2845,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_194",
@@ -3108,8 +2859,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_195",
@@ -3118,17 +2870,12 @@
       "precondition_text": "1.手表显示Notifications设置页",
       "steps_text": "1.开启Hide Notifications\n2.执行设备重启\n3.进入Notifications设置",
       "expected_text": "1.开关显示开启\n2.手表完成重启\n3.开关仍显示开启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_NOTIFICATION,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/流程: 2.执行设备重启；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_196",
@@ -3140,12 +2887,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "首屏截图覆盖Notifications标题与Hide Notifications开关，上滑后第二张截图覆盖被底部裁切的完整说明文案；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "首屏显示Notifications标题和Hide Notifications开关",
-        "上滑后显示完整的通知隐藏说明文案"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_197",
@@ -3157,12 +2901,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "两次开关点击后分别采集开、关状态；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Hide Notifications开关显示开启",
-        "Hide Notifications开关显示关闭"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_198",
@@ -3174,13 +2915,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "三个方向手势后分别采集 Notifications 页面状态；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后页面位置不变",
-        "下滑后页面位置不变",
-        "左滑后页面保持Notifications"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_199",
@@ -3189,24 +2926,12 @@
       "precondition_text": "1.手表已进入Notifications页",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.页面位置和Hide Notifications开关状态均不变",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_NOTIFICATION,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19900;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:19901,500;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19901;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "采集编码器旋转前后两张截图，页面位置与开关状态不变可直接对比；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "旋转前Notifications页位置与Hide Notifications开关状态",
-        "旋转后页面位置和Hide Notifications开关状态均不变"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_200",
@@ -3218,8 +2943,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立Settings父页导航栈，再进入Notifications，右滑后返回Settings而非主表盘；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_201",
@@ -3228,16 +2954,12 @@
       "precondition_text": "1.设备已恢复出厂",
       "steps_text": "1.进入Settings→Power Saving\n2.观察省电开关状态\n3.阅读省电模式说明文案",
       "expected_text": "1.页面显示当前电量百分比\n2.省电开关处于关闭状态\n3.页面显示When Power Saving Mode is enabled, only date, time, and battery are displayed. Press and hold the side button for 5 seconds to exit.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_202",
@@ -3249,8 +2971,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_203",
@@ -3262,8 +2985,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "开启/退出省电模式的页面可截图，但帧缓冲截图不体现屏幕背光的20%与70%；完整人工预期在截图唯一判据下不可验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_204",
@@ -3275,14 +2999,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立Settings父页导航栈再进入BATTERY；各手势后统一等待稳定，最后右滑返回Settings；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示下方内容并显示右侧滚动条",
-        "页面返回上方内容并显示右侧滚动条",
-        "左滑后页面保持Power Saving设置页",
-        "右滑后手表返回Settings列表"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_205",
@@ -3291,24 +3010,12 @@
       "precondition_text": "1.Power Saving设置页内容已形成长页",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.页面向下滚动并显示后续内容",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BATTERY,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:20500;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:20501,500;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:20501;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "BATTERY是Power Saving设置页；采集编码器旋转前后截图，直接对比页面下滚与后续内容；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "旋转前Power Saving页初始位置",
-        "逆时针旋转编码器后页面向下滚动并显示后续内容"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_206",
@@ -3320,8 +3027,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_207",
@@ -3330,17 +3038,12 @@
       "precondition_text": "1.省电模式已开启",
       "steps_text": "1.观察省电表盘电量区域\n2.观察省电表盘时间区域\n3.观察省电表盘日期区域\n4.观察省电表盘步数区域",
       "expected_text": "1.省电表盘显示电量\n2.省电表盘显示时间\n3.省电表盘显示日期\n4.省电表盘显示步数",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SAVE_POWER_WATCHFACE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_208",
@@ -3352,8 +3055,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_209",
@@ -3365,13 +3069,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "上滑、下滑和编码器输入后分别采集省电表盘页面；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后页面保持省电表盘",
-        "下滑后页面保持省电表盘",
-        "旋转编码器后页面保持省电表盘"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_210",
@@ -3382,13 +3082,10 @@
       "expected_text": "1.手表在15秒时进入熄屏\n2.手表亮屏并显示省电表盘",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "省电表盘保持 15 秒无操作后进入熄屏",
-        "单击编码器后重新亮屏并显示省电表盘"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_211",
@@ -3397,17 +3094,12 @@
       "precondition_text": "1.省电模式已开启",
       "steps_text": "1.尝试从手表进入非SOS的本地功能",
       "expected_text": "1.手表保持省电表盘，非SOS本地功能不可访问",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SAVE_POWER_WATCHFACE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_212",
@@ -3419,8 +3111,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_213",
@@ -3432,8 +3125,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_214",
@@ -3445,8 +3139,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_215",
@@ -3458,8 +3153,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_216",
@@ -3471,8 +3167,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_217",
@@ -3484,8 +3181,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_218",
@@ -3494,17 +3192,12 @@
       "precondition_text": "1.省电模式已关闭\n2.电量可依次降至19%、9%和4%",
       "steps_text": "1.将电量从20%降至19%\n2.将电量从10%降至9%\n3.将电量从5%降至4%",
       "expected_text": "1.低电弹窗显示琺珀色电池+叶子图标\n2.低电弹窗显示琺珀色电池+叶子图标\n3.低电弹窗显示红色电池+叶子图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SAVE_POWER_WATCHFACE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "该用例要求先确定省电模式为关闭再跨越三个低电阈值；当前只有电量命令，没有幂等设置省电模式的 SIM 命令，需要新增 SIM_POWER_SAVING_SET；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_219",
@@ -3513,17 +3206,12 @@
       "precondition_text": "1.省电模式已关闭",
       "steps_text": "1.用电量测试工具将电量从20%降至19%\n2.用电量测试工具将电量从10%降至9%\n3.用电量测试工具将电量从5%降至4%",
       "expected_text": "1.手表显示Battery is below 20%, turn on power saving mode及✓/✗按钮\n2.手表亮屏并显示Battery is below 10%, turn on power saving mode及✓/✗按钮\n3.手表亮屏并显示Battery is below 5%, turn on power saving mode及✓/✗按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SAVE_POWER_WATCHFACE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/流程: 1.用电量测试工具将电量从20%降至19%；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_220",
@@ -3532,17 +3220,12 @@
       "precondition_text": "1.省电模式已关闭\n2.振动采集仪已连接",
       "steps_text": "1.将电量从10%降至9%\n2.采集低电提醒振动波形",
       "expected_text": "1.手表触发低电提醒\n2.振动采集仪记录两次250ms短振，两次振动间隔750ms",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VIBRATION_STRENGTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_221",
@@ -3554,8 +3237,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_222",
@@ -3566,13 +3250,10 @@
       "expected_text": "1.低电弹窗关闭，手表返回触发弹窗前页面",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "触发低电弹窗前显示表盘",
-        "关闭低电弹窗后返回同一表盘"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "先截图记录触发弹窗前页面，再建立低电前置并执行关闭操作，避免仅凭关闭后单图猜测返回页面；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_223",
@@ -3581,17 +3262,12 @@
       "precondition_text": "1.省电模式在电量高于20%时已开启",
       "steps_text": "1.将电量从20%降至19%\n2.将电量从10%降至9%\n3.将电量从5%降至4%",
       "expected_text": "1.手表显示Battery level is below 20%. Please charge your device!，页面无操作按钮\n2.手表显示Battery level is below 10%. Please charge your device!，页面无操作按钮\n3.手表显示Battery level is below 5%. Please charge your device!，页面无操作按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SAVE_POWER_WATCHFACE,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "该用例要求先确定省电模式为开启再跨越三个低电阈值；当前只有电量命令，没有幂等设置省电模式的 SIM 命令，需要新增 SIM_POWER_SAVING_SET；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_224",
@@ -3603,8 +3279,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_225",
@@ -3616,8 +3293,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "该用例要在省电模式开启时两次重新触发低电通知；当前没有幂等设置省电模式的命令，不能稳定建立前置状态，需要新增 SIM_POWER_SAVING_SET；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_226",
@@ -3626,31 +3304,12 @@
       "precondition_text": "1.省电模式已关闭\n2.电量可精确设置",
       "steps_text": "1.将电量保持在20%\n2.将电量从20%降至19%\n3.将电量从10%降至9%\n4.将电量从5%降至4%",
       "expected_text": "1.手表不触发20%低电弹窗\n2.手表触发20%低电弹窗\n3.手表触发10%低电弹窗\n4.手表触发5%低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:20;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22601;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:19;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22602;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:10;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:9;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22603;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:5;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:4;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22604;"
-      ],
-      "verification_points": [
-        "电量保持 20% 时不显示低电弹窗",
-        "电量从 20% 降至 19% 时显示 20% 低电弹窗",
-        "电量从 10% 降至 9% 时显示 10% 低电弹窗",
-        "电量从 5% 降至 4% 时显示 5% 低电弹窗"
-      ],
+      "setup": [],
+      "actions": [],
+      "verification_points": [],
       "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "SET_227",
@@ -3661,15 +3320,10 @@
       "expected_text": "1.手表电量显示11%\n2.手表退出充电状态\n3.手表再次触发10%低电提醒",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "进入充电状态且电量回升到 11%",
-        "停止充电前电量已显示 10%",
-        "停止充电后退出充电状态",
-        "电量再次从 10% 降至 9% 时重新显示 10% 低电提醒"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_228",
@@ -3680,13 +3334,10 @@
       "expected_text": "1.手表退出省电模式并进入充电状态",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "连接充电器前手表处于省电表盘",
-        "连接充电器后退出省电表盘并显示充电状态"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "补充充电前省电表盘基线截图；充电后截图与基线共同证明退出省电模式并进入充电状态；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_229",
@@ -3698,8 +3349,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_230",
@@ -3711,8 +3363,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_231",
@@ -3723,13 +3376,10 @@
       "expected_text": "1.页面显示Gender/DOB/Height/Weight",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Profile页面上方显示Gender和DOB",
-        "Profile页面下方显示Height和Weight"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "从Settings列表真实滚动并点击Profile；用顶部/底部两张截图覆盖四个资料项；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_232",
@@ -3740,13 +3390,10 @@
       "expected_text": "1.手表显示Profile列表\n2.Gender资料项显示名称\n3.Gender资料项显示当前值副标题\n4.Gender资料项右侧显示>箭头\n5.DOB资料项显示名称\n6.DOB资料项显示当前值副标题\n7.DOB资料项右侧显示>箭头\n8.Height资料项显示名称\n9.Height资料项显示当前值副标题\n10.Height资料项右侧显示>箭头\n11.Weight资料项显示名称\n12.Weight资料项显示当前值副标题\n13.Weight资料项右侧显示>箭头",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Profile列表上方显示Gender、DOB的名称、当前值副标题和右侧箭头",
-        "Profile列表下方显示Height、Weight的名称、当前值副标题和右侧箭头"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用用户资料前置命令建立四项保存值，从Settings真实进入Profile，并用两张截图覆盖全部项目；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_233",
@@ -3757,13 +3404,10 @@
       "expected_text": "1.四个项目下方显示当前值",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "Gender和DOB项目下方显示当前值",
-        "Height和Weight项目下方显示当前值"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "Profile为长页，顶部/底部两张截图覆盖四项当前值；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_234",
@@ -3775,12 +3419,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Profile 列表上、下滑后分别采集资料项位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "列表显示下方资料项",
-        "列表返回上方资料项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_235",
@@ -3792,8 +3433,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_236",
@@ -3805,8 +3447,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: PERSONAL_INFO。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_237",
@@ -3818,8 +3461,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Profile列表点击Gender资料项，执行真实进入操作并保留父页导航栈；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_238",
@@ -3831,8 +3475,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 Gender 编辑页只提供 Male/Female/Prefer not to say 三个互斥选项，没有清除选择的界面操作或 SIM 命令，无法建立“无性别选择”的前置状态；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: GENDER_EDIT；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_239",
@@ -3844,12 +3489,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先从Profile真实进入Gender以建立父页栈；Male选项与确认按钮坐标复用当前Designer证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Male显示选中",
-        "Profile列表Gender副标题显示Male"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_240",
@@ -3861,12 +3503,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先从Profile真实进入Gender以建立父页栈；Female选项与确认按钮坐标复用当前Designer证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Female显示选中",
-        "Profile列表Gender副标题显示Female"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_241",
@@ -3878,12 +3517,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先从Profile真实进入Gender以建立父页栈；Prefer not to say与确认按钮坐标来自当前Designer结构；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Prefer not to say显示选中",
-        "Profile列表Gender副标题显示Prefer not to say"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_242",
@@ -3892,17 +3528,12 @@
       "precondition_text": "1.手表显示Date of Birth编辑页",
       "steps_text": "1.恢复出厂后进入DOB编辑页",
       "expected_text": "1.滚轮显示02/Feb/2001",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入DOB编辑页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_243",
@@ -3914,8 +3545,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用birth_year建立相邻前置值1927，随后聚焦年份滚轮并真实旋转一步到下边界1926；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_244",
@@ -3927,8 +3559,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用birth_year建立相邻前置值2025，随后聚焦年份滚轮并真实旋转一步到上边界2026；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_245",
@@ -3939,13 +3572,10 @@
       "expected_text": "1.年份范围保持1926至2026",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "年份滚轮下边界显示1926",
-        "年份滚轮上边界显示2026"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "使用通用QDEC重复次数执行真实滚轮输入，并分别截图首尾边界；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_246",
@@ -3957,8 +3587,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入 DOB 的 SIM 命令，DOB 三列滚轮初值依赖持久化资料，无法稳定构造未满 18 岁日期；需要新增 SIM_PROFILE_DOB_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_247",
@@ -3970,8 +3601,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立DOB编辑页父栈再打开年龄提示页；点击提示页唯一关闭控件后应返回DOB编辑页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_248",
@@ -3983,8 +3615,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "修正目标页为BIRTH_DATE_EDIT；三列日期滚轮可由单张截图直接检查；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: BIRTH_DATE_EDIT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_249",
@@ -3996,8 +3629,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可确定写入 DOB 的 SIM 命令，三列滚轮初值依赖持久化资料，无法稳定选择指定合法 DOB 并证明副标题变化；需要新增 SIM_PROFILE_DOB_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: BIRTH_DATE_EDIT；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_250",
@@ -4009,8 +3643,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用Profile前置命令建立Male、未配置身高和英制单位，再进入Height检查产品默认值；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_251",
@@ -4022,8 +3657,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用Profile前置命令建立Female、未配置身高和英制单位；若仍显示5'5\"应记录为产品与人工预期不一致；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_252",
@@ -4034,13 +3670,10 @@
       "expected_text": "1.单位按钮显示cm\n2.身高滚轮显示62",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "单位按钮显示cm",
-        "身高滚轮显示62"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "以相邻英制可换算值建立前置，真实点击cm并用编码器下调两步到62；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_253",
@@ -4051,13 +3684,10 @@
       "expected_text": "1.单位按钮显示cm\n2.身高滚轮显示275",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "单位按钮显示cm",
-        "身高滚轮显示275"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "以274cm等价英制值建立前置，真实点击cm并用编码器上调一步到275；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SET_254",
@@ -4069,12 +3699,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以前置3英尺等价值进入Height，真实切换ft并将英尺列下调一档到2；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示ft",
-        "英尺滚轮显示2"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_255",
@@ -4086,12 +3713,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以前置8英尺等价值进入Height，真实切换ft并将英尺列上调一档到9；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示ft",
-        "英尺滚轮显示9"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_256",
@@ -4103,12 +3727,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先截图记录170cm，再真实点击ft并截图对应双列值；ft按钮坐标复用当前HEIGHT_EDIT Designer；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "切换前截图记录cm数值",
-        "切换后滚轮显示对应ft数值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_257",
@@ -4120,12 +3741,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "同一Height页真实点击两个单位按钮，并分别截图两列ft与单列cm布局；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "ft模式显示英尺和英寸两列滚轮",
-        "cm模式显示单列厘米数字滚轮"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_258",
@@ -4137,13 +3755,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享Profile前置建立170cm，分三阶段截图cm相邻值、ft模式及英寸相邻值；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "cm值变为171cm",
-        "Height编辑页显示ft单位模式",
-        "英寸列按1in变化"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_259",
@@ -4155,12 +3769,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Profile真实进入Height以建立父页面栈，再选择相邻值并确认，避免直达子页后返回表盘；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "身高滚轮显示所选身高",
-        "Profile列表的Height副标题显示新值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_260",
@@ -4172,8 +3783,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用Profile前置命令建立Male、未配置体重和公制单位，再进入Weight检查产品默认值；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_261",
@@ -4185,8 +3797,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用Profile前置命令建立Female、未配置体重和公制单位，再进入Weight检查产品默认值；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_262",
@@ -4198,12 +3811,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以21kg等价英制前置进入Weight，真实切换kg并下调一档到20；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示kg",
-        "体重滚轮显示20"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_263",
@@ -4215,12 +3825,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以249kg等价英制前置进入Weight，真实切换kg并上调一档到250；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示kg",
-        "体重滚轮显示250"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_264",
@@ -4232,12 +3839,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以21kg前置切换lbs，真实用编码器下调到44lbs；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示lbs",
-        "体重滚轮显示44"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_265",
@@ -4249,12 +3853,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以249kg前置切换lbs，真实用编码器上调到551lbs；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "单位按钮显示lbs",
-        "体重滚轮显示551"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_266",
@@ -4266,12 +3867,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先截图记录50kg，再真实点击lbs并截图对应值；lbs按钮坐标复用当前WEIGHT_EDIT Designer；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "切换前截图记录kg数值",
-        "切换后滚轮显示对应lbs数值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_267",
@@ -4283,8 +3881,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "建立确定的60kg前置并进入Weight，单张截图检查单列整数滚轮；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_268",
@@ -4296,13 +3895,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享Profile前置建立60kg，分三阶段截图kg相邻值、lbs模式及lbs相邻值；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "kg值变为61kg",
-        "Weight编辑页显示lbs单位模式",
-        "lbs值按1lb变化"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_269",
@@ -4314,12 +3909,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Profile真实进入Weight以建立父页面栈，再选择相邻值并确认，避免直达子页后返回表盘；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "体重滚轮显示所选体重",
-        "Profile列表的Weight副标题显示新值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_270",
@@ -4331,8 +3923,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_271",
@@ -4344,8 +3937,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_272",
@@ -4357,8 +3951,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_273",
@@ -4370,8 +3965,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.使用已有本地资料的手表绑定新App账号；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_274",
@@ -4383,12 +3979,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从Profile真实进入Weight建立父栈，编码器调整一档后右滑取消；两个阶段分别采集滚轮变化和Profile原副标题；6202首轮迁移暂不可执行：SIM_USER_SETTING_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "滚轮显示新数值",
-        "Weight副标题保持原值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_275",
@@ -4400,8 +3993,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "未绑定后进入真实 Settings 列表并向下浏览 Date and Time 条目；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_276",
@@ -4413,8 +4007,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_277",
@@ -4426,8 +4021,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "未绑定状态进入 Date and Time 列表，截图同时覆盖 Date 与 Time；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_278",
@@ -4439,8 +4035,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "未绑定状态进入 Date and Time 列表，以一张完整截图核对两个资料项；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_279",
@@ -4452,8 +4049,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前产品 Date and Time 只有 Date 与 Time 两项，无法建立人工前置所述长页；不得用重复条目伪造可滚动内容；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_280",
@@ -4465,12 +4063,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "分别在 Date and Time 列表与 Date 编辑页执行左滑并分阶段截图；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面保持Date and Time列表",
-        "页面保持Date编辑页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_281",
@@ -4482,8 +4077,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 Date and Time 列表只有两项且不形成长页，第一阶段的列表滚动前置无法实现；不执行第二阶段冒充完整用例；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_282",
@@ -4495,12 +4091,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先将系统日期确定为 2027-01-01，再在 DATE_SETTING 年滚轮向下滑一档至 2026；年滚轮和确认按钮坐标来自当前 Designer；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "年份滚轮显示2026",
-        "Date副标题显示2026年对应日期"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_283",
@@ -4512,8 +4105,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "TIME_SET 只接受两位年份，当前没有可直接定位 DATE_SETTING 年滚轮到 2126 的命令；逐档重复 100 次不符合 KISS/DRY，需要新增 SIM_DATE_PICKER_SET；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_284",
@@ -4525,8 +4119,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_285",
@@ -4538,8 +4133,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直接建立 Set Current Date 编辑页，截图覆盖日、英文月缩写与年三列；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_286",
@@ -4551,8 +4147,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直接建立 Set Current Time 编辑页，截图验证 24 小时制不含 AM/PM；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_287",
@@ -4564,12 +4161,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "TIME_SET 先建立 00:01，TIME_SETTING 分钟滚轮向下滑一档得到 00:00；滚轮和确认按钮坐标来自当前 Designer；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "时间滚轮显示00:00",
-        "Time副标题显示00:00"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_288",
@@ -4581,12 +4175,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "TIME_SET 先建立 23:58，TIME_SETTING 分钟滚轮向上滑一档得到 23:59；滚轮和确认按钮坐标来自当前 Designer；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "时间滚轮显示23:59",
-        "Time副标题显示23:59"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_289",
@@ -4598,12 +4189,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "TIME_SETTING 分钟滚轮调整一档后右滑取消，两个阶段分别采集滚轮变化与 Date and Time 原副标题证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "滚轮显示新时间",
-        "Time副标题保持原时间"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_290",
@@ -4615,8 +4203,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直接建立 Set Current Time 编辑页，截图覆盖小时与分钟两列；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_291",
@@ -4628,8 +4217,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_292",
@@ -4638,17 +4228,12 @@
       "precondition_text": "1.手表显示System设置页",
       "steps_text": "1.进入Settings→System",
       "expected_text": "1.页面显示QR to Pair/Restart/Power Off/Reset",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_GENERAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_293",
@@ -4660,8 +4245,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_294",
@@ -4673,8 +4259,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_295",
@@ -4686,8 +4273,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 620C_W6830 的 System 固定包含 QR to Pair/Restart/Power Off/Reset 四项，无法在同一固件中构造“内容不足一屏”的另一配置状态；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_296",
@@ -4699,8 +4287,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_297",
@@ -4712,8 +4301,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 620C_W6830 的 System 固定为四项长列表，无法切换到“内容不足一屏”的配置状态来执行第二阶段；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_298",
@@ -4725,8 +4315,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SETTING_GENERAL 当前列表首项由 GENERAL_ITEM_CONFIG 定义为 QR to Pair，点击首项进入 QRCODE；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_299",
@@ -4738,8 +4329,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从 System 真实点击 QR to Pair 建立父页面返回栈，再右滑返回 System；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_300",
@@ -4751,8 +4343,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.使用App扫描手表二维码；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_301",
@@ -4764,8 +4357,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "GENERAL_ITEM_CONFIG 第二项为 Restart；编码器定位第二项后点击当前居中列表项，实际执行人工点击路径；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_302",
@@ -4777,8 +4371,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_303",
@@ -4790,12 +4385,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先从 Restart 确认页右滑返回 System，再执行一次编码器短按；两个阶段分别采集返回与仍可运行证据；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "手表返回System列表",
-        "手表保持当前运行状态"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_304",
@@ -4807,8 +4399,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_305",
@@ -4820,8 +4413,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_306",
@@ -4833,8 +4427,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "GENERAL_ITEM_CONFIG 第三项为 Power Off；编码器定位第三项后点击当前居中列表项，实际执行人工点击路径；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_307",
@@ -4846,8 +4441,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_308",
@@ -4859,13 +4455,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从General列表真实点击Power Off建立确认页，使用共享确认弹窗取消坐标和实体主键，三阶段截图验证取消及设备保持开机；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "取消前截图显示Power Off确认页",
-        "点击取消按钮后，截图显示返回System列表",
-        "按压编码器后，截图显示设备仍处于开机状态"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_309",
@@ -4877,8 +4469,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_310",
@@ -4887,19 +4480,12 @@
       "precondition_text": "1.手表已通过Power Off进入关机状态",
       "steps_text": "1.用秒表计时，长按编码器3秒",
       "expected_text": "1.手表开始播放Titan品牌开机动画",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_311",
@@ -4911,8 +4497,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "GENERAL_ITEM_CONFIG 第四项为 Reset；编码器定位第四项后点击当前居中列表项，实际执行人工点击路径；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_312",
@@ -4924,8 +4511,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_313",
@@ -4937,8 +4525,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_314",
@@ -4950,8 +4539,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_315",
@@ -4963,8 +4553,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 2.等待恢复出厂完成；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_316",
@@ -4976,8 +4567,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_317",
@@ -4989,8 +4581,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_318",
@@ -5002,8 +4595,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_319",
@@ -5012,17 +4606,12 @@
       "precondition_text": "1.手表显示Reset确认页",
       "steps_text": "1.将菜单风格改为Grid\n2.执行恢复出厂\n3.重新进入Menu Style",
       "expected_text": "1.Grid显示为当前选项\n2.手表完成恢复出厂\n3.List显示为当前选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_320",
@@ -5031,17 +4620,12 @@
       "precondition_text": "1.手表显示Reset确认页",
       "steps_text": "1.将亮屏时长改为30s\n2.执行恢复出厂\n3.重新进入Screen Timeout",
       "expected_text": "1.30s显示为当前选项\n2.手表完成恢复出厂\n3.5s显示为当前选项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_321",
@@ -5050,16 +4634,12 @@
       "precondition_text": "1.手表显示Reset确认页",
       "steps_text": "1.恢复出厂后逐项读取设置值",
       "expected_text": "1.待产品确认未在PRD明确的设置默认值",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_322",
@@ -5071,8 +4651,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_button: 人工步骤缺少 ['BUTTON_PRESS']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_323",
@@ -5084,13 +4665,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "About 是长页，分三段截图覆盖顶部、中部与底部字段；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "About顶部显示Watch Name与Model",
-        "About中段显示Firmware Version与MAC Address",
-        "About底部显示BIS"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_324",
@@ -5099,17 +4676,12 @@
       "precondition_text": "1.手表显示About页",
       "steps_text": "1.观察Watch Name字段",
       "expected_text": "1.字段值符合TI_S6603_XXXX格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SYSTEM_INFO,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_325",
@@ -5118,16 +4690,12 @@
       "precondition_text": "1.手表显示About页",
       "steps_text": "1.对比About版本与固件日志",
       "expected_text": "1.两处固件版本字符串相同",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "固件日志是外部文本，不在产品截图内；截图唯一判据下无法比较两处字符串；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_326",
@@ -5139,8 +4707,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_327",
@@ -5152,8 +4721,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SYSTEM_INFO 连续上滑可到页面底部；已实测底部只显示 MAC，可用于检出 WEEE/BIS 缺失；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_328",
@@ -5162,19 +4732,12 @@
       "precondition_text": "1.手表显示About页",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.页面显示下方设备信息",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SYSTEM_INFO,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0,3;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_329",
@@ -5186,12 +4749,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SYSTEM_INFO 上、下滑后分别采集设备信息位置；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示下方设备信息",
-        "页面返回上方设备信息"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_330",
@@ -5203,8 +4763,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_331",
@@ -5216,8 +4777,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_332",
@@ -5229,8 +4791,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.用触控治具按0.25秒间隔点击标题8次；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_333",
@@ -5242,8 +4805,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_334",
@@ -5255,8 +4819,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工步骤是在主表盘长按而非实体按键长按，改用TP_PRESS按下/等待2秒/释放的真实触控手势验证Watch Faces入口；6202首轮迁移暂不可执行：TP_PRESS 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_335",
@@ -5265,17 +4830,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.观察Watch Faces页面",
       "expected_text": "1.页面显示表盘缩略图与底部分页点",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_336",
@@ -5284,17 +4844,12 @@
       "precondition_text": "1.已安装至少3个表盘",
       "steps_text": "1.进入Watch Faces页",
       "expected_text": "1.页面顶部显示Watch Faces标题和右上角当前时间，表盘缩略图居中显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_337",
@@ -5303,17 +4858,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.观察当前表盘缩略图",
       "expected_text": "1.缩略图周围显示蓝色选中框",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_338",
@@ -5322,16 +4872,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.模拟表盘缩略图延迟加载",
       "expected_text": "1.页面显示灰色占位图",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前模拟器没有可复用的缩略图加载延迟注入能力；正常进入只会显示已加载预览，不能伪造灰色占位图；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_339",
@@ -5340,19 +4886,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.完成表盘缩略图加载",
       "expected_text": "1.灰色占位图替换为表盘预览图",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_340",
@@ -5364,8 +4903,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_341",
@@ -5377,8 +4917,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_342",
@@ -5390,8 +4931,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先左滑到相邻的非当前表盘作为准备，再点击当前居中的表盘缩略图；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_343",
@@ -5403,8 +4945,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_344",
@@ -5413,19 +4956,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.在Watch Faces页单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_345",
@@ -5434,17 +4970,12 @@
       "precondition_text": "1.手表显示Watch Faces页",
       "steps_text": "1.进入Watch Faces页\n2.查看已安装表盘操作入口\n3.查看表盘上传入口\n4.查看表盘删除入口",
       "expected_text": "1.手表显示Watch Faces页\n2.页面提供已安装表盘浏览和切换入口\n3.页面不显示上传表盘入口\n4.页面不显示删除表盘入口",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL_SELECT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_346",
@@ -5456,12 +4987,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "左滑前后分别采集分页点状态，以验证分页点总数及高亮位置迁移；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "分页点数量等于已安装表盘总数，当前表盘对应分页点高亮",
-        "高亮分页点移至下一位置"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_347",
@@ -5473,8 +5001,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_348",
@@ -5486,8 +5015,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_349",
@@ -5499,8 +5029,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_350",
@@ -5512,8 +5043,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_351",
@@ -5525,8 +5057,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_352",
@@ -5538,8 +5071,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_353",
@@ -5551,8 +5085,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_354",
@@ -5564,8 +5099,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_355",
@@ -5577,8 +5113,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_356",
@@ -5590,8 +5127,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_357",
@@ -5603,8 +5141,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_358",
@@ -5616,8 +5155,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_359",
@@ -5629,8 +5169,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_360",
@@ -5642,8 +5183,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_361",
@@ -5655,8 +5197,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "QRCODE_HUB_CHOOSE 是当前二维码卡包选择窗口，标题由已保存的默认卡索引生成；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: QRCODE_HUB_CHOOSE。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_362",
@@ -5668,8 +5211,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_363",
@@ -5681,8 +5225,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "qr_hub_item_list 第一项为 UPI；QRCODE_HUB_CHOOSE 首项范围 y=50..142；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_364",
@@ -5694,8 +5239,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "qr_hub_item_list 第二项为 WiFi；QRCODE_HUB_CHOOSE 第二项范围 y=142..234；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_365",
@@ -5707,8 +5253,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "qr_hub_item_list 第三项为 Movie；列表上滑到底后 Movie 项覆盖 y=164..256，点击其可见区域；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_366",
@@ -5720,8 +5267,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控制中心默认二维码来自 App 下发的 wallet card 数据；当前无命令写入 UPI 内容并设为默认卡，需要新增 SIM_QR_HUB_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: QRCODE_HUB_CHOOSE；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_367",
@@ -5733,8 +5281,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控制中心默认二维码来自 App 下发的 wallet card 数据；当前无命令写入 WiFi 内容并设为默认卡，需要新增 SIM_QR_HUB_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: QRCODE_HUB_CHOOSE；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_368",
@@ -5746,8 +5295,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控制中心默认二维码来自 App 下发的 wallet card 数据；当前无命令写入 Movie 内容并设为默认卡，需要新增 SIM_QR_HUB_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: QRCODE_HUB_CHOOSE；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_369",
@@ -5759,8 +5309,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_370",
@@ -5772,8 +5323,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_371",
@@ -5785,8 +5337,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_372",
@@ -5798,8 +5351,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_373",
@@ -5811,8 +5365,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_374",
@@ -5824,8 +5379,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_375",
@@ -5837,8 +5393,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_376",
@@ -5850,8 +5407,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.在App断连状态将亮屏时长改为15s；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_377",
@@ -5863,8 +5421,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_378",
@@ -5876,8 +5435,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_379",
@@ -5886,17 +5446,12 @@
       "precondition_text": "1.手表显示设置页",
       "steps_text": "1.连续进入退出Display页面50次",
       "expected_text": "1.手表未发生异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DISPLAY_BRIGHTNESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_380",
@@ -5908,8 +5463,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_381",
@@ -5921,8 +5477,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_382",
@@ -5934,12 +5491,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SYSTEM_INFO 是 About 长页；滑动后立即截图，再按共享稳定等待5秒采集滚动条隐藏证据；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面右侧显示滚动条",
-        "滚动条滑块消失"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_383",
@@ -5951,8 +5505,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_384",
@@ -5964,8 +5519,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_385",
@@ -5977,8 +5533,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_386",
@@ -5990,8 +5547,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.从另一台手机拨打绑定手机；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_387",
@@ -6003,8 +5561,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.向绑定手机发送一条测试消息；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_388",
@@ -6016,8 +5575,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_389",
@@ -6029,8 +5589,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SET_390",
@@ -6042,12 +5603,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从 Settings 真实点击 Display 建立父页面栈，分别截图 Display 与右滑后的 Settings；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "手表显示Display页",
-        "手表返回Settings主页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

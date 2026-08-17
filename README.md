@@ -26,7 +26,7 @@ result.json + 新截图 + 日志
 
 | 目标 ID | 执行方式 | 用例映射 |
 | --- | --- | --- |
-| `620C_W6830` | Windows Simulator | `case_map/620C_case_map` |
+| `620C_W6830` | Windows Simulator | `case_map/620C_simulator_case_map` |
 | `6202_W5230` | 真实手表 | `case_map/6202_case_map` |
 | `6202_W5230_SIMULATOR` | Windows Simulator | `case_map/6202_simulator_case_map` |
 

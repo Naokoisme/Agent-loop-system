@@ -181,6 +181,7 @@ def decide_reproduction_action(
     execution_target: str = "simulator",
     capability_knowledge: str | None = None,
     navigation_source_root: str | None = None,
+    test_case: dict[str, str] | None = None,
 ) -> "ReproductionDecision | None":
     """根据当前观察只决定下一步，不生成整套命令。"""
     from agent_loop_system.reproduction import ReproductionDecision
@@ -245,20 +246,47 @@ def decide_reproduction_action(
         for item in navigation_sources
     )
 
-    target_label = "6202 真机" if execution_target == "hardware" else "模拟器"
+    target_label = "当前真机项目" if execution_target == "hardware" else "模拟器"
     target_knowledge = capability_knowledge or load_simulator_knowledge()
     target_rule = (
-        "7. 当前是 6202 真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"
+        "7. 当前是真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"
         "关机、重启或批量删除类命令。\n"
         if execution_target == "hardware"
         else "7. Windows 模拟器不得选择能力目录中注明仅供非 Windows 真机兼容的旧命令，"
         "必须使用目录给出的模拟器替代命令。\n"
     )
+    if test_case is None:
+        role_text = (
+            "你是嵌入式手表缺陷复现 Agent。你要根据当前截图和历史观察，只决定下一步一个动作，"
+            "不能一次规划整套命令，也不能修改源码。"
+        )
+        task_text = f"缺陷描述：\n{objective}"
+        source_title = "缺陷预定位源码（完整文件，仅供理解缺陷）"
+        ready_rule = "当前截图已清楚显示缺陷相关目标内容，可以交给独立视觉判定。"
+        completion_rule = ""
+    else:
+        role_text = (
+            "你是嵌入式手表测试执行 Agent。你要根据人工用例原文、当前截图和历史观察，"
+            "一次只决定一个真实业务动作；不得修改源码、正式 case_map 或外部探索账本。"
+        )
+        task_text = (
+            f"测试用例：{test_case.get('case_id', '')}\n"
+            f"前置条件：{test_case.get('precondition_text', '')}\n"
+            f"操作步骤：{test_case.get('steps_text', '')}\n"
+            f"预期结果：{test_case.get('expected_text', '')}"
+        )
+        source_title = "相关源码（仅供理解当前项目能力）"
+        ready_rule = (
+            "原始操作步骤已经完整执行，历史观察与当前截图足以交给独立视觉判定；"
+            "不得仅因初始画面符合部分预期而提前结束。"
+        )
+        completion_rule = (
+            "9. 普通测试只负责完成原始步骤和留下截图，不得自行判 PASS/FAIL，也不得把本次命令写回正式映射。\n"
+        )
     prompt = (
-        "你是嵌入式手表缺陷复现 Agent。你要根据当前截图和历史观察，只决定下一步一个动作，"
-        "不能一次规划整套命令，也不能修改源码。\n\n"
-        f"缺陷描述：\n{objective}\n\n"
-        f"缺陷预定位源码（完整文件，仅供理解缺陷）：\n{files_text}\n\n"
+        f"{role_text}\n\n"
+        f"{task_text}\n\n"
+        f"{source_title}：\n{files_text}\n\n"
         "运行时页面入口源码（系统根据目标窗口与实际落点自动补充，用于判断重定向和前置状态）：\n"
         f"{navigation_text or '本轮没有发生需要补充源码的页面重定向'}\n\n"
         f"{target_label}能力目录（命令和窗口只能从这里选择，禁止编造）：\n"
@@ -268,13 +296,14 @@ def decide_reproduction_action(
         "动作规则：\n"
         "1. EXECUTE：只执行一条推进真实产品状态的业务命令，command 必须为 :CMD:args。\n"
         "2. OBSERVE_AGAIN：界面正在转场或截图时机不稳定时再观察一次，不得携带 command。\n"
-        "3. READY_TO_JUDGE：当前截图已清楚显示缺陷相关目标内容，可以交给独立视觉判定。\n"
+        f"3. READY_TO_JUDGE：{ready_rule}\n"
         "4. BLOCKED：真实能力目录明确缺少到达目标所需能力时停止；不要因为暂时没找到入口就阻塞。\n"
         "5. GUI_PING、GUI_TREE、GUI_STATE、SCREENSHOT_PRINT 由系统自动执行，禁止放进 command。\n"
         "6. 优先使用注册窗口的 ENTER_PAGE；目标窗口本身能展示文案、排版或图片时，不得额外读取"
         " BUSINESS_GET 或注入无关业务数据。\n"
         f"{target_rule}"
         "8. reason 用一句话说明为什么选择这个动作。\n\n"
+        f"{completion_rule}"
         "视觉相关性规则：\n"
         f"{VISUAL_RELEVANCE_RULES}"
     )

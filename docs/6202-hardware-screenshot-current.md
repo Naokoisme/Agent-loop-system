@@ -1,6 +1,6 @@
 # 6202 真机截图当前状态
 
-更新时间：2026-08-14（Asia/Shanghai）
+更新时间：2026-08-17（Asia/Shanghai）
 
 ## 结论
 
@@ -17,67 +17,117 @@
 - 上游参考：`D:\TOPSTEP\shenju_w30`，本次未修改、未构建
 - 当前真机已刷入带序号 debug 固件；所有改动均未提交、未推送
 
-## BLE 独立截图 POC（待真机门）
+## BLE 独立截图 POC（真机门未通过）
 
-已在 6202 隔离工作区和 Agent-loop 中实现最小闭环源码：PC 通过现有 FF02
-写入工程命令 `0x7F01`，固件复用现有
-`gui_comm_watch_capture_file_request(seq)` 生成同一份原子 BMP，再通过 FF03 Notify
-发送 START、顺序 DATA 和 END。DATA 固定为 960 字节，END 携带文件长度、分块数和
-CRC32；PC 只在顺序、长度、CRC32 以及 410×502 top-down 24-bit BMP 全部通过后原子落盘。
+### 2026-08-17 状态校正
 
-PC 命令：
+亿赛通加密问题已经解除，原 `.txt` 草案已恢复为正式 C 源文件。固件端、Agent-loop
+组装器和 ACK 写队列已经同时升级为 v2 停等协议并完成 debug 构建；用户已经把本次
+`w30.up3` 刷入手表。该包大小为 37,519,360 bytes，SHA256 为
+`3F6F028C70AD208B51498204810E4679EDF20ACF3E5AF8F212B3A215FB6C623C`。最终 ELF 包含
+`handle_cmd_0x7F01`，BLE 截图线程优先级为 6、栈为 2048 bytes。MTP 仍是默认截图源，
+BLE 只有通过一张真实 BMP 验收后才能临时切为 Provider。
+
+当前 v2 协议如下：
+
+- PC 通过 FF02 写入工程命令 `0x7F01`，固件通过 FF03 Notify 返回 START、DATA、END。
+- ACK 类型为 5，8-byte 载荷为 `<version:u8, type:u8, sequence:u32, next_chunk:u16>`。
+- START 等待 ACK 0；DATA i 等待 ACK i+1；END 等待 ACK `0xFFFF`。
+- 每帧首次发送后最多重试 3 次，每次等待 ACK 1 秒；只有收到正确 ACK 才提交偏移、CRC
+  和分块序号。
+- DATA 固定为 960 bytes。标准 618,518-byte BMP 应有 645 个 DATA 分块。
+- PC 只有在序号、分块、长度、CRC32、BMP 头和 410×502 top-down 24-bit 像素格式全部通过
+  后才原子落盘；失败不留下半成品。
+
+### BLE 广播状态与恢复命令
+
+本次排查确认当前 debug 包已经编入下列 Zephyr Shell 命令。它们是裸 Shell 命令，不是
+`srv_quick_cmd send` 包装命令；必须通过 SuperCom 已持有的 COM7 命名管道发送，不得另外
+直接打开 COM7：
+
+```text
+btm disp
+btm le adv_start
+btm le adv_stop
+```
+
+`btm disp` 是只读状态命令，重点看三项：
+
+- `bthost_status:1`：蓝牙栈已经打开。
+- `le adv state:1`：手表正在 BLE 广播；0 表示没有广播。
+- `bt manager le connect dev number:N`：当前 BLE 中心设备连接数；大于 0 时通常是手机或
+  PC 已占用连接。
+
+安全的自动化预检顺序：
+
+1. 先通过 SuperCom 管道执行 `btm disp`。
+2. 如果 BLE 连接数大于 0，不发送 `adv_start`；先识别并断开占用者，尤其是手机 App。
+3. 只有在 `bthost_status=1`、BLE 连接数为 0、`le adv state=0` 时，才执行
+   `btm le adv_start`，随后再次执行 `btm disp` 验证状态变成 1。
+4. 如果 `bthost_status` 不是 1，自动化应返回明确的“蓝牙栈未就绪”，不要盲目执行
+   `btm open` 或重启蓝牙栈。
+5. `btm le adv_stop` 只保留给明确的工程诊断，不进入正常截图流程。
+
+2026-08-17 19:37 的真实 `btm disp` 结果：本机地址
+`54:C8:D4:D9:29:06`，BLE 名称 `oraimo Watch Tank N_2906`，`bthost_status=1`，
+`le adv state=1`，BLE 连接数为 0，广播间隔约 960–1280 ms。诊断证据位于
+`D:\Agent-loop-evidence\6202_ble_link_diagnostics\20260817-193710\serial`。
+
+### 手机抢占与扫描窗口
+
+手机连接手表时，PC 扫描不到手表属于预期的单中心连接表现，不能误判为固件 BLE 已关闭。
+仅在手机 App 中点“断开”也可能被后台自动重连；测试前应完全关闭手机蓝牙或确保 App 不再
+占用。手表从旧地址 `42:74:DC:C8:0A:02` 变为当前地址 `54:C8:D4:D9:29:06`，说明 Agent-loop
+不能永久相信 `.env` 中的旧地址。每次真机 BLE 测试应先从 `btm disp` 读取本机地址和名称，
+再进行扫描。由于广播间隔接近 1 秒且 Windows 扫描存在偶发漏报，单次未发现不能直接断言
+蓝牙关闭；应把“固件广播状态”和“PC 本轮是否扫到”作为两个独立状态记录。
+
+### 2026-08-17 单图真机结果与根因修复
+
+手机解除占用后，PC 扫描到 `54:C8:D4:D9:29:06`，建立 GATT 会话并发出一条截图请求，
+请求序号为 `514442546`。客户端等待 180 秒后返回 `SCREENSHOT_TIMEOUT`，没有组装出完整
+BMP，也没有留下目标文件。测试后再次扫描仍能看到同一手表，RSSI 为 -63 dBm；随后
+`btm disp` 证明蓝牙栈和广播仍然正常、BLE 连接数为 0。没有观察到重启迹象，但本次没有从
+请求开始同步保存 UART 启动日志，因此不把“绝对未重启”写成已证明事实。失败范围是“截图
+请求已发出之后、完整 BMP 形成之前”，不能再归类为扫描或连接失败。
+
+随后取得的 SuperCom 日志已经把失败点收窄到 BLE 发送切片：START 已发送成功并收到 ACK 0；
+第一块 DATA 的 984-byte App 帧被原发送器拆为 495 和 489 bytes 两次通知。加上每次 4-byte
+L2CAP 与 3-byte ATT 头后，C400 实际收到 502 和 496-byte HCI ACL Data 包，并连续打印
+`llm acl data tx Out of max buffer size`。C400 控制器库中的硬检查上限是 251 bytes，因此
+DATA 0 从未到达 PC，PC 不可能返回 ACK 1，固件最终打印 `ack timeout: ... next=1`。
+
+第一性原理上的根因不在截图 DATA 大小，也不是 ATT MTU 498 本身非法。标准 BLE Host 应把较大
+L2CAP PDU 按控制器的 HCI ACL 缓冲能力拆成 START/CONT 分片；当前预编译的 C400 Host/L2CAP
+路径没有在 251-byte 边界正确分片，却把整个 502/496-byte PDU 交给控制器。该长期修复需要供应商
+修正 Host/HCI 的 ACL 上限记录、fallback 和分片逻辑，当前可维护源码无法安全修改这部分 `.a` 库。
+
+本次采用的最小兼容修复位于 BLE DAL 发送适配边界：`dal_ble_get_pack_len()` 返回
+`min(ATT_MTU - 3, 244)`，其中 `244 = 251 - 4-byte L2CAP - 3-byte ATT notification`。
+它使同一个 984-byte App DATA 被拆成 `244+244+244+244+8` 五次通知；PC 仍按连续字节流重组，
+只有第五片到齐并通过 App CRC 与截图元数据校验后才返回 ACK 1。960-byte 协议 DATA、停等 ACK、
+截图格式和 MTP 主链路均不改。244 是针对 C400 缺陷的传输兼容上限，不是 Bluetooth 规范规定的
+通用通知上限。
+
+当前不预加固定延时或逐物理片 ACK：已有证据只证明单包超限，没有证明发送队列已满；停等协议
+把每轮突发限制在五次通知。该源码修改尚未构建、尚未刷机、尚未做真机复测，不能写成 BLE 已
+通过。下一道门依次是 debug 构建、单独授权刷机、启动日志冒烟，以及确认 oversized/buffer-full
+日志均消失、ACK 连续推进和一张按序号/分块/长度/CRC/BMP 可读性完整验收的真图。
+
+PC 单图命令仍为：
 
 ```powershell
 uv run python -m agent_loop_system.tools.watch_ble screenshot `
-  --address "42:74:DC:C8:0A:02" `
+  --address "<从 btm disp 读取的当前地址>" `
   --scan-timeout 15 `
   --timeout 180 `
   --output "D:\evidence\watch-ble.bmp"
 ```
 
-当前验证边界：PC 侧协议与模拟 FF02/FF03 端到端测试通过；目标手表 GATT 连接已通过。
-固件桥接源码尚未在受保护的工程会话中编译，未刷机，也未完成真实 618,518-byte BLE
-传图。因此 MTP 仍是 Agent-loop 默认截图源，BLE 仅是可选 POC；在“debug 构建通过 →
-用户另行授权刷机 → 单张真机截图通过”之前不得切换默认路线。
-
-当前 Codex 进程即使进入 Zora 环境，CMake 也会在预处理受 E-SafeNet 保护的
-`zephyr/include/zephyr/dt-bindings/adc/adc.h` 时提前停止，尚未编译到新增桥接文件；
-不得修改该受保护头文件。下一次构建应由可读取受保护源码的工程终端执行：
-
-延期记录（2026-08-14）：用户当前不在工程现场，暂不执行构建、刷机和真机单图门。
-离线阶段只继续完善 PC/Agent-loop 的可选 BLE Provider 与模拟测试；恢复现场后从下列
-构建命令继续，不重复前面的协议实现。
-
-```text
-cmd
-zora
-cd /d D:\Agent-loop-workspace\6202_W5230
-python build.py -b w30_wcs -c500 -S debug projects/tb_watch
-```
-
-### Agent-loop 可选接入（离线模拟已通过）
-
-`RealDeviceSession` 保持 MTP 为默认截图源。只有显式设置下列变量时，截图 Provider
-才切到 BLE；真机业务命令仍使用现有 UART/SuperCom，不会被蓝牙替代：
-
-```powershell
-$env:W30_HARDWARE_CAPTURE_PROVIDER = "ble"
-$env:W30_HARDWARE_BLE_ADDRESS = "42:74:DC:C8:0A:02"
-$env:W30_HARDWARE_BLE_SCAN_TIMEOUT = "15"
-```
-
-BLE Provider 遵循现有 `capture(timeout, after_sequence) -> CaptureFrame` 合同；每次只建立
-一次短连接，完成扫描、连接、截图、校验后立即断开。默认单图总超时为 180 秒，证据元数据
-保留目标 BLE 地址、文件 CRC32、像素 CRC32、分块大小和数量。取消上述变量或设置
-`W30_HARDWARE_CAPTURE_PROVIDER=mtp` 即继续使用原 MTP 路线。
-
-实测准备记录（2026-08-14）：上述三项已经写入 `D:\Agent-loop-system\.env`，目标地址为
-`42:74:DC:C8:0A:02`。明日启动 Agent-loop 测试进程时会自动加载；如果 PowerShell
-进程已经预先设置了同名变量，应先确认，因为进程变量优先于 `.env`。
-
-截至 2026-08-14，假 GATT 流、BLE Provider、环境选择和 `RealDeviceSession` 定向回归为
-57 passed、14 subtests passed。该结果只证明离线代码接线，不能代替固件构建、刷机和真实
-FF03 传图门。
+`RealDeviceSession` 保持 `W30_HARDWARE_CAPTURE_PROVIDER=mtp`。BLE Provider 遵循现有
+`capture(timeout, after_sequence) -> CaptureFrame` 合同，但本次真实单图门仍为 OPEN；
+`.env` 中记录的旧 BLE 地址不得作为当前地址直接使用。v2 协议和 ACK 因果测试已经通过，
+这只证明离线实现，不代替真实 618,518-byte BMP 验收。
 
 ## 已完成能力
 

@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_004",
@@ -63,7 +66,8 @@
         "空闹钟列表页显示居中的闹钟图标、无闹钟提示和底部加号按钮"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：命令无错，1个检查点对应1张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_004\\20260814-224352-602e5eb96b384e97b607f179ae3d3894。"
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：命令无错，1个检查点对应1张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_004\\20260814-224352-602e5eb96b384e97b607f179ae3d3894。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_005",
@@ -92,7 +96,8 @@
         "上滑后显示 Once 闹钟的时间、重复周期和开关，且不显示备注"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：当前 ADD_ALARM 一次固定建立 Custom、Every day、Once 共4条测试闹钟；2个检查点对应2张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_005\\20260814-224454-37caddbfc8ad40f295729e28ca84d194。"
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：当前 ADD_ALARM 一次固定建立 Custom、Every day、Once 共4条测试闹钟；2个检查点对应2张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_005\\20260814-224454-37caddbfc8ad40f295729e28ca84d194。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_006",
@@ -104,10 +109,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-      ],
-      "unable": true,
-      "note": "BLOCKED_CAPABILITY_MISSING：当前6202 main.exe 对 SIM_ALARM_SET 无任何回执，而已验证 ADD_ALARM 只能固定生成08:00、08:02、08:03、08:04，无法精确建立原始前置06:30、08:00、22:00；失败探针及替代数据截图见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_006\\20260814-222238-7a7413f23ade4e6495083be96f5cd34f。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_007",
@@ -119,8 +123,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "同时间闹钟按不同索引依次写入，避免重复 ADD_ALARM 反复覆盖同一固定数据；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_008",
@@ -150,7 +155,8 @@
         "上滑后列表显示08:03、08:04和底部加号等下方内容"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：命令无错、双检查点各有独立新截图、evidence_contract完整，审计为PROMOTABLE_FAIL。稳定截图显示TP_SWIPE后列表仍回到顶部、未显示底部加号，这是当前产品真实FAIL而非执行路径失败，故保留可执行映射。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_008\\20260814-231110-53cce1b62d334abda7e306fefd604346。"
+      "note": "正式Runner已复跑：命令无错、双检查点各有独立新截图、evidence_contract完整，审计为PROMOTABLE_FAIL。稳定截图显示TP_SWIPE后列表仍回到顶部、未显示底部加号，这是当前产品真实FAIL而非执行路径失败，故保留可执行映射。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_008\\20260814-231110-53cce1b62d334abda7e306fefd604346。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_009",
@@ -182,7 +188,8 @@
         "下滑后列表重新显示08:00、08:02等上方闹钟"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：QDEC_SET:1 精确建立列表离开顶部的前置，真实下滑命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示下滑后仍停在08:02、08:03、08:04，未恢复08:00，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_009\\20260814-225630-7b5ff4a77f6a441297ac89da0a57eecc。"
+      "note": "正式Runner已复跑：QDEC_SET:1 精确建立列表离开顶部的前置，真实下滑命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示下滑后仍停在08:02、08:03、08:04，未恢复08:00，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_009\\20260814-225630-7b5ff4a77f6a441297ac89da0a57eecc。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_010",
@@ -212,7 +219,8 @@
         "顺时针旋转一格后列表沿旋转方向向下滚动并显示08:02、08:03、08:04"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：QDEC_SET:1 后列表从08:00、08:02、08:03移动为08:02、08:03、08:04；双检查点各有独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_010\\20260814-225746-500eba62e97e490281df73974e7684cb。"
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：QDEC_SET:1 后列表从08:00、08:02、08:03移动为08:02、08:03、08:04；双检查点各有独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_010\\20260814-225746-500eba62e97e490281df73974e7684cb。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_011",
@@ -241,7 +249,8 @@
         "右滑后返回进入Alarm前的主表盘"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：当前5803 Alarm页头部执行真实右滑(20,50)到(370,50)，命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示右滑后仍停留Alarm列表，未返回DIAL，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_011\\20260814-225859-bd3efc45bbc44aa281aa187c85ad1788。"
+      "note": "正式Runner已复跑：当前5803 Alarm页头部执行真实右滑(20,50)到(370,50)，命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示右滑后仍停留Alarm列表，未返回DIAL，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_011\\20260814-225859-bd3efc45bbc44aa281aa187c85ad1788。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_012",
@@ -253,8 +262,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_013",
@@ -266,8 +276,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_014",
@@ -280,8 +291,8 @@
       "actions": [],
       "collect": [],
       "verification_points": [],
-      "unable": true,
-      "note": "BLOCKED_CAPABILITY_MISSING：已在当前5803闹钟列表对真实首条记录分别执行(330,145)到(90,145)、(250,145)到(50,145)左滑及全局左滑，截图均未出现红色删除按钮；随后点击右侧只切换了闹钟开关，无法完成原始两步检查点。目标条目左滑与点击证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_014\\20260814-221717-5c157f4f03ba416bb0381ca77ffb0d05。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_015",
@@ -294,8 +305,8 @@
       "actions": [],
       "collect": [],
       "verification_points": [],
-      "unable": true,
-      "note": "BLOCKED_CAPABILITY_MISSING：原始前置要求目标闹钟已左滑露出删除按钮；在独立新会话中对当前5803首条真实闹钟执行(350,145)到(80,145)左滑并等待稳定后，截图仍为默认列表且无删除按钮，无法精确建立前置，因此不固化后续右滑。证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_015\\20260814-230531-357dcfd91a9e4943ac30a05214c72af5。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_016",
@@ -307,8 +318,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置的具体条目左滑状态无法由原 SWIPE_SIM 准确建立，原 0,0 点击无效；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_017",
@@ -321,8 +333,8 @@
       "actions": [],
       "collect": [],
       "verification_points": [],
-      "unable": true,
-      "note": "BLOCKED_CAPABILITY_MISSING：当前 ADD_ALARM 每次只重建同一组4条测试闹钟，重复调用不增加数量；SIM_ALARM_SET 对当前 main.exe 无回执；真实UI新增链路又受异步页面动画影响，探索未能以独立可重复方式精确建立9个闹钟，故不得把加号路径固化为可执行映射。能力与UI探针见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_017\\20260814-222623-c4b75a1d3177487ca3e97969a30c5a67。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_018",
@@ -334,8 +346,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "ADD_ALARM 每次都重建同一组4条测试闹钟，重复10次不会得到10个闹钟；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_019",
@@ -347,8 +360,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先用通用命令填满10条闹钟并通过真实加号触发超限Toast，再等待其自动消失；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_020",
@@ -360,8 +374,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直接进入当前源码注册的时间设置页，验证加号所到达的目标页面；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_021",
@@ -373,8 +388,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用当前日期的14位TIME_SET建立10:23前置，避免旧日期被运行环境纠正；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_022",
@@ -386,8 +402,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TIME_SETTING。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_023",
@@ -396,17 +413,12 @@
       "precondition_text": "1.系统时间制为24小时",
       "steps_text": "1.进入新增时间设置页\n2.滚动小时列一整圈",
       "expected_text": "1.页面显示24小时制滚轮\n2.小时值仅在00至23循环",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "小时值完整循环范围需动态观察滚动过程，静态截图无法完全验证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_024",
@@ -415,19 +427,12 @@
       "precondition_text": "1.系统时间制为12小时",
       "steps_text": "1.进入新增时间设置页",
       "expected_text": "1.页面显示1至12小时和分钟和AM或PM列",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_TIME,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "当前源码约定TIME_MODE:0=12小时制、TIME_MODE:1=24小时制；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_025",
@@ -439,8 +444,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需连续观察分钟值完整循环及每次变化量，涉及动态视频分析；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TIME_SETTING。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_026",
@@ -452,13 +458,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先采集小时列初始值，再对上、下滑结果分别截图，形成完整视觉对比；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "操作前截图显示小时列的初始选中值",
-        "小时值向上变化1小时",
-        "小时值反向变化1小时"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_027",
@@ -470,8 +472,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TIME_SETTING。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_028",
@@ -483,8 +486,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过 Alarm 列表加号真实进入新增时间页，使确认操作保留正确返回链；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_029",
@@ -496,8 +500,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从真实 Alarm 列表进入新增时间页，右滑才有闹钟列表父页面可返回；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_030",
@@ -509,8 +514,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从真实 Alarm 列表进入新增时间页，编码器返回时保留正确父页面；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_031",
@@ -522,12 +528,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "重复周期页首屏显示 Once 选中",
-        "滚动后 Custom 下方不显示日期缩写"
-      ],
-      "unable": true,
-      "note": "通过新增流程真实进入重复页，并用上下两张截图覆盖被裁切的 Custom 区域；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_032",
@@ -539,12 +542,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "重复周期页首屏显示 Everyday 选中",
-        "滚动后 Custom 下方显示 S M T W T F S"
-      ],
-      "unable": true,
-      "note": "点击 Everyday 后分别采集首屏和滚动后的 Custom 区域，补齐完整截图覆盖；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "ALARM_033",
@@ -556,8 +556,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过新增流程进入重复页，滚动到 Custom 后真实点击；不再用错误方向的编码器移动猜测坐标；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_034",
@@ -569,8 +570,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_035",
@@ -582,8 +584,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从真实新增流程进入重复周期页，右滑时保留 Alarm 列表父页面和原始数量；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_036",
@@ -595,13 +598,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标来自 ALARM_CLOCK_WEEKDAY 实际界面；分别在首屏和滚动后截图，避免周一被滚出画面后只留下后两个选项证据；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；TP_SWIPE 缺少6202已验证坐标。",
-      "verification_points": [
-        "首屏截图中周一显示高亮选中",
-        "第一次滚动后的截图中周三显示高亮选中",
-        "第二次滚动后的截图中周五显示高亮选中"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_037",
@@ -613,8 +612,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可复用的星期选择状态注入，也没有稳定的滚动后确认按钮语义定位；直接点击固定坐标无法保证建立周一、周三、周五前置条件。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_038",
@@ -626,8 +626,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前无法建立“原选周一、本次临时加选周三”的可见前置状态，也没有稳定的星期页取消按钮语义定位；直接进入子页会丢失真实父页面状态。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_039",
@@ -639,12 +640,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从闹钟列表点击目标条目进入编辑页，并用首屏和滚动后两张截图覆盖四个编辑项；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "编辑页首屏显示Time和Repeat",
-        "编辑页滚动后显示Snooze和红色删除按钮"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_040",
@@ -656,14 +654,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "ADD_ALARM 后先关闭首条闹钟；随后从列表逐级点击进入编辑/时间页，修改确认并返回列表；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示目标闹钟编辑页",
-        "页面显示闹钟时间设置页",
-        "编辑页显示新时间",
-        "列表显示新时间且开关自动开启"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_041",
@@ -675,8 +668,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前只有方向滑动，不能稳定把时间滚轮精确设为09:00；历史运行中滚轮仍停在08:00，继续增加固定滑动会形成机型相关特调。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_042",
@@ -688,8 +682,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有按目标值定位滚轮的命令，0,0 点击无法把08:00准确调整为09:00；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_043",
@@ -701,15 +696,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用 SIM_ALARM_SET 建立Once闹钟，再从列表按人工路径进入编辑/Repeat；选择Everyday后滚动到页脚确认并返回列表；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "页面显示闹钟编辑页",
-        "页面显示重复周期页",
-        "Everyday显示选中",
-        "编辑页显示Every Day",
-        "列表显示Every Day"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_044",
@@ -721,12 +710,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；选择Everyday后滚动到页脚确认；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "Everyday显示选中",
-        "返回闹钟编辑页后Repeat显示Every Day"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_045",
@@ -738,12 +724,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；临时选择Everyday后右滑取消；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "Everyday显示选中",
-        "返回闹钟编辑页后Repeat仍显示Once"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_046",
@@ -755,12 +738,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；临时选择Everyday后执行编码器短按；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Everyday显示选中",
-        "编码器短按后返回闹钟编辑页且Repeat仍显示Once"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_047",
@@ -772,8 +752,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_048",
@@ -785,8 +766,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "尚未验证具体闹钟编辑上下文和 Delete 控件坐标；原 0,0 点击无效；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_049",
@@ -798,8 +780,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闹钟触发需要等待动态时间，且250ms/750ms循环振动无法通过GUI截图验证；知识库无可配置即将到点且启用Snooze的命令。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_050",
@@ -811,8 +794,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待闹钟触发属于长时间等待，无法由模拟器命令执行；目标闹钟及Snooze关闭状态需人工预置。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_051",
@@ -821,16 +805,12 @@
       "precondition_text": "1.振动测试仪已固定并校准\n2.目标闹钟已开启且即将到点",
       "steps_text": "1.采集已触发闹钟的振动波形",
       "expected_text": "1.振动测试仪记录每次振动的持续时间为250ms",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果为外部振动测试仪对振动波形的动态分析，无法由手表端GUI截图验证；采集步骤需外部设备执行。；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_052",
@@ -839,16 +819,12 @@
       "precondition_text": "1.振动测试仪已固定并校准\n2.目标闹钟已开启且即将到点",
       "steps_text": "1.采集已触发闹钟的连续振动波形",
       "expected_text": "1.振动测试仪记录相邻两次振动间的无振动区间为750ms",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部振动测试仪采集并分析连续振动波形，无法通过手表端GUI截图验证；使用MSG_TEST触发闹钟提醒。；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_053",
@@ -860,8 +836,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "关闭按钮和返回页面可以由截图检查，但“振动停止”没有可见画面证据；当前只有手表模拟器截图，无法判定完整预期。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_054",
@@ -870,17 +847,12 @@
       "precondition_text": "1.手表正在显示闹钟响铃页",
       "steps_text": "1.执行按键熄屏",
       "expected_text": "1.屏幕熄灭，当前闹钟振动继续",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "闹钟振动继续属于非GUI效果，无法通过截图验证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_055",
@@ -889,17 +861,12 @@
       "precondition_text": "1.手表正在显示闹钟响铃页",
       "steps_text": "1.执行垂腕动作",
       "expected_text": "1.手表保持响铃页面亮屏",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_RING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "垂腕动作无法由模拟器命令执行，需人工完成后观察界面；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_056",
@@ -911,8 +878,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_057",
@@ -924,8 +892,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需长时间等待1分钟及10分钟，无法转换为模拟器命令；且无命令可配置Snooze开启状态。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_058",
@@ -937,8 +906,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法设置 Snooze 关闭状态；保持无操作1分钟属于长时间等待，无法由模拟器执行。可用 :MSG_TEST:20 尝试触发闹钟提醒，但无法保证满足“正在响铃”前置条件。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_059",
@@ -950,8 +920,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_060",
@@ -963,8 +934,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法模拟“同一闹钟已累计完成5次贪睡”及等待下一次提醒时点；使用ENTER_PAGE进入闹钟列表验证开关和Once状态。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_061",
@@ -976,8 +948,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_062",
@@ -989,8 +962,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法注入Once闹钟已触发Snooze状态，且涉及10分钟等待；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_063",
@@ -1002,12 +976,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用TIME_SET和SIM_ALARM_SET建立已错过当天触发点的Everyday闹钟，再跳到次日触发前2秒并真实等待跨点；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "次日触发前截图显示主表盘且没有响铃页",
-        "跨过次日08:00后截图显示Everyday闹钟响铃页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_064",
@@ -1019,12 +990,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用TIME_SET加速到当天结束；前后截图在明确检查点验证已错过的Once闹钟未出现响铃页；6202首轮迁移暂不可执行：SIM_ALARM_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "当天08:01截图显示主表盘且错过的Once闹钟未响铃",
-        "推进到当天结束并跨日后截图仍显示主表盘且未出现响铃页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_065",
@@ -1036,8 +1004,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手机调时与时间同步需外部设备执行，且推进至次日属于长时间等待；现有命令无法创建指定当天10:00的Once闹钟。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_066",
@@ -1049,8 +1018,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "控件可按截图动态定位；仍需可加速等待和分段取证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_067",
@@ -1062,8 +1032,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有App侧新增闹钟和双端同步命令；直接进入Alarm只能看到手表页面，不能证明App保存及同步结果。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_068",
@@ -1075,8 +1046,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有App侧删除闹钟和双端同步命令；手表端空列表截图不能证明目标闹钟曾经存在并由App删除。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_069",
@@ -1088,8 +1060,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_070",
@@ -1101,8 +1074,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待闹钟触发属于长时间等待，无法执行；用ENTER_PAGE直接进入闹钟响铃页验证GUI。勿扰模式开启和闹钟即将到点暂无可用前置命令。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_071",
@@ -1114,8 +1088,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待闹钟触发属于长时间等待，无法由命令执行或验证。；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_072",
@@ -1127,8 +1102,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待闹钟触发及手机来电属于长时间等待/外部设备步骤，无法直接执行；用 ENTER_PAGE 进入闹钟响铃页验证手表端 GUI，并用 MSG_TEST:1 模拟来电提醒。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_073",
@@ -1140,8 +1116,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法同步设置计时器归零时点与闹钟触发时点，且步骤需要等待动态同步触发；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_074",
@@ -1153,8 +1130,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "步骤需另一台手机发送消息，无法由手表模拟器执行；预期结果顺序待产品确认。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_075",
@@ -1166,8 +1144,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_076",
@@ -1176,16 +1155,12 @@
       "precondition_text": "1.闹钟列表初始为空",
       "steps_text": "1.连续完成20轮新增闹钟和删除闹钟",
       "expected_text": "1.每轮闹钟均可创建和删除，手表无异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "ADD_ALARM/CLEAN_ALARM 是状态注入，不是人工新增/删除操作；最终空列表截图也不能证明20轮UI操作全部成功且期间未重启。；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "ALARM_077",
@@ -1197,8 +1172,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需在Android和iOS手机App完成闹钟添加、编辑及同步，并验证App端字段，无法由手表模拟器执行和截图验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

@@ -20,10 +20,22 @@ def _write_case(path: Path, **overrides) -> None:
             "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
         ],
         "unable": False,
+        "mapping_status": "PROMOTED",
         "note": "",
     }
     payload.update(overrides)
     path.write_text(json.dumps([payload], ensure_ascii=False), encoding="utf-8")
+    (path.parent / "external_execution_history.jsonl").write_text(
+        json.dumps({
+            "case_id": payload["case_id"],
+            "sheet": payload["sheet"],
+            "target": "TEST_PROFILE",
+            "last_verified": "2026-08-17",
+            "evidence_root": str(path.parent),
+            "evidence_paths": ["result.json"],
+        }, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
 
 def test_audit_accepts_matching_operation_and_checkpoint(tmp_path: Path) -> None:
@@ -33,7 +45,35 @@ def test_audit_accepts_matching_operation_and_checkpoint(tmp_path: Path) -> None
         return_value=({"ENTER_PAGE", "TP_CLICK", "GUI_TREE", "SCREENSHOT_PRINT"}, {"DEMO"}),
     ):
         counts, issues = audit_case_maps(tmp_path)
-    assert counts["executable"] == 1
+    assert counts["solidified"] == 1
+    assert issues == []
+
+
+def test_audit_accepts_empty_dynamic_case_without_external_history(tmp_path: Path) -> None:
+    payload = {
+        "case_id": "DEMO_DYNAMIC",
+        "sheet": "demo",
+        "steps_text": "1.点击按钮",
+        "expected_text": "1.进入结果页",
+        "setup": [],
+        "actions": [],
+        "collect": [],
+        "verification_points": [],
+        "unable": False,
+        "note": "",
+    }
+    (tmp_path / "demo.json").write_text(
+        json.dumps([payload], ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (tmp_path / "external_execution_history.jsonl").write_text("", encoding="utf-8")
+    with patch(
+        "sim_tools.audit_case_map._live_capabilities",
+        return_value=(set(), set()),
+    ):
+        counts, issues = audit_case_maps(tmp_path)
+    assert counts["unexplored"] == 1
+    assert counts["solidified"] == 0
     assert issues == []
 
 

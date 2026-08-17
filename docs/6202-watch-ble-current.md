@@ -3,6 +3,8 @@
 > 归档时间：2026-08-13  
 > 状态：暂停推进，代码保留，不作为当前真机自动化主链路。
 
+> 2026-08-17 补充：用户明确要求实现新平台 PB 协议后，主机协议层已扩展为完整 schema、分包/重组、并发请求和主动通知接收。实现范围与规格缺口见 `docs/pb-protocol-current.md`。此变化不改变本文的真机结论，MTP 仍是默认截图链路，也没有新增真机 BLE 成功证据。
+
 ## 阶段结论
 
 Agent-loop 已具备一套实验性的 Windows BLE GATT 客户端，可以扫描 6202、编码/解码 App 协议，并尝试绑定和登录。
@@ -113,4 +115,3 @@ uv run python -m agent_loop_system.tools.watch_ble login --address "<address>" -
 3. 已确定要建设真实 Android/iOS 手机自动化，并需要 BLE 客户端做协议诊断或故障注入。
 
 恢复时从最小闭环开始：扫描 -> 单次绑定 -> 单次登录 -> 重启后登录。不要先增加 BLE Quick Command、天气、通知、音乐、相机或经典蓝牙模拟。
-

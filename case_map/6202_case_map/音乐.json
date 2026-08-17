@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Entertainment 二级菜单内容和 Music 项位置由运行时配置决定，当前没有可静态确认的点击坐标；ENTER_PAGE 不能替代人工点击；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "负一屏卡片顺序由运行时配置决定，当前没有可静态确认的 Music 卡非控制区坐标；ENTER_PAGE 不能替代人工点击；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测 APP_CONNECT:0 后直接 ENTER_PAGE:MUSIC 会绕过应用入口的未绑定路由并显示音乐控制页；当前缺按可见应用入口进入 Music 的通用语义操作，不能用直达 NO_PAIR_TIP 冒充人工步骤；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "与 MUSIC_003 同一入口路由缺口；无法先合法进入 Music 未绑定页，也就不能验证该页返回栈；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "与 MUSIC_003 同一入口路由缺口；不能直达通用 NO_PAIR_TIP 后把二维码结果归因于 Music 的 Pair Now；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用现有共享音乐状态命令建立正在播放的歌名、作者和中间音量，不再把仅连接状态误当成正在播放；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_007",
@@ -90,12 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "长歌名由共享 SIM_MUSIC_SET 建立，间隔两秒采集两张截图验证可见文本位置发生滚动；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "进入 Music 后长歌名首段可见",
-        "等待两秒后同一歌名显示不同可见片段，形成滚动证据"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_008",
@@ -107,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享音乐状态命令建立正在播放但歌名为空的输入；截图按产品实际占位文案判定；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_009",
@@ -120,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_010",
@@ -130,19 +135,12 @@
       "precondition_text": "1.歌曲名包含手表不支持的特殊符号",
       "steps_text": "1.进入Music",
       "expected_text": "1.手表不显示不支持的特殊符号，其余文本可见",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MUSIC,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MUSIC,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_011",
@@ -154,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表退出页可截图，但手机音乐保持播放属于手机侧证据；截图不能只证明一半预期；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_012",
@@ -167,12 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SIM_MUSIC_SET 先建立手机播放态，再注入手机暂停事件；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "进入 Music 后检查当前为暂停按钮图标",
-        "注入手机暂停事件后检查控制页切换为播放按钮图标"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_013",
@@ -184,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "播放按钮控件位置来自当前 MUSIC Designer；SIM_MUSIC_SET 建立手机正在播放的前置状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_014",
@@ -197,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "播放按钮控件位置来自当前 MUSIC Designer；SIM_MUSIC_SET 建立手机暂停的前置状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_015",
@@ -210,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有会响应手表上一首命令并返回新歌名的虚拟手机播放列表；事后注入新歌名会伪造产品响应；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_016",
@@ -223,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有会响应手表下一首命令并返回新歌名的虚拟手机播放列表；事后注入新歌名会伪造产品响应；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_017",
@@ -236,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "共享音乐状态命令明确建立50%中间音量，截图只判断可见圆环；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_018",
@@ -249,13 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立50%音量并采集基线，再对两个旋转方向分别截图；GUI Tree仅触发截图采集，不参与产品判决；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "操作前截图显示中间音量圆环基线",
-        "顺时针旋转后检查媒体音量和圆环进度增加",
-        "逆时针旋转后检查媒体音量和圆环进度降低"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_019",
@@ -264,19 +261,12 @@
       "precondition_text": "1.媒体音量已处于最小值\n2.手表显示Music",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.媒体音量保持最小，圆环不出现负进度",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MUSIC,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_020",
@@ -288,12 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用共享音乐状态命令建立100%音量，旋转前后两张截图验证圆环不超过满进度；6202首轮迁移暂不可执行：SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "操作前截图显示媒体音量已处于最大值",
-        "顺时针旋转后圆环仍保持最大且不超过满进度"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_021",
@@ -305,12 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手机音量变化前后各采集一张截图，比较同一圆环由60%到80%的可见变化；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。",
-      "verification_points": [
-        "手机增加媒体音量前圆环显示60%基线",
-        "手机增加媒体音量后圆环同步增加到80%"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_022",
@@ -322,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "重绑定后的可见Music结果由通用连接态和播放态建立；恢复出厂过程本身不作为本截图结论；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_023",
@@ -335,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立明确的手机播放态，再依据截图检查通道图标；不使用GUI Tree判定图标；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_024",
@@ -348,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_025",
@@ -361,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前402x256 MUSIC Designer只给上一首、播放/暂停、下一首注册点击事件，左侧通道图标没有点击事件；无法执行通道切换，更不能验证动态亮中暗过程；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_026",
@@ -374,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行；当前MUSIC Designer未注册通道切换点击事件，且模拟器没有音频通道路由状态机，不能通过等待产生切换；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_027",
@@ -387,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行；当前MUSIC Designer未注册通道切换点击事件，且模拟器没有手机到手表音频路由状态机；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_028",
@@ -400,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行；当前MUSIC Designer未注册通道切换点击事件，且模拟器没有手表到手机音频路由状态机；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_029",
@@ -413,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行；当前MUSIC Designer未注册通道切换点击事件，也没有可构造通道切换失败的共享业务状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_030",
@@ -426,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 MUSIC Designer 只注册上一首、播放/暂停和下一首点击事件，没有音频通道切换控件；无法建立并执行该人工步骤；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_031",
@@ -439,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 MUSIC Designer 没有注册音频通道按钮点击事件，现有坐标点击会落在无事件区域，无法真实执行置灰按钮点击。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_032",
@@ -449,16 +443,12 @@
       "precondition_text": "1.音频通道切换已进入进行中状态",
       "steps_text": "1.阻止切换结果返回",
       "expected_text": "1.待产品确认：超时时长和页面反馈和通道回退状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_033",
@@ -470,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "右滑和10秒等待可执行；最终只要求手机音乐持续播放，当前手表截图无法判定手机侧播放状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_034",
@@ -483,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_035",
@@ -496,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前只有直接进入 MUSIC 子页面的命令，没有可复用的应用列表语义入口；直接 ENTER_PAGE 不能真实覆盖退出后重新从应用入口进入的人工路径。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_036",
@@ -509,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_037",
@@ -522,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_038",
@@ -535,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_039",
@@ -548,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "断连和点击可在手表端执行，但“手机音乐保持原播放状态”必须由手机侧画面证明；手表截图不能判定该外部结果。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_040",
@@ -561,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_041",
@@ -574,8 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_042",
@@ -587,8 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_043",
@@ -600,8 +600,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前 MUSIC_CTRL 只发送一次控制事件，没有可复用的500轮播放/暂停/切歌执行器和逐轮可见结果；单张最终截图不能证明500轮链路均响应。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MUSIC_044",
@@ -613,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "该用例要求Android和iOS真实手机侧控制结果，PC手表模拟器截图不能提供两平台证据。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

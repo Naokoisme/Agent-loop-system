@@ -24,13 +24,18 @@ const RESULT_FILTER_LABELS = {
 };
 const TEST_FILTER_LABELS = {
   all: '全部用例',
-  executable: '可执行',
-  unable: '暂不可执行',
-  pass: '已通过',
-  p0: 'P0 用例',
-  p1: 'P1 用例'
+  unexplored: '尚未外部探索',
+  externally_explored: '已经外部探索',
+  explored_unsolidified: '已探索但未固化',
+  solidified: '已固化、Agent-loop 可执行',
+  untested: '尚未运行',
+  fail: '最近失败',
+  cannot_verify: '最近无法验证',
+  error: '最近执行异常',
+  pass: '最近通过'
 };
 const DEFAULT_TEST_PROJECT = '620C_W6830';
+const DEFAULT_TEST_STATE = 'all';
 const TEST_PROJECTS = {
   '620C_W6830': {
     project: '620C_W6830',
@@ -52,9 +57,10 @@ const TEST_PROJECTS = {
   }
 };
 const BATCH_CATEGORY_LABELS = {
-  untested: '未测过',
-  fail: '测过 FAIL',
-  cannot_verify: '测过无法验证'
+  untested: '尚未运行',
+  fail: '最近运行失败',
+  cannot_verify: '最近无法验证',
+  error: '最近执行异常'
 };
 const WORKFLOW_NODES = ['validate', 'interactive_reproduce', 'agent', 'apply', 'build', 'test', 'record'];
 const NODE_LABELS = {
@@ -115,7 +121,7 @@ function resultPresentation(value) {
   if (normalized === 'PASS') return {className: 'chip chip-pass', label: '已通过'};
   if (normalized === 'FAIL') return {className: 'chip chip-fail', label: '失败'};
   if (normalized === 'CANNOT_VERIFY') return {className: 'chip chip-warning', label: '无法验证'};
-  if (normalized === 'SKIP') return {className: 'chip chip-warning', label: '暂不可执行'};
+  if (normalized === 'SKIP') return {className: 'chip chip-warning', label: '无法验证'};
   if (normalized === 'ERROR') return {className: 'chip chip-fail', label: '执行错误'};
   if (normalized === 'RUNNING' || normalized === 'QUEUED') return {className: 'chip chip-running', label: '运行中'};
   return {className: 'chip chip-pending', label: '未运行'};
@@ -133,6 +139,25 @@ function setActiveNav(section) {
 function resultChip(value) {
   const presentation = resultPresentation(value);
   return `<span class="${presentation.className}">${presentation.label}</span>`;
+}
+
+function maturityChip(row = {}) {
+  if (row.is_promoted || row.maturity_state === 'solidified') {
+    return '<span class="chip chip-solidified">已固化</span>';
+  }
+  if (row.external_explored || row.maturity_state === 'explored_unsolidified') {
+    return '<span class="chip chip-unsolidified">未固化</span>';
+  }
+  return '<span class="chip chip-unexplored">尚未探索</span>';
+}
+
+function testExecutionModeLabel(value) {
+  const labels = {
+    fixed_mapping: '固化步骤',
+    candidate_mapping: '外部候选复跑',
+    agent_exploration: 'Agent-loop 临时探索'
+  };
+  return labels[String(value || '')] || '旧记录未标明';
 }
 
 function testProject(value = DEFAULT_TEST_PROJECT) {
@@ -586,33 +611,33 @@ async function renderList() {
 function testListParams() {
   const params = new URLSearchParams(location.search);
   const rawPage = Number.parseInt(params.get('page') || '1', 10);
-  const state = String(params.get('state') || 'all').toLowerCase();
+  const state = String(params.get('state') || DEFAULT_TEST_STATE).toLowerCase();
   const project = String(params.get('project') || DEFAULT_TEST_PROJECT);
   return {
     query: (params.get('q') || '').trim(),
     page: Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1,
-    state: Object.hasOwn(TEST_FILTER_LABELS, state) ? state : 'all',
+    state: Object.hasOwn(TEST_FILTER_LABELS, state) ? state : DEFAULT_TEST_STATE,
     project: Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT
   };
 }
 
-function buildTestListUrl(query, page, state = 'all', project = DEFAULT_TEST_PROJECT) {
+function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT) {
   const params = new URLSearchParams();
   params.set('project', testProject(project).project);
   if (query.trim()) params.set('q', query.trim());
-  if (state !== 'all') params.set('state', state);
+  if (state !== DEFAULT_TEST_STATE) params.set('state', state);
   if (page > 1) params.set('page', String(page));
   return params.size ? `/tests?${params.toString()}` : '/tests';
 }
 
-function setTestListUrl(query, page, state = 'all', project = DEFAULT_TEST_PROJECT, mode = 'replace') {
+function setTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT, mode = 'replace') {
   const url = buildTestListUrl(query, page, state, project);
   history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
 }
 
 function testReturnUrl() {
   const fallbackProject = testListParams().project;
-  const fallback = buildTestListUrl('', 1, 'all', fallbackProject);
+  const fallback = buildTestListUrl('', 1, DEFAULT_TEST_STATE, fallbackProject);
   const raw = new URLSearchParams(location.search).get('from');
   if (!raw) return fallback;
   try {
@@ -621,8 +646,8 @@ function testReturnUrl() {
     const params = new URLSearchParams(target.search);
     const rawPage = Number.parseInt(params.get('page') || '1', 10);
     const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
-    const rawState = String(params.get('state') || 'all').toLowerCase();
-    const state = Object.hasOwn(TEST_FILTER_LABELS, rawState) ? rawState : 'all';
+    const rawState = String(params.get('state') || DEFAULT_TEST_STATE).toLowerCase();
+    const state = Object.hasOwn(TEST_FILTER_LABELS, rawState) ? rawState : DEFAULT_TEST_STATE;
     const project = String(params.get('project') || DEFAULT_TEST_PROJECT);
     return buildTestListUrl(
       (params.get('q') || '').trim(), page, state,
@@ -646,19 +671,40 @@ function testHistoryHref(project, sheet, caseId, runId, returnTo = '/tests') {
   return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
 }
 
-function testMetricCards(summary = {}, activeState = 'all') {
-  const cards = [
+function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
+  const maturityCards = [
     ['all', 'all', '全部用例'],
-    ['executable', 'executable', '可执行'],
-    ['unable', 'unable', '暂不可执行'],
-    ['pass', 'pass', '已通过'],
-    ['p0', 'p0', 'P0 用例'],
-    ['p1', 'p1', 'P1 用例']
+    ['unexplored', 'unexplored', '尚未外部探索'],
+    ['externally_explored', 'externally_explored', '已经外部探索'],
+    ['explored_unsolidified', 'explored_unsolidified', '已探索但未固化'],
+    ['solidified', 'solidified', '已固化、Agent-loop 可执行']
   ];
-  return cards.map(([state, countKey, label]) => `
+  const runCards = [
+    ['untested', 'untested', '尚未运行'],
+    ['pass', 'pass', '最近通过'],
+    ['fail', 'fail', '最近失败'],
+    ['cannot_verify', 'cannot_verify', '最近无法验证'],
+    ['error', 'error', '执行异常']
+  ];
+  const renderCards = cards => cards.map(([state, countKey, label]) => `
     <button class="metric${activeState === state ? ' is-active' : ''}" type="button" data-test-filter="${state}" aria-pressed="${activeState === state}">
       <strong>${Number(summary[countKey] || 0)}</strong><span>${label}</span>
     </button>`).join('');
+  return `
+    <section class="test-metric-group" aria-labelledby="maturity-status-title">
+      <header class="test-metric-heading">
+        <div><strong id="maturity-status-title">外部探索与固化</strong><span>分类只取外部账本和正式 case_map</span></div>
+        <small>全部 ${Number(summary.all || 0)}</small>
+      </header>
+      <div class="metrics test-metric-grid maturity-metrics">${renderCards(maturityCards)}</div>
+    </section>
+    <section class="test-metric-group" aria-labelledby="run-status-title">
+      <header class="test-metric-heading">
+        <div><strong id="run-status-title">最近一次 Agent-loop 结果</strong><span>运行结果不改变外部探索或固化状态</span></div>
+        <small>全部用例都可运行</small>
+      </header>
+      <div class="metrics test-metric-grid run-metrics">${renderCards(runCards)}</div>
+    </section>`;
 }
 
 function testRows(items, query, state, returnTo = '/tests') {
@@ -673,20 +719,22 @@ function testRows(items, query, state, returnTo = '/tests') {
     const sheet = String(row.file_sheet || row.sheet || '');
     const caseId = String(row.case_id || '');
     const selected = selectedTestCases.has(testCaseSelectionKey(sheet, caseId));
-    const unavailable = Boolean(row.unable);
+    const historyText = row.history_count
+      ? `${row.history_count} 次运行 · ${formatTime(row.last_run_at)}`
+      : 'Agent-loop 尚未运行';
     return `
-      <div class="test-row-shell${selected ? ' is-selected' : ''}${unavailable ? ' is-unavailable' : ''}">
-        <label class="test-case-selector" title="${escapeHtml(unavailable ? '该用例当前不可自动执行' : `选择 ${caseId} 创建精确批次`)}">
-          <input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''} ${unavailable ? 'disabled' : ''}>
+      <div class="test-row-shell${selected ? ' is-selected' : ''}">
+        <label class="test-case-selector" title="${escapeHtml(`选择 ${caseId} 创建精确批次`)}">
+          <input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''}>
         </label>
         <a class="defect-row test-row" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">
           <span class="defect-number">${escapeHtml(caseId)}</span>
           <span class="defect-copy">
             <strong>${escapeHtml(row.steps_text || row.expected_text || '未填写测试步骤')}</strong>
-            <small>${escapeHtml(row.sheet)} · ${row.history_count ? `${row.history_count} 次运行 · ${formatTime(row.last_run_at)}` : '尚无运行记录'}</small>
+            <small>${escapeHtml(row.sheet)} · ${historyText}</small>
           </span>
-          ${testTargetChip(row)}
           <span class="chip chip-status">${escapeHtml(row.priority || '未分级')}</span>
+          ${maturityChip(row)}
           ${resultChip(row.latest_verdict)}
           <span class="row-arrow" aria-hidden="true">›</span>
         </a>
@@ -723,15 +771,15 @@ function updateSelectedTestCasesUi() {
     }
   });
 
-  const executableOnPage = currentTestPageItems.filter(item => !item.unable);
-  const selectedOnPage = executableOnPage.filter(item => selectedTestCases.has(
+  const casesOnPage = currentTestPageItems;
+  const selectedOnPage = casesOnPage.filter(item => selectedTestCases.has(
     testCaseSelectionKey(item.file_sheet || item.sheet, item.case_id)
   )).length;
   const selectPage = document.querySelector('#select-test-page');
   if (selectPage) {
-    selectPage.disabled = executableOnPage.length < 1;
-    selectPage.checked = executableOnPage.length > 0 && selectedOnPage === executableOnPage.length;
-    selectPage.indeterminate = selectedOnPage > 0 && selectedOnPage < executableOnPage.length;
+    selectPage.disabled = casesOnPage.length < 1;
+    selectPage.checked = casesOnPage.length > 0 && selectedOnPage === casesOnPage.length;
+    selectPage.indeterminate = selectedOnPage > 0 && selectedOnPage < casesOnPage.length;
   }
 
   const count = selectedTestCases.size;
@@ -746,7 +794,7 @@ function updateSelectedTestCasesUi() {
   const run = document.querySelector('#run-selected-tests');
   if (run) {
     run.disabled = count < 1;
-    run.textContent = count ? `创建已选批次（${count}）` : '创建已选批次';
+    run.textContent = count ? `用已选用例创建批次（${count}）` : '用已选用例创建批次';
   }
 }
 
@@ -770,10 +818,10 @@ function updateBatchLaunch(summary = latestBatchCandidateSummary) {
   const button = document.querySelector('#test-batch-button');
   if (button) {
     button.disabled = total < 1;
-    button.textContent = total ? `按状态创建批次（${total}）` : '所选分类没有用例';
+    button.textContent = total ? `创建状态批次（${total}）` : '所选分类没有用例';
   }
   const note = document.querySelector('#batch-selection-note');
-  if (note) note.textContent = `最新结果为 PASS 的 ${Number(latestBatchCandidateSummary.pass || 0)} 条已排除`;
+  if (note) note.textContent = `最新结果已通过的 ${Number(latestBatchCandidateSummary.pass || 0)} 条已排除`;
 }
 
 async function refreshTests(query, page, {
@@ -791,8 +839,10 @@ async function refreshTests(query, page, {
     const payload = await api(`/api/tests?project=${encodeURIComponent(project)}&q=${encodeURIComponent(query)}&state=${encodeURIComponent(state)}&page=${page}&page_size=${PAGE_SIZE}`);
     if (token !== testListRequestToken) return;
     ensureTestSelectionProject(payload.project);
+    const projectTarget = document.querySelector('#test-project-target');
+    if (projectTarget) projectTarget.innerHTML = testTargetChip(payload);
     currentTestPageItems = payload.items || [];
-    const selected = Object.hasOwn(TEST_FILTER_LABELS, payload.state_filter) ? payload.state_filter : 'all';
+    const selected = Object.hasOwn(TEST_FILTER_LABELS, payload.state_filter) ? payload.state_filter : DEFAULT_TEST_STATE;
     document.querySelector('#test-metrics').innerHTML = testMetricCards(payload.summary, selected);
     document.querySelector('#test-queue-title').textContent = TEST_FILTER_LABELS[selected];
     updateBatchLaunch(payload.summary);
@@ -825,9 +875,13 @@ async function renderTests() {
       <div>
         <p class="eyebrow">本地测试工作台</p>
         <h1 class="page-title">Agent 测试</h1>
-        <p class="page-intro">按项目查看人工用例映射，运行对应的模拟器或真机测试，并复查每个检查点的截图与判定信息。</p>
+        <p class="page-intro">全部用例都可以运行；有固化步骤时固定执行，没有固化步骤时由 Agent-loop 临时探索。</p>
       </div>
       <div class="batch-launch">
+        <div class="batch-launch-heading">
+          <strong>按运行状态自动选例</strong>
+          <small>勾选分类后创建一个批次</small>
+        </div>
         <div class="batch-scope" aria-label="选择批次范围">
           ${Object.entries(BATCH_CATEGORY_LABELS).map(([value, label]) => `
             <label class="batch-option">
@@ -849,7 +903,7 @@ async function renderTests() {
         <select id="test-project" aria-label="选择测试项目">
           ${Object.values(TEST_PROJECTS).map(item => `<option value="${escapeHtml(item.project)}" ${item.project === initial.project ? 'selected' : ''}>${escapeHtml(item.projectLabel)} · ${escapeHtml(item.targetLabel)}</option>`).join('')}
         </select>
-        <small>${testTargetChip(initialProject)}</small>
+        <small id="test-project-target">${testTargetChip(initialProject)}</small>
       </div>
       <div class="search-stage">
         <label for="test-search">搜索测试用例</label>
@@ -862,22 +916,22 @@ async function renderTests() {
     </section>
     <section class="test-selection-bar" aria-label="精确选择测试批次">
       <div class="test-selection-copy">
-        <strong>勾选用例创建批次</strong>
+        <strong>手动勾选用例</strong>
         <span id="selected-test-summary">尚未勾选用例；勾选项可跨分页保留</span>
       </div>
       <div class="test-selection-actions">
         <label class="test-page-selector">
           <input id="select-test-page" type="checkbox">
-          <span>全选当前页可执行用例</span>
+          <span>全选当前页用例</span>
         </label>
         <button id="clear-selected-tests" class="button button-secondary" type="button" disabled>清空</button>
-        <button id="run-selected-tests" class="button" type="button" disabled>创建已选批次</button>
+        <button id="run-selected-tests" class="button" type="button" disabled>用已选用例创建批次</button>
       </div>
     </section>
-    <section id="test-metrics" class="metrics" aria-label="测试用例统计与筛选">${testMetricCards({}, initial.state)}</section>
+    <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards({}, initial.state)}</section>
     <section class="panel queue-panel">
       <header class="panel-head">
-        <div><h2 id="test-queue-title">${TEST_FILTER_LABELS[initial.state]}</h2><p>按模块和用例编号排列</p></div>
+        <div><h2 id="test-queue-title">${TEST_FILTER_LABELS[initial.state]}</h2><p>按模块和用例编号排列，结果取最近一次 Agent-loop 运行记录</p></div>
         <span id="test-count" class="chip chip-pending">正在读取</span>
       </header>
       <div id="test-list" class="defect-list"><div class="list-loading">正在读取测试用例…</div></div>
@@ -925,7 +979,7 @@ async function renderTests() {
     updateSelectedTestCasesUi();
   });
   document.querySelector('#select-test-page').addEventListener('change', event => {
-    for (const item of currentTestPageItems.filter(row => !row.unable)) {
+    for (const item of currentTestPageItems) {
       const selectedCase = {
         sheet: String(item.file_sheet || item.sheet || ''),
         case_id: String(item.case_id || ''),
@@ -972,7 +1026,7 @@ async function renderTests() {
       return;
     }
     const projectMeta = testProject(projectSelect.value);
-    if (!window.confirm(`确定在${projectMeta.targetLabel}运行 ${projectMeta.projectLabel} 的所选 ${total} 条吗？范围：${labels.join('、')}。最新结果为 PASS 的用例不会重跑。`)) return;
+    if (!window.confirm(`确定在${projectMeta.targetLabel}运行 ${projectMeta.projectLabel} 的所选 ${total} 条吗？范围：${labels.join('、')}。最新结果已通过的用例不会重跑。`)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
     try {
@@ -1132,14 +1186,15 @@ async function renderTest(sheet, caseId) {
   const testCase = await api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}`);
   document.title = `${testCase.case_id} · Agent 测试`;
   const latest = testCase.history?.[0];
-  const initialVerdict = latest?.verdict || (testCase.unable ? 'SKIP' : 'PENDING');
+  const initialVerdict = latest?.verdict || 'PENDING';
+  const usesFixedMapping = Boolean(testCase.is_promoted);
   app.innerHTML = `
     <a class="back-link test-list-back-link" href="${escapeHtml(returnTo)}">← 返回测试用例</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(testCase.sheet)} · Agent 测试 · ${escapeHtml(testCase.execution_target_label)}</p>
         <h1 class="page-title detail-title">${escapeHtml(testCase.case_id)}</h1>
-        <div class="meta-line">${testTargetChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${resultChip(initialVerdict)}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
+        <div class="meta-line">${testTargetChip(testCase)}${maturityChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${resultChip(initialVerdict)}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
       </div>
     </header>
     <div class="detail-grid">
@@ -1154,25 +1209,23 @@ async function renderTest(sheet, caseId) {
           </div>
         </section>
         <section class="panel">
-          <header class="panel-head"><div><h2>命令映射</h2><p>执行器按准备、操作、采集的顺序运行</p></div></header>
+          <header class="panel-head"><div><h2>${usesFixedMapping ? '固化步骤' : '动态探索'}</h2><p>${usesFixedMapping ? 'Runner 按准备、操作、采集的固定顺序运行' : '当前没有固化步骤，启动后由 Agent-loop 依据用例原文逐步探索'}</p></div></header>
           <div class="panel-body command-phases">
-            ${commandPhase('准备环境', 'setup', testCase.setup)}
-            ${commandPhase('执行操作', 'actions', testCase.actions)}
-            ${commandPhase('采集证据', 'collect', testCase.collect)}
+            ${usesFixedMapping ? `${commandPhase('准备环境', 'setup', testCase.setup)}${commandPhase('执行操作', 'actions', testCase.actions)}${commandPhase('采集证据', 'collect', testCase.collect)}` : '<div class="notice"><strong>本条将临时探索</strong><p>探索命令和截图只写入本次运行历史，不会写入外部探索账本，也不会自动固化到 case_map。</p></div>'}
           </div>
         </section>
-        ${testCase.note ? `<section class="panel"><header class="panel-head"><div><h2>审核说明</h2><p>命令转换或不可执行原因</p></div></header><div class="panel-body prose">${escapeHtml(testCase.note)}</div></section>` : ''}
+        ${testCase.note ? `<section class="panel"><header class="panel-head"><div><h2>补充说明</h2><p>映射字段未表达的简短说明</p></div></header><div class="panel-body prose">${escapeHtml(testCase.note)}</div></section>` : ''}
       </div>
       <aside class="panel repair-panel">
         <header class="panel-head"><div><h2>启动测试</h2><p>使用 ${escapeHtml(testCase.project_label)} ${escapeHtml(testCase.execution_target_label)}执行并由 Agent 判定</p></div></header>
         <form id="test-run-form" class="panel-body">
           <ul class="run-notes">
-            <li>逐条执行已审核命令</li>
+            <li>${usesFixedMapping ? '逐条执行已固化命令' : 'Agent-loop 按原始前置、步骤和预期逐步探索'}</li>
             <li>每个截图检查点分别采集${escapeHtml(screenshotLabel(testCase))}</li>
             <li>保存判定理由与运行证据</li>
           </ul>
-          <button id="test-run-button" class="button button-wide" type="submit" ${testCase.unable ? 'disabled' : ''}>${testCase.unable ? '当前不可自动执行' : '启动测试'}</button>
-          <p class="form-note">${testCase.unable ? escapeHtml(testCase.note || `该用例依赖当前${testCase.execution_target_label}不支持的能力。`) : `同一时间只运行一个测试或修复任务，避免${testCase.execution_target_label}链路冲突。`}</p>
+          <button id="test-run-button" class="button button-wide" type="submit">启动测试</button>
+          <p class="form-note">同一时间只运行一个测试或修复任务，避免${escapeHtml(testCase.execution_target_label)}链路冲突。</p>
         </form>
       </aside>
     </div>
@@ -1188,8 +1241,7 @@ async function renderTest(sheet, caseId) {
       <div id="test-history-body" class="panel-body">${testHistoryRows(testCase.history, project, sheet, caseId, returnTo)}</div>
     </section>`;
 
-  if (!testCase.unable) {
-    document.querySelector('#test-run-form').addEventListener('submit', async event => {
+  document.querySelector('#test-run-form').addEventListener('submit', async event => {
       event.preventDefault();
       const button = document.querySelector('#test-run-button');
       button.disabled = true;
@@ -1211,9 +1263,8 @@ async function renderTest(sheet, caseId) {
         button.disabled = false;
         button.textContent = '启动测试';
       }
-    });
-  }
-  await restoreActiveTest(project, sheet, caseId, Boolean(testCase.unable));
+  });
+  await restoreActiveTest(project, sheet, caseId);
 }
 
 function stopTestPolling() {
@@ -1221,12 +1272,12 @@ function stopTestPolling() {
   testPollTimer = null;
 }
 
-async function restoreActiveTest(project, sheet, caseId, unable = false) {
+async function restoreActiveTest(project, sheet, caseId) {
   stopTestPolling();
   const button = document.querySelector('#test-run-button');
   const chip = document.querySelector('#test-job-chip');
   const message = document.querySelector('#test-job-message');
-  if (!button || !chip || !message || unable) return;
+  if (!button || !chip || !message) return;
   try {
     const payload = await api('/api/tests/active');
     const job = activeTestJobForProject(payload, project);
@@ -1311,7 +1362,7 @@ function stopBatchTestPolling() {
 
 function batchRecentRows(items = [], project = DEFAULT_TEST_PROJECT) {
   if (!items.length) return '<p class="muted">首条用例完成后，这里会显示最新判定。</p>';
-  const returnTo = buildTestListUrl('', 1, 'all', project);
+  const returnTo = buildTestListUrl('', 1, DEFAULT_TEST_STATE, project);
   return `<div class="batch-result-list">${items.map(item => {
     const content = `${resultChip(item.verdict)}<span><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.sheet)} · ${escapeHtml(item.reason || '未记录判定理由')}</small></span><time>${formatTime(item.finished_at)}</time>`;
     return item.history_id
@@ -1415,7 +1466,7 @@ async function renderTestBatch(jobId) {
   stopBatchTestPolling();
   const initialJob = await api(`/api/tests/jobs/${encodeURIComponent(jobId)}`);
   const projectMeta = testProject(initialJob.project);
-  const returnTo = buildTestListUrl('', 1, 'all', projectMeta.project);
+  const returnTo = buildTestListUrl('', 1, DEFAULT_TEST_STATE, projectMeta.project);
   document.title = `批次测试 ${jobId} · Agent 测试`;
   app.innerHTML = `
     <a class="back-link" href="${escapeHtml(returnTo)}">← 返回测试用例</a>
@@ -1898,6 +1949,7 @@ async function renderTestHistory(sheet, caseId, runId) {
           <div class="kv"><span>执行目标</span><strong>${escapeHtml(record.execution_target_label)}</strong></div>
           <div class="kv"><span>测试模块</span><strong>${escapeHtml(record.sheet)}</strong></div>
           <div class="kv"><span>用例编号</span><strong>${escapeHtml(record.case_id)}</strong></div>
+          <div class="kv"><span>执行方式</span><strong>${escapeHtml(testExecutionModeLabel(record.execution_mode))}</strong></div>
           <div class="kv"><span>优先级</span><strong>${escapeHtml(record.priority || '未分级')}</strong></div>
           <div class="kv"><span>进程返回码</span><strong>${escapeHtml(record.return_code ?? '未记录')}</strong></div>
           <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
@@ -1929,9 +1981,9 @@ async function renderTestHistory(sheet, caseId, runId) {
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>命令映射快照</h2><p>本次运行采用的计划，不能替代上方实际轨迹</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
       <div class="panel-body command-phases">
-        ${commandPhase('准备环境', 'setup', record.setup)}
-        ${commandPhase('执行操作', 'actions', record.actions)}
-        ${commandPhase('采集证据', 'collect', record.collect)}
+        ${commandPhase('准备环境', 'setup', record.planned_commands?.setup || record.setup)}
+        ${commandPhase('执行操作', 'actions', record.planned_commands?.action || record.actions)}
+        ${commandPhase('采集证据', 'collect', record.planned_commands?.collect || record.collect)}
       </div>
     </details>
     <section class="panel">

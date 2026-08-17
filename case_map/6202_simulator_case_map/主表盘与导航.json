@@ -9,16 +9,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.点亮手表屏幕",
       "expected_text": "1.主表盘显示当前时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "模拟器屏幕常亮,'点亮屏幕'无对应命令；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_002",
@@ -29,7 +25,7 @@
       "expected_text": "1.手表显示主表盘",
       "setup": [
         "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
@@ -38,7 +34,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "verification_points": [
+        "Encoder click from Settings returns to the main watch face"
+      ],
+      "note": "PROMOTED: Formal Runner PASS and audit PROMOTABLE_PASS; evidence contract COMPLETE with one real encoder action and one fresh BMP. Exploration: start-wface-batch20-121-027-20260817-013808/exploration/6202_SIM_01/WFACE_002/exploration.json. Formal result: formal-wface-002-20260817-020000/result.json.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_003",
@@ -50,8 +50,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_004",
@@ -63,8 +64,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_005",
@@ -76,8 +78,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_006",
@@ -89,8 +92,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_007",
@@ -102,8 +106,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用TP_PRESS按下/释放与SIM_WAIT精确构造主表盘中心长按2秒，不再把触控治具误判为不可执行；6202首轮迁移暂不可执行：TP_PRESS 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_008",
@@ -112,18 +117,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.顺时针旋转编码器",
       "expected_text": "1.手表显示消息中心",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_009",
@@ -132,18 +131,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_010",
@@ -152,18 +145,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘单击编码器",
       "expected_text": "1.手表显示主菜单",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_011",
@@ -175,8 +162,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_012",
@@ -188,8 +176,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_013",
@@ -201,8 +190,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_014",
@@ -214,8 +204,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_015",
@@ -227,8 +218,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_016",
@@ -240,8 +232,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_017",
@@ -253,8 +246,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_018",
@@ -266,8 +260,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_019",
@@ -276,16 +271,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在设置列表查找一级视图排序入口",
       "expected_text": "1.设置列表不显示一级视图排序入口",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_020",
@@ -297,8 +288,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_021",
@@ -310,8 +302,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_022",
@@ -323,8 +316,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_023",
@@ -336,8 +330,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "以各视图中部(201,128)近似非专用操作区域；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_024",
@@ -346,18 +341,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在Sleep视图单击编码器",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_025",
@@ -366,17 +355,12 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness主页面",
       "expected_text": "1.页面左侧显示三色同心圆环",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DATA,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_026",
@@ -385,17 +369,12 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness右侧数值区",
       "expected_text": "1.数值区显示Steps",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DATA,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_027",
@@ -404,17 +383,12 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness右侧数值区",
       "expected_text": "1.数值区显示Calories",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DATA,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_028",
@@ -423,17 +397,12 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness右侧数值区",
       "expected_text": "1.数值区显示Active Time",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DATA,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_029",
@@ -442,17 +411,12 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness主页面",
       "expected_text": "1.页面右侧显示白色滚动条",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DATA,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_030",
@@ -464,8 +428,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_031",
@@ -477,13 +442,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "三个导航阶段分别采集页面树；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后检查 My Fitness 子页面",
-        "左滑后检查 Sleep 主页面",
-        "右滑后检查返回 My Fitness 主页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_032",
@@ -492,18 +453,12 @@
       "precondition_text": "1.今日存在睡眠数据",
       "steps_text": "1.观察Sleep主页面",
       "expected_text": "1.页面左侧显示弧形进度环，右侧显示实际睡眠时长",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SLEEP_RECORD_CREATE:1,480,120,60,60,30;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP_WIDGET,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_033",
@@ -512,18 +467,12 @@
       "precondition_text": "1.今日存在睡眠数据",
       "steps_text": "1.观察Sleep主页面",
       "expected_text": "1.页面显示Sleep Goal",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SLEEP_RECORD_CREATE:1,480,120,60,60,30;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP_WIDGET,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_034",
@@ -532,18 +481,12 @@
       "precondition_text": "1.今日存在睡眠数据",
       "steps_text": "1.观察Sleep主页面",
       "expected_text": "1.页面显示From与To时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SLEEP_RECORD_CREATE:1,480,120,60,60,30;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP_WIDGET,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_035",
@@ -552,17 +495,12 @@
       "precondition_text": "1.手表显示Sleep一级视图",
       "steps_text": "1.观察页面顶部",
       "expected_text": "1.页面顶部显示Sleep标题",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP_WIDGET,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_036",
@@ -574,8 +512,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_037",
@@ -587,8 +526,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_038",
@@ -600,8 +540,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_039",
@@ -610,17 +551,12 @@
       "precondition_text": "1.手表显示OCM一级视图",
       "steps_text": "1.观察One Click Measurement",
       "expected_text": "1.页面显示Heart Rate卡片",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_040",
@@ -629,17 +565,12 @@
       "precondition_text": "1.手表显示OCM一级视图",
       "steps_text": "1.观察One Click Measurement",
       "expected_text": "1.页面显示Stress卡片",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_041",
@@ -648,17 +579,12 @@
       "precondition_text": "1.手表显示OCM一级视图",
       "steps_text": "1.观察One Click Measurement",
       "expected_text": "1.页面显示SpO2卡片",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ONE_CLICK_MEASURE_RESULT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_042",
@@ -670,8 +596,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_043",
@@ -683,12 +610,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "启动测量和滑出页面后分别采集页面树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击 Measure 后检查一键测量进程页",
-        "左滑切换一级视图后检查测量进程已停止"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_044",
@@ -700,13 +624,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "测量启动、滑出停止和返回结果页三个阶段分别取证；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击 Measure 后检查一键测量进程页",
-        "左滑切换一级视图后检查测量进程已停止",
-        "右滑返回后检查页面没有本次未完成测量值"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_045",
@@ -718,8 +638,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_046",
@@ -731,8 +652,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_047",
@@ -744,8 +666,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_048",
@@ -754,16 +677,12 @@
       "precondition_text": "1.用户尚未使用运动功能",
       "steps_text": "1.首次进入Recent Multisport",
       "expected_text": "1.第1格显示运动列表第1项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_049",
@@ -772,16 +691,12 @@
       "precondition_text": "1.用户尚未使用运动功能",
       "steps_text": "1.首次进入Recent Multisport",
       "expected_text": "1.第2格显示运动列表第2项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_050",
@@ -790,16 +705,12 @@
       "precondition_text": "1.用户尚未使用运动功能",
       "steps_text": "1.首次进入Recent Multisport",
       "expected_text": "1.第3格显示运动列表第3项",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_051",
@@ -811,8 +722,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "运动流程模拟: 1.连续使用四种运动后进入Recent Multisport；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_052",
@@ -824,8 +736,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "运动流程模拟: 1.启动Walking运动；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_053",
@@ -837,8 +750,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_WIDGET。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_054",
@@ -850,8 +764,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_055",
@@ -863,8 +778,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_056",
@@ -873,17 +789,12 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察Breathe主页面",
       "expected_text": "1.页面显示练习时长卡片",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_057",
@@ -892,17 +803,12 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察Breathe主页面",
       "expected_text": "1.页面显示强度卡片",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_058",
@@ -911,17 +817,12 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察Breathe主页面",
       "expected_text": "1.页面显示绿色播放按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_059",
@@ -930,17 +831,12 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察页面顶部",
       "expected_text": "1.页面顶部以绿色显示Breathe标题",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BREATH_TRAIN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_060",
@@ -952,8 +848,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "播放按钮未在控件树定位(实测 BREATH_TRAIN 仅时长/强度卡片可点)；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_061",
@@ -965,8 +862,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_062",
@@ -978,8 +876,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_063",
@@ -991,8 +890,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_064",
@@ -1001,17 +901,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察页面顶部",
       "expected_text": "1.页面顶部以粉色显示My Cycle标题",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_065",
@@ -1020,17 +915,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察My Cycle主页面",
       "expected_text": "1.页面显示横向日期气泡轴",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_066",
@@ -1039,17 +929,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察My Cycle日期轴",
       "expected_text": "1.当前日期气泡位于中间位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_067",
@@ -1058,17 +943,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察My Cycle日期轴顶部",
       "expected_text": "1.当前日上方显示S标签，表示Start起始日",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_068",
@@ -1077,17 +957,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察My Cycle状态区",
       "expected_text": "1.状态区显示Phase",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_069",
@@ -1096,17 +971,12 @@
       "precondition_text": "1.Profile Gender为Female",
       "steps_text": "1.观察My Cycle状态区",
       "expected_text": "1.状态区显示Cycle Day",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_070",
@@ -1118,8 +988,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_071",
@@ -1131,8 +1002,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_072",
@@ -1144,8 +1016,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前只有 DIAL 和 FEMALE_HEALTH 窗口导航命令，没有把一级视图定位到 My Cycle 的已注册命令；从 DIAL 直接滑动不能可靠建立该前置页面；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_073",
@@ -1157,8 +1030,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待、熄屏和实体按键均可执行；人工前置写主表盘而步骤要求Sleep主页面，来源用例前置与操作页面矛盾，需先明确实际起始页；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_074",
@@ -1170,8 +1044,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待、熄屏和实体按键均可执行；人工前置写主表盘而步骤要求Sleep主页面，来源用例前置与操作页面矛盾，需先明确实际起始页；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_075",
@@ -1183,8 +1058,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_076",
@@ -1196,12 +1072,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SIM_MUSIC_SET 建立持续播放场景，进入控制中心和返回表盘后分别取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "下滑后检查控制中心页面",
-        "右滑返回后检查主表盘；动作序列未修改已注入的音乐播放状态"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_077",
@@ -1210,16 +1083,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.用可编程触控治具连续切换一级视图500次",
       "expected_text": "1.手表未发生异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/App: 1.用可编程触控治具连续切换一级视图500次；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_078",
@@ -1231,8 +1100,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/App: 1.在App将Gender改为Female；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WFACE_079",
@@ -1244,8 +1114,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "动态/循环场景无法静态判定: 1.缓慢左右拖动一级视图；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

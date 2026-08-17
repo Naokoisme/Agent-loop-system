@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "负一屏 Clock 卡位于可滚动长页面，当前命令只有坐标滑动且无法按卡片语义稳定定位 Stopwatch；需新增按控件文本/业务 ID 点击能力；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_003",
@@ -35,19 +37,12 @@
       "precondition_text": "1.秒表已重置",
       "steps_text": "1.进入Stopwatch",
       "expected_text": "1.主计时显示00:00.00，计次按钮置灰，开始按钮可用",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_004",
@@ -59,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_005",
@@ -72,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_006",
@@ -82,17 +79,12 @@
       "precondition_text": "1.秒表已开始且总时长少于1小时",
       "steps_text": "1.观察主计时",
       "expected_text": "1.主计时显示MM:SS.cs格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_007",
@@ -104,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行，但完整等待1小时会占用单模拟器；当前缺把秒表单调计时安全推进到59:59附近的通用状态命令，不能用系统RTC代替秒表时钟；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_008",
@@ -117,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_009",
@@ -130,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_010",
@@ -143,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_011",
@@ -156,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_012",
@@ -169,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_013",
@@ -182,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用已验证的秒表开始和计次坐标建立超过一屏的30条记录；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_014",
@@ -195,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用已验证的30条计次记录并先上滑离开顶部；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_015",
@@ -208,12 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "旋转前计次列表位置",
-        "旋转后计次列表沿旋转方向滚动"
-      ],
-      "unable": true,
-      "note": "复用已验证的30条计次记录；旋转前后分别截图；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_016",
@@ -225,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用已验证的秒表开始和计次坐标建立3条记录；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_017",
@@ -238,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有把秒表单调计时推进到1小时以上的通用模拟器能力，不能用系统时间或伪造显示代替；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_018",
@@ -248,16 +247,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.点击暂停按钮\n2.等待3秒",
       "expected_text": "1.页面显示重置和继续按钮\n2.主计时保持暂停值",
-      "verification_points": [
-        "暂停前秒表正在计时",
-        "点击暂停后显示重置和继续按钮",
-        "真实等待3秒后主计时仍保持暂停值"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用秒表共享开始/暂停坐标，暂停后真实等待3秒；三阶段截图判断按钮切换和数值冻结；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_019",
@@ -266,15 +261,12 @@
       "precondition_text": "1.秒表处于暂停状态",
       "steps_text": "1.点击继续按钮\n2.等待1秒",
       "expected_text": "1.页面显示计次和暂停按钮\n2.主计时从暂停值继续增加",
-      "verification_points": [
-        "继续前秒表处于暂停状态",
-        "点击继续并真实等待1秒后显示计次和暂停按钮且主计时增加"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用秒表共享开始/暂停/继续坐标建立暂停态，再真实等待1秒；前后截图判断恢复计时；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_020",
@@ -286,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_021",
@@ -296,16 +289,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.执行右滑\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表退出秒表页\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [
-        "右滑前秒表正在计时",
-        "右滑后已退出秒表页",
-        "真实等待10秒并重新进入后主计时增加约10秒"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "真实启动秒表，右滑退出后等待10秒，再从时钟子菜单点击Stopwatch；三阶段截图覆盖；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_022",
@@ -314,16 +303,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.单击编码器\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表返回主表盘\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [
-        "按键前秒表正在计时",
-        "单击编码器后显示主表盘",
-        "真实等待10秒并重新进入后主计时增加约10秒"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实体编码器由通用BUTTON_PRESS执行，真实等待10秒后从时钟子菜单重新进入；三阶段截图覆盖；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_023",
@@ -335,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_024",
@@ -348,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_025",
@@ -358,17 +345,12 @@
       "precondition_text": "1.秒表正在计时\n2.系统已配置全局灭屏时间流",
       "steps_text": "1.执行覆盖熄屏\n2.等待全局灭屏时间流结束后点亮屏幕",
       "expected_text": "1.屏幕熄灭，秒表计时继续\n2.手表显示主表盘，重新进入秒表后计时值包含熄屏时长",
-      "verification_points": [
-        "覆盖前秒表正在计时",
-        "覆盖后屏幕熄灭",
-        "熄屏超过10秒后点亮显示主表盘",
-        "重新进入秒表后计时值包含熄屏时长"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用screen_off、真实等待、实体主键和时钟子菜单入口；四阶段截图覆盖熄屏、超时返回和后台计时；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_026",
@@ -377,17 +359,12 @@
       "precondition_text": "1.秒表正在计时\n2.系统已配置全局灭屏时间流",
       "steps_text": "1.执行垂腕熄屏\n2.等待全局灭屏时间流结束后点亮屏幕",
       "expected_text": "1.屏幕熄灭，秒表计时继续\n2.手表显示主表盘，重新进入秒表后计时值包含熄屏时长",
-      "verification_points": [
-        "垂腕前秒表正在计时",
-        "垂腕后屏幕熄灭",
-        "熄屏超过10秒后点亮显示主表盘",
-        "重新进入秒表后计时值包含熄屏时长"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用wrist_down、真实等待、实体主键和时钟子菜单入口；四阶段截图覆盖熄屏、超时返回和后台计时；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_027",
@@ -399,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待1秒本身可执行；当前缺把秒表业务单调时钟可靠建立到23:59:58的通用状态命令，不能用系统RTC冒充秒表计时；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_028",
@@ -412,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_029",
@@ -425,14 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "快速点击5次后仍只有一个秒表且计时有效",
-        "快速点击10次后仍只有一个秒表且计时不倒退",
-        "快速点击15次后仍只有一个秒表且计时继续",
-        "快速点击20次后仍只有一个秒表且计时不倒退"
-      ],
-      "unable": true,
-      "note": "复用当前402x256秒表开始/暂停共享按钮坐标，按人工步骤实际点击20次并分阶段截图；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_030",
@@ -441,16 +415,12 @@
       "precondition_text": "1.秒表正在后台计时",
       "steps_text": "1.重启手表\n2.重新进入Stopwatch",
       "expected_text": "1.手表完成开机\n2.待产品确认：秒表进程和计次记录是否恢复",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_031",
@@ -462,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可由SIM_WAIT执行；最终要求查看手机音乐播放状态，当前手表截图无法判定手机侧结果；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_032",
@@ -475,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_033",
@@ -488,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App/外部: 1.让手机收到来电；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_034",
@@ -501,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App/外部: 1.从手机发送一条通知；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_035",
@@ -514,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_036",
@@ -524,17 +499,12 @@
       "precondition_text": "1.手表电量和供电可支持长时测试",
       "steps_text": "1.启动秒表\n2.持续计时23小时",
       "expected_text": "1.秒表持续计时，手表无异常重启\n2.主计时接近23:00:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

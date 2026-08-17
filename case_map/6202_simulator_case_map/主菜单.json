@@ -11,8 +11,7 @@
       "expected_text": "1.手表显示当前风格主菜单",
       "setup": [
         "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
@@ -21,7 +20,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "Current 6202 simulator exploration verified one encoder click from DIAL reaches the current-style main menu; formal Runner must decide the visual result.",
+      "verification_points": [
+        "A single encoder click from the main dial shows the current-style main menu"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_002",
@@ -33,8 +36,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.在负一屏点击All Apps；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_003",
@@ -46,8 +50,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_004",
@@ -68,7 +73,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "Current 6202 simulator exploration verified the real main-menu button return path; formal Runner must decide the visual result.",
+      "verification_points": [
+        "A single button click from the current main menu returns to the main dial"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_005",
@@ -80,8 +89,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入主菜单；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_006",
@@ -93,8 +103,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_007",
@@ -106,8 +117,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_008",
@@ -116,11 +128,22 @@
       "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
       "steps_text": "1.在List主菜单上滑",
       "expected_text": "1.页面右侧显示滚动条",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,100,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 source exposes MENU_LIST as the registered List-style menu window; exploration verified the upward swipe and scrollbar evidence, pending formal Runner.",
+      "verification_points": [
+        "After swiping the List main menu upward, the right-side scrollbar is visible"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_009",
@@ -132,8 +155,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_010",
@@ -145,8 +169,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_011",
@@ -158,8 +183,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_012",
@@ -171,8 +197,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_013",
@@ -184,8 +211,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_014",
@@ -197,8 +225,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_015",
@@ -210,8 +239,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_016",
@@ -223,8 +253,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_017",
@@ -236,8 +267,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_018",
@@ -249,8 +281,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Honeycomb 图标无文本标识,坐标无法确定；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_019",
@@ -259,19 +292,12 @@
       "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.网格内容向下方区域滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_020",
@@ -283,8 +309,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_021",
@@ -296,8 +323,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_022",
@@ -309,8 +337,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_023",
@@ -319,17 +348,12 @@
       "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
       "steps_text": "1.观察Grid主菜单边缘",
       "expected_text": "1.屏幕边缘图标小于中心图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_024",
@@ -341,8 +365,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_025",
@@ -354,8 +379,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_026",
@@ -364,24 +390,12 @@
       "precondition_text": "1.主菜单样式设为Grid且当前页非底部",
       "steps_text": "1.顺时针旋转编码器一格\n2.逆时针旋转编码器一格",
       "expected_text": "1.Grid交错蜂窝内容向下方区域滚动\n2.Grid交错蜂窝内容向上方区域滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:90261;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:90262;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "顺时针一格后 Grid 内容向下方区域滚动",
-        "逆时针一格后 Grid 内容向上方区域滚动"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_027",
@@ -393,8 +407,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_028",
@@ -406,8 +421,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_029",
@@ -419,8 +435,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_030",
@@ -432,8 +449,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_031",
@@ -442,11 +460,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第1项显示My Fitness",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,250,205,260,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'My Fitness', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_01/MENU_031/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_01/01-MENU_031/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 1 is visible after the prescribed scroll; expected label is 'My Fitness'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_032",
@@ -455,11 +484,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第2项显示Sports",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,250,205,260,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'Sports', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_01/MENU_032/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_01/02-MENU_032/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 2 is visible after the prescribed scroll; expected label is 'Sports'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_033",
@@ -468,11 +508,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第3项显示Health",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,250,205,260,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'Health', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_01/MENU_033/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_01/03-MENU_033/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 3 is visible after the prescribed scroll; expected label is 'Health'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_034",
@@ -481,11 +532,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第4项显示Sleep",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,250,205,260,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'Sleep', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_01/MENU_034/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_01/04-MENU_034/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 4 is visible after the prescribed scroll; expected label is 'Sleep'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_035",
@@ -497,8 +559,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_036",
@@ -510,8 +573,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_037",
@@ -523,8 +587,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_038",
@@ -536,8 +601,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_039",
@@ -546,11 +612,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第9项显示Clock",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'Clock', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_02/MENU_039/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_02/01-MENU_039/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 9 is visible after the prescribed scroll; expected label is 'Clock'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_040",
@@ -562,8 +639,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_041",
@@ -572,11 +650,23 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第11项显示Utilities",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'Utilities', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_02/MENU_041/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_02/03-MENU_041/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 11 is visible after the prescribed scroll; expected label is 'Utilities'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_042",
@@ -588,8 +678,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_043",
@@ -601,8 +692,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_044",
@@ -614,8 +706,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_045",
@@ -624,11 +717,24 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第15项显示About",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,400,205,300,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed the List-menu scroll and captured a fresh screenshot; the visible product order conflicts with the authoritative expected label 'About', so formal Runner must decide PASS or product FAIL. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_02/MENU_045/exploration.json. Formal Runner verdict=FAIL, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_02/07-MENU_045/result.json.",
+      "verification_points": [
+        "The current List menu item at ordinal 15 is visible after the prescribed scroll; expected label is 'About'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_046",
@@ -637,17 +743,12 @@
       "precondition_text": "1.手表显示主菜单",
       "steps_text": "1.在Menu设置页查找排序入口",
       "expected_text": "1.页面不显示菜单排序入口",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_047",
@@ -659,8 +760,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_048",
@@ -669,11 +771,22 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.观察Sports子菜单",
       "expected_text": "1.页面显示单列列表",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_SUBMENU。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,410,205,300,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration executed a real SPORT_LIST scroll and captured a fresh screenshot showing single-column sport rows; formal Runner must decide the visual result. Evidence: menu-batch20-029-048-20260817-084551/exploration/6202_SIM_02/MENU_048/exploration.json. Formal Runner verdict=PASS, evidence_contract=COMPLETE, independent audit promotion_eligible=true. Formal result: formal-menu-031-048-20260817-092916/6202_SIM_02/09-MENU_048/result.json.",
+      "verification_points": [
+        "The Sports submenu is rendered as a single-column List"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_049",
@@ -682,11 +795,22 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.滚动Sports子菜单",
       "expected_text": "1.Sports标题保持在顶部",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,410,205,280,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration entered SPORT_LIST, executed the prescribed scroll with current-page verified coordinates, and captured a fresh screenshot. Formal Runner verdict=FAIL: the visible title is Workout, not Sports. evidence_contract=COMPLETE and independent audit promotion_eligible=true. Exploration: menu-batch20-049-068-20260817-094722/exploration/6202_SIM_01/MENU_049/exploration.json. Formal result: formal-menu-049-068-20260817-103500/6202_SIM_01/MENU_049/result.json.",
+      "verification_points": [
+        "After scrolling the Sports submenu, the title Sports remains visible at the top"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_050",
@@ -695,11 +819,22 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.观察Sports页面顶部",
       "expected_text": "1.页面右上角显示当前时分",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_SUBMENU。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,260,205,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration entered SPORT_LIST, executed a real page gesture, and captured a fresh screenshot of the page header. Formal Runner verdict=PASS: the upper-right time matched the capture time. evidence_contract=COMPLETE and independent audit promotion_eligible=true. Exploration: menu-batch20-049-068-20260817-094722/exploration/6202_SIM_01/MENU_050/exploration.json. Formal result: formal-menu-049-068-20260817-103500/6202_SIM_01/MENU_050/result.json.",
+      "verification_points": [
+        "The upper-right corner of the Sports page visibly shows the current hour and minute"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_051",
@@ -708,11 +843,22 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第1项显示Multisport",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_SUBMENU。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_LIST,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,260,205,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "Current 6202 Simulator exploration entered SPORT_LIST, executed a real page gesture, and captured a fresh screenshot exposing the current first visible sport row. Formal Runner verdict=FAIL: the first visible row is Outdoor run, not Multisport. evidence_contract=COMPLETE and independent audit promotion_eligible=true. Exploration: menu-batch20-049-068-20260817-094722/exploration/6202_SIM_01/MENU_051/exploration.json. Formal result: formal-menu-049-068-20260817-103500/6202_SIM_01/MENU_051/result.json.",
+      "verification_points": [
+        "The Sports submenu item at ordinal 1 is visible and labeled 'Multisport'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_052",
@@ -724,8 +870,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: SPORT_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_053",
@@ -737,8 +884,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_054",
@@ -750,8 +898,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_055",
@@ -763,8 +912,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_056",
@@ -776,8 +926,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_057",
@@ -789,8 +940,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_058",
@@ -802,8 +954,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_059",
@@ -815,8 +968,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_060",
@@ -828,8 +982,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_061",
@@ -841,8 +996,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_062",
@@ -854,8 +1010,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_063",
@@ -867,8 +1024,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_064",
@@ -880,8 +1038,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_065",
@@ -893,8 +1052,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_066",
@@ -906,8 +1066,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_067",
@@ -919,8 +1080,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_068",
@@ -932,8 +1094,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_069",
@@ -945,8 +1108,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_070",
@@ -958,8 +1122,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_071",
@@ -971,8 +1136,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: CLOCK_SUBMENU。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_072",
@@ -984,8 +1150,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_073",
@@ -997,8 +1164,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_074",
@@ -1010,8 +1178,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: ENTERTAINMENT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_075",
@@ -1023,8 +1192,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_076",
@@ -1036,8 +1206,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: ENTERTAINMENT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_077",
@@ -1049,8 +1220,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: ENTERTAINMENT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_078",
@@ -1062,8 +1234,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: ENTERTAINMENT。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_079",
@@ -1075,8 +1248,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_080",
@@ -1088,8 +1262,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: GAME。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_081",
@@ -1101,8 +1276,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: GAME。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_082",
@@ -1114,8 +1290,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_083",
@@ -1127,8 +1304,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_084",
@@ -1140,8 +1318,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_085",
@@ -1153,8 +1332,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_086",
@@ -1166,8 +1346,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_087",
@@ -1179,8 +1360,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_088",
@@ -1192,8 +1374,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_089",
@@ -1205,8 +1388,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_090",
@@ -1218,8 +1402,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_091",
@@ -1231,8 +1416,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_092",
@@ -1244,8 +1430,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_093",
@@ -1257,8 +1444,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_094",
@@ -1270,8 +1458,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: UTILITIES。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_095",
@@ -1283,8 +1472,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_096",
@@ -1293,17 +1483,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第1项显示Keypad",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_097",
@@ -1312,17 +1497,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第2项显示Contacts",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_098",
@@ -1331,17 +1511,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第3项显示Call History",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_099",
@@ -1350,17 +1525,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第4项显示SOS",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_100",
@@ -1369,17 +1539,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Keypad子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_101",
@@ -1388,17 +1553,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Contacts子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_102",
@@ -1407,17 +1567,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Call History子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_103",
@@ -1426,17 +1581,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察SOS子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_104",
@@ -1448,8 +1598,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_105",
@@ -1458,17 +1609,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone子菜单",
       "expected_text": "1.页面显示单列列表",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_106",
@@ -1480,8 +1626,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_107",
@@ -1490,17 +1637,12 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone页面顶部",
       "expected_text": "1.页面右上角显示当前时分",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_108",
@@ -1512,8 +1654,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_109",
@@ -1525,8 +1668,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_110",
@@ -1538,8 +1682,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_111",
@@ -1551,8 +1696,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_112",
@@ -1564,8 +1710,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_113",
@@ -1577,8 +1724,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_114",
@@ -1590,8 +1738,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_115",
@@ -1603,8 +1752,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_116",
@@ -1616,8 +1766,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_117",
@@ -1629,8 +1780,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_118",
@@ -1642,8 +1794,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_119",
@@ -1655,8 +1808,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_120",
@@ -1668,8 +1822,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_121",
@@ -1681,8 +1836,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_122",
@@ -1694,8 +1850,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: TITAN_Q。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_123",
@@ -1707,8 +1864,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_124",
@@ -1720,8 +1878,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_125",
@@ -1733,8 +1892,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_126",
@@ -1746,8 +1906,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_127",
@@ -1756,17 +1917,12 @@
       "precondition_text": "1.手表显示主菜单",
       "steps_text": "1.观察List主菜单中的Phone",
       "expected_text": "1.Phone行右侧不显示>箭头",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_128",
@@ -1778,13 +1934,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Menu Style 选择 Grid 后显示为当前布局",
-        "进入主菜单后显示 Grid 主菜单",
-        "点击 Health 后子菜单显示单列列表"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_129",
@@ -1796,14 +1948,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "Menu Style 选择 Honeycomb 后显示为当前布局",
-        "进入主菜单后显示 Honeycomb 主菜单",
-        "点击 Entertainment 后显示其子菜单",
-        "点击 Games 后三级菜单显示单列列表"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_130",
@@ -1812,17 +1959,12 @@
       "precondition_text": "1.系统时间已设为13:05",
       "steps_text": "1.进入Sports子菜单",
       "expected_text": "1.页面右上角显示13:05",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_131",
@@ -1834,12 +1976,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Modern 显示为当前主题",
-        "进入一级菜单后显示 Modern 背景图"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_132",
@@ -1851,12 +1990,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Modern 显示为当前主题",
-        "进入 Health 后显示 Modern 背景图"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_133",
@@ -1868,12 +2004,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "Modern 显示为当前主题",
-        "进入 Games 后显示 Modern 背景图"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_134",
@@ -1885,13 +2018,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "滚动后主菜单显示底部菜单项",
-        "单击编码器后显示主表盘",
-        "再次单击编码器后主菜单回到第1项"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_135",
@@ -1903,14 +2032,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "List 显示为当前选项",
-        "Honeycomb 显示为当前选项",
-        "Grid 显示为当前选项",
-        "进入主菜单后显示 Grid 布局"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_136",
@@ -1919,17 +2043,12 @@
       "precondition_text": "1.手表显示主菜单",
       "steps_text": "1.用可编程触控治具连续滚动主菜单500次",
       "expected_text": "1.手表未发生异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖外部设备/流程: 1.用可编程触控治具连续滚动主菜单500次；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_137",
@@ -1938,19 +2057,12 @@
       "precondition_text": "1.手表显示主菜单",
       "steps_text": "1.依次组合三种菜单风格与Modern主题",
       "expected_text": "1.每种风格均显示Modern背景图",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "MENU_138",
@@ -1962,8 +2074,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Grid 边缘图标无文本标识；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

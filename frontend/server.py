@@ -45,7 +45,7 @@ TEST_PROJECTS: dict[str, dict[str, str]] = {
         "project_label": "620C W6830",
         "execution_target": "simulator",
         "execution_target_label": "模拟器",
-        "case_map_dir": "620C_case_map",
+        "case_map_dir": "620C_simulator_case_map",
         "case_map_profile": "620C_W6830",
     },
     "6202_W5230": {
@@ -335,6 +335,33 @@ def _case_entries(
 ) -> list[dict[str, Any]]:
     raw = _read_json(_case_map_path(paths, sheet, project), [])
     return effective_case_entries(raw)
+
+
+def _external_explored_ids(
+    paths: AppPaths,
+    project: str = DEFAULT_TEST_PROJECT,
+) -> set[str]:
+    """外部探索事实只来自目标目录自己的 JSONL 账本。"""
+
+    project_meta = _test_project(project)
+    ledger = paths.case_map / project_meta["case_map_dir"] / "external_execution_history.jsonl"
+    if not ledger.is_file():
+        raise ValueError(f"外部探索账本不存在: {ledger}")
+    case_ids: set[str] = set()
+    for line_number, line in enumerate(ledger.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"外部探索账本第 {line_number} 行不是合法 JSON") from exc
+        case_id = str(record.get("case_id") or "").strip() if isinstance(record, dict) else ""
+        if not case_id:
+            raise ValueError(f"外部探索账本第 {line_number} 行缺少 case_id")
+        if case_id in case_ids:
+            raise ValueError(f"外部探索账本 case_id 重复: {case_id}")
+        case_ids.add(case_id)
+    return case_ids
 
 
 class HistoryStore:
@@ -731,11 +758,14 @@ class TestHistoryStore:
             "finished_at": job.get("finished_at"),
             "verdict": result.get("verdict", "ERROR"),
             "reason": result.get("reason") or job.get("error") or "",
+            "execution_mode": result.get("execution_mode", "fixed_mapping"),
             "priority": case.get("priority", ""),
             "precondition_text": case.get("precondition_text", ""),
             "steps_text": case.get("steps_text", ""),
             "expected_text": case.get("expected_text", ""),
-            "verification_points": case.get("verification_points", []),
+            "verification_points": result.get(
+                "verification_points", case.get("verification_points", [])
+            ),
             "setup": case.get("setup", []),
             "actions": case.get("actions", []),
             "collect": case.get("collect", []),
@@ -752,6 +782,7 @@ class TestHistoryStore:
             "action_errors": result.get("action_errors", []),
             "collect_errors": result.get("collect_errors", []),
             "terminal_json": result.get("terminal_json", []),
+            "exploration_trace": result.get("exploration_trace"),
             "return_code": job.get("return_code"),
             "stdout": stdout[-MAX_LOG_CHARS:],
             "stderr": stderr[-MAX_LOG_CHARS:],
@@ -840,6 +871,8 @@ class TestHistoryStore:
                 if key not in {
                     "precondition_text", "steps_text", "expected_text", "verification_points",
                     "setup", "actions", "collect", "terminal_json", "screenshots", "stdout", "stderr",
+                    "planned_commands", "command_trace", "evidence_contract", "exploration_trace",
+                    "setup_errors", "action_errors", "collect_errors",
                 }
             }
             screenshot_count = sum(1 for path in run_dir.glob("screenshot*.bmp") if path.is_file())
@@ -937,8 +970,7 @@ class TestHistoryStore:
         project: str = DEFAULT_TEST_PROJECT,
     ) -> dict[tuple[str, str], dict[str, Any]]:
         """缓存列表页历史摘要；同一服务进程内刷新不再重扫全部 run.json。"""
-        project_meta = _test_project(project)
-        project = project_meta["project"]
+        project = _test_project(project)["project"]
         with self._summary_index_lock:
             if project in self._summary_index_cache:
                 return self._summary_index_cache[project]
@@ -1044,8 +1076,13 @@ class TestHistoryStore:
 class CaseMapRepository:
     """case_map 的只读查询视图。"""
 
-    FILTERS = {"all", "executable", "unable", "pass", "p0", "p1"}
-    BATCH_CATEGORIES = {"untested", "fail", "cannot_verify"}
+    FILTERS = {
+        "all", "unexplored", "externally_explored",
+        "explored_unsolidified", "solidified",
+        "untested", "pass", "fail", "cannot_verify", "error",
+    }
+    RUN_CATEGORIES = {"untested", "pass", "fail", "cannot_verify", "error"}
+    BATCH_CATEGORIES = RUN_CATEGORIES - {"pass"}
 
     def __init__(self, paths: AppPaths, history: TestHistoryStore):
         self.paths = paths
@@ -1060,6 +1097,7 @@ class CaseMapRepository:
         rows: list[dict[str, Any]] = []
         history_index = self.history.summary_index(project=project)
         case_map_root = self.paths.case_map / project_meta["case_map_dir"]
+        externally_explored_ids = _external_explored_ids(self.paths, project)
         for path in sorted(case_map_root.glob("*.json"), key=lambda item: item.stem):
             for item in _case_entries(self.paths, path.stem, project):
                 case_id = str(item.get("case_id") or "").strip()
@@ -1081,6 +1119,7 @@ class CaseMapRepository:
                     "actions": item.get("actions", []) if isinstance(item.get("actions", []), list) else [],
                     "collect": item.get("collect", []) if isinstance(item.get("collect", []), list) else [],
                     "unable": bool(item.get("unable", False)),
+                    "mapping_status": str(item.get("mapping_status") or "").strip(),
                     "note": str(item.get("note") or ""),
                     **{key: project_meta[key] for key in (
                         "project", "project_label", "execution_target", "execution_target_label"
@@ -1088,9 +1127,21 @@ class CaseMapRepository:
                 }
                 history = history_index.get((path.stem, case_id))
                 latest = history.get("latest") if history else None
-                row["latest_verdict"] = latest.get("verdict") if latest else ("SKIP" if row["unable"] else "PENDING")
+                row["latest_verdict"] = latest.get("verdict") if latest else "PENDING"
                 row["last_run_at"] = latest.get("timestamp") if latest else None
                 row["history_count"] = int(history.get("history_count") or 0) if history else 0
+                row["external_explored"] = case_id in externally_explored_ids
+                row["is_promoted"] = (
+                    row["external_explored"]
+                    and row["mapping_status"] == "PROMOTED"
+                )
+                row["maturity_state"] = (
+                    "solidified"
+                    if row["is_promoted"]
+                    else "explored_unsolidified"
+                    if row["external_explored"]
+                    else "unexplored"
+                )
                 rows.append(row)
         return rows
 
@@ -1109,28 +1160,19 @@ class CaseMapRepository:
         if state_filter not in self.FILTERS:
             raise ValueError("state 参数不合法")
         rows = self._all(project)
+        run_counts = {
+            category: sum(self.run_category(row) == category for row in rows)
+            for category in self.RUN_CATEGORIES
+        }
         summary = {
             "all": len(rows),
-            "executable": sum(not row["unable"] for row in rows),
-            "unable": sum(row["unable"] for row in rows),
-            "p0": sum(row["priority"].upper() == "P0" for row in rows),
-            "p1": sum(row["priority"].upper() == "P1" for row in rows),
-            "untested": sum(
-                not row["unable"] and self.batch_category(row) == "untested"
-                for row in rows
+            "unexplored": sum(not row["external_explored"] for row in rows),
+            "externally_explored": sum(row["external_explored"] for row in rows),
+            "explored_unsolidified": sum(
+                row["external_explored"] and not row["is_promoted"] for row in rows
             ),
-            "fail": sum(
-                not row["unable"] and self.batch_category(row) == "fail"
-                for row in rows
-            ),
-            "cannot_verify": sum(
-                not row["unable"] and self.batch_category(row) == "cannot_verify"
-                for row in rows
-            ),
-            "pass": sum(
-                not row["unable"] and str(row["latest_verdict"]).upper() == "PASS"
-                for row in rows
-            ),
+            "solidified": sum(row["is_promoted"] for row in rows),
+            **run_counts,
         }
         keywords = [word.casefold() for word in query.strip().split() if word]
         if keywords:
@@ -1141,23 +1183,23 @@ class CaseMapRepository:
                         str(row.get(field, ""))
                         for field in (
                             "case_id", "sheet", "priority", "precondition_text",
-                            "steps_text", "expected_text", "verification_points", "note",
+                            "steps_text", "expected_text", "verification_points",
+                            "mapping_status", "note",
                         )
                     ).casefold()
                     for word in keywords
                 )
             ]
-        if state_filter == "executable":
-            rows = [row for row in rows if not row["unable"]]
-        elif state_filter == "unable":
-            rows = [row for row in rows if row["unable"]]
-        elif state_filter == "pass":
-            rows = [
-                row for row in rows
-                if not row["unable"] and str(row["latest_verdict"]).upper() == "PASS"
-            ]
-        elif state_filter in {"p0", "p1"}:
-            rows = [row for row in rows if row["priority"].casefold() == state_filter]
+        if state_filter in self.RUN_CATEGORIES:
+            rows = [row for row in rows if self.run_category(row) == state_filter]
+        elif state_filter == "unexplored":
+            rows = [row for row in rows if not row["external_explored"]]
+        elif state_filter == "externally_explored":
+            rows = [row for row in rows if row["external_explored"]]
+        elif state_filter == "explored_unsolidified":
+            rows = [row for row in rows if row["maturity_state"] == state_filter]
+        elif state_filter == "solidified":
+            rows = [row for row in rows if row["is_promoted"]]
         rows.sort(key=lambda row: (row["file_sheet"], row["case_id"]))
         total = len(rows)
         total_pages = (total + page_size - 1) // page_size
@@ -1187,32 +1229,36 @@ class CaseMapRepository:
         project_meta = _test_project(project)
         project = project_meta["project"]
         case_id = _safe_segment(case_id, "测试用例编号")
-        for item in _case_entries(self.paths, sheet, project):
-            if str(item.get("case_id") or "") != case_id:
+        for item in self._all(project):
+            if item["file_sheet"] != sheet or item["case_id"] != case_id:
                 continue
             result = dict(item)
-            result["sheet"] = str(item.get("sheet") or sheet)
-            result["file_sheet"] = sheet
             result["history"] = self.history.list(sheet, case_id, project=project)
-            result.update({key: project_meta[key] for key in (
-                "project", "project_label", "execution_target", "execution_target_label"
-            )})
+            result["history_count"] = len(result["history"])
             return result
         return None
 
     @staticmethod
-    def batch_category(row: dict[str, Any]) -> str | None:
-        """按最新一次测试结果分类；旧 FAIL 后已 PASS 的用例不再算 FAIL。"""
-        if row.get("unable"):
-            return None
+    def run_category(row: dict[str, Any]) -> str:
+        """所有用例都归入一个独立的最近运行结果分类。"""
         if int(row.get("history_count") or 0) == 0:
             return "untested"
         verdict = str(row.get("latest_verdict") or "").upper()
+        if verdict == "PASS":
+            return "pass"
         if verdict == "FAIL":
             return "fail"
         if verdict == "CANNOT_VERIFY":
             return "cannot_verify"
-        return None
+        if verdict == "SKIP":
+            return "cannot_verify"
+        return "error"
+
+    @classmethod
+    def batch_category(cls, row: dict[str, Any]) -> str | None:
+        """已通过用例默认不重跑；其余最近运行分类均可组成批次。"""
+        category = cls.run_category(row)
+        return category if category in cls.BATCH_CATEGORIES else None
 
     def executable(
         self,
@@ -1220,8 +1266,8 @@ class CaseMapRepository:
         *,
         project: str = DEFAULT_TEST_PROJECT,
     ) -> list[dict[str, Any]]:
-        """返回稳定排序的可执行用例；可按最新测试状态筛选。"""
-        rows = [row for row in self._all(project) if not row["unable"]]
+        """返回全部可运行用例；可按最新测试状态筛选。"""
+        rows = self._all(project)
         if categories is None:
             return rows
         unknown = categories - self.BATCH_CATEGORIES
@@ -1335,6 +1381,8 @@ class CaseTestManager:
             if run is None:
                 break
             verdict = str(run.get("verdict") or "ERROR").upper()
+            if verdict == "SKIP":
+                verdict = "CANNOT_VERIFY"
             if verdict not in job["verdict_counts"]:
                 verdict = "ERROR"
             job["verdict_counts"][verdict] += 1
@@ -1379,7 +1427,7 @@ class CaseTestManager:
                 "project", "project_label", "execution_target", "execution_target_label"
             ):
                 job.setdefault(key, project_meta[key])
-            job.setdefault("verdict_counts", {key: 0 for key in ("PASS", "FAIL", "ERROR", "CANNOT_VERIFY", "SKIP")})
+            job.setdefault("verdict_counts", {key: 0 for key in ("PASS", "FAIL", "ERROR", "CANNOT_VERIFY")})
             job.setdefault("recent_results", [])
             job.setdefault("completed", 0)
             job.setdefault("total", len(cases))
@@ -1406,8 +1454,6 @@ class CaseTestManager:
         case = self.cases.get(sheet, case_id, project=project)
         if case is None:
             raise ValueError("测试用例不存在")
-        if case.get("unable"):
-            raise ValueError("该用例当前不可自动执行")
         with self._lock:
             job_id = uuid.uuid4().hex[:12]
             job = {
@@ -1463,7 +1509,7 @@ class CaseTestManager:
                     continue
                 case = by_key.get(key)
                 if case is None:
-                    raise ValueError(f"用例不存在或不可自动执行: {key[0]} / {key[1]}")
+                    raise ValueError(f"用例不存在: {key[0]} / {key[1]}")
                 seen.add(key)
                 selected.append(case)
             cases = selected
@@ -1493,7 +1539,6 @@ class CaseTestManager:
                     "FAIL": 0,
                     "ERROR": 0,
                     "CANNOT_VERIFY": 0,
-                    "SKIP": 0,
                 },
                 "recent_results": [],
                 "cancel_requested": False,
@@ -1742,10 +1787,10 @@ class CaseTestManager:
         loaded = _read_json(result_file, {})
         result = loaded if isinstance(loaded, dict) else {}
         if result.get("skipped"):
-            verdict = "SKIP"
+            verdict = "CANNOT_VERIFY"
         else:
             verdict = str(result.get("verdict") or "ERROR").upper()
-        if verdict not in {"PASS", "FAIL", "CANNOT_VERIFY", "SKIP"}:
+        if verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}:
             verdict = "ERROR"
         evidence_contract = result.get("evidence_contract")
         evidence_issues = (

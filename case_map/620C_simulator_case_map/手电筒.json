@@ -6,19 +6,12 @@
     "precondition_text": "1.手表显示Utilities二级菜单",
     "steps_text": "1.点击Flashlight",
     "expected_text": "1.手表显示白底深色图标，屏幕亮度为最高",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_002",
@@ -27,19 +20,12 @@
     "precondition_text": "1.负一屏显示Flashlight入口",
     "steps_text": "1.点击Flashlight",
     "expected_text": "1.手表显示白底深色图标，屏幕亮度为最高",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_003",
@@ -48,19 +34,12 @@
     "precondition_text": "1.控制中心显示Flashlight图标",
     "steps_text": "1.点击Flashlight图标",
     "expected_text": "1.手表显示白底深色图标，屏幕亮度为最高",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_004",
@@ -69,16 +48,12 @@
     "precondition_text": "1.手表刚进入Flashlight",
     "steps_text": "1.观察手电筒页面",
     "expected_text": "1.页面为白色背景，显示深色手电筒图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_005",
@@ -87,18 +62,12 @@
     "precondition_text": "1.进入Flashlight前系统亮度为最低档",
     "steps_text": "1.进入Flashlight",
     "expected_text": "1.屏幕亮度升至设备最高亮度",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_006",
@@ -107,24 +76,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.等待超过系统自动灭屏时间",
     "expected_text": "1.手表保持Flashlight开启页亮屏",
-    "verification_points": [
-      "等待前Flashlight开启页处于亮屏状态",
-      "超过5秒自动灭屏时间后仍保持Flashlight开启页亮屏"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:6002,6000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "设置5秒全局亮屏时长后真实等待6秒；前后截图判断Flashlight页是否保持亮屏"
+    "note": ""
   },
   {
     "case_id": "FLASH_007",
@@ -133,18 +90,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.执行垂腕动作",
     "expected_text": "1.手表保持Flashlight开启页亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前源码命令已覆盖，并通过模拟器验证"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_008",
@@ -153,18 +104,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.点击屏幕",
     "expected_text": "1.页面切换为黑底浅色图标，仍停留Flashlight",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_009",
@@ -173,18 +118,12 @@
     "precondition_text": "1.手表显示Flashlight关闭态",
     "steps_text": "1.点击屏幕",
     "expected_text": "1.页面恢复白底深色图标，亮度升至最高",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_010",
@@ -193,18 +132,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.连续点击屏幕20次",
     "expected_text": "1.页面完成20次开关切换，最终回到开启态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_011",
@@ -213,16 +146,12 @@
     "precondition_text": "1.手表显示Flashlight关闭态",
     "steps_text": "1.观察页面",
     "expected_text": "1.页面保持黑底浅色图标，不返回上一级",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_012",
@@ -231,18 +160,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.执行上滑",
     "expected_text": "1.页面保持开启态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_013",
@@ -251,18 +174,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.执行下滑",
     "expected_text": "1.页面保持开启态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_014",
@@ -271,18 +188,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.执行左滑",
     "expected_text": "1.页面保持开启态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_015",
@@ -291,18 +202,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.页面保持开启态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "QDEC_SET 来自当前源码，验证该页面忽略编码器输入"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_016",
@@ -311,18 +216,12 @@
     "precondition_text": "1.手表显示Flashlight开启或关闭态",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入Flashlight前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_017",
@@ -331,18 +230,12 @@
     "precondition_text": "1.手表显示Flashlight开启或关闭态",
     "steps_text": "1.单击编码器",
     "expected_text": "1.手表按全局按键规则退出Flashlight",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_018",
@@ -351,25 +244,12 @@
     "precondition_text": "1.进入Flashlight前系统亮度为中间档",
     "steps_text": "1.进入Flashlight\n2.执行右滑",
     "expected_text": "1.Flashlight亮度升至最高\n2.退出后系统亮度恢复中间档",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:305,92,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:87181;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:87182;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "点击控制中心 Flashlight 后亮度升至最高",
-      "右滑退出后系统亮度恢复中间档"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "FLASH_019",
@@ -378,25 +258,12 @@
     "precondition_text": "1.手表已退出Flashlight并处于普通页面",
     "steps_text": "1.保持无操作至系统灭屏时间",
     "expected_text": "1.手表按系统设置自动熄屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1901,screen_on;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1901;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1902,5500;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "退出Flashlight后用普通表盘作为基线，设置5秒亮屏时长并真实等待5.5秒截图检查自动熄屏",
-    "verification_points": [
-      "等待前截图显示已退出Flashlight的普通页面",
-      "达到系统灭屏时间后截图显示屏幕熄灭"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_020",
@@ -407,12 +274,10 @@
     "expected_text": "1.手表屏幕熄灭\n2.待产品确认：亮屏返回Flashlight或主表盘",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_021",
@@ -423,12 +288,10 @@
     "expected_text": "1.待产品确认：是否允许最高亮度和页面提示",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_022",
@@ -439,12 +302,10 @@
     "expected_text": "1.待产品确认：入口是否可达和开启结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_023",
@@ -455,12 +316,10 @@
     "expected_text": "1.Flashlight页面关闭，亮度不再强制最高\n2.手表显示Firmware Update进度页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App/外部: 1.从App发起升级"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_024",
@@ -469,16 +328,12 @@
     "precondition_text": "1.手表连接稳定供电且温度可监测",
     "steps_text": "1.保持Flashlight开启1小时",
     "expected_text": "1.页面持续亮起，手表无异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_025",
@@ -487,18 +342,12 @@
     "precondition_text": "1.手表显示Flashlight开启页",
     "steps_text": "1.用可编程触控治具点击屏幕1000次",
     "expected_text": "1.每次状态均可切换，手表无异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FLASH_026",
@@ -507,15 +356,11 @@
     "precondition_text": "1.手表显示Flashlight开启页\n2.环境光较暗",
     "steps_text": "1.观察屏幕照明和图标",
     "expected_text": "1.白色背景无明显黑块，深色图标可辨认",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

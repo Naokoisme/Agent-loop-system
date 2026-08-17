@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Health 列表第3项中心坐标来自当前 402x256 Designer：列表 y=50、行高74；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_002",
@@ -22,20 +23,12 @@
       "precondition_text": "1.手表已有当日压力测量数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.页面显示最近压力值与Measure按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:45;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "用6202已注册的SET_STRESS_VALUE建立当日压力数据，再进入Stress主页面；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_003",
@@ -44,19 +37,12 @@
       "precondition_text": "1.手表当日没有压力测量数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.最近压力值显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_004",
@@ -65,17 +51,12 @@
       "precondition_text": "1.手表显示Stress主页面",
       "steps_text": "1.查看24小时柱状图和说明图标",
       "expected_text": "1.页面显示24小时柱状图与说明图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "24小时图表与说明图标位于Stress主页面，不跳转到压力说明页；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_005",
@@ -87,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_006",
@@ -100,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "信息图标坐标来自当前 STRESS Designer 控件层级；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_007",
@@ -113,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_008",
@@ -123,19 +107,12 @@
       "precondition_text": "1.手表显示Stress主页面",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_009",
@@ -147,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_010",
@@ -160,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_011",
@@ -173,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_012",
@@ -186,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_013",
@@ -196,16 +177,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.系统灭屏时间设为5秒\n3.手动压力测量正在运行",
       "steps_text": "1.保持手表静止超过5秒",
       "expected_text": "1.压力测量页面保持亮屏",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_014",
@@ -217,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_015",
@@ -227,16 +205,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动压力测量正在运行",
       "steps_text": "1.用手掌覆盖屏幕",
       "expected_text": "1.手表退出压力测量状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_016",
@@ -248,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_017",
@@ -261,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_018",
@@ -274,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "进入压力主页面后实际点击说明图标；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_019",
@@ -287,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_020",
@@ -300,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_021",
@@ -313,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_022",
@@ -326,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_023",
@@ -339,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_024",
@@ -352,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_025",
@@ -365,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_026",
@@ -378,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_027",
@@ -391,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_028",
@@ -404,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_029",
@@ -417,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_030",
@@ -430,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_031",
@@ -443,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_032",
@@ -453,16 +443,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动压力测量已完成",
       "steps_text": "1.等待页面按系统设置熄屏\n2.在10秒内单击实体按键",
       "expected_text": "1.手表屏幕熄灭\n2.手表显示Stress主页面",
-      "verification_points": [
-        "手动压力测量完成页在自动熄屏前显示",
-        "按5秒系统设置等待后屏幕熄灭",
-        "熄屏10秒内单击实体按键后显示Stress主页面"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用佩戴、HR和Stress状态并真实等待30秒完成测量，再按5秒熄屏规则与实体主键分阶段截图；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "STRS_033",
@@ -471,17 +457,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动压力测量已完成",
       "steps_text": "1.等待页面按系统设置熄屏\n2.等待超过10秒\n3.单击实体按键",
       "expected_text": "1.手表屏幕熄灭\n2.手表保持熄屏\n3.手表显示主表盘",
-      "verification_points": [
-        "手动压力测量完成页在自动熄屏前显示",
-        "按5秒系统设置等待后屏幕熄灭",
-        "熄屏真实保持超过10秒后仍为黑屏",
-        "单击实体按键后显示主表盘"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用同一压力完成态构造，覆盖自动熄屏、超过10秒黑屏和主键返回表盘四阶段截图；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "STRS_034",
@@ -490,17 +471,12 @@
       "precondition_text": "1.手表已产生最近7天压力数据",
       "steps_text": "1.重启手表",
       "expected_text": "1.设备日志仍包含最近7天压力数据",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS_DETAIL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_035",
@@ -512,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_036",
@@ -525,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_037",
@@ -538,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_038",
@@ -551,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_039",
@@ -564,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_040",
@@ -574,19 +555,12 @@
       "precondition_text": "1.同一小时存在自动压力点与手动压力点",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.该小时图形按PRD聚合规则显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "人工前置明确要求压力说明页，统一进入已注册窗口STRESS_DETAIL取证；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_041",
@@ -595,20 +569,12 @@
       "precondition_text": "1.通过压力数据测试工具在同一小时依次生成压力20、40、60三条记录",
       "steps_text": "1.进入Stress主页面\n2.查看目标小时柱上显示的数值",
       "expected_text": "1.手表显示Stress主页面\n2.目标小时柱按三条记录算术平均显示40",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:45;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "最近值版式检查需要有效压力数值；复用已注册SET_STRESS_VALUE建立45后进入Stress主页面，产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_042",
@@ -617,27 +583,12 @@
       "precondition_text": "1.手表已有多个压力区间数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.柱子颜色跟随对应压力区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811090000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:25;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811100000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:50;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811110000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:75;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:100;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用TIME_SET和SET_STRESS_VALUE在四个小时槽建立跨区间数据；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_043",
@@ -646,21 +597,12 @@
       "precondition_text": "1.同一小时平均压力值为80",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.对应小时柱显示High区间颜色",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:80;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "以单个有效样本80建立平均值为80的最小合法小时数据；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_044",
@@ -669,27 +611,12 @@
       "precondition_text": "1.准备压力值25、50、75、100的四个小时数据",
       "steps_text": "1.进入Stress主页面\n2.观察四根小时柱",
       "expected_text": "1.手表显示Stress主页面\n2.25/50/75/100分别使用Relax蓝色/Normal绿色/Medium黄橙色/High红色柱",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811090000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:25;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811100000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:50;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811110000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:75;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:100;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用TIME_SET和SET_STRESS_VALUE建立25/50/75/100四个小时槽；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_045",
@@ -698,20 +625,12 @@
       "precondition_text": "1.手表已有当日压力数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.柱状图按24个小时槽位展示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:45;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用SET_STRESS_VALUE建立当日有效柱，再观察24小时槽位；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_046",
@@ -720,17 +639,12 @@
       "precondition_text": "1.手表显示Stress主页面",
       "steps_text": "1.观察横轴左侧刻度\n2.观察横轴中间刻度\n3.观察横轴右侧刻度",
       "expected_text": "1.左侧刻度显示00:00\n2.中间刻度显示12:00\n3.右侧刻度显示24:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_047",
@@ -739,19 +653,12 @@
       "precondition_text": "1.手表当日没有压力数据",
       "steps_text": "1.进入Stress主页面\n2.观察图表坐标轴\n3.观察图表数据区",
       "expected_text": "1.手表显示Stress主页面\n2.图表显示默认空坐标轴\n3.图表不显示压力数据柱",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_048",
@@ -760,25 +667,12 @@
       "precondition_text": "1.当前时间为10:00\n2.手表已有0点至10点压力数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.10点之后的小时槽位不显示数据柱",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811000000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:25;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811050000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:50;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811100000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:75;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "固定当前时间10:00，并在0/5/10点建立有效柱，验证未来槽位保持为空；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_049",
@@ -790,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_050",
@@ -800,17 +695,12 @@
       "precondition_text": "1.手表已连续8天产生压力数据",
       "steps_text": "1.查看设备数据日志",
       "expected_text": "1.设备保留最近7天压力记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_051",
@@ -819,18 +709,12 @@
       "precondition_text": "1.当日压力图表至少有一根有效柱",
       "steps_text": "1.观察压力柱从底部到顶部的颜色过渡",
       "expected_text": "1.每根有效压力柱使用连续渐变填充，不显示纯色块断层",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:80;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "复用SET_STRESS_VALUE建立一根有效压力柱，以截图检查填充连续性；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_052",
@@ -839,23 +723,12 @@
       "precondition_text": "1.当日压力数据包含明显最高值和最低值",
       "steps_text": "1.进入Stress主页面\n2.观察图表和最近值区域",
       "expected_text": "1.手表显示Stress主页面\n2.页面不显示压力最高值或最低值字段，图表不标注极值点",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811110000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:25;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:75;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "在两个小时槽建立明显高低值，再观察页面是否额外标注极值；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_053",
@@ -864,19 +737,12 @@
       "precondition_text": "1.手表当日没有压力数据",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.最近压力值显示--，Relax/Normal/Medium/High区间标签不显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_054",
@@ -885,21 +751,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量结束时间可控",
       "steps_text": "1.将当前时间设置为测量后30秒",
       "expected_text": "1.上次测量时间显示刚刚",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120030;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先固定时间并写入压力值，再用 TIME_SET 精确推进30秒；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_055",
@@ -908,21 +765,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量结束时间可控",
       "steps_text": "1.将当前时间设置为测量后60秒",
       "expected_text": "1.上次测量时间显示1分钟前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120100;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先固定时间并写入压力值，再用 TIME_SET 精确推进60秒；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_056",
@@ -931,21 +779,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量结束时间可控",
       "steps_text": "1.将当前时间设置为测量后3599秒",
       "expected_text": "1.上次测量时间显示59分钟前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811125959;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先固定时间并写入压力值，再用 TIME_SET 精确推进3599秒；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_057",
@@ -954,21 +793,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量结束时间可控",
       "steps_text": "1.将当前时间设置为测量后3600秒",
       "expected_text": "1.上次测量时间显示1小时前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811130000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先固定时间并写入压力值，再用 TIME_SET 精确推进3600秒；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_058",
@@ -977,22 +807,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量发生在昨日",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.最近压力值显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260810120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先在昨日写入压力值，再推进到次日进入Stress主页；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_059",
@@ -1001,22 +821,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近压力测量发生在昨日",
       "steps_text": "1.进入Stress主页面",
       "expected_text": "1.页面不显示上次测量时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260810120000;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:40;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "先在昨日写入压力值，再推进到次日检查是否隐藏上次测量时间；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_060",
@@ -1025,19 +835,12 @@
       "precondition_text": "1.准备压力值0的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Relax",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只能写历史状态且测量会覆盖，产品又把0作为无有效测量数据处理。当前缺可从测量输入侧稳定产出压力0的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值0对应Relax区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_061",
@@ -1046,19 +849,12 @@
       "precondition_text": "1.准备压力值25的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Relax",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力25的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值25对应Relax区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_062",
@@ -1067,19 +863,12 @@
       "precondition_text": "1.准备压力值26的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Normal",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力26的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值26对应Normal区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_063",
@@ -1088,19 +877,12 @@
       "precondition_text": "1.准备压力值50的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Normal",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力50的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值50对应Normal区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_064",
@@ -1109,19 +891,12 @@
       "precondition_text": "1.准备压力值51的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Medium",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力51的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值51对应Medium区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_065",
@@ -1130,19 +905,12 @@
       "precondition_text": "1.准备压力值75的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示Medium",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力75的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值75对应Medium区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_066",
@@ -1151,19 +919,12 @@
       "precondition_text": "1.准备压力值76的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示High",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力76的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值76对应High区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_067",
@@ -1172,19 +933,12 @@
       "precondition_text": "1.准备压力值100的可控测量数据",
       "steps_text": "1.完成一次压力测量",
       "expected_text": "1.主页面区间标签显示High",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "实测确认固定心率输入完成压力测量后得到35/Normal；SET_STRESS_VALUE只写历史状态且会被新测量覆盖。当前缺少从测量输入侧稳定产出压力100的通用能力，不能在测量后伪改结果；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "测量完成后的截图显示压力值100对应High区间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_068",
@@ -1193,29 +947,12 @@
       "precondition_text": "1.压力数据测试工具可分别设置25、50、75、100四个压力结果",
       "steps_text": "1.查看25对应说明文案\n2.查看50对应说明文案\n3.查看75对应说明文案\n4.查看100对应说明文案",
       "expected_text": "1.25显示You're doing well.\n2.50显示You seem to be slightly stressed, take a break.\n3.75显示You seem to be stressed. Some breathing exercise may help you relax.\n4.100显示ALERT!, Your stress level is alarming, take a break, relax, listen to soothing music and take deep breaths.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS_DETAIL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6801;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6802;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6803;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "四档说明文案属于STRESS_DETAIL长页；复用已验证的编码器滚动并分阶段截图覆盖整页，不再误停在无数据主页面；产品结果仅按截图判定。",
-      "verification_points": [
-        "说明页上部截图显示Relax与Normal区间文案",
-        "说明页中部截图显示Moderate区间文案",
-        "说明页下部截图显示High区间文案",
-        "最终截图仍为压力说明页且未滚出有效内容"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_069",
@@ -1224,17 +961,12 @@
       "precondition_text": "1.手表显示压力说明页",
       "steps_text": "1.观察说明页顶部",
       "expected_text": "1.页面显示压力说明正文与四档区间说明",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS_DETAIL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "人工前置明确要求压力说明页，统一进入已注册窗口STRESS_DETAIL取证；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_070",
@@ -1246,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_071",
@@ -1259,8 +992,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_072",
@@ -1269,19 +1003,12 @@
       "precondition_text": "1.手表显示压力说明页",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.说明内容发生纵向滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS_DETAIL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "修正为真实说明窗口 STRESS_DETAIL，QDEC_SET 是当前源码注册的编码器滚动命令，已实测；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_073",
@@ -1293,8 +1020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_074",
@@ -1306,8 +1034,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_075",
@@ -1319,8 +1048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_076",
@@ -1332,8 +1062,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_077",
@@ -1345,8 +1076,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/App: 1.恢复手表与App连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_078",
@@ -1358,8 +1090,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_079",
@@ -1371,8 +1104,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_080",
@@ -1384,8 +1118,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_081",
@@ -1397,8 +1132,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_082",
@@ -1410,8 +1146,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_083",
@@ -1423,8 +1160,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_084",
@@ -1436,8 +1174,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_085",
@@ -1449,8 +1188,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_086",
@@ -1459,16 +1199,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样",
       "steps_text": "1.连续完成20次手动压力测量",
       "expected_text": "1.手表未出现死机或异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_087",
@@ -1480,8 +1216,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "STRS_088",
@@ -1490,18 +1227,12 @@
       "precondition_text": "1.手表显示Stress主页面",
       "steps_text": "1.在默认亮度下观察最近值区域",
       "expected_text": "1.压力数值与单位无重叠或裁切",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SET_STRESS_VALUE:45;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STRESS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "最近值版式检查需要有效压力数值；复用已注册SET_STRESS_VALUE建立45后进入Stress主页面，产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

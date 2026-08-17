@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用当前源码注册窗口直接验证 Sports Records 目标页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_002",
@@ -22,19 +23,12 @@
       "precondition_text": "1.手表存在至少1条已保存运动记录",
       "steps_text": "1.进入Sports Records",
       "expected_text": "1.手表显示运动记录列表",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_003",
@@ -46,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_004",
@@ -59,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_005",
@@ -72,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_006",
@@ -82,19 +79,12 @@
       "precondition_text": "1.手表显示运动记录空状态页",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_007",
@@ -106,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_008",
@@ -119,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_009",
@@ -129,19 +121,12 @@
       "precondition_text": "1.手表存在运动记录",
       "steps_text": "1.进入Sports Records\n2.观察列表项图标\n3.观察列表项数据\n4.观察列表项时间",
       "expected_text": "1.手表显示运动记录列表\n2.列表项显示运动图标\n3.列表项显示运动数据\n4.列表项显示日期时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_010",
@@ -153,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_011",
@@ -166,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_012",
@@ -179,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先用源码中的 SET_SPORT_RECORD_DATA 构造超过一屏的记录，再用 QDEC_SET 滚动；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_013",
@@ -192,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_014",
@@ -202,19 +191,12 @@
       "precondition_text": "1.手表显示运动记录列表",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_015",
@@ -226,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_016",
@@ -239,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_017",
@@ -249,19 +233,12 @@
       "precondition_text": "1.存在Walking与Cycling运动记录",
       "steps_text": "1.进入Sports Records",
       "expected_text": "1.两条记录显示各自运动类型图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_018",
@@ -273,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_019",
@@ -286,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_020",
@@ -299,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_021",
@@ -312,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_022",
@@ -325,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_023",
@@ -338,11 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先在21:00构造晚间记录并以24小时制进入列表，再切换为12小时制重新进入；最终页面可合并证明时间制与PM显示；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。",
-      "verification_points": [
-        "Sports Records以12小时制显示且晚间记录带PM标识"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_024",
@@ -354,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_025",
@@ -367,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_026",
@@ -380,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_027",
@@ -393,11 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SET_SPORT_RECORD_DATA 每次只创建一条；按18:00/19:00/20:00分别构造三条，再执行模拟器关机/开机并重进列表；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "开机后Sports Records仍显示三条记录并按20:00、19:00、18:00倒序排列"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_028",
@@ -406,17 +387,12 @@
       "precondition_text": "1.已保存一条较新运动记录",
       "steps_text": "1.将系统时间回拨\n2.保存另一条运动记录",
       "expected_text": "1.系统时间显示回拨后的时间\n2.列表按两条记录时间戳倒序排列",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_029",
@@ -428,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_030",
@@ -441,20 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "第1屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第2屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第3屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第4屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第5屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第6屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第7屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第8屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第9屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-        "第10屏显示记录列表连续片段，全部截图合计覆盖19条记录"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_031",
@@ -466,20 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "第1屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第2屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第3屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第4屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第5屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第6屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第7屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第8屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第9屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-        "第10屏显示记录列表连续片段，全部截图合计覆盖20条记录"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_032",
@@ -491,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用当前源码的运动记录写入命令构造20条前置记录，再写入第21条验证上限淘汰；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_033",
@@ -504,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用当前源码的运动记录写入命令构造20条前置记录，再写入第21条验证保留范围；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_034",
@@ -517,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SET_SPORT_RECORD_DATA 每次只创建一条，参数0,20不会批量创建20条；当前缺少批量构造21条且时间递增的命令，需要新增 SIM_SPORT_RECORD_BATCH_SET；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_035",
@@ -530,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_036",
@@ -543,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用源码命令清空并写入一条 Outdoor Run 记录，再点击首条列表项；6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_037",
@@ -556,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_038",
@@ -569,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_039",
@@ -579,19 +541,12 @@
       "precondition_text": "1.手表显示历史Workout Summary",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_040",
@@ -603,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_041",
@@ -615,14 +571,10 @@
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总距离\n4.小结显示该记录的平均配速\n5.小结显示该记录的总步数\n6.小结显示该记录的总卡路里\n7.小结显示该记录的最大步频\n8.小结显示该记录的平均步频\n9.小结显示该记录运动时段内的心率曲线\n10.小结显示平均心率和最小-最大心率及心率区间\n11.小结显示该记录的运动日期与时间",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "进入 Outdoor Run 的 Workout Summary，并显示用时、距离、配速、步数和卡路里",
-        "向下浏览后显示最大/平均步频和心率曲线、心率统计",
-        "继续向下浏览后显示该记录的运动日期与时间"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SREC_042",
@@ -633,13 +585,10 @@
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总卡路里\n4.小结显示该记录运动时段内的心率曲线\n5.小结显示平均心率和最小-最大心率及心率区间\n6.小结显示该记录的运动日期与时间\n7.小结不显示距离和配速和步数和步频字段",
       "setup": [],
       "actions": [],
-      "verification_points": [
-        "进入基础类或骑行记录的 Workout Summary，并显示用时和卡路里",
-        "向下浏览后显示心率曲线、心率统计和日期时间，且不出现不适用的距离类字段"
-      ],
+      "verification_points": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SREC_043",
@@ -648,19 +597,12 @@
       "precondition_text": "1.运动前存在高心率数据\n2.当前运动期间存在可控心率数据",
       "steps_text": "1.进入该次Workout Summary",
       "expected_text": "1.心率区间不计入运动前数据",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_044",
@@ -669,19 +611,12 @@
       "precondition_text": "1.运动期间存在可控心率数据\n2.运动结束后存在高心率数据",
       "steps_text": "1.进入该次Workout Summary\n2.读取心率区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.心率区间时长与占比不计入运动结束后的高心率数据",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_045",
@@ -690,19 +625,12 @@
       "precondition_text": "1.用户年龄为30岁\n2.运动记录包含心率数据",
       "steps_text": "1.进入该次Workout Summary",
       "expected_text": "1.心率区间按190bpm最大心率划分",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_046",
@@ -711,19 +639,12 @@
       "precondition_text": "1.运动记录包含五区间有效心率数据",
       "steps_text": "1.进入该次Workout Summary",
       "expected_text": "1.小结显示五个心率区间的时长与占比色条",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_047",
@@ -732,19 +653,12 @@
       "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含100、119和120bpm心率样本",
       "steps_text": "1.进入该次Workout Summary\n2.读取热身与燃脂区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.100和119bpm计入热身区间，120bpm不计入热身而计入燃脂区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_048",
@@ -753,19 +667,12 @@
       "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含120、139和140bpm心率样本",
       "steps_text": "1.进入该次Workout Summary\n2.读取燃脂与有氧耐力区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.120和139bpm计入燃脂区间，140bpm不计入燃脂而计入有氧耐力区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_049",
@@ -774,19 +681,12 @@
       "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含140、159和160bpm心率样本",
       "steps_text": "1.进入该次Workout Summary\n2.读取有氧与无氧耐力区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.140和159bpm计入有氧耐力区间，160bpm不计入有氧而计入无氧耐力区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_050",
@@ -795,19 +695,12 @@
       "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含160、179和180bpm心率样本",
       "steps_text": "1.进入该次Workout Summary\n2.读取无氧耐力与极限区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.160和179bpm计入无氧耐力区间，180bpm不计入无氧而计入极限区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_051",
@@ -816,19 +709,12 @@
       "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含179、180和200bpm心率样本",
       "steps_text": "1.进入该次Workout Summary\n2.读取极限区间统计",
       "expected_text": "1.手表显示该次运动的Workout Summary\n2.179bpm不计入极限区间，180和200bpm计入极限区间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_052",
@@ -840,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_053",
@@ -853,8 +740,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_054",
@@ -866,8 +754,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_055",
@@ -879,8 +768,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；危险真机命令 CLEAR_ALL_SPORT_RECORD: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_056",
@@ -889,17 +779,12 @@
       "precondition_text": "1.运动记录列表中不存在本次测试运动\n2.距离类运动时长60秒、距离200米、卡路里0千卡",
       "steps_text": "1.在暂停结束页触发结束\n2.确认结束本次数据不足的运动\n3.进入Sports Records查找本次运动",
       "expected_text": "1.手表显示数据过少提示\n2.手表结束本次运动，Workout Summary不显示\n3.Sports Records列表不新增本次运动记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需时间推进/触发链路: 1.在暂停结束页触发结束；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_057",
@@ -911,8 +796,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/App: 1.恢复手表与App连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_058",
@@ -924,8 +810,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_059",
@@ -937,8 +824,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_060",
@@ -950,8 +838,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有 SET_SPORT_RECORD_DATA 固定写入有效心率数据，无法构造缺少有效心率的数据记录；需新增可配置 data_type/心率样本的 SIM_SPORT_RECORD_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_061",
@@ -963,8 +852,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_062",
@@ -973,17 +863,12 @@
       "precondition_text": "1.手表已保存运动记录",
       "steps_text": "1.完成一次OTA升级",
       "expected_text": "1.Sports Records仍显示升级前记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "OTA事件与等待可模拟界面流程；本用例要求升级镜像、进程重启重连及升级前运动记录持久化，当前SIM_OTA_EVENT不替代真实升级和持久化验证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_063",
@@ -992,17 +877,12 @@
       "precondition_text": "1.运动记录列表存在20条记录",
       "steps_text": "1.用可编程触控治具上下滚动列表500次",
       "expected_text": "1.手表未出现死机或异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_064",
@@ -1014,8 +894,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SREC_065",
@@ -1024,17 +905,12 @@
       "precondition_text": "1.列表包含距离类与非距离类记录",
       "steps_text": "1.观察列表项图标\n2.观察列表项数据\n3.观察列表项时间",
       "expected_text": "1.图标清晰可见\n2.数据清晰可见\n3.日期时间清晰可见",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

@@ -42,6 +42,14 @@ BUTTON_TERMS = (
 TOUCH_PRESS_TERMS = ("长按",)
 ROTATE_TERMS = ("旋转编码器", "顺时针旋转", "逆时针旋转", "编码器一格")
 WAIT_TERMS = ("等待", "保持无操作", "静置", "无操作")
+LEDGER_FIELDS = {
+    "case_id", "sheet", "target", "last_verified", "evidence_root", "evidence_paths"
+}
+LEDGER_TARGETS = {
+    "620C_simulator_case_map": "620C_W6830",
+    "6202_case_map": "6202_W5230",
+    "6202_simulator_case_map": "6202_W5230_SIMULATOR",
+}
 
 
 @dataclass(frozen=True)
@@ -137,8 +145,102 @@ def audit_case_maps(
         _live_capabilities() if target == "simulator" else _live_capabilities(target)
     )
     issues: list[AuditIssue] = []
-    counts = Counter(files=0, total=0, executable=0, unable=0)
+    counts = Counter(
+        files=0,
+        total=0,
+        unexplored=0,
+        externally_explored=0,
+        explored_unsolidified=0,
+        solidified=0,
+    )
     seen_case_ids: dict[str, str] = {}
+    seen_case_sheets: dict[str, str] = {}
+    ledger_ids: set[str] = set()
+    ledger_records: dict[str, dict] = {}
+    ledger_path = case_map_dir / "external_execution_history.jsonl"
+    if ledger_path.is_file():
+        for line_number, line in enumerate(
+            ledger_path.read_text(encoding="utf-8").splitlines(),
+            1,
+        ):
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError as exc:
+                issues.append(AuditIssue(
+                    "error",
+                    "invalid_external_ledger_json",
+                    ledger_path.name,
+                    f"line:{line_number}",
+                    str(exc),
+                ))
+                continue
+            case_id = str(record.get("case_id") or "").strip() if isinstance(record, dict) else ""
+            if not case_id:
+                issues.append(AuditIssue(
+                    "error",
+                    "external_ledger_case_id_missing",
+                    ledger_path.name,
+                    f"line:{line_number}",
+                    "外部探索记录缺少 case_id",
+                ))
+            elif case_id in ledger_ids:
+                issues.append(AuditIssue(
+                    "error",
+                    "duplicate_external_ledger_case_id",
+                    ledger_path.name,
+                    case_id,
+                    "外部探索账本中的 case_id 必须唯一",
+                ))
+            else:
+                ledger_ids.add(case_id)
+                ledger_records[case_id] = record
+                if set(record) != LEDGER_FIELDS:
+                    issues.append(AuditIssue(
+                        "error",
+                        "external_ledger_schema_mismatch",
+                        ledger_path.name,
+                        case_id,
+                        f"账本字段必须精确为 {sorted(LEDGER_FIELDS)}",
+                    ))
+                expected_target = LEDGER_TARGETS.get(case_map_dir.name)
+                if expected_target and str(record.get("target") or "") != expected_target:
+                    issues.append(AuditIssue(
+                        "error",
+                        "external_ledger_target_mismatch",
+                        ledger_path.name,
+                        case_id,
+                        f"target 必须是 {expected_target}",
+                    ))
+                for field in ("sheet", "target", "last_verified", "evidence_root"):
+                    if not str(record.get(field) or "").strip():
+                        issues.append(AuditIssue(
+                            "error",
+                            "external_ledger_fact_missing",
+                            ledger_path.name,
+                            case_id,
+                            f"账本字段 {field} 不能为空",
+                        ))
+                evidence_paths = record.get("evidence_paths")
+                if not isinstance(evidence_paths, list) or not evidence_paths or not all(
+                    str(path).strip() for path in evidence_paths
+                ):
+                    issues.append(AuditIssue(
+                        "error",
+                        "external_ledger_evidence_missing",
+                        ledger_path.name,
+                        case_id,
+                        "evidence_paths 必须包含本轮真实证据路径",
+                    ))
+    else:
+        issues.append(AuditIssue(
+            "error",
+            "external_ledger_missing",
+            ledger_path.name,
+            "<ledger>",
+            "缺少 external_execution_history.jsonl",
+        ))
 
     for path in sorted(case_map_dir.glob("*.json")):
         counts["files"] += 1
@@ -158,6 +260,7 @@ def audit_case_maps(
                 ))
             else:
                 seen_case_ids[raw_case_id] = path.name
+                seen_case_sheets[raw_case_id] = str(raw.get("sheet") or path.stem)
             try:
                 case = CaseEntry(**raw)
             except ValidationError as exc:
@@ -169,14 +272,50 @@ def audit_case_maps(
                     str(exc).replace("\n", " "),
                 ))
                 continue
-            counts["unable" if case.unable else "executable"] += 1
             label = (path.name, case.case_id)
 
-            if case.unable:
-                if case.actions:
-                    issues.append(AuditIssue("error", "unable_has_actions", *label, "unable 用例仍有 actions"))
-                if not case.note.strip():
-                    issues.append(AuditIssue("error", "unable_without_note", *label, "unable 用例没有原因"))
+            external_explored = case.case_id in ledger_ids
+            if external_explored:
+                counts["externally_explored"] += 1
+            if case.is_promoted and external_explored:
+                counts["solidified"] += 1
+            elif external_explored:
+                counts["explored_unsolidified"] += 1
+            else:
+                counts["unexplored"] += 1
+
+            if case.is_promoted and not external_explored:
+                issues.append(AuditIssue(
+                    "error",
+                    "promoted_without_external_exploration",
+                    *label,
+                    "PROMOTED 用例必须先存在于同目标外部探索账本",
+                ))
+
+            if not case.is_promoted:
+                if case.mapping_status:
+                    issues.append(AuditIssue(
+                        "error",
+                        "invalid_mapping_status",
+                        *label,
+                        "正式状态只允许精确的 PROMOTED",
+                    ))
+                if any(getattr(case, field) for field in (
+                    "setup", "actions", "collect", "verification_points"
+                )):
+                    issues.append(AuditIssue(
+                        "error",
+                        "unsolidified_has_mapping",
+                        *label,
+                        "未固化用例不得长期保留固定步骤或验证点",
+                    ))
+                if case.unable:
+                    issues.append(AuditIssue(
+                        "error",
+                        "legacy_unable_gate",
+                        *label,
+                        "unable 不再参与分类或运行入口",
+                    ))
                 continue
 
             phase_names: dict[str, list[str]] = {}
@@ -276,6 +415,26 @@ def audit_case_maps(
                     *label,
                     f"expected_items={expected_items}, actions={business_actions}",
                 ))
+
+    for case_id in sorted(ledger_ids - set(seen_case_ids)):
+        issues.append(AuditIssue(
+            "error",
+            "external_ledger_case_missing",
+            ledger_path.name,
+            case_id,
+            "外部探索账本引用了当前 case_map 中不存在的 case_id",
+        ))
+    for case_id in sorted(ledger_ids.intersection(seen_case_ids)):
+        record = ledger_records[case_id]
+        expected_sheet = seen_case_sheets[case_id]
+        if str(record.get("sheet") or "") != expected_sheet:
+            issues.append(AuditIssue(
+                "error",
+                "external_ledger_sheet_mismatch",
+                ledger_path.name,
+                case_id,
+                f"sheet 必须是 {expected_sheet}",
+            ))
 
     return dict(counts), issues
 

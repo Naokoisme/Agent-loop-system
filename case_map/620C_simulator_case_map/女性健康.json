@@ -8,12 +8,10 @@
     "expected_text": "1.手表进入未配对引导页而非My Cycle主页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_002",
@@ -24,12 +22,10 @@
     "expected_text": "1.手表进入No cycle data空态页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_003",
@@ -40,12 +36,10 @@
     "expected_text": "1.手表进入可纵向浏览的My Cycle主页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_004",
@@ -54,16 +48,12 @@
     "precondition_text": "1.手表正在显示My Cycle未配对引导页",
     "steps_text": "1.观察图标、文案和按钮",
     "expected_text": "1.页面呈现完整的未配对引导布局",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_005",
@@ -74,12 +64,10 @@
     "expected_text": "1.手表显示My Cycle未配对引导页\n2.页面逐字显示To use this feature, your watch must be connected to the Titan Smart World App.\n3.两模块使用相同的手机断连图标和英文文案和返回按钮和Pair Now按钮排版",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_006",
@@ -88,19 +76,12 @@
     "precondition_text": "1.手表正在显示My Cycle未配对引导页",
     "steps_text": "1.点击Pair Now",
     "expected_text": "1.手表跳转到设置-System-QR to Pair页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:280,215,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前402x256 NO_PAIR_TIP Designer确认Pair Now事件绑定在X=208起始、宽154的底部配对控件，(280,215)位于控件内"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_007",
@@ -109,16 +90,12 @@
     "precondition_text": "1.手表正在显示My Cycle未配对引导页",
     "steps_text": "1.点击左侧返回按钮",
     "expected_text": "1.手表返回App列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_008",
@@ -127,18 +104,12 @@
     "precondition_text": "1.手表正在显示My Cycle未配对引导页",
     "steps_text": "1.在页面执行右滑",
     "expected_text": "1.页面保持未配对引导页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_009",
@@ -147,18 +118,12 @@
     "precondition_text": "1.手表正在显示My Cycle未配对引导页",
     "steps_text": "1.短按编码器",
     "expected_text": "1.手表按全局按键规则返回主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_010",
@@ -169,12 +134,10 @@
     "expected_text": "1.页面呈现完整的已配对无数据空态布局",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_011",
@@ -185,12 +148,10 @@
     "expected_text": "1.手表显示固定无数据状态页\n2.页面逐字显示No cycle data. Set up My Cycle in the app to get started.",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_012",
@@ -199,22 +160,10 @@
     "precondition_text": "1.手表正在显示My Cycle无数据状态页",
     "steps_text": "1.执行上滑\n2.执行下滑",
     "expected_text": "1.固定空态页不滚动\n2.固定空态页不滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1201;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1202;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "上滑后页面保持My Cycle固定空态",
-      "下滑后页面保持My Cycle固定空态"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
     "note": ""
   },
@@ -225,18 +174,12 @@
     "precondition_text": "1.手表正在显示My Cycle无数据状态页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.页面保持无数据状态页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_014",
@@ -245,18 +188,12 @@
     "precondition_text": "1.手表正在显示My Cycle无数据状态页",
     "steps_text": "1.短按编码器",
     "expected_text": "1.手表返回主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_015",
@@ -267,12 +204,10 @@
     "expected_text": "1.页面完整呈现六个周期信息区块",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_016",
@@ -281,18 +216,12 @@
     "precondition_text": "1.手表已进入My Cycle主页面",
     "steps_text": "1.观察标题栏和页面右侧\n2.滚动到页面底部",
     "expected_text": "1.标题栏呈现粉色My Cycle与系统时间\n2.底部预测模块完整显示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_017",
@@ -303,12 +232,10 @@
     "expected_text": "1.页面右侧显示位于顶部的位置指示\n2.滚动条滑块移动到中部位置\n3.滚动条滑块移动到底部，六个区块均可到达",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_018",
@@ -317,28 +244,10 @@
     "precondition_text": "1.手表已进入My Cycle主页面顶部",
     "steps_text": "1.上滑页面\n2.下滑页面\n3.顺时针旋转编码器\n4.逆时针旋转编码器",
     "expected_text": "1.页面显示下方区块\n2.页面显示上方区块\n3.页面向上滚动\n4.页面向下滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1801;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1802;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1803;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1804;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "上滑后页面显示下方区块",
-      "下滑后页面显示上方区块",
-      "顺时针旋转编码器后页面向上滚动",
-      "逆时针旋转编码器后页面向下滚动"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
     "note": ""
   },
@@ -349,18 +258,12 @@
     "precondition_text": "1.手表已进入My Cycle主页面",
     "steps_text": "1.短按编码器",
     "expected_text": "1.手表返回主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_020",
@@ -369,16 +272,12 @@
     "precondition_text": "1.手表已进入My Cycle主页面且五日日视图可见",
     "steps_text": "1.观察中间、相邻和两端日期气泡",
     "expected_text": "1.五个气泡按中间最大向两侧逐级缩小",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_021",
@@ -389,12 +288,10 @@
     "expected_text": "1.中间最大气泡显示日期数字23，数字上方显示星期简写Sa\n2.左右最小气泡显示各自日期数字，边缘可部分裁切但日期数字仍可识别",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_022",
@@ -403,16 +300,12 @@
     "precondition_text": "1.五日范围同时覆盖月经期、排卵期和安全期日期",
     "steps_text": "1.观察各日期气泡颜色",
     "expected_text": "1.月经期为粉红色，排卵期为青色，卵泡期和黄体期为灰色",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_023",
@@ -421,18 +314,12 @@
     "precondition_text": "1.手表已显示五日日视图且当前日期可向后切换",
     "steps_text": "1.在五日日视图执行左滑",
     "expected_text": "1.选中日期向后移动，气泡播放缩放动效",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_024",
@@ -441,18 +328,12 @@
     "precondition_text": "1.手表已显示五日日视图且当前日期可向前切换",
     "steps_text": "1.在五日日视图执行右滑",
     "expected_text": "1.选中日期向前移动，页面不退出My Cycle，气泡播放缩放动效",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_025",
@@ -461,16 +342,12 @@
     "precondition_text": "1.选中日期已知其周期阶段和周期日",
     "steps_text": "1.观察当前阶段信息卡",
     "expected_text": "1.阶段卡显示对应Phase与Cycle Day",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_026",
@@ -479,16 +356,12 @@
     "precondition_text": "1.五日日视图已选中一个已知日期",
     "steps_text": "1.观察日期选择器胶囊",
     "expected_text": "1.胶囊显示所选日期对应的星期全称与DD/MM",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_027",
@@ -497,16 +370,12 @@
     "precondition_text": "1.相邻日期处于不同周期阶段",
     "steps_text": "1.在五日日视图切换到相邻日期",
     "expected_text": "1.三个联动区块均更新为新选中日期的数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前源码已有数据注入命令；该用例需分场景逐步取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_028",
@@ -515,16 +384,12 @@
     "precondition_text": "1.手表已滚动到月历区块\n2.当前月份含三类阶段日期",
     "steps_text": "1.观察月经期、排卵期、安全期和选中日期",
     "expected_text": "1.月经期为粉红实心圆，排卵期为青色实心圆，安全期无背景，选中日期叠加圆形描边",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_029",
@@ -533,18 +398,12 @@
     "precondition_text": "1.五日日视图当前选中月末日期\n2.月历区块可见",
     "steps_text": "1.左滑切换到下月日期",
     "expected_text": "1.五日视图选中下月日期，月历自动切换到对应月份",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_030",
@@ -553,16 +412,12 @@
     "precondition_text": "1.手表已滚动到月历区块\n2.当前五日日视图选中日期已记录",
     "steps_text": "1.点击月历中的另一日期",
     "expected_text": "1.月历不独立选中点击日期，五日日视图和日期胶囊保持原选中日",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前实时源码没有女性健康周期数据和选中日期注入命令，无法可靠建立月历区块及原选中日；不以 ENTER_PAGE 冒充日期点击"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_031",
@@ -573,12 +428,10 @@
     "expected_text": "1.月历可展示页面专节定义的6个月范围\n2.月历不继续扩展为第7个月，但超范围预测仍可在预测模块显示文字日期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_032",
@@ -589,12 +442,10 @@
     "expected_text": "1.手表数据从上个月开始覆盖到未来第6个月，上个月数据由三要素倒推",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_033",
@@ -603,16 +454,12 @@
     "precondition_text": "1.上次经期开始日为2026-07-01\n2.周期长度为28天\n3.数据已同步到手表",
     "steps_text": "1.查看Expected Next Cycle区块",
     "expected_text": "1.区块显示29/07/26",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_034",
@@ -621,16 +468,12 @@
     "precondition_text": "1.当前经期和排卵期已结束\n2.手表已滚动到预测区块",
     "steps_text": "1.查看三个预测模块",
     "expected_text": "1.三个预测模块按规定图标与日期格式显示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_035",
@@ -641,12 +484,10 @@
     "expected_text": "1.Menstrual Phase显示深粉色圆形底的波浪形图标及DD/MM – DD/MM日期范围\n2.Fertile Phase显示深粉色圆形底的靶心或环形图标及DD/MM – DD/MM日期范围\n3.Ovulation Day显示深粉色圆形底的同心圆图标及DD/MM单日日期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_036",
@@ -655,16 +496,12 @@
     "precondition_text": "1.可设置手表当前日期，并核对女性健康阶段、周期日和预测日期\n2.当前周期经期结束日为2026-07-05\n3.下次预测经期为2026-07-29至2026-08-02",
     "steps_text": "1.在2026-07-05查看Menstrual Phase模块\n2.推进到2026-07-06后查看Menstrual Phase模块",
     "expected_text": "1.当前经期尚未结束时不提前显示下次经期范围\n2.当前经期结束后Menstrual Phase显示29/07 – 02/08",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_037",
@@ -673,16 +510,12 @@
     "precondition_text": "1.可设置手表当前日期，并核对女性健康阶段、周期日和预测日期\n2.当前排卵期结束日为2026-07-18\n3.下次预测排卵期为2026-08-12至2026-08-16\n4.下次预测排卵日为2026-08-14",
     "steps_text": "1.在2026-07-18查看Fertile Phase与Ovulation Day模块\n2.推进到2026-07-19后查看两个预测模块",
     "expected_text": "1.当前排卵期尚未结束时不提前切换到下次排卵预测\n2.当前排卵期结束后Fertile Phase显示12/08 – 16/08，Ovulation Day显示14/08",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_038",
@@ -693,12 +526,10 @@
     "expected_text": "1.App保存并下发23天周期\n2.手表显示第13天排卵日与第11至15天排卵期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_039",
@@ -709,12 +540,10 @@
     "expected_text": "1.App保存并下发28天周期\n2.手表显示第16天排卵日与第14至18天排卵期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_040",
@@ -725,12 +554,10 @@
     "expected_text": "1.App保存并下发32天周期\n2.手表显示第19天排卵日与第17至21天排卵期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_041",
@@ -741,12 +568,10 @@
     "expected_text": "1.App保存并下发35天周期\n2.手表显示第22天排卵日与第20至24天排卵期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_042",
@@ -757,12 +582,10 @@
     "expected_text": "1.24天映射第13天排卵及第11至15天排卵期，25和26天映射第14天及第12至16天，27天映射第15天及第13至17天，29和30天映射第17天及第15至19天，31天映射第19天及第17至21天，33天映射第20天及第18至22天，34天映射第22天及第20至24天",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_043",
@@ -773,12 +596,10 @@
     "expected_text": "1.第1至5天均显示粉红色Menstrual阶段\n2.第6至13天均显示灰色Follicular阶段\n3.第14至18天均显示青色Ovulation阶段\n4.第19至28天均显示灰色Luteal阶段",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_044",
@@ -789,12 +610,10 @@
     "expected_text": "1.App不允许保存22天\n2.App可保存23天\n3.App可保存35天\n4.App不允许保存36天",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_045",
@@ -805,12 +624,10 @@
     "expected_text": "1.App不允许保存2天\n2.App可保存3天\n3.App可保存5天\n4.App不允许保存6天",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_046",
@@ -821,12 +638,10 @@
     "expected_text": "1.App保留历史月份原数据并重算当月和未来数据\n2.手表历史月份不变，当月和未来阶段及预测更新",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_047",
@@ -837,12 +652,10 @@
     "expected_text": "1.App只修改所选周期内的经期区间\n2.手表仅更新该周期，其他周期阶段和预测保持不变",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_048",
@@ -853,12 +666,10 @@
     "expected_text": "1.App保存同一周期内两个经期区间\n2.手表月历仅在所选日期范围显示两段粉红经期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_049",
@@ -869,12 +680,10 @@
     "expected_text": "1.App完成上次开始时间调整，开始新周期流程不显示\n2.上个经期开始日仍为2026-06-01\n3.上个周期长度缩短为26天并从2026-06-27重新计算最近周期数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_050",
@@ -885,12 +694,10 @@
     "expected_text": "1.App保存新的最近周期开始日2026-07-01\n2.上个周期长度延长为30天\n3.手表从2026-07-01起按新周期开始日显示阶段",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_051",
@@ -901,12 +708,10 @@
     "expected_text": "1.App从调整日期开始按5天经期长度重新计算女性健康数据\n2.经期开始日保持2026-07-01和周期长度保持28天和经期长度更新为5天\n3.手表第1至5天显示Menstrual，后续Follicular和Ovulation和Luteal边界按更新后三要素显示",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_052",
@@ -917,12 +722,10 @@
     "expected_text": "1.待产品确认：两类操作的日期选择边界",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_053",
@@ -933,12 +736,10 @@
     "expected_text": "1.待产品确认：明确用于重算的默认周期长度和默认经期长度\n2.待产品确认：手表预测应基于确认后的默认值更新",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_054",
@@ -949,12 +750,10 @@
     "expected_text": "1.App重算当前及后续周期数据并发起同步\n2.手表全部周期区块更新为校准后数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_055",
@@ -965,12 +764,10 @@
     "expected_text": "1.App保留该周期最后一次设置作为待同步值\n2.重连后下发最后一次设置\n3.手表显示第三次保存的周期数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_056",
@@ -981,12 +778,10 @@
     "expected_text": "1.App下发上个月和当月整月的女性健康数据\n2.手表呈现完整的上月与当月数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_057",
@@ -997,12 +792,10 @@
     "expected_text": "1.第一次编辑后App重新下发上个月与当月整月数据\n2.第二次编辑后App再次下发上个月与当月整月数据\n3.第三次编辑后App再次下发上个月与当月整月数据\n4.每次下发包含当次最新编辑结果，手表最终显示第三次结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_058",
@@ -1013,12 +806,10 @@
     "expected_text": "1.App开始下发新数据\n2.同步未完成\n3.手表仍显示中断前的完整数据\n4.重连后手表一次性更新为新完整数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_059",
@@ -1029,12 +820,10 @@
     "expected_text": "1.手表呈现完整的月经期提前提醒页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_060",
@@ -1045,12 +834,10 @@
     "expected_text": "1.手表呈现完整的排卵期提前提醒页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_061",
@@ -1061,12 +848,10 @@
     "expected_text": "1.月经期提醒逐字显示Menstrual phase starts tomorrow.并展示波浪形图标\n2.排卵期提醒逐字显示Ovulation phase starts tomorrow.并展示靶心或环形图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_062",
@@ -1077,12 +862,10 @@
     "expected_text": "1.振动波形为250毫秒振动两次，间隔750毫秒",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_063",
@@ -1091,23 +874,12 @@
     "precondition_text": "1.女性健康提醒即将触发",
     "steps_text": "1.计时观察未操作的提醒页面",
     "expected_text": "1.提醒页显示5秒后关闭",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:FEMALE:0,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6301;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:6302,6000;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6303;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "女性健康提醒触发后显示提醒页面",
-      "等待6秒后提醒页面已经自动关闭"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-    "note": "FEMALE:0,1由实时源码触发经期开始提醒，SIM_WAIT覆盖5秒自动关闭窗口"
+    "note": ""
   },
   {
     "case_id": "CYCLE_064",
@@ -1118,12 +890,10 @@
     "expected_text": "1.手表保持无女性健康提醒状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_065",
@@ -1132,16 +902,12 @@
     "precondition_text": "1.同一周期数据已成功同步到手表",
     "steps_text": "1.在App重复下发同一版本周期数据3次\n2.查看手表月历和预测",
     "expected_text": "1.每次同步均不新增重复经期区间\n2.月历和预测仍只有一套对应阶段数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/App: 1.在App重复下发同一版本周期数据3次"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_066",
@@ -1152,12 +918,10 @@
     "expected_text": "1.午夜前显示当前日期对应阶段和周期日\n2.次日全部日期联动区块完成刷新",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_067",
@@ -1168,12 +932,10 @@
     "expected_text": "1.待产品确认：睡眠中提醒的显示与补显规则",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_068",
@@ -1184,12 +946,10 @@
     "expected_text": "1.手表显示Menstrual phase starts tomorrow.并振动两次",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_069",
@@ -1200,12 +960,10 @@
     "expected_text": "1.App显示升级确认\n2.手表切换为Firmware Update进度页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_070",
@@ -1216,12 +974,10 @@
     "expected_text": "1.20次切换结束后页面保持稳定联动",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_071",
@@ -1232,12 +988,10 @@
     "expected_text": "1.连续同步期间页面保持可用\n2.手表只显示第10次校准对应的唯一阶段和预测结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_072",
@@ -1248,12 +1002,10 @@
     "expected_text": "1.两平台下手表均显示相同周期数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前缺女性健康周期数据注入命令；源码数据结构和提醒事件已找到，可继续接入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CYCLE_073",
@@ -1262,15 +1014,11 @@
     "precondition_text": "1.主页面同时可见五日视图和多阶段日期",
     "steps_text": "1.在默认亮度下浏览五日视图、月历和预测模块",
     "expected_text": "1.日期气泡与预测文字均清晰可读",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FEMALE_HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

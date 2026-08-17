@@ -142,6 +142,7 @@ class ReproductionTrace(BaseModel):
     finished_at: str | None = None
     steps: list[StepObservation] = Field(default_factory=list)
     outcome: ReproductionOutcome | None = None
+    verdict: str | None = None
     reason: str | None = None
 
     @model_validator(mode="after")
@@ -453,15 +454,21 @@ def interactive_reproduce(
     evidence_dir: str | os.PathLike[str],
     max_actions: int = 6,
     target: str = "simulator",
+    test_case: dict[str, str] | None = None,
+    build_simulator: bool = True,
 ) -> ReproductionTrace:
-    """在选定目标上按“观察→一个动作→再观察”复现缺陷。
+    """在选定目标上按“观察→一个动作→再观察”完成缺陷复现或普通测试。
 
     simulator 保持原有的一次构建、一次会话；hardware 跳过构建，直接使用
     当前已烧录的 6202 Debug 固件，并从核对后的 6202 源码即时加载命令表。
     """
     from agent_loop_system.tools.agent import decide_reproduction_action
     from agent_loop_system.tools.build import BuildConfig, run_build
-    from agent_loop_system.tools.test import get_simulator_exe, judge_with_vision
+    from agent_loop_system.tools.test import (
+        get_simulator_exe,
+        judge_test_with_vision,
+        judge_with_vision,
+    )
 
     if max_actions < 1:
         raise ValueError("max_actions 必须大于 0")
@@ -500,16 +507,19 @@ def interactive_reproduce(
             session: DeviceSession = RealDeviceSession(evidence_dir=output_dir)
         else:
             capabilities = load_current_command_capabilities()
-            config = BuildConfig.from_env()
-            build_result = run_build(config)
-            if not build_result.success:
-                return _finish_trace(
-                    output_dir,
-                    trace,
-                    ReproductionOutcome.SYSTEM_ERROR,
-                    f"修复前源码构建失败: {build_result.error_message or '未知错误'}",
-                )
-            simulator_exe = build_result.artifact_path or get_simulator_exe()
+            if build_simulator:
+                config = BuildConfig.from_env()
+                build_result = run_build(config)
+                if not build_result.success:
+                    return _finish_trace(
+                        output_dir,
+                        trace,
+                        ReproductionOutcome.SYSTEM_ERROR,
+                        f"修复前源码构建失败: {build_result.error_message or '未知错误'}",
+                    )
+                simulator_exe = build_result.artifact_path or get_simulator_exe()
+            else:
+                simulator_exe = get_simulator_exe()
             session = SimulatorSession(simulator_exe)
     except Exception as exc:
         return _finish_trace(
@@ -570,6 +580,7 @@ def interactive_reproduce(
                 execution_target=target,
                 capability_knowledge=capability_knowledge,
                 navigation_source_root=navigation_source_root,
+                test_case=test_case,
             )
             if decision is None:
                 return _finish_trace(
@@ -596,12 +607,31 @@ def interactive_reproduce(
                         ReproductionOutcome.SYSTEM_ERROR,
                         "最终截图不可用，无法视觉判定",
                     )
-                verdict = judge_with_vision(
-                    current.screenshot_path,
-                    objective,
-                    defect_image_paths=defect_image_paths,
-                    verified_observations=verified_observation_facts(trace),
-                )
+                if test_case is None:
+                    verdict = judge_with_vision(
+                        current.screenshot_path,
+                        objective,
+                        defect_image_paths=defect_image_paths,
+                        verified_observations=verified_observation_facts(trace),
+                    )
+                else:
+                    screenshots = [
+                        {
+                            "path": item.screenshot_path,
+                            "label": (
+                                item.decision.reason
+                                if item.decision is not None
+                                else "执行前初始画面"
+                            ),
+                        }
+                        for item in trace.steps
+                        if item.screenshot_ok and item.screenshot_path
+                    ]
+                    verdict = judge_test_with_vision(
+                        str(test_case.get("expected_text") or ""),
+                        screenshots,
+                    )
+                trace.verdict = verdict.verdict
                 outcome = {
                     "FAIL": ReproductionOutcome.DEFECT_REPRODUCED,
                     "PASS": ReproductionOutcome.CURRENT_CONFORMS,

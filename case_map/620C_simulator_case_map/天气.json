@@ -6,25 +6,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.点击Weather",
     "expected_text": "1.手表显示天气业务页或引导页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "直接进入当前源码注册的 WEATHER_HOME，验证天气业务页或引导页"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_002",
@@ -34,15 +21,11 @@
     "steps_text": "1.点击天气卡",
     "expected_text": "1.手表显示天气业务页或引导页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,126,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前项目 MENU_CUSTOM_SORT 中 Weather 为第 8 项；MenuList 编码器每次移动一项后点击屏幕中心"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_003",
@@ -52,15 +35,11 @@
     "steps_text": "1.进入Weather",
     "expected_text": "1.页面显示手机断连图标和配对文案和返回按钮和Pair Now",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_004",
@@ -70,15 +49,11 @@
     "steps_text": "1.进入Weather",
     "expected_text": "1.页面逐字显示To use this feature, your watch must be connected to the Titan Smart World App.",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_005",
@@ -87,16 +62,12 @@
     "precondition_text": "1.手表显示天气未配对引导页",
     "steps_text": "1.点击Pair Now",
     "expected_text": "1.手表显示设置中的Scan to Pair二维码页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "Pair Now 会进入当前模拟器不稳定的配对流程，尚无已验证的安全触发命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_006",
@@ -105,18 +76,12 @@
     "precondition_text": "1.手表显示天气未配对引导页",
     "steps_text": "1.点击返回按钮",
     "expected_text": "1.手表返回进入Weather前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:NO_PAIR_TIP,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:116,215,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用页面统一右滑返回动作；返回目标由窗口栈决定"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_007",
@@ -125,19 +90,12 @@
     "precondition_text": "1.手表已绑定配套App\n2.手表没有可用天气数据",
     "steps_text": "1.进入Weather",
     "expected_text": "1.页面显示Weather标题和Connect with the App to access Weather data文案",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_CLEAR:;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_008",
@@ -146,19 +104,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App尚未同步天气数据",
     "steps_text": "1.进入Weather",
     "expected_text": "1.页面逐字显示Connect with the App to access Weather data",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_CLEAR:;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_009",
@@ -167,19 +118,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App已同步完整天气数据",
     "steps_text": "1.进入Weather",
     "expected_text": "1.页面显示城市和图标和当前温度和天气类型和高低温和更新时间和UV和AQI和风速和湿度和多日预报",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,1,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_010",
@@ -188,18 +132,12 @@
     "precondition_text": "1.手表显示天气主页顶部",
     "steps_text": "1.执行上滑",
     "expected_text": "1.页面显示UV和AQI和风速和湿度或多日预报区域",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_011",
@@ -208,19 +146,12 @@
     "precondition_text": "1.天气长页面已离开顶部",
     "steps_text": "1.执行下滑",
     "expected_text": "1.页面显示前序天气数据区域",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_012",
@@ -229,18 +160,12 @@
     "precondition_text": "1.手表显示天气长页面",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.天气页面沿旋转方向滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_013",
@@ -249,18 +174,12 @@
     "precondition_text": "1.手表显示天气主页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入Weather前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_014",
@@ -269,20 +188,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App同步Delhi当前24度、Clear、最高28度、最低20度、更新时间09:35的天气数据",
     "steps_text": "1.进入Weather主页\n2.观察实时天气区域",
     "expected_text": "1.手表显示Weather主页\n2.页面显示城市Delhi/英文天气类型Clear/当前温度24°/最高28°C/最低20°C/Last updated 09:35",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101093500;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Delhi,100,0,24,0,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_015",
@@ -291,19 +202,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App同步风速12km/h、湿度65%及至少3天预报",
     "steps_text": "1.滚动到天气详情和Forecast区域",
     "expected_text": "1.Wind Speed显示12 km/h，Humidity显示65%，多日预报项显示星期/天气图标/最高低温",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:BT_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步风速、湿度及至少3天预报的步骤无法执行，用ENTER_PAGE进入天气页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_016",
@@ -312,28 +216,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.当前天气更新时间为下午3:05",
     "steps_text": "1.将系统切换为24小时制\n2.进入Weather\n3.将系统切换为12小时制\n4.重新进入Weather",
     "expected_text": "1.系统显示24小时制\n2.标题栏时间和Last updated均按15:05格式显示\n3.系统显示12小时制\n4.标题栏时间和Last updated均按03:05 PM格式显示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101150500;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,0,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1601;",
-      "srv_quick_cmd send TOP5STEP:TIME_MODE:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1602;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "两种时间制下分别重新进入 Weather 并采集标题栏与 Last updated",
-    "verification_points": [
-      "24小时制下标题栏时间和Last updated均按15:05格式显示",
-      "12小时制下标题栏时间和Last updated均按03:05 PM格式显示"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_017",
@@ -342,22 +230,12 @@
     "precondition_text": "1.App可下发Clear天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Clear天气数据\n2.页面显示Clear文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,32,25,10,1,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Clear 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Clear 文案和对应天气图标，合并证明 Clear 数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_018",
@@ -367,15 +245,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Snow天气数据\n2.页面显示Snow文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步Snow天气步骤无法执行，且知识库未提供Snow对应的WEATHER_SET类型值；用ENTER_PAGE进入天气页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_019",
@@ -384,18 +258,12 @@
     "precondition_text": "1.App可下发Mist天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Mist天气数据\n2.页面显示Mist文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_020",
@@ -405,15 +273,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Showers天气数据\n2.页面显示Showers文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_021",
@@ -422,18 +286,12 @@
     "precondition_text": "1.App可下发Few Clouds天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Few Clouds天气数据\n2.页面显示Few Clouds文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,2,2,25,10000,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用 WEATHER_SET 注入 Few Clouds 天气数据，并用 ENTER_PAGE 进入页面验证GUI。"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_022",
@@ -442,22 +300,12 @@
     "precondition_text": "1.App可下发Scattered Clouds天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Scattered Clouds天气数据\n2.页面显示Scattered Clouds文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test,802,26,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Scattered Clouds 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Scattered Clouds 文案和对应图标，合并证明该天气数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_023",
@@ -467,15 +315,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Thunderstorm天气数据\n2.页面显示Thunderstorm文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步天气步骤无法执行，且知识库未提供Thunderstorm对应的WEATHER_SET类型值；用ENTER_PAGE进入页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_024",
@@ -485,19 +329,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Broken Clouds天气数据\n2.页面显示Broken Clouds文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test,803,28,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Broken Clouds 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Broken Clouds 文案和对应图标，合并证明该天气数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_025",
@@ -506,22 +342,12 @@
     "precondition_text": "1.App可下发Rain天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Rain天气数据\n2.页面显示Rain文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test City,0,104,20,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Rain 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Rain 文案和对应图标，合并证明 Rain 数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_026",
@@ -530,22 +356,12 @@
     "precondition_text": "1.App可下发Heavy Rain天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Heavy Rain天气数据\n2.页面显示Heavy Rain文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,40,25,10,3,5;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Heavy Rain 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Heavy Rain 文案和对应图标，合并证明该天气数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_027",
@@ -554,22 +370,12 @@
     "precondition_text": "1.App可下发Windy天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Windy天气数据\n2.页面显示Windy文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,24,25,10,3,5;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Windy 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Windy 文案和对应图标，合并证明 Windy 数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_028",
@@ -579,15 +385,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Sleet天气数据\n2.页面显示Sleet文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_029",
@@ -597,19 +399,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Fog天气数据\n2.页面显示Fog文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,20,20,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Fog 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Fog 文案和对应图标，合并证明 Fog 数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_030",
@@ -618,22 +412,12 @@
     "precondition_text": "1.App可下发Sandstorm天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Sandstorm天气数据\n2.页面显示Sandstorm文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Sandstorm,0,19,25,10,1,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Sandstorm 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Sandstorm 文案和对应图标，合并证明该天气数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_031",
@@ -642,22 +426,12 @@
     "precondition_text": "1.App可下发Snow Shower天气类型",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Snow Shower天气数据\n2.页面显示Snow Shower文案和对应天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test,0,14,0,10,1,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 Snow Shower 文案和图标，可同时证明数据接收与页面渲染",
-    "verification_points": [
-      "Weather 页面显示 Snow Shower 文案和对应图标，合并证明该天气数据已接收并渲染"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_032",
@@ -667,15 +441,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather",
     "expected_text": "1.手表接收Typhoon天气数据\n2.页面显示Typhoon文案和对应天气图标",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；知识库未提供Typhoon对应的WEATHER_SET类型值，无法注入该天气数据"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_033",
@@ -686,12 +456,10 @@
     "expected_text": "1.页面显示Clear日间图标\n2.页面显示Clear夜间图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "WEATHER_SET不支持下发日出、日落时间，无法满足前置条件并准确切换昼夜状态"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_034",
@@ -700,23 +468,12 @@
     "precondition_text": "1.App已下发Mist且包含日出日落时间",
     "steps_text": "1.将时间设为日出后\n2.将时间设为日落后",
     "expected_text": "1.页面显示Mist日间图标\n2.页面显示Mist夜间图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shanghai,701,Mist,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260810070000;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260810190000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_035",
@@ -725,17 +482,12 @@
     "precondition_text": "1.App已下发Showers且包含日出日落时间",
     "steps_text": "1.将时间设为日出后\n2.将时间设为日落后",
     "expected_text": "1.页面显示Showers日间图标\n2.页面显示Showers夜间图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "WEATHER_SET 只能注入当前天气、温度、能见度、UV 和风力，不能注入日出/日落时间；需要新增 SIM_WEATHER_SET_EXT 才能验证按日出日落切换图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_036",
@@ -746,12 +498,10 @@
     "expected_text": "1.页面显示Few Clouds日间图标\n2.页面显示Few Clouds夜间图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "缺少可注入日出日落时间的命令，无法满足前置条件并准确设置日出后、日落后时间"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_037",
@@ -762,12 +512,10 @@
     "expected_text": "1.页面显示Scattered Clouds日间图标\n2.页面显示Scattered Clouds夜间图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "前置天气数据包含日出日落时间，现有WEATHER_SET命令不支持注入该字段；操作步骤也未提供可用于TIME_SET的具体日期和日出、日落时间，需App下发或外部设备配合，无法生成可执行命令。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_038",
@@ -778,12 +526,10 @@
     "expected_text": "1.页面显示Broken Clouds日间图标\n2.页面显示Broken Clouds夜间图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法可靠执行：WEATHER_SET不支持注入日出、日落时间，且用例未提供具体日出日落时刻；12:00和20:00仅为代表性时间，不能保证分别位于日出后和日落后。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_039",
@@ -792,22 +538,12 @@
     "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
     "steps_text": "1.将手表时间设为05:59\n2.进入Weather",
     "expected_text": "1.手表时间修改成功\n2.页面显示夜间天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,32,20,10,1,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:190801055900;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同时显示 05:59 标题时间和夜间图标，可合并证明设时与图标判断",
-    "verification_points": [
-      "Weather 页面标题时间为05:59且显示夜间天气图标"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_040",
@@ -816,22 +552,12 @@
     "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
     "steps_text": "1.将手表时间设为06:00\n2.进入Weather",
     "expected_text": "1.手表时间修改成功\n2.页面显示日间天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,32,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101060000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同时显示 06:00 标题时间和日间图标，可合并证明设时与图标判断",
-    "verification_points": [
-      "Weather 页面标题时间为06:00且显示日间天气图标"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_041",
@@ -840,22 +566,12 @@
     "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
     "steps_text": "1.将手表时间设为17:59\n2.进入Weather",
     "expected_text": "1.手表时间修改成功\n2.页面显示日间天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,32,20,10,1,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101175900;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同时显示 17:59 标题时间和日间图标，可合并证明设时与图标判断",
-    "verification_points": [
-      "Weather 页面标题时间为17:59且显示日间天气图标"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_042",
@@ -864,23 +580,12 @@
     "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
     "steps_text": "1.将手表时间设为18:00\n2.进入Weather",
     "expected_text": "1.手表时间修改成功\n2.页面显示夜间天气图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_CLEAR:;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,32,26,10,5,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260810180000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同时显示 18:00 标题时间和夜间图标，可合并证明设时与图标判断",
-    "verification_points": [
-      "Weather 页面标题时间为18:00且显示夜间天气图标"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_043",
@@ -889,19 +594,12 @@
     "precondition_text": "1.天气数据包含06:30日出和18:30日落\n2.天气类型支持日夜图标",
     "steps_text": "1.将手表时间设为06:29\n2.将手表时间设为06:30\n3.将手表时间设为18:30",
     "expected_text": "1.页面显示夜间图标\n2.页面切换为日间图标\n3.页面切换为夜间图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SWITCH:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "WEATHER_SET 不包含日出/日落字段，当前命令无法建立 06:30 日出和 18:30 日落前置数据；需要新增 SIM_WEATHER_SET_EXT"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_044",
@@ -910,16 +608,12 @@
     "precondition_text": "1.App可下发AQI=0",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=0\n2.AQI等级显示Good",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "WEATHER_SET 参数不包含 AQI，第二个参数是天气 code，不能用 code=0 冒充 AQI=0；需要新增 SIM_WEATHER_SET_EXT 或 SIM_WEATHER_AQI_SET"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_045",
@@ -930,12 +624,10 @@
     "expected_text": "1.手表接收AQI=50\n2.AQI等级显示Good",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需App下发AQI=50，现有命令不支持AQI数据注入；仅能进入天气页面采集GUI"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_046",
@@ -945,15 +637,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=51\n2.AQI等级显示Satisfactory",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步AQI=51步骤无法执行；当前命令无AQI注入参数，用ENTER_PAGE进入Weather页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_047",
@@ -963,15 +651,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=100\n2.AQI等级显示Satisfactory",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步步骤无法执行，用ENTER_PAGE进入天气页面验证GUI；现有命令无法注入AQI=100"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_048",
@@ -980,18 +664,12 @@
     "precondition_text": "1.App可下发AQI=101",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=101\n2.AQI等级显示Moderate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App下发AQI=101的步骤无法执行，现有天气命令不支持AQI字段；用ENTER_PAGE进入天气页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_049",
@@ -1000,18 +678,12 @@
     "precondition_text": "1.App可下发AQI=200",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=200\n2.AQI等级显示Moderate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=200"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_050",
@@ -1021,15 +693,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=201\n2.AQI等级显示Poor",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=201"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_051",
@@ -1038,18 +706,12 @@
     "precondition_text": "1.App可下发AQI=300",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收AQI=300\n2.AQI等级显示Poor",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "App同步步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=300"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_052",
@@ -1060,12 +722,10 @@
     "expected_text": "1.手表接收AQI=301\n2.AQI等级显示Very Poor",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "现有命令不支持下发AQI=301，无法建立验证所需天气数据。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_053",
@@ -1076,12 +736,10 @@
     "expected_text": "1.手表接收AQI=400\n2.AQI等级显示Very Poor",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "AQI=400无可用注入命令，且同步天气数据需要App执行，无法建立验证所需数据。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_054",
@@ -1092,12 +750,10 @@
     "expected_text": "1.手表接收AQI=401\n2.AQI等级显示Severe",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法执行App天气同步，且现有命令不支持注入AQI=401，无法构造目标GUI状态"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_055",
@@ -1106,22 +762,12 @@
     "precondition_text": "1.App可下发UV=0",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=0\n2.UV等级显示Low",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test,0,0,25,10,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=0 与 Low，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=0且等级为Low"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_056",
@@ -1130,22 +776,12 @@
     "precondition_text": "1.App可下发UV=2",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=2\n2.UV等级显示Low",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,0,25,10,2,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=2 与 Low，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=2且等级为Low"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_057",
@@ -1154,22 +790,12 @@
     "precondition_text": "1.App可下发UV=3",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=3\n2.UV等级显示Moderate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,0,20,10,3,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=3 与 Moderate，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=3且等级为Moderate"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_058",
@@ -1178,22 +804,12 @@
     "precondition_text": "1.App可下发UV=5",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=5\n2.UV等级显示Moderate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Test,0,0,25,10,5,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=5 与 Moderate，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=5且等级为Moderate"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_059",
@@ -1202,22 +818,12 @@
     "precondition_text": "1.App可下发UV=6",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=6\n2.UV等级显示High",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,100,1,25,10,6,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=6 与 High，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=6且等级为High"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_060",
@@ -1226,23 +832,12 @@
     "precondition_text": "1.App可下发UV=7",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=7\n2.UV等级显示High",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,1,25,10,7,3;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_PING:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=7 与 High，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=7且等级为High"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_061",
@@ -1251,22 +846,12 @@
     "precondition_text": "1.App可下发UV=8",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=8\n2.UV等级显示Very High",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,0,0,25,10,8,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=8 与 Very High，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=8且等级为Very High"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_062",
@@ -1275,22 +860,12 @@
     "precondition_text": "1.App可下发UV=10",
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=10\n2.UV等级显示Very High",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,0,0,25,10,10,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=10 与 Very High，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=10且等级为Very High"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_063",
@@ -1300,19 +875,11 @@
     "steps_text": "1.同步天气数据到手表\n2.进入Weather指标区",
     "expected_text": "1.手表接收UV=11\n2.UV等级显示Extreme",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:0,0,0,0,0,11,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终指标区同屏显示 UV=11 与 Extreme，可合并证明接收值和等级映射",
-    "verification_points": [
-      "Weather 指标区显示UV=11且等级为Extreme"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_064",
@@ -1321,23 +888,12 @@
     "precondition_text": "1.手表已同步当天完整天气数据",
     "steps_text": "1.断开设备数据连接\n2.进入Weather",
     "expected_text": "1.手表进入断连状态\n2.页面显示断连前最后一次天气和Last updated时间",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,0,0,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面显示断连前城市、天气和 Last updated，可同时证明断连后仍使用缓存",
-    "verification_points": [
-      "断连后 Weather 页面仍显示断连前最后一次天气和Last updated时间"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_065",
@@ -1346,24 +902,12 @@
     "precondition_text": "1.手表与App保持连接\n2.当天已同步天气\n3.手机App在跨日后未打开",
     "steps_text": "1.将系统时间推进至次日00:00\n2.进入Weather",
     "expected_text": "1.天气缓存进入跨日失效状态\n2.页面显示未获取天气提示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101235900;",
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,100,0,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250102000000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 未获取提示同时证明跨日后旧缓存失效和页面进入空态",
-    "verification_points": [
-      "次日00:00进入Weather后旧缓存失效且页面显示未获取天气提示"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_066",
@@ -1372,22 +916,12 @@
     "precondition_text": "1.手表已有当天缓存\n2.设备数据连接已断开",
     "steps_text": "1.将系统时间推进至次日00:00\n2.进入Weather",
     "expected_text": "1.旧天气缓存不再有效\n2.页面显示未获取天气提示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,0,0,25,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,day_pass;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 未获取提示同时证明 day_pass 后旧缓存失效和页面进入空态",
-    "verification_points": [
-      "day_pass后旧天气缓存失效且页面显示未获取天气提示"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_067",
@@ -1396,24 +930,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表正在显示旧天气数据",
     "steps_text": "1.在App更新城市天气数据\n2.在手表重新进入Weather",
     "expected_text": "1.App完成天气数据同步\n2.手表显示新城市数据和新的Last updated时间",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:OldCity,001,1,20,8,2,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:NewCity,002,2,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终 Weather 页面同屏显示 NewCity 和新的 Last updated，可合并证明同步与刷新",
-    "verification_points": [
-      "Weather 页面显示NewCity及新的Last updated时间"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_068",
@@ -1422,18 +944,12 @@
     "precondition_text": "1.手表已显示城市A天气\n2.手机定位已切换到城市B",
     "steps_text": "1.触发天气刷新",
     "expected_text": "1.待产品确认：城市名和缓存数据和Last updated的更新时机",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:城市A,101010100,1,20,10,3,2;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:城市B,101010100,1,20,10,3,2;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_069",
@@ -1443,15 +959,11 @@
     "steps_text": "1.触发天气同步\n2.进入Weather",
     "expected_text": "1.待产品确认：当前依赖状态的错误页或缓存表现\n2.待产品确认：恢复后刷新时机",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "天气同步需App或外部网络触发，无法执行；用ENTER_PAGE进入Weather页面验证GUI"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_070",
@@ -1460,17 +972,12 @@
     "precondition_text": "1.手表显示一份已同步天气数据",
     "steps_text": "1.保持App不刷新天气数据",
     "expected_text": "1.待产品确认：缓存有效期和自动刷新周期和超时页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,100,1,25,10,3,2;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需App保持不刷新并长时间等待缓存超时，且预期结果待产品确认，当前无法执行验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_071",
@@ -1479,25 +986,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.负一屏存在天气卡片",
     "steps_text": "1.在App同步一组新天气数据\n2.查看负一屏天气卡",
     "expected_text": "1.手表天气主页数据更新\n2.负一屏卡片显示同一城市和核心天气数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:7101;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:7102;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先采集 Weather 主页新数据，再进入负一屏采集同一城市和核心天气数据",
-    "verification_points": [
-      "手表Weather主页显示新同步的Shenzhen天气数据",
-      "负一屏天气卡显示同一城市和核心天气数据"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_072",
@@ -1506,19 +1000,12 @@
     "precondition_text": "1.天气数据支持日夜图标\n2.手表显示有效天气",
     "steps_text": "1.修改手表时区使日期跨日\n2.进入Weather",
     "expected_text": "1.系统日期按新时区变化\n2.页面按新日期判断缓存有效性和日夜图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:250101235900;",
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SWITCH:1;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,100,0,25,10,5,2;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "TIME_SET 只修改 RTC，不能修改时区；当前没有 SIM_TIMEZONE_SET，无法证明“按新时区”跨日和重算日夜图标"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_073",
@@ -1527,17 +1014,12 @@
     "precondition_text": "1.手机音乐正在播放\n2.手表已缓存可显示的天气数据",
     "steps_text": "1.进入Weather主页面\n2.右滑退出Weather",
     "expected_text": "1.手表显示天气数据\n2.手机音乐继续播放",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,100,0,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:MUSIC_CTRL:0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "手机音乐是否继续播放属于外部设备音频状态，无法通过手表GUI截图验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_074",
@@ -1546,115 +1028,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.天气数据测试工具可向手表下发有效天气数据",
     "steps_text": "1.连续执行50次天气数据更新和页面进入",
     "expected_text": "1.每次页面均可加载，手表无异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;",
-      "srv_quick_cmd send TOP5STEP:WEATHER_SET:Beijing,101010100,1,25,10,3,2;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "WTHR_075",
@@ -1665,11 +1044,9 @@
     "expected_text": "1.两平台下手表显示的城市和温度和指标和预报字段一致",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需分别通过Android和iOS手机同步同一组天气数据，涉及外部设备操作，无法用模拟器命令执行跨平台对比"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

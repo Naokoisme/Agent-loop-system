@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from agent_loop_system.tools.case_map import CaseEntry
+from agent_loop_system.tools.case_map import CaseEntry, CaseRunResult
 from agent_loop_system.tools.simulator import CommandResult
 from agent_loop_system.tools.test import run_single_case
 
@@ -49,6 +49,7 @@ def test_hardware_single_case_uses_6202_map_and_preserves_external_lease() -> No
         setup=[":LANGUAGE_SET:1", ":ENTER_PAGE:DIAL,0"],
         actions=[":ENTER_PAGE:CALCULATOR,0"],
         collect=[":HOST_SCREENSHOT:1"],
+        mapping_status="PROMOTED",
     )
     session = _FakeHardwareSession()
 
@@ -84,3 +85,47 @@ def test_hardware_single_case_uses_6202_map_and_preserves_external_lease() -> No
     assert ":ENTER_PAGE:CALCULATOR,0" in session.calls
     assert all(not call.startswith(":HOST_SCREENSHOT:") for call in session.calls)
     assert len(result.screenshots) == 1
+
+
+def test_graph_case_mode_uses_the_same_single_case_runner() -> None:
+    from agent_loop_system import graph as graph_module
+
+    with tempfile.TemporaryDirectory() as temporary:
+        evidence_root = Path(temporary)
+        screenshot = evidence_root / "dynamic.bmp"
+        screenshot.write_bytes(b"BM-dynamic")
+        case_result = CaseRunResult(
+            case_id="DEMO_001",
+            sheet="demo",
+            expected_text="显示结果",
+            execution_mode="agent_exploration",
+            precomputed_verdict="PASS",
+            precomputed_reason="截图符合预期",
+            evidence_contract={"complete": True, "issues": []},
+            screenshots=[{"path": str(screenshot), "label": "结果页"}],
+        )
+        with (
+            mock.patch.object(graph_module, "EVIDENCE_ROOT", evidence_root),
+            mock.patch(
+                "agent_loop_system.tools.test.run_single_case",
+                return_value=case_result,
+            ) as single_runner,
+        ):
+            result = graph_module.test({
+                "task_id": "graph-case",
+                "test_cases": [{"sheet": "demo", "case_id": "DEMO_001"}],
+                "agent_test_commands": [],
+                "judge_criteria": "",
+                "target": "simulator",
+            })
+
+        single_runner.assert_called_once_with(
+            "demo",
+            "DEMO_001",
+            str(evidence_root / "graph-case" / "case-001-DEMO_001" / "screenshot.bmp"),
+            target="simulator",
+        )
+        self_result = result["test_output"]["results"][0]
+        assert result["verdict"] == "PASS"
+        assert self_result["execution_mode"] == "agent_exploration"
+        assert (evidence_root / "graph-case" / "after.bmp").read_bytes() == b"BM-dynamic"

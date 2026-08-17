@@ -193,6 +193,15 @@ a { color: inherit; }
   min-width: 440px;
 }
 
+.batch-launch-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.batch-launch-heading strong { font-size: 12px; }
+
 .batch-scope {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -594,6 +603,39 @@ a { color: inherit; }
 .metric strong { display: block; font-size: 25px; line-height: 1.1; letter-spacing: -.7px; }
 .metric span { display: block; margin-top: 8px; color: var(--ink-soft); font-size: 12px; }
 
+.test-metric-groups {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.test-metric-group {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 253, 249, .58);
+}
+
+.test-metric-heading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 2px 12px;
+}
+
+.test-metric-heading strong,
+.test-metric-heading span { display: block; }
+.test-metric-heading strong { font-size: 13px; }
+.test-metric-heading span,
+.test-metric-heading small { color: var(--ink-soft); font-size: 11px; }
+.test-metric-heading span { margin-top: 3px; }
+.test-metric-heading small { white-space: nowrap; }
+
+.test-metric-grid { margin: 0; }
+.maturity-metrics,
+.run-metrics { grid-template-columns: repeat(5, minmax(120px, 1fr)); }
+
 .panel {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -681,7 +723,6 @@ a { color: inherit; }
   min-width: 48px;
   cursor: pointer;
 }
-.test-row-shell.is-unavailable .test-case-selector { cursor: not-allowed; }
 .test-row { grid-template-columns: 112px minmax(260px, 1fr) 145px 90px 110px 24px; }
 .defect-number { color: var(--ink-soft); font-size: 13px; font-weight: 800; letter-spacing: .3px; }
 .defect-copy strong { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 14px; line-height: 1.5; }
@@ -734,6 +775,9 @@ a { color: inherit; }
 .chip-pending { color: var(--ink-soft); background: #eee9e1; }
 .chip-running { color: var(--blue); background: var(--blue-soft); }
 .chip-status { color: #5f584e; background: #eee9e1; }
+.chip-solidified { color: var(--green); border: 1px solid rgba(40, 116, 84, .2); background: var(--green-soft); }
+.chip-unsolidified { color: var(--amber); border: 1px solid rgba(150, 102, 29, .2); background: var(--amber-soft); }
+.chip-unexplored { color: var(--blue); border: 1px solid rgba(65, 103, 132, .18); background: var(--blue-soft); }
 .chip-target { border: 1px solid transparent; }
 .target-simulator { color: var(--blue); border-color: rgba(43, 91, 138, .18); background: var(--blue-soft); }
 .target-hardware { color: var(--green); border-color: rgba(42, 105, 70, .18); background: var(--green-soft); }

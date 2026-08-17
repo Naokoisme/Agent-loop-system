@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用当前控制中心用例中已确认的 Flashlight 图标坐标；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_004",
@@ -48,17 +51,12 @@
       "precondition_text": "1.手表刚进入Flashlight",
       "steps_text": "1.观察手电筒页面",
       "expected_text": "1.页面为白色背景，显示深色手电筒图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_005",
@@ -67,19 +65,12 @@
       "precondition_text": "1.进入Flashlight前系统亮度为最低档",
       "steps_text": "1.进入Flashlight",
       "expected_text": "1.屏幕亮度升至设备最高亮度",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_006",
@@ -88,25 +79,12 @@
       "precondition_text": "1.手表显示Flashlight开启页",
       "steps_text": "1.等待超过系统自动灭屏时间",
       "expected_text": "1.手表保持Flashlight开启页亮屏",
-      "verification_points": [
-        "等待前Flashlight开启页处于亮屏状态",
-        "超过5秒自动灭屏时间后仍保持Flashlight开启页亮屏"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:6002,6000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "设置5秒全局亮屏时长后真实等待6秒；前后截图判断Flashlight页是否保持亮屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "FLASH_007",
@@ -118,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_008",
@@ -131,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_009",
@@ -144,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_010",
@@ -157,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_011",
@@ -167,17 +149,12 @@
       "precondition_text": "1.手表显示Flashlight关闭态",
       "steps_text": "1.观察页面",
       "expected_text": "1.页面保持黑底浅色图标，不返回上一级",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_012",
@@ -189,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_013",
@@ -202,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_014",
@@ -215,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_015",
@@ -225,19 +205,12 @@
       "precondition_text": "1.手表显示Flashlight开启页",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.页面保持开启态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "QDEC_SET 来自当前源码，验证该页面忽略编码器输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_016",
@@ -249,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_017",
@@ -259,19 +233,12 @@
       "precondition_text": "1.手表显示Flashlight开启或关闭态",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表按全局按键规则退出Flashlight",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_018",
@@ -283,12 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "点击控制中心 Flashlight 后亮度升至最高",
-        "右滑退出后系统亮度恢复中间档"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_019",
@@ -300,12 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "退出Flashlight后用普通表盘作为基线，设置5秒亮屏时长并真实等待5.5秒截图检查自动熄屏；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "等待前截图显示已退出Flashlight的普通页面",
-        "达到系统灭屏时间后截图显示屏幕熄灭"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_020",
@@ -317,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_021",
@@ -327,16 +289,12 @@
       "precondition_text": "1.手表处于低电提醒状态",
       "steps_text": "1.进入Flashlight",
       "expected_text": "1.待产品确认：是否允许最高亮度和页面提示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_022",
@@ -345,16 +303,12 @@
       "precondition_text": "1.手表处于省电模式",
       "steps_text": "1.尝试从可见入口进入Flashlight",
       "expected_text": "1.待产品确认：入口是否可达和开启结果",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_023",
@@ -366,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App/外部: 1.从App发起升级；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_024",
@@ -376,17 +331,12 @@
       "precondition_text": "1.手表连接稳定供电且温度可监测",
       "steps_text": "1.保持Flashlight开启1小时",
       "expected_text": "1.页面持续亮起，手表无异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_025",
@@ -398,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "FLASH_026",
@@ -408,17 +359,12 @@
       "precondition_text": "1.手表显示Flashlight开启页\n2.环境光较暗",
       "steps_text": "1.观察屏幕照明和图标",
       "expected_text": "1.白色背景无明显黑块，深色图标可辨认",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

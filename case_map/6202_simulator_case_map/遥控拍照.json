@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要手机 App 在前台打开遥控拍照并提供实时相机画面；APP_CONNECT 只能建立连接状态，不能伪造手机相机流；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "负一屏 Camera 卡片位于可滚动长页面，当前命令无法按卡片业务 ID 稳定定位；需新增按控件文本/业务 ID 点击能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "APP_CONNECT:0 建立未绑定状态后进入 Camera；不再用连接状态冒充未绑定前置；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "APP_CONNECT:0 建立未绑定状态后采集 Camera 未绑定提示；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立未绑定页，再点击当前 402x256 未绑定提示页的 Pair Now 按钮；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_006",
@@ -74,15 +79,12 @@
       "precondition_text": "1.手表已绑定配套App\n2.配套App未打开遥控拍照",
       "steps_text": "1.进入Camera\n2.保持无操作10秒",
       "expected_text": "1.页面显示相机图标和引导文案\n2.手表保持提示页，不自动退出",
-      "verification_points": [
-        "进入Camera后显示相机图标和引导文案",
-        "真实等待10秒后仍保持同一提示页"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用现有连接状态和Camera页面，真实等待10秒；前后截图判断提示页是否自动退出；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "CAMERA_007",
@@ -94,12 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "提示页首屏显示连接 Titan Smart World App 的说明",
-        "滚动后显示完整的 phone's default camera 文案"
-      ],
-      "unable": true,
-      "note": "连接提示文案超过一屏，使用同一通用滑动补齐截图覆盖；截图仍是判决证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "CAMERA_008",
@@ -111,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_009",
@@ -124,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_010",
@@ -137,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要手机相机权限、前台遥控拍照会话和实时画面；PC 模拟器当前没有手机相机流能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_011",
@@ -150,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_012",
@@ -163,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_013",
@@ -176,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置条件要求手机提供实时相机预览；当前 PC 模拟器没有相机流，不能用连接提示页代替；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_014",
@@ -189,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置条件要求手机提供实时相机预览；当前 PC 模拟器没有相机流，不能用连接提示页代替；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_015",
@@ -202,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置条件要求手机提供实时相机预览；当前 PC 模拟器没有相机流，不能用连接提示页代替；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_016",
@@ -215,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "QDEC_SET 可用，但前置实时相机预览必须由手机提供；当前 PC 模拟器没有相机流；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_017",
@@ -228,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置实时预览和进入 Camera 前页面均需真实手机会话路径；直接 ENTER_PAGE 不会建立该返回链；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_018",
@@ -238,19 +247,12 @@
       "precondition_text": "1.手表显示实时预览页",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表按全局按键规则退出Camera",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CAMERA,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_019",
@@ -262,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闪光灯状态属于手机相机会话，当前 PC 模拟器没有相机流和手机闪光灯状态能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_020",
@@ -275,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闪光灯状态属于手机相机会话，当前 PC 模拟器没有相机流和手机闪光灯状态能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_021",
@@ -288,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闪光灯状态属于手机相机会话，当前 PC 模拟器没有相机流和手机闪光灯状态能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_022",
@@ -301,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要真实手机切换前置摄像头并提供前摄画面；APP_CONNECT 不能代替手机相机会话；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_023",
@@ -314,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要真实手机切换后置摄像头并提供后摄画面；APP_CONNECT 不能代替手机相机会话；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_024",
@@ -327,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要真实手机相机与存储产生照片并回传完成态；当前 PC 模拟器无该外部能力；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_025",
@@ -337,16 +345,12 @@
       "precondition_text": "1.手表刚完成一次拍照",
       "steps_text": "1.观察拍照完成态",
       "expected_text": "1.画面定格，控制按钮隐藏，显示Image Captured.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "拍照完成态依赖真实手机相机会话的完成回执；不能用 CAMERA_DONE 伪造人工操作的拍照结果；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_026",
@@ -358,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要真实手机生成照片并回传拍照完成态；当前 PC 模拟器没有手机相机与存储证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_027",
@@ -371,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "一秒等待可执行；当前缺手机相机实时预览流和拍照完成态输入，直达CAMERA页面不能建立该前置；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_028",
@@ -384,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置拍照完成态及手机照片数量都依赖真实手机相机会话，PC 模拟器无法建立或判定；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_029",
@@ -394,16 +401,12 @@
       "precondition_text": "1.手表显示实时预览页",
       "steps_text": "1.执行垂腕动作",
       "expected_text": "1.手表保持实时预览页亮屏",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "垂腕事件可模拟，但前置实时相机预览必须由手机提供；当前 PC 模拟器没有相机流；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_030",
@@ -412,16 +415,12 @@
       "precondition_text": "1.手表显示实时预览页",
       "steps_text": "1.执行覆盖熄屏",
       "expected_text": "1.待产品确认：是否退出拍照和再次亮屏页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_031",
@@ -433,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_032",
@@ -446,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_033",
@@ -456,16 +457,12 @@
       "precondition_text": "1.手表正在显示实时预览",
       "steps_text": "1.断开设备数据连接",
       "expected_text": "1.手表停止显示实时取景，退出遥控拍照功能",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "断连事件可模拟，但必须先由真实手机建立实时取景；连接提示页不能代替该前置状态；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_034",
@@ -477,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_035",
@@ -490,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_036",
@@ -503,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_037",
@@ -516,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_038",
@@ -529,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_039",
@@ -542,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CAMERA_040",
@@ -555,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "明确要求 Android 与 iOS 两台真实手机提供预览、切摄、闪光灯和拍照证据，PC 模拟器无法覆盖；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

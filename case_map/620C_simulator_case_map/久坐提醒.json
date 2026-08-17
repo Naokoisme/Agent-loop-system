@@ -8,12 +8,10 @@
     "expected_text": "1.App显示久坐提醒开关与时间配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_002",
@@ -24,12 +22,10 @@
     "expected_text": "1.手表开始久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_003",
@@ -40,12 +36,10 @@
     "expected_text": "1.手表停止久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_004",
@@ -56,12 +50,10 @@
     "expected_text": "1.手表继续使用断连前久坐提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_005",
@@ -72,12 +64,10 @@
     "expected_text": "1.手表采用App最新久坐提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_006",
@@ -88,12 +78,10 @@
     "expected_text": "1.手表继续使用重启前久坐提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_007",
@@ -104,12 +92,10 @@
     "expected_text": "1.手表只保留一个久坐提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_008",
@@ -120,12 +106,10 @@
     "expected_text": "1.待产品确认：久坐提醒默认开关状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_009",
@@ -136,12 +120,10 @@
     "expected_text": "1.手表显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_010",
@@ -152,12 +134,10 @@
     "expected_text": "1.间隔显示1小时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_011",
@@ -168,12 +148,10 @@
     "expected_text": "1.手表从09:17开始本轮计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_012",
@@ -184,12 +162,10 @@
     "expected_text": "1.设备日志记录当前时刻为计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_013",
@@ -200,12 +176,10 @@
     "expected_text": "1.待产品确认：重启后久坐提醒计时继续或重置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖佩戴/传感器采样; 需恢复出厂/重启/OTA 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_014",
@@ -216,12 +190,10 @@
     "expected_text": "1.手表不立即重复显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_015",
@@ -232,12 +204,10 @@
     "expected_text": "1.设备日志记录一次步数增量判断",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_016",
@@ -248,12 +218,10 @@
     "expected_text": "1.设备以本次步数窗口结束时刻重置计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需步数传感器持续注入; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_017",
@@ -264,12 +232,10 @@
     "expected_text": "1.设备继续当前久坐计时周期",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需步数传感器持续注入; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_018",
@@ -280,12 +246,10 @@
     "expected_text": "1.待产品确认：20步是否重置久坐计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需步数传感器持续注入; 需长时等待/时序; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_019",
@@ -296,12 +260,10 @@
     "expected_text": "1.待产品确认：180min是时段长度或间隔上限",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_020",
@@ -312,12 +274,10 @@
     "expected_text": "1.待产品确认：未佩戴时久坐计时器的状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_021",
@@ -328,12 +288,10 @@
     "expected_text": "1.开始时间显示09:00",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_022",
@@ -344,12 +302,10 @@
     "expected_text": "1.手表开始久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_023",
@@ -360,12 +316,10 @@
     "expected_text": "1.手表不显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_024",
@@ -376,12 +330,10 @@
     "expected_text": "1.手表按新的开始时间重建久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_025",
@@ -392,12 +344,10 @@
     "expected_text": "1.待产品确认：久坐提醒是否支持跨日监测时段",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_026",
@@ -408,12 +358,10 @@
     "expected_text": "1.手表不显示久坐提醒",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_027",
@@ -424,12 +372,10 @@
     "expected_text": "1.设备从14:00建立新的久坐计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_028",
@@ -440,12 +386,10 @@
     "expected_text": "1.App固定显示12:00–14:00，修改控件不显示",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_029",
@@ -456,12 +400,10 @@
     "expected_text": "1.设备以运动结束时刻建立新的久坐计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_030",
@@ -472,12 +414,10 @@
     "expected_text": "1.设备以醒来时刻建立新的久坐提醒计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_031",
@@ -488,12 +428,10 @@
     "expected_text": "1.手表显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_032",
@@ -504,12 +442,10 @@
     "expected_text": "1.页面显示久坐提醒图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_033",
@@ -520,12 +456,10 @@
     "expected_text": "1.页面显示Time to move!",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_034",
@@ -536,12 +470,10 @@
     "expected_text": "1.久坐提醒弹窗自动关闭",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_035",
@@ -552,12 +484,10 @@
     "expected_text": "1.手表按250毫秒振动两次",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需振动采集仪; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_036",
@@ -568,12 +498,10 @@
     "expected_text": "1.波形显示两次短振各持续250毫秒，两次短振之间的间隔为750毫秒",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需振动采集仪"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_037",
@@ -584,12 +512,10 @@
     "expected_text": "1.久坐提醒弹窗关闭",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "提醒弹窗本身不可触发(依赖 App 下发+等待)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_038",
@@ -598,24 +524,12 @@
     "precondition_text": "1.手表显示久坐提醒弹窗",
     "steps_text": "1.单击实体按键",
     "expected_text": "1.久坐提醒弹窗关闭",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:22;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:3801,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3801;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用MSG_TEST:22发送真实久坐提醒业务事件，实体主键短按前后截图验证关闭",
-    "verification_points": [
-      "按键前截图显示久坐提醒弹窗",
-      "单击实体按键后，截图显示久坐提醒弹窗已关闭"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_039",
@@ -626,12 +540,10 @@
     "expected_text": "1.页面保持久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_040",
@@ -642,12 +554,10 @@
     "expected_text": "1.页面保持久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_041",
@@ -658,12 +568,10 @@
     "expected_text": "1.页面保持久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_042",
@@ -672,24 +580,12 @@
     "precondition_text": "1.手表显示久坐提醒弹窗",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.页面保持久坐提醒弹窗",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:22;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:4201,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4201;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用MSG_TEST:22发送真实久坐提醒业务事件，编码器旋转前后截图验证弹窗保持",
-    "verification_points": [
-      "旋转编码器前截图显示久坐提醒弹窗",
-      "旋转编码器后截图仍显示久坐提醒弹窗且页面不变"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_043",
@@ -700,12 +596,10 @@
     "expected_text": "1.设备以弹窗关闭时刻建立下一轮久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 提醒弹窗本身不可触发(依赖 App 下发+等待)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_044",
@@ -716,12 +610,10 @@
     "expected_text": "1.设备以自动关闭时刻建立下一轮久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_045",
@@ -732,12 +624,10 @@
     "expected_text": "1.设备不建立下一轮久坐提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_046",
@@ -748,12 +638,10 @@
     "expected_text": "1.手表继续使用原久坐提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_047",
@@ -764,12 +652,10 @@
     "expected_text": "1.设备建立新一天久坐提醒计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_048",
@@ -780,12 +666,10 @@
     "expected_text": "1.待产品确认：勿扰下久坐提醒弹窗与振动结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需振动采集仪; 需长时等待/时序; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_049",
@@ -796,12 +680,10 @@
     "expected_text": "1.设备仍保留久坐提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_050",
@@ -812,12 +694,10 @@
     "expected_text": "1.设备仍保留久坐提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_051",
@@ -828,12 +708,10 @@
     "expected_text": "1.手表继续使用升级前久坐提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_052",
@@ -844,12 +722,10 @@
     "expected_text": "1.手表不显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_053",
@@ -860,12 +736,10 @@
     "expected_text": "1.手表不显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_054",
@@ -876,12 +750,10 @@
     "expected_text": "1.消息弹窗保持在前台\n2.消息关闭后显示久坐提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_055",
@@ -892,12 +764,10 @@
     "expected_text": "1.App显示升级确认\n2.手表切换为Firmware Update进度页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_056",
@@ -908,12 +778,10 @@
     "expected_text": "1.手表未出现死机或异常重启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_057",
@@ -924,12 +792,10 @@
     "expected_text": "1.两平台配置均可同步到手表",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "SED_058",
@@ -940,11 +806,9 @@
     "expected_text": "1.图标与文案无重叠或裁切",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

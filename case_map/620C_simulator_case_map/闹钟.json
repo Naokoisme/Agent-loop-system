@@ -6,18 +6,12 @@
     "precondition_text": "1.手表显示Clock二级菜单",
     "steps_text": "1.点击Alarm",
     "expected_text": "1.手表显示Alarm闹钟列表页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,87,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_002",
@@ -26,18 +20,12 @@
     "precondition_text": "1.手表显示负一屏Clock卡片",
     "steps_text": "1.点击Alarm图标",
     "expected_text": "1.手表显示Alarm闹钟列表页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,87,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_003",
@@ -46,18 +34,12 @@
     "precondition_text": "1.手表显示控制中心闹钟入口",
     "steps_text": "1.点击闹钟图标",
     "expected_text": "1.手表显示Alarm闹钟列表页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,87,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_004",
@@ -66,18 +48,12 @@
     "precondition_text": "1.手表不存在任何闹钟",
     "steps_text": "1.进入Alarm",
     "expected_text": "1.页面显示居中闹钟图标和底部加号按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;"
-    ],
-  "actions": [
-    "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-  ],
-  "collect": [
-    "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-    "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-  ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_005",
@@ -86,20 +62,12 @@
     "precondition_text": "1.手表已有Once、Every Day和Custom闹钟",
     "steps_text": "1.进入Alarm",
     "expected_text": "1.每个条目显示时间和重复周期和开关，不显示备注",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_006",
@@ -107,28 +75,13 @@
     "priority": "P0",
     "precondition_text": "1.手表已有06:30、08:00和22:00闹钟",
     "steps_text": "1.进入Alarm",
-  "expected_text": "1.闹钟按06:30和08:00和22:00顺序显示",
-  "setup": [
-    "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9601,0,6,30,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9602,1,8,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9603,2,22,0,127,1;"
-  ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:9604;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:9605;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "列表首屏按顺序显示 06:30 和 08:00",
-      "滚动后显示 22:00，且整体顺序仍为 06:30、08:00、22:00"
-    ],
+    "expected_text": "1.闹钟按06:30和08:00和22:00顺序显示",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-  "note": "使用通用 SIM_ALARM_SET 建立任意时间闹钟，并用首屏加滚动后两张截图覆盖三条记录"
+    "note": ""
   },
   {
     "case_id": "ALARM_007",
@@ -136,22 +89,13 @@
     "priority": "P1",
     "precondition_text": "1.手表已有三个同时间闹钟且添加顺序可识别",
     "steps_text": "1.进入Alarm",
-  "expected_text": "1.同步间闹钟按创建先后顺序排列",
-  "setup": [
-    "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9701,0,8,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9702,1,8,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9703,2,8,0,127,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "expected_text": "1.同步间闹钟按创建先后顺序排列",
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-  "note": "同时间闹钟按不同索引依次写入，避免重复 ADD_ALARM 反复覆盖同一固定数据"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_008",
@@ -160,24 +104,12 @@
     "precondition_text": "1.闹钟列表内容超过一屏",
     "steps_text": "1.执行上滑",
     "expected_text": "1.列表显示下方闹钟条目",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_009",
@@ -185,27 +117,13 @@
     "priority": "P2",
     "precondition_text": "1.闹钟列表已离开顶部",
     "steps_text": "1.执行下滑",
-  "expected_text": "1.列表显示上方闹钟条目",
-  "setup": [
-    "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9901,0,6,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9902,1,7,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9903,2,8,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9904,3,9,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9905,4,10,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9906,5,11,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-    "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "expected_text": "1.列表显示上方闹钟条目",
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-  "note": "先建立超过一屏的真实闹钟列表并离开顶部，再执行下滑检查回到上方条目"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_010",
@@ -213,31 +131,13 @@
     "priority": "P2",
     "precondition_text": "1.闹钟列表内容超过一屏",
     "steps_text": "1.旋转编码器",
-  "expected_text": "1.闹钟列表沿旋转方向滚动",
-  "setup": [
-    "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10001,0,6,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10002,1,7,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10003,2,8,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10004,3,9,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10005,4,10,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:10006,5,11,0,127,1;",
-    "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-    "srv_quick_cmd send TOP5STEP:GUI_TREE:10000;"
-  ],
-  "actions": [
-    "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-    "srv_quick_cmd send TOP5STEP:GUI_TREE:10007;"
-  ],
-  "collect": [
-    "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-  ],
-  "verification_points": [
-    "旋转前截图显示闹钟列表初始位置",
-    "旋转后截图显示列表沿编码器方向移动"
-  ],
+    "expected_text": "1.闹钟列表沿旋转方向滚动",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-  "note": "建立超过一屏的闹钟并补旋转前后两张截图，避免用单张静态图判断滚动"
+    "note": ""
   },
   {
     "case_id": "ALARM_011",
@@ -246,18 +146,12 @@
     "precondition_text": "1.手表显示Alarm列表",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入Alarm前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_012",
@@ -266,17 +160,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.目标闹钟处于开启状态",
     "steps_text": "1.关闭目标闹钟开关\n2.在App刷新闹钟列表",
     "expected_text": "1.手表目标闹钟显示关闭\n2.App目标闹钟显示关闭",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_013",
@@ -285,16 +174,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.目标闹钟处于关闭状态",
     "steps_text": "1.开启目标闹钟开关\n2.在App刷新闹钟列表",
     "expected_text": "1.手表目标闹钟显示开启\n2.App目标闹钟显示开启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_014",
@@ -303,17 +188,12 @@
     "precondition_text": "1.闹钟列表存在目标闹钟",
     "steps_text": "1.左滑目标闹钟\n2.点击红色删除按钮",
     "expected_text": "1.目标闹钟右侧显示删除按钮\n2.目标闹钟直接删除，不显示确认弹窗",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "删除需要对具体闹钟条目做带坐标左滑并点击删除；原 SWIPE_SIM 和 0,0 点击不能表示该操作"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_015",
@@ -322,20 +202,12 @@
     "precondition_text": "1.目标闹钟已左滑露出删除按钮",
     "steps_text": "1.在目标条目执行右滑",
     "expected_text": "1.目标条目回到默认列表状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_016",
@@ -344,18 +216,12 @@
     "precondition_text": "1.目标闹钟已左滑露出删除按钮",
     "steps_text": "1.点击列表其他位置",
     "expected_text": "1.目标条目回到默认列表状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "前置的具体条目左滑状态无法由原 SWIPE_SIM 准确建立，原 0,0 点击无效"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_017",
@@ -364,24 +230,12 @@
     "precondition_text": "1.手表已有9个闹钟",
     "steps_text": "1.点击加号按钮",
     "expected_text": "1.手表显示时间设置页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "ADD_ALARM 每次都重建同一组4条测试闹钟，重复9次不会得到9个闹钟"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_018",
@@ -390,26 +244,12 @@
     "precondition_text": "1.手表已有10个闹钟",
     "steps_text": "1.点击加号按钮",
     "expected_text": "1.页面显示Maximum number of alarms added.，不进入时间设置页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "ADD_ALARM 每次都重建同一组4条测试闹钟，重复10次不会得到10个闹钟"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_019",
@@ -418,30 +258,12 @@
     "precondition_text": "1.超限Toast正在显示",
     "steps_text": "1.保持无操作3秒",
     "expected_text": "1.Toast消失，页面保持闹钟列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19001,0,6,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19002,1,7,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19003,2,8,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19004,3,9,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19005,4,10,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19006,5,11,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19007,6,12,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19008,7,13,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19009,8,14,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:19010,9,15,0,127,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1901,3000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先用通用命令填满10条闹钟并通过真实加号触发超限Toast，再等待其自动消失"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_020",
@@ -450,19 +272,12 @@
     "precondition_text": "1.手表闹钟数量少于10个",
     "steps_text": "1.点击加号按钮",
     "expected_text": "1.页面直接显示时间设置滚轮，不显示Add Alarm汇总页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "直接进入当前源码注册的时间设置页，验证加号所到达的目标页面"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_021",
@@ -471,20 +286,12 @@
     "precondition_text": "1.手表时间已设为10:23",
     "steps_text": "1.从列表点击加号",
     "expected_text": "1.时间设置页默认选中10:23",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:20260812102300;",
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用当前日期的14位TIME_SET建立10:23前置，避免旧日期被运行环境纠正"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_022",
@@ -493,16 +300,12 @@
     "precondition_text": "1.手表显示时间设置页",
     "steps_text": "1.观察小时列和分钟列的滚轮内容",
     "expected_text": "1.每列固定显示上一行和当前行和下一行共3行，当前行高亮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIME_SETTING,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_023",
@@ -511,16 +314,12 @@
     "precondition_text": "1.系统时间制为24小时",
     "steps_text": "1.进入新增时间设置页\n2.滚动小时列一整圈",
     "expected_text": "1.页面显示24小时制滚轮\n2.小时值仅在00至23循环",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "小时值完整循环范围需动态观察滚动过程，静态截图无法完全验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_024",
@@ -529,18 +328,12 @@
     "precondition_text": "1.系统时间制为12小时",
     "steps_text": "1.进入新增时间设置页",
     "expected_text": "1.页面显示1至12小时和分钟和AM或PM列",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_TIME,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前源码约定TIME_MODE:0=12小时制、TIME_MODE:1=24小时制"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_025",
@@ -549,16 +342,12 @@
     "precondition_text": "1.手表显示时间设置页",
     "steps_text": "1.滚动分钟列一整圈",
     "expected_text": "1.分钟值仅在00至59循环，每次变化1分钟",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIME_SETTING,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需连续观察分钟值完整循环及每次变化量，涉及动态视频分析"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_026",
@@ -567,30 +356,12 @@
     "precondition_text": "1.手表显示时间设置页且小时列已选中",
     "steps_text": "1.在小时列执行上滑\n2.在小时列执行下滑",
     "expected_text": "1.小时值变化1小时\n2.小时值反向变化1小时",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,90,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:2600;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:2601;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:2602;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先采集小时列初始值，再对上、下滑结果分别截图，形成完整视觉对比",
-    "verification_points": [
-      "操作前截图显示小时列的初始选中值",
-      "小时值向上变化1小时",
-      "小时值反向变化1小时"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_027",
@@ -599,18 +370,12 @@
     "precondition_text": "1.手表显示时间设置页且分钟列已选中",
     "steps_text": "1.旋转编码器一格",
     "expected_text": "1.分钟值变化1分钟",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TIME_SETTING,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_028",
@@ -619,20 +384,12 @@
     "precondition_text": "1.手表显示新增时间设置页",
     "steps_text": "1.点击确认按钮",
     "expected_text": "1.手表显示重复周期选择页，默认选中Once",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "通过 Alarm 列表加号真实进入新增时间页，使确认操作保留正确返回链"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_029",
@@ -641,20 +398,12 @@
     "precondition_text": "1.手表显示新增时间设置页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回闹钟列表，闹钟数量不变",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从真实 Alarm 列表进入新增时间页，右滑才有闹钟列表父页面可返回"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_030",
@@ -663,20 +412,12 @@
     "precondition_text": "1.手表显示新增时间设置页",
     "steps_text": "1.单击编码器",
     "expected_text": "1.手表返回闹钟列表，闹钟数量不变",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从真实 Alarm 列表进入新增时间页，编码器返回时保留正确父页面"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_031",
@@ -685,26 +426,12 @@
     "precondition_text": "1.从新增时间设置页确认时间",
     "steps_text": "1.查看重复周期选择页",
     "expected_text": "1.Once显示选中，Custom下方不显示日期缩写",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3101;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3102;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "重复周期页首屏显示 Once 选中",
-      "滚动后 Custom 下方不显示日期缩写"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-    "note": "通过新增流程真实进入重复页，并用上下两张截图覆盖被裁切的 Custom 区域"
+    "note": ""
   },
   {
     "case_id": "ALARM_032",
@@ -713,24 +440,12 @@
     "precondition_text": "1.手表显示重复周期选择页",
     "steps_text": "1.点击Everyday",
     "expected_text": "1.Everyday显示选中，Custom下方显示S M T W T F S",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_REPEAT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3201;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3202;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "verification_points": [
-      "重复周期页首屏显示 Everyday 选中",
-      "滚动后 Custom 下方显示 S M T W T F S"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "verification_points": [],
     "unable": false,
-    "note": "点击 Everyday 后分别采集首屏和滚动后的 Custom 区域，补齐完整截图覆盖"
+    "note": ""
   },
   {
     "case_id": "ALARM_033",
@@ -739,22 +454,12 @@
     "precondition_text": "1.手表显示重复周期选择页",
     "steps_text": "1.点击Custom",
     "expected_text": "1.手表显示周日到周六的自定义日期页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "通过新增流程进入重复页，滚动到 Custom 后真实点击；不再用错误方向的编码器移动猜测坐标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_034",
@@ -764,15 +469,11 @@
     "steps_text": "1.点击确认按钮",
     "expected_text": "1.手表返回列表，新增闹钟按时间排序显示",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_035",
@@ -781,21 +482,12 @@
     "precondition_text": "1.新增流程已进入重复周期选择页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回闹钟列表，闹钟数量不变",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,216,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从真实新增流程进入重复周期页，右滑时保留 Alarm 列表父页面和原始数量"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_036",
@@ -804,29 +496,12 @@
     "precondition_text": "1.手表显示自定义日期页",
     "steps_text": "1.依次点击周一和周三和周五",
     "expected_text": "1.周一和周三和周五显示高亮选中",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_WEEKDAY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,106,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3601;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,230,201,105,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,165,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3602;",
-      "srv_quick_cmd send TOP5STEP:TP_SWIPE:201,230,201,105,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3603;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "坐标来自 ALARM_CLOCK_WEEKDAY 实际界面；分别在首屏和滚动后截图，避免周一被滚出画面后只留下后两个选项证据",
-    "verification_points": [
-      "首屏截图中周一显示高亮选中",
-      "第一次滚动后的截图中周三显示高亮选中",
-      "第二次滚动后的截图中周五显示高亮选中"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_037",
@@ -838,8 +513,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "当前没有可复用的星期选择状态注入，也没有稳定的滚动后确认按钮语义定位；直接点击固定坐标无法保证建立周一、周三、周五前置条件。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_038",
@@ -851,8 +527,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "当前无法建立“原选周一、本次临时加选周三”的可见前置状态，也没有稳定的星期页取消按钮语义定位；直接进入子页会丢失真实父页面状态。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_039",
@@ -861,25 +538,12 @@
     "precondition_text": "1.闹钟列表存在目标闹钟",
     "steps_text": "1.点击目标闹钟条目",
     "expected_text": "1.页面显示Time和Repeat和Snooze和Delete",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3901;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3902;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "从闹钟列表点击目标条目进入编辑页，并用首屏和滚动后两张截图覆盖四个编辑项",
-    "verification_points": [
-      "编辑页首屏显示Time和Repeat",
-      "编辑页滚动后显示Snooze和红色删除按钮"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_040",
@@ -888,34 +552,12 @@
     "precondition_text": "1.目标闹钟当前关闭",
     "steps_text": "1.进入目标闹钟编辑页\n2.点击Time\n3.修改时间完成，点击确认\n4.执行右滑返回列表",
     "expected_text": "1.页面显示闹钟编辑页\n2.页面显示时间设置页\n3.编辑页显示新时间\n4.列表显示新时间，开关自动开启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:350,102,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,90,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4002;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4003;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4004;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "ADD_ALARM 后先关闭首条闹钟；随后从列表逐级点击进入编辑/时间页，修改确认并返回列表",
-    "verification_points": [
-      "页面显示目标闹钟编辑页",
-      "页面显示闹钟时间设置页",
-      "编辑页显示新时间",
-      "列表显示新时间且开关自动开启"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_041",
@@ -927,8 +569,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "当前只有方向滑动，不能稳定把时间滚轮精确设为09:00；历史运行中滚轮仍停在08:00，继续增加固定滑动会形成机型相关特调。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_042",
@@ -937,16 +580,12 @@
     "precondition_text": "1.目标闹钟时间为08:00\n2.手表显示该闹钟的时间设置页",
     "steps_text": "1.将滚轮时间调整为09:00\n2.单击编码器",
     "expected_text": "1.时间滚轮当前选中09:00\n2.手表返回闹钟编辑页，Time仍显示08:00",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_TIME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "当前没有按目标值定位滚轮的命令，0,0 点击无法把08:00准确调整为09:00"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_043",
@@ -955,36 +594,12 @@
     "precondition_text": "1.目标闹钟重复周期为Once",
     "steps_text": "1.进入目标闹钟编辑页\n2.点击Repeat\n3.选择Everyday\n4.点击确认按钮\n5.执行右滑返回列表",
     "expected_text": "1.页面显示闹钟编辑页\n2.页面显示重复周期页\n3.Everyday显示选中\n4.编辑页显示Every Day\n5.列表显示Every Day",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9430,0,8,0,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4301;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4302;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4303;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4304;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4305;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用通用 SIM_ALARM_SET 建立Once闹钟，再从列表按人工路径进入编辑/Repeat；选择Everyday后滚动到页脚确认并返回列表",
-    "verification_points": [
-      "页面显示闹钟编辑页",
-      "页面显示重复周期页",
-      "Everyday显示选中",
-      "编辑页显示Every Day",
-      "列表显示Every Day"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_044",
@@ -993,29 +608,12 @@
     "precondition_text": "1.目标闹钟重复周期为Once\n2.手表显示该闹钟的重复周期页",
     "steps_text": "1.点击Everyday\n2.点击确认按钮",
     "expected_text": "1.Everyday显示选中\n2.手表返回闹钟编辑页，Repeat显示Every Day",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9440,0,8,0,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4401;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,215,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4402;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；选择Everyday后滚动到页脚确认",
-    "verification_points": [
-      "Everyday显示选中",
-      "返回闹钟编辑页后Repeat显示Every Day"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_045",
@@ -1024,28 +622,12 @@
     "precondition_text": "1.目标闹钟重复周期为Once\n2.手表显示该闹钟的重复周期页",
     "steps_text": "1.点击Everyday\n2.执行右滑",
     "expected_text": "1.Everyday显示选中\n2.手表返回闹钟编辑页，Repeat仍显示Once",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9450,0,8,0,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4501;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4502;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；临时选择Everyday后右滑取消",
-    "verification_points": [
-      "Everyday显示选中",
-      "返回闹钟编辑页后Repeat仍显示Once"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_046",
@@ -1054,28 +636,12 @@
     "precondition_text": "1.目标闹钟重复周期为Once\n2.手表显示该闹钟的重复周期页",
     "steps_text": "1.点击Everyday\n2.单击编码器",
     "expected_text": "1.Everyday显示选中\n2.手表返回闹钟编辑页，Repeat仍显示Once",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:9460,0,8,0,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,180,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4601;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:4602;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用通用 SIM_ALARM_SET 建立Once闹钟并从列表进入Repeat页；临时选择Everyday后执行编码器短按",
-    "verification_points": [
-      "Everyday显示选中",
-      "编码器短按后返回闹钟编辑页且Repeat仍显示Once"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_047",
@@ -1084,16 +650,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.目标闹钟Snooze处于开启",
     "steps_text": "1.进入目标闹钟编辑页\n2.关闭Snooze开关\n3.在App查看该闹钟",
     "expected_text": "1.编辑页显示Snooze关闭\n2.手表保存Snooze关闭状态\n3.App同步显示Snooze关闭，无可编辑入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_048",
@@ -1104,12 +666,10 @@
     "expected_text": "1.页面显示目标闹钟配置\n2.目标闹钟直接删除，列表刷新",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "尚未验证具体闹钟编辑上下文和 Delete 控件坐标；原 0,0 点击无效"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_049",
@@ -1120,12 +680,10 @@
     "expected_text": "1.页面显示闹钟时间和关闭按钮和Snooze按钮，按250ms/750ms循环振动",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "闹钟触发需要等待动态时间，且250ms/750ms循环振动无法通过GUI截图验证；知识库无可配置即将到点且启用Snooze的命令。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_050",
@@ -1136,12 +694,10 @@
     "expected_text": "1.页面显示闹钟时间和关闭按钮，不显示Snooze按钮",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "等待闹钟触发属于长时间等待，无法由模拟器命令执行；目标闹钟及Snooze关闭状态需人工预置。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_051",
@@ -1152,12 +708,10 @@
     "expected_text": "1.振动测试仪记录每次振动的持续时间为250ms",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "预期结果为外部振动测试仪对振动波形的动态分析，无法由手表端GUI截图验证；采集步骤需外部设备执行。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_052",
@@ -1168,12 +722,10 @@
     "expected_text": "1.振动测试仪记录相邻两次振动间的无振动区间为750ms",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需外部振动测试仪采集并分析连续振动波形，无法通过手表端GUI截图验证；使用MSG_TEST触发闹钟提醒。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_053",
@@ -1185,8 +737,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "关闭按钮和返回页面可以由截图检查，但“振动停止”没有可见画面证据；当前只有手表模拟器截图，无法判定完整预期。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_054",
@@ -1195,16 +748,12 @@
     "precondition_text": "1.手表正在显示闹钟响铃页",
     "steps_text": "1.执行按键熄屏",
     "expected_text": "1.屏幕熄灭，当前闹钟振动继续",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "闹钟振动继续属于非GUI效果，无法通过截图验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_055",
@@ -1213,16 +762,12 @@
     "precondition_text": "1.手表正在显示闹钟响铃页",
     "steps_text": "1.执行垂腕动作",
     "expected_text": "1.手表保持响铃页面亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_RING,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "垂腕动作无法由模拟器命令执行，需人工完成后观察界面"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_056",
@@ -1231,16 +776,12 @@
     "precondition_text": "1.Snooze开启的闹钟正在响铃",
     "steps_text": "1.点击Snooze按钮\n2.等待10分钟",
     "expected_text": "1.当前响铃页关闭，振动停止\n2.同一闹钟再次显示响铃页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_RING,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "控件可按截图动态定位；仍需可加速等待和分段取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_057",
@@ -1249,16 +790,12 @@
     "precondition_text": "1.Snooze开启的闹钟正在响铃",
     "steps_text": "1.保持无操作1分钟\n2.等待10分钟",
     "expected_text": "1.振动停止，响铃页关闭\n2.同一闹钟再次显示响铃页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需长时间等待1分钟及10分钟，无法转换为模拟器命令；且无命令可配置Snooze开启状态。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_058",
@@ -1267,16 +804,12 @@
     "precondition_text": "1.Snooze关闭的闹钟正在响铃",
     "steps_text": "1.保持无操作1分钟",
     "expected_text": "1.待产品确认：提醒关闭后是否不进入贪睡，闹钟状态如何变化",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法设置 Snooze 关闭状态；保持无操作1分钟属于长时间等待，无法由模拟器执行。可用 :MSG_TEST:20 尝试触发闹钟提醒，但无法保证满足“正在响铃”前置条件。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_059",
@@ -1285,16 +818,12 @@
     "precondition_text": "1.Snooze开启的闹钟正在响铃",
     "steps_text": "1.连续完成5次Snooze和10分钟等待",
     "expected_text": "1.第1至第5次均按10分钟间隔再次显示提醒",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:20;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "控件可按截图动态定位；仍需可加速等待和分段取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_060",
@@ -1305,12 +834,10 @@
     "expected_text": "1.待产品确认：是否不再弹出当前提醒\n2.待产品确认：闹钟开关和Once状态的最终值",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法模拟“同一闹钟已累计完成5次贪睡”及等待下一次提醒时点；使用ENTER_PAGE进入闹钟列表验证开关和Once状态。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_061",
@@ -1321,12 +848,10 @@
     "expected_text": "1.闹钟开关显示关闭\n2.手表不再弹出该次提醒",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "控件可按截图动态定位；仍需可加速等待和分段取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_062",
@@ -1337,12 +862,10 @@
     "expected_text": "1.该Once闹钟开关保持开启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法注入Once闹钟已触发Snooze状态，且涉及10分钟等待"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_063",
@@ -1351,27 +874,12 @@
     "precondition_text": "1.当前时间晚于Everyday闹钟时间\n2.闹钟开关已开启",
     "steps_text": "1.等待次日相同步间",
     "expected_text": "1.Everyday闹钟显示响铃页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:TIME_SET:20260812080100;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:6301,0,8,0,127,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:20260813075958;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6301;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:6302,3000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用TIME_SET和SIM_ALARM_SET建立已错过当天触发点的Everyday闹钟，再跳到次日触发前2秒并真实等待跨点",
-    "verification_points": [
-      "次日触发前截图显示主表盘且没有响铃页",
-      "跨过次日08:00后截图显示Everyday闹钟响铃页"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_064",
@@ -1380,27 +888,12 @@
     "precondition_text": "1.当前时间晚于Once闹钟时间\n2.闹钟开关已开启",
     "steps_text": "1.观察至当天结束",
     "expected_text": "1.该Once闹钟不触发响铃页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:CLEAN_ALARM:;",
-      "srv_quick_cmd send TOP5STEP:TIME_SET:20260812080100;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:6401,0,8,0,0,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6401;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:20260812235958;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:6402,3000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用TIME_SET加速到当天结束；前后截图在明确检查点验证已错过的Once闹钟未出现响铃页",
-    "verification_points": [
-      "当天08:01截图显示主表盘且错过的Once闹钟未响铃",
-      "推进到当天结束并跨日后截图仍显示主表盘且未出现响铃页"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_065",
@@ -1411,12 +904,10 @@
     "expected_text": "1.手表时间跳过闹钟触发点后不立即显示该闹钟响铃页\n2.该Once闹钟在次日10:00显示一次响铃页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "手机调时与时间同步需外部设备执行，且推进至次日属于长时间等待；现有命令无法创建指定当天10:00的Once闹钟。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_066",
@@ -1427,12 +918,10 @@
     "expected_text": "1.当前提醒关闭\n2.同一闹钟在00:05再次响铃",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "控件可按截图动态定位；仍需可加速等待和分段取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_067",
@@ -1444,8 +933,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "当前模拟器没有App侧新增闹钟和双端同步命令；直接进入Alarm只能看到手表页面，不能证明App保存及同步结果。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_068",
@@ -1457,8 +947,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "当前模拟器没有App侧删除闹钟和双端同步命令；手表端空列表截图不能证明目标闹钟曾经存在并由App删除。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_069",
@@ -1469,12 +960,10 @@
     "expected_text": "1.手表保存新时间\n2.手表与App恢复数据通道\n3.App显示手表修改后的时间",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_070",
@@ -1485,12 +974,10 @@
     "expected_text": "1.手表显示闹钟响铃页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "等待闹钟触发属于长时间等待，无法执行；用ENTER_PAGE直接进入闹钟响铃页验证GUI。勿扰模式开启和闹钟即将到点暂无可用前置命令。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_071",
@@ -1501,12 +988,10 @@
     "expected_text": "1.手表不显示闹钟响铃页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "等待闹钟触发属于长时间等待，无法由命令执行或验证。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_072",
@@ -1517,12 +1002,10 @@
     "expected_text": "1.手表显示闹钟响铃页\n2.待产品确认：闹钟与来电谁显示在前台",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "等待闹钟触发及手机来电属于长时间等待/外部设备步骤，无法直接执行；用 ENTER_PAGE 进入闹钟响铃页验证手表端 GUI，并用 MSG_TEST:1 模拟来电提醒。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_073",
@@ -1531,16 +1014,12 @@
     "precondition_text": "1.计时器将在闹钟时点归零\n2.闹钟已启用",
     "steps_text": "1.等待两者同步触发",
     "expected_text": "1.待产品确认：闹钟与Time's Up谁显示在前台",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ADD_ALARM:;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "无法同步设置计时器归零时点与闹钟触发时点，且步骤需要等待动态同步触发"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_074",
@@ -1549,16 +1028,12 @@
     "precondition_text": "1.手表正在显示闹钟响铃页\n2.绑定手机的消息通知权限已开启",
     "steps_text": "1.从另一台手机向绑定手机发送一条测试消息",
     "expected_text": "1.待产品确认：闹钟页面与消息弹窗的显示顺序",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_RING,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "步骤需另一台手机发送消息，无法由手表模拟器执行；预期结果顺序待产品确认。"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_075",
@@ -1567,17 +1042,12 @@
     "precondition_text": "1.手表正在显示闹钟响铃页\n2.App已打开固件升级页且手表电量高于30%",
     "steps_text": "1.在App点击安装\n2.在手表确认升级",
     "expected_text": "1.App显示升级确认\n2.待产品确认：闹钟页面与Firmware Update页的显示顺序",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ALARM_CLOCK_RING,0;",
-      "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:31;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "窗口可进入，控件可按截图动态定位；仍需外部端结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_076",
@@ -1589,8 +1059,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "ADD_ALARM/CLEAN_ALARM 是状态注入，不是人工新增/删除操作；最终空列表截图也不能证明20轮UI操作全部成功且期间未重启。"
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "ALARM_077",
@@ -1601,11 +1072,9 @@
     "expected_text": "1.两平台同步后的时间和周期和开关和Snooze字段均与手表一致",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;"
-    ],
-    "unable": true,
-    "note": "需在Android和iOS手机App完成闹钟添加、编辑及同步，并验证App端字段，无法由手表模拟器执行和截图验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

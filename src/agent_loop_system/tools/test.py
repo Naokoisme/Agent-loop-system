@@ -24,6 +24,7 @@ from pydantic import BaseModel
 
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
+    CaseEntry,
     CaseRunResult,
     load_case_map,
     run_case,
@@ -86,7 +87,7 @@ class Verdict(BaseModel):
 
 
 class CaseDecision(BaseModel):
-    """Runner 最终判定；ERROR/SKIP 由证据门禁产生，不交给视觉模型猜。"""
+    """Runner 最终判定；执行异常由证据门禁产生，不交给视觉模型猜。"""
 
     verdict: Literal["PASS", "FAIL", "CANNOT_VERIFY", "ERROR", "SKIP"]
     reason: str
@@ -345,7 +346,10 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
     """先执行证据门禁，再把完整截图交给视觉模型判产品结果。"""
 
     if result.skipped:
-        return CaseDecision(verdict="SKIP", reason="用例标记为 unable，未执行")
+        return CaseDecision(
+            verdict="CANNOT_VERIFY",
+            reason="旧 Runner 返回了跳过结果；当前用例应重新运行",
+        )
 
     contract = result.evidence_contract if isinstance(result.evidence_contract, dict) else {}
     if contract.get("complete") is not True:
@@ -357,6 +361,12 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
         ]
         reason = messages[0] if messages else "证据合同不完整，禁止进入产品 PASS 判定"
         return CaseDecision(verdict="ERROR", reason=reason)
+
+    if result.precomputed_verdict:
+        return CaseDecision(
+            verdict=result.precomputed_verdict,
+            reason=result.precomputed_reason or "Agent-loop 探索已完成",
+        )
 
     visual = judge_test_with_vision(
         result.expected_text,
@@ -385,8 +395,8 @@ def save_evidence(
         if isinstance(item, dict) and str(item.get("message") or "").strip()
     ), "")
     if result.skipped:
-        result_verdict = "SKIP"
-        reason = "用例标记为 unable，未执行"
+        result_verdict = "CANNOT_VERIFY"
+        reason = "旧 Runner 返回了跳过结果；当前用例应重新运行"
     elif result.aborted or result.setup_errors or result.action_errors or evidence_error:
         result_verdict = "ERROR"
         reason = (
@@ -394,6 +404,9 @@ def save_evidence(
             if result.setup_errors or result.action_errors
             else evidence_error or "准备或操作阶段未完整执行"
         )
+    elif result.precomputed_verdict:
+        result_verdict = result.precomputed_verdict
+        reason = result.precomputed_reason or "Agent-loop 探索已完成"
     else:
         result_verdict = verdict.verdict if verdict else "CANNOT_VERIFY"
         reason = verdict.reason if verdict else "LLM 不可用，需人工判定"
@@ -404,6 +417,7 @@ def save_evidence(
         "schema_version": 2,
         "case_id": result.case_id,
         "sheet": result.sheet,
+        "execution_mode": result.execution_mode,
         "precondition_text": result.precondition_text,
         "steps_text": result.steps_text,
         "expected_text": result.expected_text,
@@ -420,6 +434,7 @@ def save_evidence(
         "execution_reason": execution_errors[0] if execution_errors else evidence_error,
         "terminal_json": result.terminal_json,
         "screenshots": result.screenshots,
+        "exploration_trace": result.exploration_trace,
         "verdict": result_verdict,
         "reason": reason,
     }
@@ -445,6 +460,141 @@ def initialize_hardware_case_session(session) -> None:
             raise RuntimeError(f"真机初始化未完成: {command} -> {barrier.status}")
 
 
+def _run_agent_exploration(
+    case: CaseEntry,
+    *,
+    screenshot_path: str,
+    target: str,
+) -> CaseRunResult:
+    """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
+
+    from agent_loop_system.reproduction import (
+        ReproductionAction,
+        ReproductionOutcome,
+        interactive_reproduce,
+        successful_reproduction_commands,
+    )
+
+    evidence_dir = Path(screenshot_path).resolve().parent
+    objective = (
+        f"执行普通测试用例 {case.case_id}。\n"
+        f"前置条件：{case.precondition_text}\n"
+        f"操作步骤：{case.steps_text}\n"
+        f"预期结果：{case.expected_text}"
+    )
+    max_actions = max(1, int(os.environ.get("AGENT_CASE_MAX_ACTIONS", "12")))
+    test_case = {
+        "case_id": case.case_id,
+        "precondition_text": case.precondition_text,
+        "steps_text": case.steps_text,
+        "expected_text": case.expected_text,
+    }
+    trace = interactive_reproduce(
+        task_id=f"case-{case.case_id}",
+        objective=objective,
+        source_files=[],
+        defect_image_paths=[],
+        evidence_dir=evidence_dir,
+        max_actions=max_actions,
+        target=target,
+        test_case=test_case,
+        build_simulator=False,
+    )
+    result = CaseRunResult(
+        case_id=case.case_id,
+        sheet=case.sheet,
+        expected_text=case.expected_text,
+        execution_mode="agent_exploration",
+        precondition_text=case.precondition_text,
+        steps_text=case.steps_text,
+        verification_points=[],
+        exploration_trace=trace.model_dump(mode="json"),
+    )
+
+    commands = successful_reproduction_commands(trace)
+    result.planned_commands = {"setup": [], "action": commands, "collect": []}
+    for observation in trace.steps:
+        decision = observation.decision
+        if decision is not None and decision.action == ReproductionAction.EXECUTE:
+            command = str(decision.command or "")
+            result.command_trace.append({
+                "index": len(result.command_trace) + 1,
+                "phase": "action",
+                "source": "agent",
+                "kind": "device",
+                "wire": "",
+                "command": command,
+                "command_name": command.lstrip(":").partition(":")[0],
+                "status": str(observation.command_status or "unknown"),
+                "ok": str(observation.command_status or "").lower()
+                not in {"busy", "error", "failed", "rejected", "unavailable", "unsupported"},
+                "reason": decision.reason,
+            })
+        result.terminal_json.extend(observation.command_results)
+        if observation.screenshot_ok and observation.screenshot_path:
+            screenshot_index = len(result.screenshots) + 1
+            label = decision.reason if decision is not None else "执行前初始画面"
+            result.screenshots.append({
+                "index": screenshot_index,
+                "label": label,
+                "phase": "exploration",
+                "command": str(decision.command or "") if decision is not None else "",
+                "path": observation.screenshot_path,
+                "capture_metadata": observation.capture_metadata,
+            })
+            result.command_trace.append({
+                "index": len(result.command_trace) + 1,
+                "phase": "exploration",
+                "source": "runner",
+                "kind": "capture",
+                "wire": "",
+                "command": ":HOST_SCREENSHOT:AGENT_EXPLORATION",
+                "command_name": "HOST_SCREENSHOT",
+                "status": "captured",
+                "ok": True,
+                "checkpoint_index": screenshot_index,
+                "checkpoint_label": label,
+            })
+
+    outcome_to_verdict = {
+        ReproductionOutcome.CURRENT_CONFORMS: "PASS",
+        ReproductionOutcome.DEFECT_REPRODUCED: "FAIL",
+        ReproductionOutcome.REFERENCE_AMBIGUOUS: "CANNOT_VERIFY",
+        ReproductionOutcome.CAPABILITY_MISSING: "CANNOT_VERIFY",
+    }
+    result.precomputed_verdict = str(
+        trace.verdict or outcome_to_verdict.get(trace.outcome, "ERROR")
+    ).upper()
+    if result.precomputed_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
+        result.precomputed_verdict = "ERROR"
+    result.precomputed_reason = trace.reason or "Agent-loop 探索未给出终止原因"
+    if result.precomputed_verdict == "ERROR":
+        result.aborted = True
+        result.action_errors.append(result.precomputed_reason)
+
+    result.verification_points = [
+        str(item.get("label") or f"探索截图 {index}")
+        for index, item in enumerate(result.screenshots, 1)
+    ]
+
+    issues = []
+    if not result.screenshots:
+        issues.append({"code": "NO_SCREENSHOT", "message": "Agent-loop 探索没有取得截图"})
+    if result.precomputed_verdict == "ERROR":
+        issues.append({"code": "EXPLORATION_ERROR", "message": result.precomputed_reason})
+    result.evidence_contract = {
+        "status": "COMPLETE" if not issues else "INCOMPLETE",
+        "complete": not issues,
+        "issues": issues,
+        "required_screenshots": len(result.screenshots),
+        "captured_screenshots": len(result.screenshots),
+        "business_action_count": len(commands),
+        "planned_action_count": len(commands),
+        "attempted_action_count": len(commands),
+    }
+    return result
+
+
 def run_single_case(
     sheet_name: str,
     case_id: str,
@@ -452,8 +602,9 @@ def run_single_case(
     *,
     target: str = "simulator",
     case_map_profile: str | None = None,
+    candidate_replay: bool = False,
 ) -> CaseRunResult:
-    """加载并在指定目标执行单条用例。
+    """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
     screenshot_path 不为 None 时，在每个 GUI_TREE 检查点保存一张截图；
     没有 GUI_TREE 时保存最终画面。
@@ -467,22 +618,30 @@ def run_single_case(
         raise KeyError(f"case_id {case_id} 不在 {location}/{sheet_name}.json 中")
     case = cases[case_id]
 
+    if target not in {"hardware", "simulator"}:
+        raise ValueError(f"未知执行目标: {target!r}")
+    if screenshot_path is None:
+        run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
+        screenshot_path = str(
+            EVIDENCE_DIR / target / sheet_name / case_id / run_stamp / "screenshot.bmp"
+        )
+    use_candidate_mapping = candidate_replay and case.has_candidate_mapping
+    if not case.is_promoted and not use_candidate_mapping:
+        return _run_agent_exploration(
+            case,
+            screenshot_path=screenshot_path,
+            target=target,
+        )
+
     if target == "hardware":
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
         from agent_loop_system.tools.real_device import RealDeviceSession
 
         HardwareTargetConfig.from_env()
-        if screenshot_path is None:
-            screenshot_path = str(
-                EVIDENCE_DIR / "hardware" / f"{sheet_name}_{case_id}.bmp"
-            )
         evidence_dir = Path(screenshot_path).resolve().parent
         session = RealDeviceSession(evidence_dir=evidence_dir)
     elif target == "simulator":
         session = SimulatorSession(get_simulator_exe())
-    else:
-        raise ValueError(f"未知执行目标: {target!r}")
-
     session.start()
     try:
         result = run_case(session, case, screenshot_path=screenshot_path)
@@ -512,6 +671,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--result-file", help="可选：把本次结果写入指定 JSON")
     parser.add_argument("--screenshot-path", help="可选：保存测试目标截图")
+    parser.add_argument(
+        "--candidate-replay",
+        action="store_true",
+        help="仅供外部 Agent 准入复跑：执行尚未 PROMOTED 的临时候选 actions",
+    )
     args = parser.parse_args(argv)
 
     print(
@@ -524,9 +688,13 @@ def main(argv: list[str] | None = None) -> int:
         args.screenshot_path,
         target=args.target,
         case_map_profile=args.case_map_profile,
+        candidate_replay=args.candidate_replay,
     )
 
-    print(f"[test] skipped={result.skipped} aborted={result.aborted}")
+    print(
+        f"[test] execution_mode={result.execution_mode} "
+        f"skipped={result.skipped} aborted={result.aborted}"
+    )
     print(f"[test] setup_errors={result.setup_errors}")
     print(f"[test] action_errors={result.action_errors}")
     print(f"[test] collect_errors={result.collect_errors}")
@@ -541,8 +709,6 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[test] reason: {decision.reason}")
 
     print(f"[test] 证据已落盘: {evidence_path}")
-    if decision.verdict == "SKIP":
-        return 2
     return 0 if decision.verdict == "PASS" else 1
 
 

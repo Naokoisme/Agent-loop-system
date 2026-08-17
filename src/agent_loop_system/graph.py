@@ -330,7 +330,7 @@ def interactive_reproduce_node(state: LoopState) -> dict:
     )
     if hardware_reproduced:
         reason = (
-            f"{reason}；缺陷已在 6202 真机复现。自动修复已暂停："
+            f"{reason}；缺陷已在当前真机项目复现。自动修复已暂停："
             "本地源码修改尚未编译并由人工授权刷入设备，不能用旧固件画面验证修复"
         )
         baseline_output["reason"] = reason
@@ -632,7 +632,6 @@ def _after_build(state: LoopState) -> str:
 
 def test(state: LoopState) -> dict:
     """执行同一组命令 → 截 after.bmp → 视觉判定修复结果 → 三态聚合。"""
-    from agent_loop_system.tools.case_map import load_case_map, run_case
     from agent_loop_system.tools.command_protocol import collect_command_json, normalize_command
     from agent_loop_system.tools.simulator import SimulatorSession
     from agent_loop_system.tools.test import (
@@ -641,6 +640,7 @@ def test(state: LoopState) -> dict:
         initialize_hardware_case_session,
         judge_case_result,
         judge_with_vision,
+        run_single_case,
     )
 
     task_id = state.get("task_id", "unknown")
@@ -652,6 +652,98 @@ def test(state: LoopState) -> dict:
     test_cases = state.get("test_cases", [])
     defect_criteria = state.get("judge_criteria", "")
     target = state.get("target", "simulator")
+
+    # case_map 模式必须和前端/CLI 共用同一个入口；不能让未固化用例落入空映射执行器。
+    if test_cases and not agent_cmds:
+        results = []
+        terminal_json_all: list[dict] = []
+        shot_ok = False
+        for case_index, tc in enumerate(test_cases, start=1):
+            sheet = str(tc.get("sheet") or "")
+            case_id = str(tc.get("case_id") or "")
+            case_dir = shot_dir / f"case-{case_index:03d}-{case_id}"
+            try:
+                case_result = run_single_case(
+                    sheet,
+                    case_id,
+                    str(case_dir / "screenshot.bmp"),
+                    target=target,
+                )
+                decision = judge_case_result(case_result)
+            except Exception as exc:
+                results.append({
+                    "case_id": case_id,
+                    "sheet": sheet,
+                    "verdict": "ERROR",
+                    "reason": f"用例执行异常: {exc}",
+                    "terminal_json": [],
+                    "screenshots": [],
+                })
+                continue
+
+            terminal_json_all.extend(case_result.terminal_json)
+            results.append({
+                "case_id": case_id,
+                "sheet": sheet,
+                "verdict": decision.verdict,
+                "reason": decision.reason,
+                "execution_mode": case_result.execution_mode,
+                "expected_text": case_result.expected_text,
+                "verification_points": case_result.verification_points,
+                "planned_commands": case_result.planned_commands,
+                "command_trace": case_result.command_trace,
+                "evidence_contract": case_result.evidence_contract,
+                "errors": (
+                    case_result.setup_errors
+                    + case_result.action_errors
+                    + case_result.collect_errors
+                ),
+                "terminal_json": case_result.terminal_json,
+                "screenshots": case_result.screenshots,
+                "exploration_trace": case_result.exploration_trace,
+            })
+            for screenshot in reversed(case_result.screenshots):
+                source = Path(str(screenshot.get("path") or ""))
+                if not source.is_file():
+                    continue
+                shutil.copy2(source, after_path)
+                shot_ok = True
+                break
+
+        if defect_criteria and shot_ok:
+            ref = before_path if Path(before_path).is_file() else None
+            verdict = judge_with_vision(
+                after_path,
+                defect_criteria,
+                reference_screenshot=ref,
+                defect_image_paths=state.get("defect_image_paths", []),
+            )
+            results.append({
+                "case_id": "agent_generated",
+                "sheet": "agent",
+                "verdict": verdict.verdict,
+                "reason": verdict.reason,
+                "test_commands": [],
+                "terminal_json": terminal_json_all,
+            })
+        elif defect_criteria and not shot_ok:
+            results.append({
+                "case_id": "agent_generated",
+                "sheet": "agent",
+                "verdict": "CANNOT_VERIFY",
+                "reason": "after.bmp 截图失败，无法视觉判定",
+                "test_commands": [],
+                "terminal_json": terminal_json_all,
+            })
+
+        evidence_issue = None if shot_ok else "after.bmp 截图失败"
+        final_verdict = aggregate_verdicts([item["verdict"] for item in results])
+        if not shot_ok:
+            final_verdict = "CANNOT_VERIFY"
+        return {
+            "verdict": final_verdict,
+            "test_output": {"results": results, "evidence_issue": evidence_issue},
+        }
 
     if target == "hardware":
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
@@ -688,44 +780,6 @@ def test(state: LoopState) -> dict:
                     resp = session.send(normalize_command(cmd))
                     terminal_json.extend(collect_command_json(resp))
                 terminal_json_all = terminal_json
-            elif test_cases:
-                sheets: dict[str, dict] = {}
-                for tc in test_cases:
-                    sheet = tc.get("sheet", "")
-                    if sheet and sheet not in sheets:
-                        sheets[sheet] = load_case_map(sheet, target=target)
-                for case_index, tc in enumerate(test_cases, start=1):
-                    sheet = tc.get("sheet", "")
-                    case_id = tc.get("case_id", "")
-                    case = sheets.get(sheet, {}).get(case_id)
-                    if case is None:
-                        results.append({"case_id": case_id, "sheet": sheet, "verdict": "SKIP", "reason": "用例不存在", "terminal_json": []})
-                        continue
-                    case_result = run_case(
-                        session,
-                        case,
-                        screenshot_path=shot_dir / f"case-{case_index:03d}-{case_id}.bmp",
-                    )
-                    terminal_json_all.extend(case_result.terminal_json)
-                    decision = judge_case_result(case_result)
-                    results.append({
-                        "case_id": case_id,
-                        "sheet": sheet,
-                        "verdict": decision.verdict,
-                        "reason": decision.reason,
-                        "expected_text": case_result.expected_text,
-                        "verification_points": case_result.verification_points,
-                        "planned_commands": case_result.planned_commands,
-                        "command_trace": case_result.command_trace,
-                        "evidence_contract": case_result.evidence_contract,
-                        "errors": (
-                            case_result.setup_errors
-                            + case_result.action_errors
-                            + case_result.collect_errors
-                        ),
-                        "terminal_json": case_result.terminal_json,
-                        "screenshots": case_result.screenshots,
-                    })
             # 没有业务命令表示缺陷在模拟器初始页面即可观察，继续走统一截图验证。
         except Exception as exc:
             return {
@@ -749,7 +803,7 @@ def test(state: LoopState) -> dict:
     finally:
         session.stop()
 
-    # defect 模式：视觉判定（case_map 模式已在上面的循环中用 judge_with_llm 判定）
+    # 缺陷命令模式：对统一的最终截图做视觉判定。
     if defect_criteria and shot_ok:
         # before_path 存在时传作参考（对比判定）
         ref = before_path if Path(before_path).is_file() else None

@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测上滑可能切页至通知中心而非滚动；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_008",
@@ -103,13 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用方向语义明确的 SWIPE_SIM 完成负一屏往返，三个阶段分别取证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "上滑后检查 All Apps 按钮",
-        "左滑后检查主表盘",
-        "再次右滑后检查负一屏顶部最近应用卡片"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_009",
@@ -121,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_010",
@@ -134,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_011",
@@ -147,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_012",
@@ -160,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_013",
@@ -173,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_014",
@@ -186,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_015",
@@ -199,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_016",
@@ -212,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_017",
@@ -225,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_018",
@@ -238,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_019",
@@ -251,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_020",
@@ -264,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_021",
@@ -274,11 +289,22 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.滚动至对应区域",
       "expected_text": "1.第2个区域显示Weather",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After scrolling to region 2, screenshot shows Weather"
+      ],
+      "note": "Exploration verified repeatable simulator rotary path; formal Runner decides the product verdict.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_022",
@@ -287,11 +313,23 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.滚动至对应区域",
       "expected_text": "1.第3个区域显示TITAN Q",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After scrolling to region 3, screenshot shows TITAN Q"
+      ],
+      "note": "Exploration verified repeatable simulator rotary path; formal Runner decides the product verdict.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_023",
@@ -300,11 +338,24 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.滚动至对应区域",
       "expected_text": "1.第4个区域显示Music",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After scrolling to region 4, screenshot shows Music"
+      ],
+      "note": "Exploration verified repeatable simulator rotary path; formal Runner decides the product verdict.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_024",
@@ -313,11 +364,25 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.滚动至对应区域",
       "expected_text": "1.第5个区域显示Clock",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After scrolling to region 5, screenshot shows Clock"
+      ],
+      "note": "Exploration verified repeatable simulator rotary path; formal Runner decides the product verdict.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_025",
@@ -329,8 +394,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_026",
@@ -342,8 +408,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_027",
@@ -355,8 +422,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_028",
@@ -368,8 +436,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_029",
@@ -381,8 +450,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_030",
@@ -394,8 +464,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_031",
@@ -407,8 +478,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入负一屏；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_032",
@@ -420,8 +492,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_033",
@@ -433,13 +506,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依次进入 Calculator、返回主表盘、右滑进入负一屏，并在每个阶段取证；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "进入后检查 Calculator 页面",
-        "返回后检查主表盘",
-        "进入负一屏后检查最近应用最左侧为 Calculator"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_034",
@@ -451,13 +520,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用当前注册的 TELEPHONY_CONTACT 目标页，并在 Contacts、主表盘和负一屏三个阶段取证；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "进入后检查 Contacts 页面",
-        "返回后检查主表盘",
-        "进入负一屏后检查最近应用最左侧为 Contacts"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_035",
@@ -469,13 +534,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用当前注册的 Display 页面 DISPLAY_BRIGHTNESS，并在 Display、主表盘和负一屏三个阶段取证；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "进入后检查 Display 页面",
-        "返回后检查主表盘",
-        "进入负一屏后检查最近应用最左侧为 Settings"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_036",
@@ -487,8 +548,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_037",
@@ -500,8 +562,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 2.执行设备重启；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_038",
@@ -513,8 +576,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测点击Phone图标进入TELEPHONY页；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_039",
@@ -526,8 +590,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测点击Camera图标进入NO_PAIR_TIP(未配对提示)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_040",
@@ -539,8 +604,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测点击Flashlight图标无页面变化；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_041",
@@ -552,8 +618,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_042",
@@ -565,8 +632,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_043",
@@ -578,8 +646,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_044",
@@ -591,8 +660,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_045",
@@ -604,8 +674,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_046",
@@ -617,8 +688,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_WEATHER_SET_EXT 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_047",
@@ -630,8 +702,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_048",
@@ -643,8 +716,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_049",
@@ -656,8 +730,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_050",
@@ -666,11 +741,23 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.点击Weather卡片",
       "expected_text": "1.手表显示Weather页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Weather卡片；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,70,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After clicking the Weather card, screenshot shows the Weather page"
+      ],
+      "note": "Current 6202 exploration and formal Runner verified Sidebar rotary positioning and TP_CLICK:205,70 reaching WEATHER_HOME; formal verdict PASS and audit promotion_eligible=true.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_051",
@@ -682,8 +769,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_052",
@@ -695,8 +783,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击TITAN Q卡片；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_053",
@@ -708,8 +797,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_054",
@@ -721,8 +811,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_055",
@@ -734,8 +825,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_056",
@@ -747,8 +839,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_057",
@@ -760,8 +853,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_058",
@@ -773,8 +867,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_059",
@@ -786,8 +881,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "音乐数据和手表发出的 audio_event 可验证；手机播放器最终状态仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_060",
@@ -799,8 +895,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "音乐数据和手表发出的 audio_event 可验证；手机播放器最终状态仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "HUB_061",
@@ -812,8 +909,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_062",
@@ -825,8 +923,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_063",
@@ -838,8 +937,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_064",
@@ -851,8 +951,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_065",
@@ -864,8 +965,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_066",
@@ -877,8 +979,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_MUSIC_SET 仅用于620C模拟器；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_067",
@@ -890,8 +993,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_068",
@@ -900,11 +1004,23 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.点击Music卡片非按钮区域",
       "expected_text": "1.手表显示Music页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Music卡片非按钮区域；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,240,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After clicking the Music card non-button area, screenshot shows the Music page"
+      ],
+      "note": "Current 6202 exploration and formal Runner verified Sidebar rotary positioning and TP_CLICK:205,240 reaching MUSIC; formal verdict PASS and audit promotion_eligible=true.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_069",
@@ -916,8 +1032,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_070",
@@ -929,8 +1046,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_071",
@@ -942,8 +1060,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_072",
@@ -955,8 +1074,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Timer图标；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_073",
@@ -965,11 +1085,31 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.点击Alarm图标",
       "expected_text": "1.手表显示Alarm页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Alarm图标；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,240,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After clicking the current Alarm card, screenshot shows the Alarm page"
+      ],
+      "note": "Current 6202 exploration and formal Runner verified the Alarm-card click path and complete evidence; formal verdict FAIL and audit promotion_eligible=true because the screenshot remained on the Alarm card list instead of the independent Alarm page.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_074",
@@ -978,11 +1118,32 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.点击Stopwatch图标",
       "expected_text": "1.手表显示Stopwatch页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Stopwatch图标；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,240,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "After clicking the current Stopwatch card, screenshot shows the Stopwatch page"
+      ],
+      "note": "Current 6202 exploration and formal Runner verified Sidebar rotary positioning and TP_CLICK:205,240 reaching STOPWATCH; formal verdict PASS and audit promotion_eligible=true.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_075",
@@ -991,11 +1152,37 @@
       "precondition_text": "1.手表显示负一屏",
       "steps_text": "1.在设置列表查找时钟卡片排序入口",
       "expected_text": "1.设置列表不显示时钟图标排序入口",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:3;"
+      ],
+      "unable": false,
+      "verification_points": [
+        "Settings-list searched upper segment contains no clock-card sorting entry",
+        "Settings-list searched middle segment contains no clock-card sorting entry",
+        "Settings-list searched bottom segment contains no clock-card sorting entry"
+      ],
+      "note": "Current 6202 exploration and formal Runner searched the Settings list in three segments with real rotary actions and independent screenshots; formal verdict PASS and audit promotion_eligible=true.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "HUB_076",
@@ -1007,8 +1194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_077",
@@ -1020,8 +1208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_078",
@@ -1033,8 +1222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Car图标；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_079",
@@ -1046,8 +1236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击2048图标；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_080",
@@ -1059,8 +1250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_081",
@@ -1072,8 +1264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_082",
@@ -1085,8 +1278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_083",
@@ -1098,8 +1292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_084",
@@ -1111,8 +1306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前缺世界时钟城市数据注入命令；源码存储结构可继续接入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_085",
@@ -1124,8 +1320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击World Clock卡片；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_086",
@@ -1137,8 +1334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_087",
@@ -1150,8 +1348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_088",
@@ -1163,8 +1362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "All Apps 在滚动底部,实测上滑滚动不可靠；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_089",
@@ -1176,8 +1376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "卡片需滚动定位且滚动行为不稳定(实测上滑可能切页): 1.点击Weather卡片；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_090",
@@ -1189,12 +1390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先清空天气并进入负一屏检查空态，再注入 Delhi 天气数据检查卡片更新；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；危险真机命令 WEATHER_CLEAR: clear or erase；SWIPE_SIM 缺少6202已验证坐标；SIM_WEATHER_SET_EXT 仅用于620C模拟器。",
-      "verification_points": [
-        "天气清空后检查 Weather 卡片显示 No weather data.",
-        "注入天气后检查卡片显示城市名称 Delhi"
-      ]
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_091",
@@ -1206,8 +1404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.恢复App连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_092",
@@ -1219,8 +1418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/流程: 1.用可编程触控治具连续滚动负一屏500次；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_093",
@@ -1232,8 +1432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "天气数据可直接注入；Android与iOS同步结果仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "HUB_094",
@@ -1245,8 +1446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     }
   ]
 }

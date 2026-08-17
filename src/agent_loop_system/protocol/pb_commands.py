@@ -1,0 +1,230 @@
+"""Command and key constants from the new-platform PB v0.1.2 document."""
+
+from __future__ import annotations
+
+from enum import IntEnum
+
+
+class PbCommandGroup(IntEnum):
+    RESERVED = 0x00
+    FIRMWARE_UPDATE = 0x01
+    SETTING = 0x02
+    ENVIRONMENT = 0x03
+    NOTICE = 0x04
+    DATA = 0x05
+    STREAM = 0x06
+    TOPSTEP_FILE = 0x11
+
+
+class ConfigKey(IntEnum):
+    GET_ALL_CONFIGS = 0x01
+    GET_DEVICE_INFO = 0x02
+    GET_FUNCTION_CONFIG = 0x03
+    SET_FUNCTION_CONFIG = 0x04
+    GET_UNIT_CONFIG = 0x05
+    SET_UNIT_CONFIG = 0x06
+    GET_GOAL_CONFIG = 0x07
+    SET_GOAL_CONFIG = 0x08
+    GET_DND_CONFIG = 0x09
+    SET_DND_CONFIG = 0x0A
+    GET_RAISE_WAKEUP_CONFIG = 0x0B
+    SET_RAISE_WAKEUP_CONFIG = 0x0C
+    GET_HEART_RATE_CONFIG = 0x0D
+    SET_HEART_RATE_CONFIG = 0x0E
+    GET_PRESSURE_CONFIG = 0x0F
+    SET_PRESSURE_CONFIG = 0x10
+    GET_BLOOD_OXYGEN_CONFIG = 0x11
+    SET_BLOOD_OXYGEN_CONFIG = 0x12
+    GET_BLOOD_PRESSURE_CONFIG = 0x13
+    SET_BLOOD_PRESSURE_CONFIG = 0x14
+    GET_WOMEN_HEALTH_CONFIG = 0x15
+    SET_WOMEN_HEALTH_CONFIG = 0x16
+    GET_NOTIFICATION_CONFIG = 0x17
+    SET_NOTIFICATION_CONFIG = 0x18
+    FUNCTION_CONFIG_CHANGED = 0x19
+    UNIT_CONFIG_CHANGED = 0x1A
+    GOAL_CONFIG_CHANGED = 0x1B
+    DND_CONFIG_CHANGED = 0x1C
+    RAISE_WAKEUP_CONFIG_CHANGED = 0x1D
+    HEART_RATE_CONFIG_CHANGED = 0x1E
+    PRESSURE_CONFIG_CHANGED = 0x1F
+    BLOOD_OXYGEN_CONFIG_CHANGED = 0x20
+    BLOOD_PRESSURE_CONFIG_CHANGED = 0x21
+    WOMEN_HEALTH_CONFIG_CHANGED = 0x22
+    NOTIFICATION_CONFIG_CHANGED = 0x23
+
+
+class SettingKey(IntEnum):
+    FIND_DEVICE = 0x30
+    STOP_FIND_DEVICE = 0x31
+    DEVICE_FOUND = 0x32
+    FIND_PHONE = 0x33
+    STOP_FIND_PHONE = 0x34
+    PHONE_FOUND = 0x35
+    APP_CAMERA_ACTION = 0x36
+    DEVICE_CAMERA_ACTION = 0x37
+    GET_ALARMS = 0x38
+    SET_ALARMS = 0x39
+    GET_CONTACTS = 0x3A
+    SET_CONTACTS = 0x3B
+    GET_EMERGENCY_CONTACTS = 0x3C
+    SET_EMERGENCY_CONTACTS = 0x3D
+    GET_REMINDERS = 0x3E
+    SET_REMINDERS = 0x3F
+    SET_WEATHER = 0x40
+    DEVICE_REFRESH_MUSIC_INFO = 0x41
+    DEVICE_REFRESH_MUSIC_STATE = 0x42
+    APP_MUSIC_INFO_CHANGED = 0x43
+    APP_MUSIC_STATE_CHANGED = 0x44
+    REFRESH_MEDIA_VOLUME = 0x45
+    MEDIA_VOLUME_CHANGED = 0x46
+    MEDIA_ACTION = 0x47
+    DEVICE_DATA_CHANGED = 0x48
+    GET_DIALS = 0x49
+    SELECT_DIAL = 0x4A
+    DELETE_DIAL = 0x4B
+    GET_WORLD_CLOCKS = 0x4C
+    SET_WORLD_CLOCKS = 0x4D
+    GET_PRAYER_CONFIG = 0x4E
+    SET_PRAYER_CONFIG = 0x4F
+    SET_PRAYER_DATA = 0x50
+    SET_TEST_BATTERY_INFO = 0x51
+    SET_TEST_DEVICE_INFO = 0x52
+    SET_DAILY_WEATHER = 0x53
+    SET_HOURLY_WEATHER = 0x54
+    GET_SCREEN_LOCK = 0x55
+    SET_SCREEN_LOCK = 0x56
+    GET_GAME_LOCK = 0x57
+    SET_GAME_LOCK = 0x58
+    SET_HSD_ICE = 0x59
+    GET_HSD_PARENTAL_MODE = 0x5A
+    SET_HSD_PARENTAL_MODE = 0x5B
+    GET_HSD_CLASSROOM_MODE = 0x5C
+    SET_HSD_CLASSROOM_MODE = 0x5D
+    GET_HSD_TASKS = 0x5E
+    SET_HSD_TASKS = 0x5F
+    EXCHANGE_HSD_TASK_REWARD = 0x60
+    GET_HSD_HABITS = 0x61
+    SET_HSD_HABITS = 0x62
+    GET_HSD_APP_USAGE = 0x63
+    GET_HSD_GAME_USAGE = 0x64
+    RESET_HSD_USAGE = 0x65
+    GET_HSD_GAME_RECORDS = 0x66
+    SET_HSD_GAME_RANKING_TRENDS = 0x67
+    GET_OFFLINE_MAP_AUTH = 0x68
+    SET_QR_CODE = 0x69
+    GET_QR_CODE_LIST = 0x6A
+    GET_EPO_TIME = 0x6B
+    CLEAR_EPO = 0x6C
+    APP_AI_RESULT = 0x6D
+    DEVICE_AI_MESSAGE = 0x6E
+
+
+class EnvironmentKey(IntEnum):
+    BIND = 0x01
+    LOGIN = 0x02
+    UNBIND = 0x03
+    SET_USER_INFO = 0x04
+    SET_TIME = 0x05
+    POWER_OFF = 0x06
+    REBOOT = 0x07
+    FACTORY_RESET = 0x08
+    GET_BATTERY = 0x09
+    BATTERY_CHANGED = 0x0A
+    GET_LANGUAGE = 0x0B
+    SET_LANGUAGE = 0x0C
+    APP_STATUS_CHANGED = 0x0D
+    DEVICE_REFRESH_APP_STATUS = 0x0E
+    GET_SUPPORTED_LANGUAGES = 0x0F
+    SET_LOCATION = 0x10
+    GET_BLUETOOTH_INFO = 0x11
+    IOS_PAIR_OR_CONNECT = 0x12
+    GET_USER_INFO = 0x13
+
+
+class NoticeKey(IntEnum):
+    APP_NOTIFICATION = 0x01
+    TELEPHONY_NOTIFICATION = 0x02
+    HANGUP_REQUEST = 0x03
+    HANGUP_RESPONSE = 0x04
+    SOS = 0x05
+    QUICK_TEST = 0x06
+
+
+class DataKey(IntEnum):
+    HEART_RATE = 0x01
+    BLOOD_OXYGEN = 0x02
+    BLOOD_PRESSURE = 0x03
+    PRESSURE = 0x04
+    SLEEP = 0x05
+    ACTIVITY = 0x06
+    SPORT = 0x07
+    START_SYNC = 0x21
+    END_SYNC = 0x22
+    APP_REALTIME_OPERATION = 0x30
+    DEVICE_REALTIME_OPERATION = 0x31
+    DEVICE_REALTIME_DATA = 0x32
+
+
+class StreamKey(IntEnum):
+    H264_HEAD = 0x01
+    H264_DATA = 0x02
+    JPEG_HEAD = 0x03
+    JPEG_DATA = 0x04
+    OPUS_HEAD = 0x11
+    OPUS_DATA = 0x12
+    OPUS_HEARTBEAT = 0x13
+    DEVICE_AUDIO_STATE = 0x14
+    APP_SET_AUDIO_STATE = 0x15
+    DEVICE_AUDIO_STATE_RESPONSE = 0x16
+    APP_FILE_HEAD = 0x21
+    APP_FILE_DATA = 0x22
+    APP_FILE_END = 0x23
+    APP_FILE_CANCEL = 0x24
+    DEVICE_FILE_HEAD = 0x25
+    DEVICE_FILE_DATA = 0x26
+    DEVICE_FILE_END = 0x27
+    DEVICE_FILE_CANCEL = 0x28
+    GET_DIRECTORY_SPACE = 0x31
+    GET_FILE_LIST = 0x32
+    DELETE_FILE = 0x33
+    CLEAR_DIRECTORY = 0x34
+    WATCH_FILE_CHANGES = 0x35
+    REQUEST_DEVICE_FILE = 0x36
+    SET_GPS_STREAM = 0x41
+    UPDATE_GPS = 0x42
+    DEVICE_HTTP_REQUEST = 0x51
+    APP_HTTP_RESPONSE = 0x52
+
+
+class TopstepFileKey(IntEnum):
+    APP_SEND_FILE = 0x01
+
+
+def command_id(group: PbCommandGroup | int, key: IntEnum | int) -> int:
+    """Build the combined 16-bit command id used by the wire codec."""
+
+    if isinstance(group, bool) or not isinstance(group, int):
+        raise TypeError("group must be an integer command group")
+    if isinstance(key, bool) or not isinstance(key, int):
+        raise TypeError("key must be an integer command key")
+    group_value = int(group)
+    key_value = int(key)
+    if not 0 <= group_value <= 0xFF:
+        raise ValueError("group must fit in one byte")
+    if not 0 <= key_value <= 0xFF:
+        raise ValueError("key must fit in one byte")
+    return (group_value << 8) | key_value
+
+
+__all__ = [
+    "ConfigKey",
+    "DataKey",
+    "EnvironmentKey",
+    "NoticeKey",
+    "PbCommandGroup",
+    "SettingKey",
+    "StreamKey",
+    "TopstepFileKey",
+    "command_id",
+]

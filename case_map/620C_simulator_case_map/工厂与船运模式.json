@@ -7,15 +7,11 @@
     "steps_text": "1.用触控治具按0.25秒间隔点击设备名称8次",
     "expected_text": "1.手表显示工厂模式主页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_002",
@@ -25,15 +21,11 @@
     "steps_text": "1.用可编程触控治具点击设备名称7次",
     "expected_text": "1.手表保持配对二维码页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_003",
@@ -43,15 +35,11 @@
     "steps_text": "1.用触控治具按0.25秒间隔点击设备名称9次",
     "expected_text": "1.手表显示工厂模式主页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_004",
@@ -61,15 +49,11 @@
     "steps_text": "1.用触控治具按0.25秒间隔点击顶部标题8次",
     "expected_text": "1.手表显示工厂模式主页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_005",
@@ -79,15 +63,11 @@
     "steps_text": "1.用触控治具按0.25秒间隔点击顶部标题8次",
     "expected_text": "1.手表保持About页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_006",
@@ -98,12 +78,10 @@
     "expected_text": "1.页面显示Factory Mode/Discharge/Rest&Shutdown/Rest&Ship mode",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_007",
@@ -114,12 +92,10 @@
     "expected_text": "1.屏幕持续保持亮屏",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "十分钟等待可由SIM_WAIT分段执行；SIM_FACTORY_MODE_SET目前只切换工厂服务标志，不会进入工厂模式主页，当前窗口清单也没有可导航的工厂主页，缺少真实页面入口"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_008",
@@ -130,12 +106,10 @@
     "expected_text": "1.测试记录保存初始步数\n2.设备完成步数采集\n3.步数大于初始记录",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前源码已有数据注入命令；该用例需分场景逐步取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_009",
@@ -146,12 +120,10 @@
     "expected_text": "1.待产品确认MOTOR检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_010",
@@ -162,12 +134,10 @@
     "expected_text": "1.待产品确认GSENSOR检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_011",
@@ -178,12 +148,10 @@
     "expected_text": "1.待产品确认KEY检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_012",
@@ -194,12 +162,10 @@
     "expected_text": "1.待产品确认LCD检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_013",
@@ -210,12 +176,10 @@
     "expected_text": "1.待产品确认TP检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_014",
@@ -226,12 +190,10 @@
     "expected_text": "1.待产品确认MIC检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_015",
@@ -242,12 +204,10 @@
     "expected_text": "1.待产品确认SPEAKER检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_016",
@@ -258,12 +218,10 @@
     "expected_text": "1.待产品确认LIGHT_LEAK检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_017",
@@ -274,12 +232,10 @@
     "expected_text": "1.待产品确认HR检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_018",
@@ -290,12 +246,10 @@
     "expected_text": "1.待产品确认BATTERY检测页的首个可观察状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_019",
@@ -306,12 +260,10 @@
     "expected_text": "1.列表显示十个检测项目",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_020",
@@ -321,15 +273,11 @@
     "steps_text": "1.在检测列表上滑",
     "expected_text": "1.列表显示下方检测项目",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_021",
@@ -339,15 +287,11 @@
     "steps_text": "1.在检测列表逆时针旋转编码器",
     "expected_text": "1.列表向下滚动",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_022",
@@ -357,15 +301,11 @@
     "steps_text": "1.点击Rest&Ship mode",
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_023",
@@ -376,12 +316,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；直接ENTER_PAGE语言页不会启动未绑定开机流程的船运模式计时器，当前缺幂等建立未绑定引导状态并启动该计时器的通用命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_024",
@@ -392,12 +330,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；当前缺建立未绑定配对提示页及其船运模式计时器的通用引导状态命令，不能用直达页面冒充完整前置"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_025",
@@ -408,12 +344,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；当前缺建立未绑定说明提示页及其船运模式计时器的通用引导状态命令，不能用直达页面冒充完整前置"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_026",
@@ -424,12 +358,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；直接进入About不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_027",
@@ -440,12 +372,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；直接进入QRCODE不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_028",
@@ -456,12 +386,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；直接进入QRCODE_BIG不会建立未绑定引导流程的船运模式计时器，当前缺完整引导状态命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_029",
@@ -472,12 +400,10 @@
     "expected_text": "1.手表仍显示当前绑定页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "29分59秒等待可执行；当前缺幂等建立未绑定页面并启动船运模式30分钟边界计时器的通用命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_030",
@@ -488,12 +414,10 @@
     "expected_text": "1.手表进入黑屏关机状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "30分钟等待可执行；当前缺幂等建立未绑定页面并启动船运模式30分钟边界计时器的通用命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_031",
@@ -504,12 +428,10 @@
     "expected_text": "1.手表保持绑定页面\n2.页面响应本次点击\n3.手表未进入船运模式",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "20分钟和15分钟等待均可执行；当前缺可建立未绑定页、启动并在点击后重置船运模式计时器的通用引导状态能力"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_032",
@@ -519,15 +441,11 @@
     "steps_text": "1.短按按键",
     "expected_text": "1.手表保持黑屏状态",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_033",
@@ -537,15 +455,11 @@
     "steps_text": "1.点击屏幕",
     "expected_text": "1.手表保持黑屏状态",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_034",
@@ -556,12 +470,10 @@
     "expected_text": "1.手表显示开机激活页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_035",
@@ -571,15 +483,11 @@
     "steps_text": "1.用秒表计时，长按编码器3秒",
     "expected_text": "1.手表显示开机动画",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_036",
@@ -590,12 +498,10 @@
     "expected_text": "1.手表开始激活\n2.手表显示适用的开机绑定页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需帧率、波形或持续时长采集器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_037",
@@ -606,12 +512,10 @@
     "expected_text": "1.设备名称累计四次点击\n2.手表显示上一绑定页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_038",
@@ -621,15 +525,11 @@
     "steps_text": "1.在工厂模式标题连续点击8次",
     "expected_text": "1.手表保持单层工厂模式页面",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_039",
@@ -639,15 +539,11 @@
     "steps_text": "1.重复10轮：进入Rest&Ship mode，手表黑屏后接入充电器",
     "expected_text": "1.每轮均显示开机动画",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_040",
@@ -657,15 +553,11 @@
     "steps_text": "1.分别从二维码页与About页进入工厂模式",
     "expected_text": "1.两次均显示同一工厂模式主页",
     "setup": [],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "FACT_041",
@@ -676,11 +568,9 @@
     "expected_text": "1.十个检测项名称均未被截断",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

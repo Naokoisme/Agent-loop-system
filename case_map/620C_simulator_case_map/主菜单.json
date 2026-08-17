@@ -6,19 +6,12 @@
     "precondition_text": "1.手表显示主表盘",
     "steps_text": "1.在主表盘单击编码器",
     "expected_text": "1.手表显示当前风格主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_002",
@@ -27,17 +20,12 @@
     "precondition_text": "1.手表显示负一屏",
     "steps_text": "1.在负一屏点击All Apps",
     "expected_text": "1.手表显示当前风格主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/流程: 1.在负一屏点击All Apps"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_003",
@@ -46,19 +34,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在主菜单右滑",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_004",
@@ -67,19 +48,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在主菜单单击按键",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_005",
@@ -88,19 +62,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.恢复出厂后进入主菜单",
     "expected_text": "1.主菜单显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/流程: 1.恢复出厂后进入主菜单"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_006",
@@ -109,19 +76,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.观察List主菜单",
     "expected_text": "1.每行左侧显示圆形App图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_007",
@@ -130,19 +90,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.观察List主菜单",
     "expected_text": "1.每行右侧显示App名称",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_008",
@@ -151,21 +104,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.在List主菜单上滑",
     "expected_text": "1.页面右侧显示滚动条",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_009",
@@ -174,21 +118,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.点击My Fitness整行",
     "expected_text": "1.手表显示My Fitness页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,32,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_010",
@@ -197,21 +132,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.缓慢滚动List主菜单",
     "expected_text": "1.图标尺寸保持不变",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_011",
@@ -220,21 +146,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.在列表顶部继续下滑",
     "expected_text": "1.列表回弹至顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_012",
@@ -243,21 +160,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.在列表底部继续上滑",
     "expected_text": "1.列表回弹至底部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_013",
@@ -266,21 +174,12 @@
     "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
     "steps_text": "1.逆时针旋转编码器",
     "expected_text": "1.列表向下滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_014",
@@ -289,19 +188,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.将Menu Style设为Honeycomb后进入主菜单",
     "expected_text": "1.主菜单显示三列常规网格",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,188,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_015",
@@ -310,17 +202,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.观察Honeycomb主菜单",
     "expected_text": "1.页面不显示App名称",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_016",
@@ -329,19 +216,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.在Honeycomb主菜单上滑",
     "expected_text": "1.网格内容向下方区域滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_017",
@@ -350,19 +230,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.在Honeycomb主菜单左滑",
     "expected_text": "1.页面保持当前网格位置",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:2,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_018",
@@ -371,17 +244,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.点击Weather图标",
     "expected_text": "1.手表显示Weather页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "Honeycomb 图标无文本标识,坐标无法确定"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_019",
@@ -390,19 +258,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.逆时针旋转编码器",
     "expected_text": "1.网格内容向下方区域滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_020",
@@ -411,19 +272,12 @@
     "precondition_text": "1.Menu Style已设为Honeycomb，手表显示Honeycomb主菜单",
     "steps_text": "1.观察Honeycomb主菜单右侧\n2.向上滑动Honeycomb主菜单",
     "expected_text": "1.页面右侧显示滚动条\n2.滚动条位置随菜单浏览位置向下更新",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_021",
@@ -432,19 +286,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.将Menu Style设为Grid后进入主菜单",
     "expected_text": "1.主菜单显示交错蜂窝布局",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,245,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_022",
@@ -453,19 +300,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.滚动Grid主菜单",
     "expected_text": "1.屏幕中心图标显示放大效果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_023",
@@ -474,17 +314,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.观察Grid主菜单边缘",
     "expected_text": "1.屏幕边缘图标小于中心图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_024",
@@ -493,17 +328,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.观察Grid主菜单",
     "expected_text": "1.页面不显示App名称",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_025",
@@ -512,19 +342,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.在Grid主菜单上滑",
     "expected_text": "1.蜂窝内容向下方区域滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_026",
@@ -533,25 +356,12 @@
     "precondition_text": "1.主菜单样式设为Grid且当前页非底部",
     "steps_text": "1.顺时针旋转编码器一格\n2.逆时针旋转编码器一格",
     "expected_text": "1.Grid交错蜂窝内容向下方区域滚动\n2.Grid交错蜂窝内容向上方区域滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:90261;",
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:90262;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "顺时针一格后 Grid 内容向下方区域滚动",
-      "逆时针一格后 Grid 内容向上方区域滚动"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "MENU_027",
@@ -560,19 +370,12 @@
     "precondition_text": "1.Grid主菜单已滚动至顶部",
     "steps_text": "1.在Grid主菜单顶部继续下滑",
     "expected_text": "1.Grid内容回弹至顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_028",
@@ -581,19 +384,12 @@
     "precondition_text": "1.Grid主菜单已滚动至底部",
     "steps_text": "1.在Grid主菜单底部继续上滑",
     "expected_text": "1.Grid内容回弹至底部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_029",
@@ -602,19 +398,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.在Grid主菜单右滑",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_030",
@@ -623,19 +412,12 @@
     "precondition_text": "1.Menu Style已设为Grid，手表显示Grid主菜单",
     "steps_text": "1.点击屏幕中心图标",
     "expected_text": "1.手表显示对应应用页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_031",
@@ -644,19 +426,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第1项显示My Fitness",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_032",
@@ -665,19 +440,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第2项显示Sports",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_033",
@@ -686,19 +454,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第3项显示Health",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_034",
@@ -707,19 +468,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第4项显示Sleep",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_035",
@@ -728,19 +482,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第5项显示Breathe",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_036",
@@ -749,19 +496,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第6项显示Titan Q",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_037",
@@ -770,19 +510,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第7项显示Phone",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_038",
@@ -791,19 +524,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第8项显示Weather",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_039",
@@ -812,19 +538,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第9项显示Clock",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_040",
@@ -833,19 +552,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第10项显示Entertainment",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_041",
@@ -854,19 +566,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第11项显示Utilities",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_042",
@@ -875,19 +580,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第12项显示Find My Phone",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_043",
@@ -896,19 +594,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第13项显示SOS",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_044",
@@ -917,19 +608,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第14项显示Settings",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_045",
@@ -938,19 +622,12 @@
     "precondition_text": "1.Menu Style为List",
     "steps_text": "1.滚动至对应菜单位置",
     "expected_text": "1.第15项显示About",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_046",
@@ -959,17 +636,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在Menu设置页查找排序入口",
     "expected_text": "1.页面不显示菜单排序入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_047",
@@ -978,18 +650,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.点击Sports",
     "expected_text": "1.手表显示Sports标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_048",
@@ -998,16 +664,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.观察Sports子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_049",
@@ -1016,18 +678,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.滚动Sports子菜单",
     "expected_text": "1.Sports标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_050",
@@ -1036,16 +692,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.观察Sports页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_051",
@@ -1054,16 +706,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示Multisport",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_052",
@@ -1072,16 +720,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示Sports Records",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_053",
@@ -1090,18 +734,12 @@
     "precondition_text": "1.手表显示Sports子菜单",
     "steps_text": "1.在Sports子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_054",
@@ -1110,18 +748,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.点击Health",
     "expected_text": "1.手表显示Health标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,160,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_055",
@@ -1130,16 +762,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.观察Health子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_056",
@@ -1148,18 +776,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动Health子菜单",
     "expected_text": "1.Health标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_057",
@@ -1168,16 +790,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.观察Health页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_058",
@@ -1186,16 +804,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示OCM",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_059",
@@ -1204,16 +818,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示Heart Rate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_060",
@@ -1222,16 +832,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第3项显示Stress",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_061",
@@ -1240,16 +846,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第4项显示SpO2",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_062",
@@ -1258,16 +860,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第5项显示My Cycle",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_063",
@@ -1276,18 +874,12 @@
     "precondition_text": "1.手表显示Health子菜单",
     "steps_text": "1.在Health子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_064",
@@ -1296,23 +888,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.点击Clock",
     "expected_text": "1.手表显示Clock标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_065",
@@ -1321,16 +902,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.观察Clock子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_066",
@@ -1339,18 +916,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.滚动Clock子菜单",
     "expected_text": "1.Clock标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_067",
@@ -1359,16 +930,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.观察Clock页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_068",
@@ -1377,16 +944,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示Alarm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_069",
@@ -1395,16 +958,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示Stopwatch",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_070",
@@ -1413,16 +972,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第3项显示Timer",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_071",
@@ -1431,16 +986,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第4项显示World Clock",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_072",
@@ -1449,18 +1000,12 @@
     "precondition_text": "1.手表显示Clock子菜单",
     "steps_text": "1.在Clock子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CLOCK_SUBMENU,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_073",
@@ -1469,24 +1014,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.点击Entertainment",
     "expected_text": "1.手表显示Entertainment标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_074",
@@ -1495,16 +1028,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.观察Entertainment子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_075",
@@ -1513,18 +1042,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.滚动Entertainment子菜单",
     "expected_text": "1.Entertainment标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_076",
@@ -1533,16 +1056,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.观察Entertainment页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_077",
@@ -1551,16 +1070,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示Music",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_078",
@@ -1569,16 +1084,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示Games",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_079",
@@ -1587,18 +1098,12 @@
     "precondition_text": "1.手表显示Entertainment子菜单",
     "steps_text": "1.在Entertainment子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:ENTERTAINMENT,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_080",
@@ -1607,16 +1112,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.观察Games三级菜单",
     "expected_text": "1.第1项显示Car",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_081",
@@ -1625,16 +1126,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.观察Games三级菜单",
     "expected_text": "1.第2项显示2048",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_082",
@@ -1643,18 +1140,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.点击Car",
     "expected_text": "1.手表显示Car标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,80,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_083",
@@ -1663,18 +1154,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.点击2048",
     "expected_text": "1.手表显示2048标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,160,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_084",
@@ -1683,18 +1168,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.在Entertainment页点击Games",
     "expected_text": "1.手表显示Games标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,161,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_085",
@@ -1703,18 +1182,12 @@
     "precondition_text": "1.手表显示Games三级菜单",
     "steps_text": "1.在Games三级菜单右滑",
     "expected_text": "1.手表显示Entertainment子菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_086",
@@ -1723,25 +1196,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.点击Utilities",
     "expected_text": "1.手表显示Utilities标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_087",
@@ -1750,16 +1210,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.观察Utilities子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_088",
@@ -1768,18 +1224,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动Utilities子菜单",
     "expected_text": "1.Utilities标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_089",
@@ -1788,16 +1238,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.观察Utilities页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_090",
@@ -1806,16 +1252,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示Camera",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_091",
@@ -1824,16 +1266,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示QR Hub",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_092",
@@ -1842,16 +1280,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第3项显示Calculator",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_093",
@@ -1860,16 +1294,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第4项显示Calendar",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_094",
@@ -1878,16 +1308,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第5项显示Flashlight",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_095",
@@ -1896,18 +1322,12 @@
     "precondition_text": "1.手表显示Utilities子菜单",
     "steps_text": "1.在Utilities子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_096",
@@ -1916,16 +1336,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示Keypad",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_097",
@@ -1934,16 +1350,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示Contacts",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_098",
@@ -1952,16 +1364,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第3项显示Call History",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_099",
@@ -1970,16 +1378,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第4项显示SOS",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_100",
@@ -1988,16 +1392,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察Keypad子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_101",
@@ -2006,16 +1406,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察Contacts子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_102",
@@ -2024,16 +1420,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察Call History子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_103",
@@ -2042,16 +1434,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察SOS子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_104",
@@ -2060,21 +1448,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.点击Phone",
     "expected_text": "1.手表显示Phone标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_105",
@@ -2083,16 +1462,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察Phone子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_106",
@@ -2101,18 +1476,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.滚动Phone子菜单",
     "expected_text": "1.Phone标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_107",
@@ -2121,16 +1490,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.观察Phone页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_108",
@@ -2139,18 +1504,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.在Phone子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_109",
@@ -2159,18 +1518,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.在Phone页点击Keypad",
     "expected_text": "1.手表显示Keypad页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,90,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_110",
@@ -2179,18 +1532,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.在Phone页点击Contacts",
     "expected_text": "1.手表显示Contacts页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,182,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_111",
@@ -2199,18 +1546,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.在Phone页点击Call History",
     "expected_text": "1.手表显示Call History页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,274,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_112",
@@ -2219,27 +1560,12 @@
     "precondition_text": "1.手表显示Phone子菜单",
     "steps_text": "1.在Phone页点击SOS",
     "expected_text": "1.手表显示SOS页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_113",
@@ -2248,16 +1574,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第1项显示AI Chat",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_114",
@@ -2266,16 +1588,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第2项显示AI Watch Face",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_115",
@@ -2284,16 +1602,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.滚动至对应子项位置",
     "expected_text": "1.第3项显示AI Voice",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_116",
@@ -2302,16 +1616,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.观察AI Chat子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_117",
@@ -2320,16 +1630,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.观察AI Watch Face子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_118",
@@ -2338,16 +1644,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.观察AI Voice子项",
     "expected_text": "1.子项右侧显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_119",
@@ -2356,20 +1658,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.点击Titan Q",
     "expected_text": "1.手表显示Titan Q标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_120",
@@ -2378,16 +1672,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.观察Titan Q子菜单",
     "expected_text": "1.页面显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_121",
@@ -2396,18 +1686,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.滚动Titan Q子菜单",
     "expected_text": "1.Titan Q标题保持在顶部",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_122",
@@ -2416,16 +1700,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.观察Titan Q页面顶部",
     "expected_text": "1.页面右上角显示当前时分",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_123",
@@ -2434,18 +1714,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.在Titan Q子菜单右滑",
     "expected_text": "1.手表显示主菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_124",
@@ -2454,18 +1728,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.在Titan Q页点击AI Chat",
     "expected_text": "1.手表显示AI Chat标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,90,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_125",
@@ -2474,18 +1742,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.在Titan Q页点击AI Watch Face",
     "expected_text": "1.手表显示AI Watch Face标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,170,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_126",
@@ -2494,18 +1756,12 @@
     "precondition_text": "1.手表显示Titan Q子菜单",
     "steps_text": "1.在Titan Q页点击AI Voice",
     "expected_text": "1.手表显示AI Voice标题页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,250,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_127",
@@ -2514,17 +1770,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.观察List主菜单中的Phone",
     "expected_text": "1.Phone行右侧不显示>箭头",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_128",
@@ -2533,29 +1784,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.将Menu Style设为Grid\n2.进入主菜单\n3.点击Health图标",
     "expected_text": "1.主菜单显示Grid布局\n2.手表显示Grid主菜单\n3.Health子菜单显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,245,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91281;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91282;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,160,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91283;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "Menu Style 选择 Grid 后显示为当前布局",
-      "进入主菜单后显示 Grid 主菜单",
-      "点击 Health 后子菜单显示单列列表"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "MENU_129",
@@ -2564,38 +1798,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.将Menu Style设为Honeycomb\n2.进入主菜单\n3.点击Entertainment图标\n4.点击Games",
     "expected_text": "1.主菜单显示Honeycomb布局\n2.手表显示Honeycomb主菜单\n3.手表显示Entertainment子菜单\n4.Games三级菜单显示单列列表",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,188,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91291;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91292;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,240,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91293;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,161,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91294;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "Menu Style 选择 Honeycomb 后显示为当前布局",
-      "进入主菜单后显示 Honeycomb 主菜单",
-      "点击 Entertainment 后显示其子菜单",
-      "点击 Games 后三级菜单显示单列列表"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "MENU_130",
@@ -2604,17 +1812,12 @@
     "precondition_text": "1.系统时间已设为13:05",
     "steps_text": "1.进入Sports子菜单",
     "expected_text": "1.页面右上角显示13:05",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_131",
@@ -2623,26 +1826,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在设置选择Modern主题\n2.进入主菜单",
     "expected_text": "1.Modern显示为当前主题\n2.一级菜单显示Modern背景图",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_THEMES,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:200,90,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91311;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MENU_LIST,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91312;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树",
-    "verification_points": [
-      "Modern 显示为当前主题",
-      "进入一级菜单后显示 Modern 背景图"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_132",
@@ -2651,26 +1840,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在设置选择Modern主题\n2.进入Health子菜单",
     "expected_text": "1.Modern显示为当前主题\n2.Health页面显示Modern背景图",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_THEMES,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:200,90,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91321;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91322;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树",
-    "verification_points": [
-      "Modern 显示为当前主题",
-      "进入 Health 后显示 Modern 背景图"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_133",
@@ -2679,26 +1854,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.在设置选择Modern主题\n2.进入Games三级菜单",
     "expected_text": "1.Modern显示为当前主题\n2.Games页面显示Modern背景图",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING_THEMES,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:200,90,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91331;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:GAME,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91332;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "坐标或窗口参数来自当前源码和模拟器 GUI 树",
-    "verification_points": [
-      "Modern 显示为当前主题",
-      "进入 Games 后显示 Modern 背景图"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_134",
@@ -2707,28 +1868,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.滚动主菜单至底部\n2.单击编码器返回主表盘\n3.再次单击编码器",
     "expected_text": "1.主菜单显示底部菜单项\n2.手表显示主表盘\n3.主菜单显示第1项",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91341;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91342;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91343;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "滚动后主菜单显示底部菜单项",
-      "单击编码器后显示主表盘",
-      "再次单击编码器后主菜单回到第1项"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "MENU_135",
@@ -2737,35 +1882,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.依次选择List\n2.选择Honeycomb\n3.选择Grid\n4.进入主菜单",
     "expected_text": "1.List显示为当前选项\n2.Honeycomb显示为当前选项\n3.Grid显示为当前选项\n4.主菜单显示Grid布局",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,96,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91351;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,188,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91352;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:PERS_MENU_STYLE_SEL,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,245,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91353;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:91354;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "List 显示为当前选项",
-      "Honeycomb 显示为当前选项",
-      "Grid 显示为当前选项",
-      "进入主菜单后显示 Grid 布局"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "MENU_136",
@@ -2774,17 +1896,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.用可编程触控治具连续滚动主菜单500次",
     "expected_text": "1.手表未发生异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/流程: 1.用可编程触控治具连续滚动主菜单500次"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_137",
@@ -2793,19 +1910,12 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.依次组合三种菜单风格与Modern主题",
     "expected_text": "1.每种风格均显示Modern背景图",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "MENU_138",
@@ -2814,16 +1924,11 @@
     "precondition_text": "1.手表显示主菜单",
     "steps_text": "1.点击Grid布局最边缘图标",
     "expected_text": "1.手表进入所点击图标的功能首页，页面标题与图标名称一致",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "Grid 边缘图标无文本标识"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

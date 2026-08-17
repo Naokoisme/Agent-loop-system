@@ -1,6 +1,6 @@
 """映射表加载 + 用例执行：查表顺序发命令 + 采集终端 JSON。
 
-映射按执行项目隔离在 ``case_map/620C_case_map``、
+映射按执行项目隔离在 ``case_map/620C_simulator_case_map``、
 ``case_map/6202_case_map`` 和 ``case_map/6202_simulator_case_map``，
 不得跨项目静默回退。
 实际格式为扁平三段式：setup（前置）→ actions（操作）→ collect（采集判定依据）。
@@ -24,11 +24,11 @@ from pydantic import BaseModel
 from agent_loop_system.tools.command_protocol import collect_command_json, normalize_command
 CASE_MAP_DIR = Path(r"d:\Agent-loop-system\case_map")
 CASE_MAP_TARGET_DIRS = {
-    "simulator": CASE_MAP_DIR / "620C_case_map",
+    "simulator": CASE_MAP_DIR / "620C_simulator_case_map",
     "hardware": CASE_MAP_DIR / "6202_case_map",
 }
 CASE_MAP_PROFILE_DIRS = {
-    "620C_W6830": CASE_MAP_DIR / "620C_case_map",
+    "620C_W6830": CASE_MAP_DIR / "620C_simulator_case_map",
     "6202_W5230": CASE_MAP_DIR / "6202_case_map",
     "6202_W5230_SIMULATOR": CASE_MAP_DIR / "6202_simulator_case_map",
 }
@@ -85,8 +85,21 @@ class CaseEntry(BaseModel):
     setup: list[str] = []  # 完整 wire 格式，如 'srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;'
     actions: list[str] = []
     collect: list[str] = []
-    unable: bool = False  # 外部 Agent 标记无法翻译
+    unable: bool = False  # 旧数据兼容；不再作为 Runner 入口闸门
+    mapping_status: str = ""
     note: str = ""
+
+    @property
+    def is_promoted(self) -> bool:
+        """只有精确的 PROMOTED 才使用固化步骤。"""
+
+        return self.mapping_status.strip() == "PROMOTED"
+
+    @property
+    def has_candidate_mapping(self) -> bool:
+        """外部 Agent 正式复跑前写入的临时候选至少要有一个业务动作。"""
+
+        return bool(self.actions)
 
 
 @dataclass
@@ -96,43 +109,32 @@ class CaseRunResult:
     case_id: str
     sheet: str
     expected_text: str
+    execution_mode: str = "fixed_mapping"
     precondition_text: str = ""
     steps_text: str = ""
     verification_points: list[str] = field(default_factory=list)
     planned_commands: dict[str, list[str]] = field(default_factory=dict)
     command_trace: list[dict[str, object]] = field(default_factory=list)
     evidence_contract: dict[str, object] = field(default_factory=dict)
-    skipped: bool = False  # unable=true 时跳过
+    skipped: bool = False  # 只兼容旧结果；当前 Runner 不再因 unable 跳过用例
     setup_errors: list[str] = field(default_factory=list)
     action_errors: list[str] = field(default_factory=list)
     collect_errors: list[str] = field(default_factory=list)
     terminal_json: list[dict] = field(default_factory=list)  # 全程采集的终端 JSON
     screenshots: list[dict[str, object]] = field(default_factory=list)
     aborted: bool = False  # 是否因 setup/actions 失败而中止
+    precomputed_verdict: str = ""
+    precomputed_reason: str = ""
+    exploration_trace: dict[str, object] | None = None
 
 
 def effective_case_entries(data: object) -> list[dict]:
-    """按 sheet 级项目能力生成实际可执行的 case_map 条目。"""
+    """读取原始条目；所有用例都可以交给 Runner 尝试执行。"""
 
     raw_entries = data.get("cases", data) if isinstance(data, dict) else data
     if not isinstance(raw_entries, list):
         return []
-    if not isinstance(data, dict) or not (
-        data.get("supported") is False or data.get("execution_supported") is False
-    ):
-        return [item for item in raw_entries if isinstance(item, dict)]
-
-    reason = str(data.get("unavailable_reason") or "当前项目不支持该模块").strip()
-    result: list[dict] = []
-    for raw in raw_entries:
-        if not isinstance(raw, dict):
-            continue
-        item = dict(raw)
-        item.update({"setup": [], "actions": [], "collect": [], "unable": True})
-        note = str(item.get("note") or "").strip()
-        item["note"] = f"{note}；{reason}" if note and reason not in note else (note or reason)
-        result.append(item)
-    return result
+    return [item for item in raw_entries if isinstance(item, dict)]
 
 
 def case_map_dir_for_target(target: str = "simulator") -> Path:
@@ -186,12 +188,13 @@ def run_case(
     """顺序发命令执行用例，采集终端 JSON。
 
     流程：setup（失败中止）→ actions（失败中止）→ collect（失败不中止，仅采集）。
-    unable=true 的用例直接跳过。
+    本函数只执行传入的固定命令。非固化用例的 Agent 探索分支由 test.py 选择。
     """
     result = CaseRunResult(
         case_id=case.case_id,
         sheet=case.sheet,
         expected_text=case.expected_text,
+        execution_mode=("fixed_mapping" if case.is_promoted else "candidate_mapping"),
         precondition_text=case.precondition_text,
         steps_text=case.steps_text,
         verification_points=list(case.verification_points),
@@ -201,10 +204,6 @@ def run_case(
             "collect": list(case.collect),
         },
     )
-
-    if case.unable:
-        result.skipped = True
-        return _finish_case_run(case, result)
 
     # setup：前置条件，失败则中止
     screenshot_base = Path(screenshot_path) if screenshot_path else None

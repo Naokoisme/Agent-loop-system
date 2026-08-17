@@ -9,16 +9,12 @@
       "precondition_text": "1.手表显示控制中心SOS图标",
       "steps_text": "1.点击SOS图标",
       "expected_text": "1.手表先检查紧急联系人和设备连接状态",
-      "verification_points": [
-        "未设置紧急联系人：显示 Sync your SOS Contact from mobile app.，不显示连接提示和联系人信息",
-        "已设置紧急联系人但 HFP 未连接：显示 Check the connection between your smart watch and the app.，不显示联系人信息",
-        "已设置紧急联系人且 HFP 已连接：显示紧急联系人姓名 QA SOS 和号码 13800138000，不显示前两种提示"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前402x256 SHORTCUT Designer确认SOS事件绑定在控制中心第2页下行第3个控件，(305,184)位于该控件内；进入后依次采集三种互斥状态；6202首轮迁移暂不可执行：SIM_SOS_CONTACT_SET 仅用于620C模拟器；SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SOS_002",
@@ -27,32 +23,12 @@
       "precondition_text": "1.手表未处于省电模式",
       "steps_text": "1.持续按住实体按键5秒",
       "expected_text": "1.手表先检查紧急联系人和设备连接状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:201,0;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:202,hfp,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:204,1,QA SOS,12345678901;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:205,hfp,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:115,410,1;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:207,hfp,1;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "复用Windows模拟器通用联系人/HFP状态注入和6202实体下键5000ms物理长按；三张截图分别覆盖无联系人、已有联系人但HFP断开、联系人与HFP均可用，产品结果只按截图判定。",
-      "verification_points": [
-        "无紧急联系人时，长按实体按键后的截图显示同步SOS联系人提示",
-        "已有联系人但HFP未连接时，截图显示检查手表与App连接提示",
-        "联系人和HFP连接均可用时，截图显示SOS倒计时流程"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_003",
@@ -64,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_004",
@@ -77,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过当前402x256 SHORTCUT Designer确认的控制中心SOS控件触发，验证无紧急联系人分支；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_SOS_CONTACT_SET 仅用于620C模拟器；SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_005",
@@ -90,12 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从控制中心真实触发无联系人提示，截图覆盖提示页基线与保持无操作5秒后的自动返回；6202首轮迁移暂不可执行：SIM_SOS_CONTACT_SET 仅用于620C模拟器；SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "等待前截图显示未设置SOS联系人提示页",
-        "保持无操作5秒后，截图显示提示页消失并返回触发前页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_006",
@@ -107,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_007",
@@ -120,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过当前402x256 SHORTCUT Designer确认的控制中心SOS控件触发，验证已有联系人但HFP未连接分支；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_SOS_CONTACT_SET 仅用于620C模拟器；SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_008",
@@ -133,12 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "从控制中心真实触发已有联系人但HFP未连接提示，截图覆盖提示页基线与5秒后的自动返回；6202首轮迁移暂不可执行：SIM_SOS_CONTACT_SET 仅用于620C模拟器；SIM_CONNECTION_SET 仅用于620C模拟器；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "等待前截图显示设备连接检查提示页",
-        "保持无操作5秒后，截图显示提示页消失并返回触发前页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_009",
@@ -150,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_010",
@@ -163,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需外部触发链路: 1.从控制中心触发SOS；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_011",
@@ -176,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202实际产品是8秒文字倒计时，不是本用例要求的3/2/1圆环；不得以任意一张SOS页面截图冒充该时序预期。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_012",
@@ -186,25 +163,12 @@
       "precondition_text": "1.手表正在显示SOS倒计时页",
       "steps_text": "1.点击取消按钮",
       "expected_text": "1.点击灰色宽取消按钮后，手表返回触发前页面，不拨号",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:1201,1,QA SOS,12345678901;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1202,hfp,1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:115,410,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "用6202实体下键5000ms长按建立真实8秒倒计时；已在外部验证取消键坐标，取消前后各采集一张截图。",
-      "verification_points": [
-        "点击取消前截图显示QA SOS、号码和自动拨号倒计时",
-        "点击红色取消按钮后截图返回触发前表盘且不显示呼出页面"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_013",
@@ -216,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前缺可稳定建立并冻结在倒计时1秒帧的通用SOS状态能力，且完整预期还要求手机侧不拨号证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_014",
@@ -229,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前缺可稳定建立并冻结在倒计时2秒帧的通用SOS状态能力，且完整预期还要求手机侧不拨号证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_015",
@@ -242,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_016",
@@ -252,25 +219,12 @@
       "precondition_text": "1.手表正在显示SOS倒计时页",
       "steps_text": "1.保持无操作直到倒计时结束",
       "expected_text": "1.手表自动发起紧急呼叫，显示联系人姓名和Calling",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:1601,1,QA SOS,12345678901;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1602,hfp,1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:9000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
       "collect": [],
       "unable": false,
-      "note": "用通用SOS联系人/HFP状态和6202实体下键5000ms长按建立真实8秒倒计时；等待9秒后再次截图，不依赖命令回执判定产品结果。",
-      "verification_points": [
-        "等待前截图显示SOS倒计时页",
-        "倒计时结束后截图显示联系人姓名和Calling"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_017",
@@ -279,23 +233,12 @@
       "precondition_text": "1.SOS已发起且对方尚未接听",
       "steps_text": "1.观察SOS呼出中页",
       "expected_text": "1.页面显示联系人姓名和Calling和扬声器和挂断和静音按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:1701,1,QA SOS,12345678901;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1702,hfp,1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:2,2,5000;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:9000;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "从联系人/HFP状态和实体下键长按建立真实SOS流程，等待8秒倒计时自然结束后截图；不再用直接打开联系人页冒充呼出中页。",
-      "verification_points": [
-        "截图显示QA SOS、Calling out以及静音、挂断、扬声器三个按钮"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_018",
@@ -307,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_019",
@@ -320,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_020",
@@ -333,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_021",
@@ -346,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_022",
@@ -359,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前模拟器没有构造SOS呼出后远端无人接听并返回标准未接通结果的通话状态事件；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_023",
@@ -369,30 +317,12 @@
       "precondition_text": "1.App已设置1个紧急联系人",
       "steps_text": "1.进入Phone中的SOS列表",
       "expected_text": "1.页面仅显示该联系人，左侧为圆形头像，右侧分别显示姓名和电话号码",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:2301,1,QA SOS,12345678901;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:2302,hfp,1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,385,1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "用通用状态注入建立唯一紧急联系人和HFP连接，经Phone真实列表滚动与点击进入SOS联系人页；若截图缺少预期号码，应如实判FAIL。",
-      "verification_points": [
-        "SOS联系人页截图仅显示一个圆形头像条目，并同时显示QA SOS和12345678901"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_024",
@@ -401,29 +331,12 @@
       "precondition_text": "1.App未设置紧急联系人",
       "steps_text": "1.进入Phone应用",
       "expected_text": "1.Phone内不显示可点击的SOS联系人条目",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:SIM_SOS_CONTACT_SET:2401,0;",
-        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:2402,hfp,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "清空紧急联系人后进入Phone并滚到列表底部，截图必须覆盖末项，避免只看首屏就误判SOS条目不存在。",
-      "verification_points": [
-        "Phone列表底部截图以Call recording结束，下面没有SOS或Emergency contact条目"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_025",
@@ -435,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_026",
@@ -448,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_027",
@@ -461,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_028",
@@ -474,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_029",
@@ -487,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_030",
@@ -500,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "普通联系人和连接状态可注入；SOS联系人使用独立存储，当前缺专用SOS联系人注入命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_031",
@@ -513,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期仍是待产品确认，缺少可判定PASS/FAIL的产品Oracle；不能用未执行断连动作的任意截图冒充结果。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_032",
@@ -526,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有真实不可拨号码的外部呼叫失败回执和标准失败页状态；直接打开SOS联系人页不能证明自动拨号失败。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_033",
@@ -539,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_034",
@@ -552,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_035",
@@ -565,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "5000ms实体主键长按可执行；当前缺幂等建立省电模式及省电表盘的SIM_POWER_SAVING_SET，不能只长按而跳过前置状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_036",
@@ -578,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_037",
@@ -591,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_038",
@@ -604,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_039",
@@ -617,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_040",
@@ -630,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前模拟器没有可验证手机端未误拨的证据通道，也没有一次性可靠执行20轮触发和取消的通用命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SOS_041",
@@ -643,8 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖Android和iOS真机App完成联系人同步与真实SOS呼叫，当前单机模拟器无法建立两平台前置状态和外部呼叫证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

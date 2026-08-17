@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_008",
@@ -103,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_009",
@@ -116,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_010",
@@ -129,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_011",
@@ -142,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_012",
@@ -155,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_013",
@@ -168,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_014",
@@ -181,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_015",
@@ -194,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_016",
@@ -207,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_017",
@@ -220,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_018",
@@ -233,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_019",
@@ -246,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_020",
@@ -259,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_021",
@@ -272,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_022",
@@ -285,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_023",
@@ -298,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_024",
@@ -311,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_025",
@@ -324,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_026",
@@ -337,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_027",
@@ -350,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_028",
@@ -363,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_029",
@@ -376,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_030",
@@ -389,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_031",
@@ -402,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_032",
@@ -415,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_033",
@@ -428,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_034",
@@ -441,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_035",
@@ -454,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_036",
@@ -467,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_037",
@@ -480,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_038",
@@ -493,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_039",
@@ -506,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_040",
@@ -519,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_041",
@@ -532,8 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_042",
@@ -545,8 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_043",
@@ -558,8 +600,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_044",
@@ -571,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_045",
@@ -584,8 +628,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_046",
@@ -597,8 +642,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_047",
@@ -610,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_048",
@@ -623,8 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_049",
@@ -636,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_050",
@@ -649,8 +698,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_051",
@@ -662,8 +712,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_052",
@@ -675,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "页面证据不能判断不振动，当前没有振动采集证据通道；不把仅有屏幕状态当成完整验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 WEAR_SET；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_053",
@@ -688,12 +740,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "未佩戴状态收到通知后不显示即时提醒",
-        "进入通知中心后列表显示刚发送的通知"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 WEAR_SET；6202当前固件未注册 SEND_MSG_TEST。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_054",
@@ -705,8 +754,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 WEAR_SET；SIM_SYSTEM_EVENT 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_055",
@@ -718,8 +768,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_056",
@@ -731,8 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_057",
@@ -744,8 +796,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_058",
@@ -757,8 +810,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 WEAR_SET；SIM_SYSTEM_EVENT 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_059",
@@ -770,8 +824,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_060",
@@ -783,8 +838,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_061",
@@ -796,8 +852,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前实时命令无法建立隐藏通知内容已开启这一前置状态；不能只进入通知列表冒充点击通知；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_062",
@@ -809,8 +866,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_063",
@@ -822,8 +880,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_064",
@@ -835,8 +894,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先用当前源码命令清空通知，再直达注册的 MESSAGE_LIST 验证空状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_065",
@@ -848,8 +908,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_066",
@@ -861,8 +922,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_067",
@@ -874,8 +936,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SEND_MSG_TEST 会真实写入通知中心，再直达 MESSAGE_LIST 核对列表字段；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_068",
@@ -887,8 +950,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_069",
@@ -900,8 +964,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_070",
@@ -913,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_071",
@@ -926,8 +992,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_072",
@@ -939,8 +1006,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_073",
@@ -952,8 +1020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_074",
@@ -965,8 +1034,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_075",
@@ -978,8 +1048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_076",
@@ -991,12 +1062,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "连续发送20条通知后即时提醒链路仍可响应",
-        "进入通知列表后可核对最新20条及最早通知"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_077",
@@ -1008,12 +1076,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "发送第21条通知后即时提醒链路仍可响应",
-        "进入通知列表后只保留最新20条且最早一条消失"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_078",
@@ -1025,12 +1090,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "同一应用连续发送2条通知后即时提醒显示最新通知",
-        "通知列表显示一张应用名+1的堆叠卡片"
-      ],
-      "unable": true,
-      "note": "SEND_MSG_TEST 写入通知中心后会弹出半屏通知；已实测需先右滑关闭，再进入 MESSAGE_LIST 查看堆叠卡；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_079",
@@ -1042,12 +1104,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "同一应用连续发送3条通知后即时提醒显示最新通知",
-        "通知列表堆叠卡显示应用名+2并预览最新一条"
-      ],
-      "unable": true,
-      "note": "使用 SEND_MSG_TEST 写入三条同应用通知，右滑关闭自动弹出的半屏通知，再进入 MESSAGE_LIST；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_080",
@@ -1059,12 +1118,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "依次发送两条通知后即时提醒显示后一条通知",
-        "通知列表堆叠卡时间显示为后一条通知的时间"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_081",
@@ -1076,8 +1132,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_082",
@@ -1089,8 +1146,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_083",
@@ -1102,12 +1160,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "上滑后显示后续同应用通知",
-        "下滑后显示前序同应用通知"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_084",
@@ -1119,8 +1174,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_085",
@@ -1132,8 +1188,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_086",
@@ -1145,8 +1202,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "402x256 MESSAGE_LIST Designer静态结构确认首条卡片覆盖列表顶部区域，(201,128)位于卡片内部；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_087",
@@ -1158,8 +1216,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_088",
@@ -1171,12 +1230,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "下滑前详情已离开顶部",
-        "下滑后页面显示正文前序内容"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_089",
@@ -1188,12 +1244,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "旋转前通知正文位置",
-        "旋转后通知正文沿旋转方向滚动"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_090",
@@ -1205,8 +1258,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_091",
@@ -1218,8 +1272,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_092",
@@ -1231,8 +1286,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_093",
@@ -1244,8 +1300,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_094",
@@ -1257,8 +1314,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_095",
@@ -1270,8 +1328,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_096",
@@ -1283,8 +1342,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_097",
@@ -1296,13 +1356,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "左滑后目标通知显示红色删除入口",
-        "点击删除入口后显示删除确认弹窗",
-        "点击确认后目标通知被删除且列表刷新"
-      ],
-      "unable": true,
-      "note": "卡片区域滑动及删除/确认坐标来自当前402x256 MESSAGE_LIST和COMMON_TITLE_BUTTON_TIP共享布局；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_098",
@@ -1314,8 +1370,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "取消按钮区域来自当前402x256 COMMON_TITLE_BUTTON_TIP Designer静态布局；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_099",
@@ -1327,8 +1384,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "删除确认弹窗、等待和按键均可执行；最终主表盘截图无法同时证明目标通知未被删除，当前缺不改变人工步骤的可见状态证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_100",
@@ -1340,13 +1398,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "左滑后折叠卡显示删除入口",
-        "点击删除入口后显示删除确认弹窗",
-        "点击确认后该应用整组通知从列表消失"
-      ],
-      "unable": true,
-      "note": "卡片区域滑动及删除/确认坐标来自当前402x256 MESSAGE_LIST和COMMON_TITLE_BUTTON_TIP共享布局；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_101",
@@ -1358,12 +1412,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "点击Clear All后显示清空确认弹窗",
-        "点击确认后全部通知清除并显示No Notifications"
-      ],
-      "unable": true,
-      "note": "Clear All和确认按钮区域来自当前402x256 MESSAGE_LIST及COMMON_TITLE_BUTTON_TIP Designer静态布局；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_102",
@@ -1375,13 +1426,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "取消前原通知数量",
-        "清空确认弹窗正在显示",
-        "取消后弹窗关闭且通知数量保持不变"
-      ],
-      "unable": true,
-      "note": "Clear All和取消按钮区域来自当前402x256 MESSAGE_LIST及COMMON_TITLE_BUTTON_TIP Designer静态布局；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 CLEAR_ALL_MSG: clear or erase；SIM_CONNECTION_SET 仅用于620C模拟器；6202当前固件未注册 SEND_MSG_TEST；SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "NOTIF_103",
@@ -1393,8 +1440,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "清空确认弹窗、等待和按键均可执行；最终主表盘截图无法同时证明原通知未被清空，当前缺不改变人工步骤的可见状态证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_104",
@@ -1406,8 +1454,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_105",
@@ -1419,8 +1468,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_106",
@@ -1432,8 +1482,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_107",
@@ -1445,8 +1496,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_108",
@@ -1458,8 +1510,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_109",
@@ -1471,8 +1524,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_110",
@@ -1484,8 +1538,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "NOTIF_111",
@@ -1497,8 +1552,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖手机 App 通知发送链路(实测 MSG_TEST 注入不写入通知中心)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

@@ -268,7 +268,7 @@ class RealDeviceSessionTest(unittest.TestCase):
 
     def test_start_uses_external_test_session_without_mutating_it(self) -> None:
         serial = FakeSerial()
-        camera = FakeCaptureProvider(FakeFrame(FakeMetadata(sequence=10), (1, 2, 3)))
+        camera = FakeCaptureProvider()
         with tempfile.TemporaryDirectory() as root:
             session = self._session(serial, camera, root)
             with mock.patch.object(real_device.time, "time_ns", return_value=123456789):
@@ -289,10 +289,7 @@ class RealDeviceSessionTest(unittest.TestCase):
                     "expected_status": "processed",
                 },
             )
-            self.assertEqual(
-                camera.capture_calls,
-                [{"timeout": 1.5, "after_sequence": None}],
-            )
+            self.assertEqual(camera.capture_calls, [])
             self.assertEqual(session.lines_since(1), ["ready"])
             session.stop()
             self.assertEqual(len(serial.send_calls), 1)
@@ -340,7 +337,6 @@ class RealDeviceSessionTest(unittest.TestCase):
     def test_capture_requires_new_frame_and_writes_generic_metadata_and_sidecar(self) -> None:
         serial = FakeSerial()
         camera = FakeCaptureProvider(
-            FakeFrame(FakeMetadata(sequence=20), (1, 2, 3)),
             FakeFrame(
                 FakeMetadata(sequence=21, timestamp=456.25, width=4, height=3),
                 (10, 20, 30),
@@ -359,7 +355,7 @@ class RealDeviceSessionTest(unittest.TestCase):
             self.assertEqual(evidence_path.read_bytes(), raw_path.read_bytes())
             self.assertEqual(
                 camera.capture_calls[-1],
-                {"timeout": 1.5, "after_sequence": 20},
+                {"timeout": 1.5, "after_sequence": 0},
             )
             self.assertEqual(
                 session.last_capture_metadata,
@@ -388,10 +384,9 @@ class RealDeviceSessionTest(unittest.TestCase):
             )
             session.stop()
 
-    def test_configured_capture_timeout_reaches_baseline_and_screenshot(self) -> None:
+    def test_configured_capture_timeout_reaches_first_screenshot(self) -> None:
         serial = FakeSerial()
         provider = FakeCaptureProvider(
-            FakeFrame(FakeMetadata(sequence=30), (1, 2, 3)),
             FakeFrame(FakeMetadata(sequence=31), (4, 5, 6)),
         )
         with tempfile.TemporaryDirectory() as root:
@@ -404,10 +399,7 @@ class RealDeviceSessionTest(unittest.TestCase):
 
         self.assertEqual(
             provider.capture_calls,
-            [
-                {"timeout": 12.0, "after_sequence": None},
-                {"timeout": 12.0, "after_sequence": 30},
-            ],
+            [{"timeout": 12.0, "after_sequence": 0}],
         )
 
     def test_watch_capture_provider_integration_uses_borrowed_serial_and_metadata(self) -> None:
@@ -535,17 +527,14 @@ class RealDeviceSessionTest(unittest.TestCase):
                 "dal_usb close",
                 'srv_quick_cmd send "TOP5STEP:SCREENSHOT_CAPTURE_FILE:200;"',
                 "dal_usb open",
-                "dal_usb close",
-                'srv_quick_cmd send "TOP5STEP:SCREENSHOT_CAPTURE_FILE:201;"',
-                "dal_usb open",
             ],
         )
-        self.assertEqual(session.last_capture_metadata["sequence"], 201)
+        self.assertEqual(session.last_capture_metadata["sequence"], 200)
         self.assertEqual(session.last_capture_metadata["transport"], "mtp")
         self.assertEqual(session.last_capture_metadata["encoding"], "bmp")
         self.assertEqual(
             session.last_capture_metadata["mtp_file_name"],
-            "agent_capture_201.bmp",
+            "agent_capture_200.bmp",
         )
         self.assertFalse(session.last_capture_metadata["receipt_verified"])
         self.assertEqual(session.last_capture_metadata["file_size"], 618_518)
@@ -599,7 +588,7 @@ class RealDeviceSessionTest(unittest.TestCase):
         self.assertFalse(session.started)
 
     def test_start_failure_cleans_up_serial_and_capture_provider(self) -> None:
-        for failure_point in ("serial", "handshake", "capture"):
+        for failure_point in ("serial", "handshake"):
             with self.subTest(failure_point=failure_point), tempfile.TemporaryDirectory() as root:
                 serial = FakeSerial()
                 camera = FakeCaptureProvider(FakeFrame(FakeMetadata(sequence=1), (1, 2, 3)))
@@ -614,14 +603,11 @@ class RealDeviceSessionTest(unittest.TestCase):
                         lines=[],
                         start_index=0,
                     )
-                else:
-                    camera.capture_error = RuntimeError("capture failed")
                 session = self._session(serial, camera, root)
 
                 expected_message = {
                     "serial": "ping failed",
                     "handshake": "GUI_PING handshake",
-                    "capture": "capture failed",
                 }[failure_point]
                 with self.assertRaisesRegex(RuntimeError, expected_message):
                     session.start()
@@ -632,6 +618,27 @@ class RealDeviceSessionTest(unittest.TestCase):
                 session.stop()
                 self.assertEqual(serial.stop_calls, 1)
                 self.assertEqual(camera.close_calls, 1)
+
+    def test_first_capture_failure_uses_initial_sequence_without_writing_evidence(
+        self,
+    ) -> None:
+        serial = FakeSerial()
+        camera = FakeCaptureProvider(capture_error=RuntimeError("capture failed"))
+        with tempfile.TemporaryDirectory() as root:
+            session = self._session(serial, camera, root)
+            session.start()
+            evidence_path = Path(root) / "step_00.bmp"
+
+            with self.assertRaisesRegex(RuntimeError, "capture failed"):
+                session.capture_screenshot(evidence_path)
+
+            self.assertEqual(
+                camera.capture_calls,
+                [{"timeout": 1.5, "after_sequence": 0}],
+            )
+            self.assertFalse(evidence_path.exists())
+            self.assertTrue(session.started)
+            session.stop()
 
 
 if __name__ == "__main__":

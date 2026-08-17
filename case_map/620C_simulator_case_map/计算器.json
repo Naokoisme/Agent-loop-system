@@ -6,18 +6,12 @@
     "precondition_text": "1.手表显示Utilities二级菜单",
     "steps_text": "1.点击Calculator",
     "expected_text": "1.页面显示数值0和四行计算键盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:UTILITIES,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,235,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_002",
@@ -26,16 +20,12 @@
     "precondition_text": "1.手表显示Calculator",
     "steps_text": "1.观察全部按键",
     "expected_text": "1.键盘显示数字和小数点和四则运算和等号和AC和退格，无百分号和正负号",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_003",
@@ -44,20 +34,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次点击1和2和3",
     "expected_text": "1.数值区显示123",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_004",
@@ -66,26 +48,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入123456789",
     "expected_text": "1.数值区显示123456789",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_005",
@@ -94,27 +62,12 @@
     "precondition_text": "1.数值区已有9位数字",
     "steps_text": "1.点击任一数字键",
     "expected_text": "1.数值区仍保持原9位内容，不显示提示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_006",
@@ -123,32 +76,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.输入1234567.8\n2.点击数字9",
     "expected_text": "1.数值区显示1234567.8共9位\n2.第10位输入无响应",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:6002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "输入 1234567.8 后和继续点击 9 后分别采集数值区",
-    "verification_points": [
-      "数值区显示1234567.8共9位",
-      "继续点击数字9后数值区仍显示1234567.8"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_007",
@@ -157,25 +90,12 @@
     "precondition_text": "1.计算器刚清空",
     "steps_text": "1.点击小数点\n2.点击5",
     "expected_text": "1.数值区显示0.\n2.数值区显示0.5",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,77,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:7001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:7002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "小数点和数字 5 输入后分别采集显示值",
-    "verification_points": [
-      "数值区显示0.",
-      "数值区显示0.5"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_008",
@@ -184,21 +104,12 @@
     "precondition_text": "1.数值区显示1.2",
     "steps_text": "1.点击小数点",
     "expected_text": "1.数值区保持1.2",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_009",
@@ -207,21 +118,12 @@
     "precondition_text": "1.数值区显示123",
     "steps_text": "1.点击退格",
     "expected_text": "1.数值区显示12",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_010",
@@ -230,19 +132,12 @@
     "precondition_text": "1.数值区显示7",
     "steps_text": "1.点击退格",
     "expected_text": "1.数值区显示0",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,77,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_011",
@@ -251,20 +146,12 @@
     "precondition_text": "1.计算器已显示运算结果8",
     "steps_text": "1.点击退格",
     "expected_text": "1.数值区显示0，运算状态清除",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_012",
@@ -273,21 +160,12 @@
     "precondition_text": "1.计算器已输入一段未完成运算",
     "steps_text": "1.点击AC",
     "expected_text": "1.数值区显示0，运算状态清除",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_013",
@@ -296,21 +174,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次点击2和+和3和=",
     "expected_text": "1.数值区显示5",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_014",
@@ -319,21 +188,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次点击8和-和3和=",
     "expected_text": "1.数值区显示5",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_015",
@@ -342,21 +202,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次点击4和×和3和=",
     "expected_text": "1.数值区显示12",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_016",
@@ -365,21 +216,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次点击8和÷和2和=",
     "expected_text": "1.数值区显示4",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_017",
@@ -388,25 +230,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入1.2+3.4=",
     "expected_text": "1.数值区显示4.6",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_018",
@@ -415,28 +244,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入8+\n2.点击乘号\n3.输入2=",
     "expected_text": "1.最新运算符替换为乘号\n2.数值区显示16\n3.数值区保持16",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:18001;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:18002,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:18003;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "最终16是乘号替换加号的可见行为证据；等待后再次截图确认结果保持，避免要求截图显示内部运算符状态",
-    "verification_points": [
-      "数值区显示16，证明最新乘号已替换先前加号",
-      "等待后数值区仍保持16"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_019",
@@ -445,32 +258,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入2+3\n2.点击乘号\n3.输入4=",
     "expected_text": "1.计算器先得到5，等待新右值\n2.数值区显示20\n3.数值区保持20",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,125,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:19001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:19002;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:19003,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:19004;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先用等号得到5，再点击乘号等待右值；输入4并等于后对20做延时复核",
-    "verification_points": [
-      "计算器先得到5并等待新右值",
-      "数值区显示20",
-      "等待后数值区仍保持20"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_020",
@@ -479,21 +272,12 @@
     "precondition_text": "1.准备结果小于10位的运算",
     "steps_text": "1.执行运算，点击等号",
     "expected_text": "1.数值区完整显示结果，不使用科学计数法",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_021",
@@ -502,29 +286,12 @@
     "precondition_text": "1.准备结果至少10位的运算",
     "steps_text": "1.执行运算，点击等号",
     "expected_text": "1.数值区使用尾数e加减指数格式显示结果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_022",
@@ -533,31 +300,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.连续输入9位数字",
     "expected_text": "1.数值区字号按可用宽度缩小，数字不溢出",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:22001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:22002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先截图单个9作为字号基线，再完成9位输入并截图，使用前后画面对比缩放且确认未裁切",
-    "verification_points": [
-      "单个9的默认字号基线",
-      "连续输入9位后字号缩小且数字未溢出"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_023",
@@ -566,21 +314,12 @@
     "precondition_text": "1.准备会产生长小数的运算",
     "steps_text": "1.执行运算，点击等号",
     "expected_text": "1.待产品确认：四舍五入位数和最终显示值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_024",
@@ -589,50 +328,12 @@
     "precondition_text": "1.准备超大结果和极小非零结果",
     "steps_text": "1.分别执行两组运算",
     "expected_text": "1.待产品确认：溢出显示和科学计数指数范围",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_025",
@@ -641,22 +342,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入5÷0=",
     "expected_text": "1.数值区显示Error",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:26000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_026",
@@ -665,33 +356,12 @@
     "precondition_text": "1.计算器显示Error",
     "steps_text": "1.点击数字键\n2.点击运算符\n3.点击AC",
     "expected_text": "1.数值区保持Error\n2.数值区保持Error\n3.数值区恢复0",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:26000;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:26001;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:26002;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,77,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:26003;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先截图确认除零已建立Error前置，再分别采集数字键、运算符和AC后的显示值",
-    "verification_points": [
-      "操作前数值区显示Error",
-      "点击数字键后数值区保持Error",
-      "点击运算符后数值区保持Error",
-      "点击AC后数值区恢复0"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_027",
@@ -700,21 +370,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.依次输入3-5=",
     "expected_text": "1.待产品确认：负结果的显示格式和后续运算能力",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_028",
@@ -723,22 +384,12 @@
     "precondition_text": "1.计算器已完成2+3=并显示5",
     "steps_text": "1.再次点击等号",
     "expected_text": "1.待产品确认：是否重复执行上一运算或保持5",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_029",
@@ -747,22 +398,12 @@
     "precondition_text": "1.计算器显示0",
     "steps_text": "1.连续输入00012",
     "expected_text": "1.待产品确认：显示为12或保留前导零",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_030",
@@ -771,25 +412,12 @@
     "precondition_text": "1.手表显示Calculator且存在输入",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入Calculator前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:30001;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:30002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先采集进入Calculator前的来源页，再采集右滑后的页面，以截图前后对比验证返回关系",
-    "verification_points": [
-      "进入Calculator前的来源页",
-      "右滑后返回同一来源页"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_031",
@@ -798,19 +426,12 @@
     "precondition_text": "1.手表显示Calculator且存在输入",
     "steps_text": "1.单击编码器",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_032",
@@ -819,29 +440,12 @@
     "precondition_text": "1.计算器显示非零结果",
     "steps_text": "1.执行右滑\n2.重新进入Calculator",
     "expected_text": "1.手表退出计算器\n2.数值区显示0，无历史结果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:32001;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:32002,300;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:32002;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "右滑退出与重新进入 Calculator 后分别采集页面状态",
-    "verification_points": [
-      "右滑后手表退出计算器",
-      "重新进入后数值区显示0且无历史结果"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_033",
@@ -850,16 +454,12 @@
     "precondition_text": "1.手机音乐正在播放\n2.手表显示Calculator页面",
     "steps_text": "1.依次输入1+1=\n2.查看手机音乐播放状态",
     "expected_text": "1.计算器显示结果2\n2.手机音乐仍在播放",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "音乐播放前提与状态需手机音乐应用配合，模拟器无法建立/验证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_034",
@@ -868,16 +468,12 @@
     "precondition_text": "1.计算器存在未完成输入",
     "steps_text": "1.让手机收到来电\n2.结束来电",
     "expected_text": "1.手表显示来电页面\n2.待产品确认：返回Calculator后原输入是否保留",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "实测 :MSG_TEST:1/2 在模拟器不弹来电页（页面跳回 DIAL），来电链路不可用"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_035",
@@ -886,16 +482,12 @@
     "precondition_text": "1.计算器存在未完成输入",
     "steps_text": "1.从手机发送一条通知\n2.关闭消息弹窗",
     "expected_text": "1.手表显示消息弹窗\n2.待产品确认：关闭消息后原输入是否保留",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "实测 :MSG_TEST:3/:SEND_MSG_TEST: 不弹通知横幅，通知链路模拟器不可用"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_036",
@@ -904,16 +496,12 @@
     "precondition_text": "1.计算器处于初始状态",
     "steps_text": "1.用可编程输入工具执行1000组基础四则运算",
     "expected_text": "1.每组结果可显示，手表无异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "1000 组循环运算需外部循环执行器，超出单条映射语义"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "CALC_037",
@@ -922,34 +510,11 @@
     "precondition_text": "1.手表处于默认亮度",
     "steps_text": "1.依次点击全部按键，观察结果区",
     "expected_text": "1.按键触发区互不重叠，结果文字无裁切",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:45,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:123,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,173,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,125,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,221,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:279,77,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:357,77,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

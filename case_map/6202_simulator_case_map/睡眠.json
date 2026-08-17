@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App列表项目由运行时配置生成，当前没有可确认的Sleep项目位置或按名称点击命令；不能用ENTER_PAGE冒充点击Sleep应用；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/App: 1.从App列表进入Sleep；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_003",
@@ -38,12 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "上滑后页面保持固定睡眠空态",
-        "下滑后页面保持固定睡眠空态"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SLEEP_004",
@@ -55,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有命令只能建立当前日聚合数据，不能建立最近8个有数据日期；当前6202睡眠页面也没有日期日志列表。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_005",
@@ -68,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前6202睡眠页面没有目标日期日志条目，无法用截图核对MM dd，yy格式。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_006",
@@ -81,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前6202睡眠页面没有按日期显示夜睡/小睡图标的日志条目，聚合数据不能建立该目标UI。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_007",
@@ -94,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前6202睡眠页面没有按日期显示zzZ图标的日志条目，聚合小睡数据不能建立该目标UI。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_008",
@@ -107,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前402x256 SLEEP Designer确认首条日志卡片区域为x=18..384、y=57..169，(201,110)位于可点击条目内；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_009",
@@ -120,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有SLEEP_RECORD_CREATE只能生成单日聚合记录，不能建立超过一屏的多日期列表；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']；missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_010",
@@ -133,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期要求返回进入Sleep前的动态App列表；直达页面会绕过该导航历史，当前没有按名称点击Sleep应用的通用命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_011",
@@ -143,19 +149,12 @@
       "precondition_text": "1.手表正在显示睡眠日志页",
       "steps_text": "1.短按编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_012",
@@ -167,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_013",
@@ -180,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_014",
@@ -193,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_015",
@@ -206,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_016",
@@ -219,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_017",
@@ -232,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_018",
@@ -242,21 +247,12 @@
       "precondition_text": "1.可通过睡眠模拟或受控实测导入带精确起止时间和阶段的睡眠数据\n2.目标夜间睡眠包含Deep、Light、REM和Awake阶段\n3.手表已进入该日睡眠详情页",
       "steps_text": "1.观察Deep Sleep条目\n2.观察Light Sleep条目\n3.观察REM Sleep条目\n4.观察Awake条目",
       "expected_text": "1.Deep Sleep时长文字为紫或粉色和圆点为紫色实心圆，，显示阶段标签和时长和百分比和水平进度条\n2.Light Sleep时长文字与实心圆点均为蓝紫色，，显示阶段标签和时长和百分比和水平进度条\n3.REM Sleep时长文字为黄或橙色和圆点为橙色实心圆，，显示阶段标签和时长和百分比和水平进度条\n4.Awake时长文字与实心圆点均为青色，显示阶段标签和时长，不显示百分比",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SLEEP_RECORD_CREATE:1,120,240,120,60,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "统一建立四阶段数据并从总览向下两屏进入阶段详情；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_019",
@@ -268,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有聚合生成器会为零REM补默认数据，不能建立Deep 2h15且REM无有效数据的精确前置。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_020",
@@ -278,21 +275,12 @@
       "precondition_text": "1.可通过睡眠模拟或受控实测导入带精确起止时间和阶段的睡眠数据\n2.夜间有效睡眠中Deep占25%、Light占50%、REM占25%\n3.手表已进入该日睡眠详情页",
       "steps_text": "1.测量三种睡眠阶段进度条的最大宽度\n2.测量Deep与REM填充长度\n3.测量Light填充长度\n4.观察三条进度条未填充区域",
       "expected_text": "1.三条进度条使用相同的固定最大宽度\n2.Deep与REM填充长度均为最大宽度的25%\n3.Light填充长度为最大宽度的50%\n4.未填充区域不显示底色背景",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:SLEEP_RECORD_CREATE:1,120,240,120,0,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SLEEP,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "统一建立25%/50%/25%三阶段数据并从总览向下两屏进入阶段详情；产品结果仅按截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_021",
@@ -304,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有SLEEP_RECORD_CREATE不能指定跨日起止时间及阶段时间线，无法建立23:00到次日07:00的进入条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_022",
@@ -317,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有聚合命令不能指定Deep→Light→REM→Awake→Light的精确顺序，也没有逐段起止标注证据。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_023",
@@ -330,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有SLEEP_RECORD_CREATE只有小睡总时长，不能建立三段各自带起止时间的小睡记录。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_024",
@@ -343,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_025",
@@ -356,14 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "上滑后详情页显示下方区块",
-        "下滑后详情页显示上方区块",
-        "顺时针旋转编码器后详情页向上滚动",
-        "逆时针旋转编码器后详情页向下滚动"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SLEEP_026",
@@ -375,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前402x256 SLEEP_WIDGET Designer确认Nap标题区在内容y=1326附近且信息图标紧随标题；5次256步编码器滚动后(160,65)位于信息图标区域；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_027",
@@ -388,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_028",
@@ -401,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: NAP_TIPS。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_029",
@@ -414,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_030",
@@ -427,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要精确10:00至10:29片段、20:00刷新及刷新前后截图；当前聚合命令不能建立该阈值前置。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_031",
@@ -440,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要精确10:00至10:30片段、20:00刷新和日期日志UI；当前聚合命令不能建立。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_032",
@@ -453,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要精确10:00至12:59片段和20:00刷新；当前聚合命令不能建立起止时间阈值。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_033",
@@ -466,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要精确10:00至13:00片段和20:00分类刷新；当前聚合命令不能建立起止时间阈值。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_034",
@@ -479,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_035",
@@ -492,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "睡眠记录可注入；当前命令还不能精确控制每段起止时刻和睡眠阶段；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_036",
@@ -505,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要21:00至23:00和次日01:00至06:00两段精确数据及20:00刷新；当前聚合命令只能生成单段固定时间线。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_037",
@@ -518,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要精确07:00结束、20:00刷新和按日期日志UI；当前聚合命令不能建立或显示日期归属。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_038",
@@ -531,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要当前睡眠运行态、09:15清醒切换、真实等待和前后记录；历史聚合注入不能代替。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_039",
@@ -544,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要19:59与20:00两阶段数据、刷新动作和两张日志截图；当前映射没有可复用的完整周期会话。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_040",
@@ -557,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工预期仍为待产品确认，08:00和20:00端点规则没有确定截图Oracle。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_041",
@@ -570,8 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工预期仍为待产品确认，窗口外3小时片段的归属没有确定截图Oracle。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_042",
@@ -583,8 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_043",
@@ -596,8 +600,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "睡眠记录可注入；当前命令还不能精确控制每段起止时刻和睡眠阶段；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_044",
@@ -609,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_045",
@@ -622,8 +628,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_046",
@@ -635,8 +642,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要睡眠中软重启与重启前后记录，且两项人工预期均待产品确认，没有确定截图Oracle。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_047",
@@ -648,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需要已同步日期记录、时间回拨、再次到达20:00和刷新前后日志证据；当前聚合命令不能建立完整会话。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_048",
@@ -661,8 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "提醒事件和等待可执行；现有SLEEP_RECORD_CREATE只能生成历史聚合记录，不能建立“设备当前已检测到用户入睡”的运行态，也无法据此验证睡眠中抑制久坐提醒；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_049",
@@ -674,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "提醒事件和等待可执行；现有SLEEP_RECORD_CREATE不能建立当前睡眠运行态，无法验证睡眠中抑制喝水提醒；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_050",
@@ -684,16 +695,12 @@
       "precondition_text": "1.手表已检测到用户入睡\n2.抬腕亮屏开关已开启且当前屏幕熄灭",
       "steps_text": "1.执行一次抬腕动作",
       "expected_text": "1.手表屏幕保持熄灭",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前模拟器没有建立入睡状态、熄屏并注入抬腕动作的通用命令，亮屏页面不能代替该动作链；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_051",
@@ -702,16 +709,12 @@
       "precondition_text": "1.手表已检测到用户入睡\n2.翻腕亮屏能力已开启且当前屏幕熄灭",
       "steps_text": "1.执行一次翻腕动作",
       "expected_text": "1.手表屏幕保持熄灭",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前模拟器没有建立入睡状态、熄屏并注入翻腕动作的通用命令，亮屏页面不能代替该动作链；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_052",
@@ -723,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闹钟触发和等待可执行；当前缺少当前睡眠运行态及睡眠周期结束的通用控制，无法完整覆盖响铃、关闭与周期结束后详情三个阶段；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_053",
@@ -733,16 +737,12 @@
       "precondition_text": "1.手表正确佩戴，睡眠监测传感器可持续记录有效数据\n2.设备电量和存储可支持连续7天监测",
       "steps_text": "1.连续7天佩戴完成有效睡眠\n2.第7天20:00后检查日志和详情",
       "expected_text": "1.连续监测期间设备保持稳定运行\n2.第7天日志呈现可打开的7日完整记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "睡眠记录可注入；当前命令还不能精确控制每段起止时刻和睡眠阶段；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_054",
@@ -754,8 +754,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SLEEP_055",
@@ -764,16 +765,12 @@
       "precondition_text": "1.详情页包含四阶段、跨日时间线和多段小睡",
       "steps_text": "1.在默认亮度下浏览完整睡眠详情",
       "expected_text": "1.四阶段颜色可区分，日期和时长不重叠，进度条与时间线无裁切，小睡列表可辨认",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "现有SLEEP_RECORD_CREATE只有单日聚合时长，不能同时建立四阶段跨日时间线和多段小睡；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

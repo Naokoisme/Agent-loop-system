@@ -56,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
         "--target",
         choices=("simulator", "hardware"),
         default="simulator",
-        help="执行目标；hardware 使用 6202 真机 UART 控制并通过 MTP 获取截图",
+        help="执行目标；hardware 使用当前真机项目的 UART 控制并通过 MTP 获取截图",
     )
     parser.add_argument(
         "--test-case",

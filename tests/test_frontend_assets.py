@@ -160,16 +160,82 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_agent_test_queue_can_filter_latest_pass_results(self) -> None:
         for token in (
-            "pass: '已通过'",
-            "['pass', 'pass', '已通过']",
+            "pass: '最近通过'",
+            "fail: '最近失败'",
+            "cannot_verify: '最近无法验证'",
+            "error: '最近执行异常'",
+            "['pass', 'pass', '最近通过']",
+            "['error', 'error', '执行异常']",
             'data-test-filter="${state}"',
         ):
             self.assertIn(token, self.javascript)
-        self.assertIn("grid-template-columns: repeat(6, minmax(110px, 1fr))", self.stylesheet)
+        self.assertIn("grid-template-columns: repeat(5, minmax(120px, 1fr));", self.stylesheet)
+
+    def test_agent_test_metrics_separate_maturity_and_run_result(self) -> None:
+        for token in (
+            "外部探索与固化",
+            "分类只取外部账本和正式 case_map",
+            "['all', 'all', '全部用例']",
+            "['unexplored', 'unexplored', '尚未外部探索']",
+            "['externally_explored', 'externally_explored', '已经外部探索']",
+            "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
+            "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
+            "['untested', 'untested', '尚未运行']",
+            "['pass', 'pass', '最近通过']",
+            "最近一次 Agent-loop 结果",
+            "运行结果不改变外部探索或固化状态",
+            "全部用例都可运行",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertIn('class="test-metric-groups"', self.javascript)
+        self.assertIn('class="metrics test-metric-grid maturity-metrics"', self.javascript)
+        self.assertIn('class="metrics test-metric-grid run-metrics"', self.javascript)
+        self.assertIn(".test-metric-group {", self.stylesheet)
+        self.assertNotIn(".asset-metrics", self.stylesheet)
+
+    def test_agent_test_queue_defaults_to_all_cases(self) -> None:
+        for token in (
+            "const DEFAULT_TEST_STATE = 'all';",
+            "params.get('state') || DEFAULT_TEST_STATE",
+            "if (state !== DEFAULT_TEST_STATE) params.set('state', state);",
+            "全部用例都可以运行；有固化步骤时固定执行，没有固化步骤时由 Agent-loop 临时探索。",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            "const DEFAULT_TEST_STATE = 'executable';",
+            "当前只展示能被 Agent-loop 执行的用例",
+            "未固化已运行",
+            "暂不可执行",
+        ):
+            self.assertNotIn(token, self.javascript)
+
+    def test_agent_test_detail_shows_maturity_and_execution_mode(self) -> None:
+        for token in (
+            "function maturityChip(row = {})",
+            "已固化",
+            "未固化",
+            "尚未探索",
+            "const usesFixedMapping = Boolean(testCase.is_promoted);",
+            "本条将临时探索",
+            "不会写入外部探索账本",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("function executionCapabilityChip", self.javascript)
+        self.assertNotIn("if (row.unable)", self.javascript)
+        self.assertIn(".chip-solidified", self.stylesheet)
+        self.assertIn(".chip-unsolidified", self.stylesheet)
+        self.assertIn(".chip-unexplored", self.stylesheet)
+
+    def test_agent_test_project_hint_tracks_the_loaded_project(self) -> None:
+        self.assertIn('id="test-project-target"', self.javascript)
+        self.assertIn(
+            "projectTarget.innerHTML = testTargetChip(payload)",
+            self.javascript,
+        )
 
     def test_agent_test_detail_back_link_keeps_list_filter_and_page(self) -> None:
         for token in (
-            "function buildTestListUrl(query, page, state = 'all', project = DEFAULT_TEST_PROJECT)",
+            "function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT)",
             "function testReturnUrl()",
             "new URLSearchParams({project: testProject(project).project, from: returnTo})",
             "testDetailHref(row.project, sheet, caseId, returnTo)",
@@ -196,11 +262,12 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_batch_launch_selects_latest_result_categories_and_excludes_pass(self) -> None:
         for token in (
             'name="batch-category"',
-            "untested: '未测过'",
-            "fail: '测过 FAIL'",
-            "cannot_verify: '测过无法验证'",
+            "untested: '尚未运行'",
+            "fail: '最近运行失败'",
+            "cannot_verify: '最近无法验证'",
+            "error: '最近执行异常'",
             "latestBatchCandidateSummary.pass",
-            "最新结果为 PASS 的用例不会重跑",
+            "最新结果已通过的用例不会重跑",
             "JSON.stringify({limit: 0, categories, project: projectSelect.value})",
             "batch-resume-button",
             "/resume",

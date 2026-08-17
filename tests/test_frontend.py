@@ -39,7 +39,7 @@ class FrontendDataTest(unittest.TestCase):
             self.paths.defects / "100",
             self.paths.defect_images,
             self.paths.evidence / "100",
-            self.paths.case_map / "620C_case_map",
+            self.paths.case_map / "620C_simulator_case_map",
             self.paths.case_map / "6202_case_map",
             self.paths.case_map / "6202_simulator_case_map",
         ):
@@ -52,7 +52,7 @@ class FrontendDataTest(unittest.TestCase):
             description="复现描述：点击等号后显示异常",
             status="处理中",
         )
-        (self.paths.case_map / "620C_case_map" / "计算器.json").write_text(
+        (self.paths.case_map / "620C_simulator_case_map" / "计算器.json").write_text(
             json.dumps(
                 [
                     {
@@ -67,6 +67,7 @@ class FrontendDataTest(unittest.TestCase):
                         "actions": ["srv_quick_cmd send TOP5STEP:TP_CLICK:10,20,1;"],
                         "collect": ["srv_quick_cmd send TOP5STEP:GUI_TREE:1;"],
                         "unable": False,
+                        "mapping_status": "PROMOTED",
                     },
                     {
                         "case_id": "CALC_002",
@@ -126,6 +127,16 @@ class FrontendDataTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        for directory, records in (
+            ("620C_simulator_case_map", [{"case_id": "CALC_001", "sheet": "计算器"}]),
+            ("6202_case_map", [{"case_id": "CALC_001", "sheet": "计算器"}]),
+            ("6202_simulator_case_map", [{"case_id": "CALC_001", "sheet": "计算器"}]),
+        ):
+            ledger = self.paths.case_map / directory / "external_execution_history.jsonl"
+            ledger.write_text(
+                "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in records),
+                encoding="utf-8",
+            )
         (self.paths.evidence / "100" / "before.bmp").write_bytes(b"BM-before")
         (self.paths.evidence / "100" / "after.bmp").write_bytes(b"BM-after")
         self.history = HistoryStore(self.paths)
@@ -267,23 +278,32 @@ class FrontendDataTest(unittest.TestCase):
         payload = self.cases.list()
         self.assertEqual(payload["summary"], {
             "all": 2,
-            "executable": 1,
-            "unable": 1,
-            "p0": 1,
-            "p1": 1,
-            "untested": 1,
+            "unexplored": 1,
+            "externally_explored": 1,
+            "explored_unsolidified": 0,
+            "solidified": 1,
+            "untested": 2,
             "fail": 0,
             "cannot_verify": 0,
+            "error": 0,
             "pass": 0,
         })
-        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="executable")["items"]], ["CALC_001"])
-        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="unable")["items"]], ["CALC_002"])
+        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="solidified")["items"]], ["CALC_001"])
+        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="externally_explored")["items"]], ["CALC_001"])
+        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="unexplored")["items"]], ["CALC_002"])
+        self.assertEqual(self.cases.list(state_filter="explored_unsolidified")["items"], [])
+        self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="untested")["items"]], ["CALC_001", "CALC_002"])
         self.assertEqual(self.cases.list(state_filter="pass")["items"], [])
+        self.assertEqual(self.cases.list(state_filter="fail")["items"], [])
+        self.assertEqual(self.cases.list(state_filter="cannot_verify")["items"], [])
+        self.assertEqual(self.cases.list(state_filter="error")["items"], [])
         self.assertEqual([row["case_id"] for row in self.cases.list(query="显示正确")["items"]], ["CALC_001"])
         detail = self.cases.get("计算器", "CALC_001")
         self.assertEqual(detail["precondition_text"], "已进入计算器")
         self.assertEqual(detail["actions"], ["srv_quick_cmd send TOP5STEP:TP_CLICK:10,20,1;"])
         self.assertEqual(detail["verification_points"], ["结果区域显示正确数值"])
+        self.assertTrue(detail["is_promoted"])
+        self.assertEqual(detail["mapping_status"], "PROMOTED")
         with self.assertRaisesRegex(ValueError, "state 参数不合法"):
             self.cases.list(state_filter="unknown")
 
@@ -309,6 +329,55 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(len(hardware["projects"]), 3)
         with self.assertRaisesRegex(ValueError, "测试项目不存在"):
             self.cases.list(project="unknown")
+
+    def test_only_exact_promoted_status_is_formalized(self) -> None:
+        path = self.paths.case_map / "620C_simulator_case_map" / "计算器.json"
+        entries = json.loads(path.read_text(encoding="utf-8"))
+        template = dict(entries[0])
+        entries.extend([
+            {**template, "case_id": "CALC_003", "mapping_status": "promoted"},
+            {key: value for key, value in {**template, "case_id": "CALC_004"}.items() if key != "mapping_status"},
+        ])
+        path.write_text(json.dumps(entries, ensure_ascii=False), encoding="utf-8")
+        ledger = path.with_name("external_execution_history.jsonl")
+        ledger.write_text(
+            "".join(
+                json.dumps({"case_id": case_id, "sheet": "计算器"}, ensure_ascii=False) + "\n"
+                for case_id in ("CALC_001", "CALC_003", "CALC_004")
+            ),
+            encoding="utf-8",
+        )
+
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(state_filter="solidified")["items"]],
+            ["CALC_001"],
+        )
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(state_filter="explored_unsolidified")["items"]],
+            ["CALC_003", "CALC_004"],
+        )
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(state_filter="externally_explored")["items"]],
+            ["CALC_001", "CALC_003", "CALC_004"],
+        )
+
+        self.test_history.create(
+            job={
+                "sheet": "计算器",
+                "case_id": "CALC_003",
+                "case": {"priority": "P0"},
+                "started_at": "2026-08-15T10:00:00+08:00",
+                "finished_at": "2026-08-15T10:01:00+08:00",
+                "return_code": 0,
+            },
+            result={"verdict": "FAIL", "reason": "FAIL"},
+            stdout="",
+            stderr="",
+        )
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(state_filter="explored_unsolidified")["items"]],
+            ["CALC_003", "CALC_004"],
+        )
 
     def test_agent_test_history_is_isolated_by_project(self) -> None:
         hardware_case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
@@ -367,7 +436,7 @@ class FrontendDataTest(unittest.TestCase):
             wraps=self.test_history._case_summary_from_dir,
         ) as summarize:
             first = self.cases.list()
-            second = self.cases.list(state_filter="executable")
+            second = self.cases.list(state_filter="all")
             self.assertEqual(summarize.call_count, 1)
             self.assertEqual(first["items"][0]["latest_verdict"], "FAIL")
             self.assertEqual(second["items"][0]["history_count"], 1)
@@ -377,6 +446,7 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(summarize.call_count, 1)
             self.assertEqual(updated["items"][0]["latest_verdict"], "PASS")
             self.assertEqual(updated["items"][0]["history_count"], 2)
+            self.assertEqual(updated["summary"]["solidified"], 1)
             self.assertEqual(
                 [row["case_id"] for row in self.cases.list(state_filter="pass")["items"]],
                 ["CALC_001"],
@@ -391,10 +461,10 @@ class FrontendDataTest(unittest.TestCase):
         self.assertIsNotNone(self.test_history.get("计算器", "CALC_001", first_id))
 
     def test_batch_candidates_use_latest_history_and_exclude_pass(self) -> None:
-        case_map_path = self.paths.case_map / "620C_case_map" / "计算器.json"
+        case_map_path = self.paths.case_map / "620C_simulator_case_map" / "计算器.json"
         entries = json.loads(case_map_path.read_text(encoding="utf-8"))
         template = dict(entries[0])
-        for case_id in ("CALC_003", "CALC_004", "CALC_005"):
+        for case_id in ("CALC_003", "CALC_004", "CALC_005", "CALC_006"):
             entries.append({**template, "case_id": case_id})
         case_map_path.write_text(json.dumps(entries, ensure_ascii=False), encoding="utf-8")
 
@@ -417,10 +487,11 @@ class FrontendDataTest(unittest.TestCase):
         record("CALC_004", "CANNOT_VERIFY")
         record("CALC_005", "FAIL")
         record("CALC_005", "PASS")
+        record("CALC_006", "ERROR")
 
         self.assertEqual(
             [row["case_id"] for row in self.cases.executable({"untested"})],
-            ["CALC_001"],
+            ["CALC_001", "CALC_002"],
         )
         self.assertEqual(
             [row["case_id"] for row in self.cases.executable({"fail"})],
@@ -430,10 +501,22 @@ class FrontendDataTest(unittest.TestCase):
             [row["case_id"] for row in self.cases.executable({"cannot_verify"})],
             ["CALC_004"],
         )
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.executable({"error"})],
+            ["CALC_006"],
+        )
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(state_filter="error")["items"]],
+            ["CALC_006"],
+        )
         summary = self.cases.list()["summary"]
         self.assertEqual(
-            {key: summary[key] for key in ("untested", "fail", "cannot_verify", "pass")},
-            {"untested": 1, "fail": 1, "cannot_verify": 1, "pass": 1},
+            {key: summary[key] for key in ("untested", "fail", "cannot_verify", "error", "pass")},
+            {"untested": 2, "fail": 1, "cannot_verify": 1, "error": 1, "pass": 1},
+        )
+        self.assertEqual(
+            sum(summary[key] for key in ("untested", "pass", "fail", "cannot_verify", "error")),
+            summary["all"],
         )
 
     def test_explicit_batch_selection_can_rerun_a_passed_case(self) -> None:
@@ -840,14 +923,14 @@ class FrontendDataTest(unittest.TestCase):
 
     def test_agent_test_api_lists_opens_and_starts_cases(self) -> None:
         application, base = self._server()
-        with urlopen(base + "/api/tests?state=executable&page=1&page_size=20", timeout=3) as response:
+        with urlopen(base + "/api/tests?state=all&page=1&page_size=20", timeout=3) as response:
             payload = json.loads(response.read().decode("utf-8"))
-        self.assertEqual([item["case_id"] for item in payload["items"]], ["CALC_001"])
+        self.assertEqual([item["case_id"] for item in payload["items"]], ["CALC_001", "CALC_002"])
         with urlopen(base + "/api/tests/%E8%AE%A1%E7%AE%97%E5%99%A8/CALC_001", timeout=3) as response:
             detail = json.loads(response.read().decode("utf-8"))
         self.assertEqual(detail["expected_text"], "显示正确")
         with urlopen(
-            base + "/api/tests?project=6202_W5230&state=executable&page=1&page_size=20",
+            base + "/api/tests?project=6202_W5230&state=all&page=1&page_size=20",
             timeout=3,
         ) as response:
             hardware = json.loads(response.read().decode("utf-8"))
@@ -911,14 +994,14 @@ class FrontendDataTest(unittest.TestCase):
 
         with patch.object(application, "start_batch_test", return_value=job) as start_categories:
             with self._post_json(base + "/api/tests/run-batch", {
-                "categories": ["untested", "fail", "cannot_verify"]
+                "categories": ["untested", "fail", "cannot_verify", "error"]
             }) as response:
                 selected = json.loads(response.read().decode("utf-8"))
         self.assertEqual(response.status, 202)
         self.assertEqual(selected["id"], "batch1")
         start_categories.assert_called_once_with(
             limit=0,
-            categories={"untested", "fail", "cannot_verify"},
+            categories={"untested", "fail", "cannot_verify", "error"},
             project="620C_W6830",
         )
 

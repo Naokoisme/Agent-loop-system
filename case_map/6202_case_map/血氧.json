@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有可静态确认的 Health 二级菜单 Blood Oxygen 项坐标；ENTER_PAGE 只能用于导航准备，不能替代人工点击；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：unknown_window: setup: HEALTH；missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_003",
@@ -35,19 +37,12 @@
       "precondition_text": "1.手表当日没有血氧测量数据",
       "steps_text": "1.进入Blood Oxygen主页面",
       "expected_text": "1.最近血氧值显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_004",
@@ -56,19 +51,12 @@
       "precondition_text": "1.手表显示Blood Oxygen主页面",
       "steps_text": "1.查看24小时柱状图和说明图标",
       "expected_text": "1.页面显示24小时柱状图与说明图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_005",
@@ -80,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用已验证的佩戴状态和 silent 血氧驱动，稳定保留测量中状态；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_006",
@@ -93,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "说明图标坐标来自当前402x256截图和BLOOD_OXYGEN标题栏共享布局；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_007",
@@ -106,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_008",
@@ -116,19 +107,12 @@
       "precondition_text": "1.手表显示Blood Oxygen主页面",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_009",
@@ -140,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用已验证的佩戴状态和 silent 血氧驱动，稳定保留测量中状态；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_010",
@@ -153,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "模拟器已输出 motor_event 的次数、强度和时长；若验物理波形仍需真机仪器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_011",
@@ -166,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "silent 血氧驱动不出值，可稳定观察刚开始测量时的 --%；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_012",
@@ -179,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_013",
@@ -189,16 +177,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.系统灭屏时间设为5秒\n3.手动血氧测量正在运行",
       "steps_text": "1.保持手表静止超过5秒",
       "expected_text": "1.血氧测量页面保持亮屏",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_014",
@@ -210,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_015",
@@ -220,16 +205,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动血氧测量正在运行",
       "steps_text": "1.用手掌覆盖屏幕",
       "expected_text": "1.手表退出血氧测量状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_016",
@@ -241,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_017",
@@ -254,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_018",
@@ -267,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立测量中状态，再点击当前402x256 BLOOD_OXYGEN标题栏的共享说明图标；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_019",
@@ -280,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "250毫秒振动无法由手表静态截图判定，需要外部振动或加速度证据；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_020",
@@ -293,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_021",
@@ -306,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前产品页面只显示数值和时间，不显示手动/自动来源；静态截图不能证明记录类型；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_022",
@@ -319,12 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "取消测量前的血氧记录基线",
-        "右滑取消后血氧记录未新增"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；6202当前固件未注册 SPO_AUTO_AREA；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SPO2_023",
@@ -336,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_024",
@@ -346,16 +331,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.血氧测量正在运行",
       "steps_text": "1.持续移动佩戴手",
       "expected_text": "1.60秒无稳定值后显示佩戴提示页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前缺可重复模拟持续移动并让血氧算法60秒无稳定值的传感器运动状态，不能用固定或静默数值冒充移动；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_025",
@@ -367,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_026",
@@ -380,12 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "取下手表前，Blood Oxygen 主页面显示已有记录基线",
-        "取下手表并退出测量后，Blood Oxygen 主页面未新增本次有效记录"
-      ],
-      "unable": true,
-      "note": "用同一页面的前后两张截图比较记录，避免只看最终画面却没有基线；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；6202当前固件未注册 SPO_AUTO_AREA；TP_CLICK 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SPO2_027",
@@ -397,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_028",
@@ -410,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_029",
@@ -420,16 +401,12 @@
       "precondition_text": "1.手表显示血氧佩戴提示页",
       "steps_text": "1.观察页面标题栏和提示正文",
       "expected_text": "1.页面显示Blood Oxygen标题和当前系统时间，正文显示Make sure your watch is fitting well just above your wrist and retry.",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前无可靠的64位模拟器通用命令可建立血氧佩戴提示页；旧 BO_WEAR_TIP 通过 uint32_t 传字符串指针，存在指针截断风险；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_030",
@@ -438,16 +415,12 @@
       "precondition_text": "1.手表显示佩戴提示页",
       "steps_text": "1.查看佩戴提示文案和重测按钮",
       "expected_text": "1.页面显示佩戴提示文案与重测按钮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前无可靠的64位模拟器通用命令可建立血氧佩戴提示页；旧 BO_WEAR_TIP 通过 uint32_t 传字符串指针，存在指针截断风险；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_031",
@@ -459,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "重测动作依赖先可靠建立血氧佩戴提示页；当前旧 BO_WEAR_TIP 在64位模拟器有指针截断风险，不能作为稳定前置命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_032",
@@ -472,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立 Blood Oxygen 主页面到提示页的导航历史，再验证右滑返回；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_033",
@@ -482,19 +457,12 @@
       "precondition_text": "1.手表显示佩戴提示页",
       "steps_text": "1.单击实体按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_034",
@@ -506,13 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "按产品固定3秒倒计时和45秒测量周期等待完成，再设置5秒自动熄屏；截图覆盖完成页、黑屏及10秒内主键唤醒返回Blood Oxygen主页面；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "自动熄屏计时开始前，截图显示手动血氧测量已经完成",
-        "达到5秒自动熄屏时间后，截图显示手表屏幕熄灭",
-        "熄屏10秒内单击实体按键后，截图显示Blood Oxygen主页面"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_035",
@@ -524,14 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "按产品固定3秒倒计时和45秒测量周期等待完成，再设置5秒自动熄屏；截图覆盖完成页、熄屏、超过10秒仍黑屏及主键唤醒主表盘；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "自动熄屏计时开始前，截图显示手动血氧测量已经完成",
-        "达到5秒自动熄屏时间后，截图显示手表屏幕熄灭",
-        "继续等待超过10秒后，截图显示手表仍保持熄屏",
-        "单击实体按键后，截图显示主表盘"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_036",
@@ -540,17 +499,12 @@
       "precondition_text": "1.手表已产生最近7天血氧数据",
       "steps_text": "1.重启手表",
       "expected_text": "1.设备日志仍包含最近7天血氧数据",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_037",
@@ -562,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_038",
@@ -575,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_039",
@@ -588,8 +544,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_040",
@@ -601,8 +558,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_041",
@@ -614,8 +572,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_042",
@@ -624,17 +583,12 @@
       "precondition_text": "1.同一小时存在自动血氧点与手动血氧点",
       "steps_text": "1.进入Blood Oxygen主页面",
       "expected_text": "1.该小时图形按PRD聚合规则显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前通用命令不能在同一小时分别建立自动血氧点和手动血氧点，无法验证两类来源的聚合规则；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_043",
@@ -643,16 +597,12 @@
       "precondition_text": "1.通过血氧数据测试工具在同一小时依次生成血氧94%、96%、98%三条记录",
       "steps_text": "1.进入Blood Oxygen主页面\n2.查看目标小时柱上显示的数值",
       "expected_text": "1.手表显示Blood Oxygen主页面\n2.目标小时柱按三条记录算术平均显示96%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "SPO_AUTO_AREA 只能直接设置每小时聚合值，不能注入同一小时三条原始记录；用96%预置值会绕过本用例要验证的算术平均逻辑；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_044",
@@ -664,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用24个小时槽位的通用血氧数据命令建立当日图表前置；本轮旧运行另有LLM 503，映射修改只影响后续运行；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_045",
@@ -674,17 +625,12 @@
       "precondition_text": "1.手表显示Blood Oxygen主页面",
       "steps_text": "1.观察横轴左侧刻度\n2.观察横轴中间刻度\n3.观察横轴右侧刻度",
       "expected_text": "1.左侧刻度显示00:00\n2.中间刻度显示12:00\n3.右侧刻度显示24:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_046",
@@ -693,19 +639,12 @@
       "precondition_text": "1.手表当日没有血氧数据",
       "steps_text": "1.进入Blood Oxygen主页面\n2.观察图表坐标轴\n3.观察图表数据区",
       "expected_text": "1.手表显示Blood Oxygen主页面\n2.图表显示默认空坐标轴\n3.图表不显示血氧数据柱",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_047",
@@ -717,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "统一建立10:00时刻及0点至10点数据，11点后的小时槽位显式为0；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_048",
@@ -730,12 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "23:59时Blood Oxygen主图显示跨日前的当日血氧数据",
-        "推进到次日00:00并触发day_pass后，主图切换为新一天血氧数据"
-      ],
-      "unable": true,
-      "note": "补齐跨日前数据基线和跨日前后双截图；现有day_pass能力已由模拟器验证；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SPO2_049",
@@ -744,16 +681,12 @@
       "precondition_text": "1.手表已连续8天产生血氧数据",
       "steps_text": "1.查看设备数据日志",
       "expected_text": "1.设备保留最近7天血氧记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前产品Blood Oxygen界面只展示当日小时图，没有可见的7天记录日志入口；静态产品截图不能证明内部保留策略，且GUI Tree或内部日志不得作为产品判据；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_050",
@@ -765,8 +698,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用24小时血氧区域命令建立多根有效柱，再由截图判定主题色；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_051",
@@ -775,19 +709,12 @@
       "precondition_text": "1.当日血氧数据均不低于90%",
       "steps_text": "1.进入Blood Oxygen主页面",
       "expected_text": "1.Y轴最小值显示90",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_052",
@@ -799,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通过共享24小时血氧区域命令建立当日最低值89%，不直接写Y轴显示值；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_053",
@@ -812,11 +740,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用现有血氧测量通用路径：固定传感器先建立输入，测量启动后再次触发固定样本回调，并覆盖3秒倒计时加45秒固定测量周期后截图检查100%结果；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "测量完成后的截图显示最近血氧值100%"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_054",
@@ -828,8 +754,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用24小时血氧区域命令建立有效柱，再由截图判定柱体渐变是否连续；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_055",
@@ -838,19 +765,12 @@
       "precondition_text": "1.当日血氧数据包含明显最高值和最低值",
       "steps_text": "1.进入Blood Oxygen主页面\n2.观察图表和最近值区域",
       "expected_text": "1.手表显示Blood Oxygen主页面\n2.页面不显示血氧最高值或最低值字段，图表不标注极值点",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_056",
@@ -862,8 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先固定时间并用持久化24小时区域命令建立最近血氧及时间戳，再用已修复的 TIME_SET 精确推进30秒；旧活动二进制尚未包含TIME_SET修复；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_057",
@@ -875,8 +796,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进60秒；修改待新二进制运行验证；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_058",
@@ -888,8 +810,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进3599秒；修改待新二进制运行验证；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_059",
@@ -901,8 +824,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用持久化血氧区域命令建立最近值和时间戳，再用已修复的 TIME_SET 推进3600秒；修改待新二进制运行验证；6202首轮迁移暂不可执行：6202当前固件未注册 SPO_AUTO_AREA。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_060",
@@ -911,19 +835,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量发生在昨日",
       "steps_text": "1.进入Blood Oxygen主页面",
       "expected_text": "1.最近血氧值显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_061",
@@ -932,19 +849,12 @@
       "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近血氧测量发生在昨日",
       "steps_text": "1.进入Blood Oxygen主页面",
       "expected_text": "1.页面不显示上次测量时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_062",
@@ -953,17 +863,12 @@
       "precondition_text": "1.手表显示血氧说明页",
       "steps_text": "1.观察说明页顶部",
       "expected_text": "1.页面显示SpO2健康说明正文",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "人工前置是血氧说明页，统一使用已注册的BLOOD_OXYGEN_TIPS页面；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_063",
@@ -975,11 +880,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直达源码注册的血氧说明页，使用 SWIPE_SIM 浏览后续正文；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "最终滚动画面的后续正文同时证明页面已滚动，并可核对完整 SpO2 说明文本"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_064",
@@ -991,8 +894,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立说明页顶部，再执行人工上滑；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_065",
@@ -1004,8 +908,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先进入说明页并上滑离开顶部，再执行人工下滑返回前序内容；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_066",
@@ -1014,19 +919,12 @@
       "precondition_text": "1.手表显示血氧说明页",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.说明内容发生纵向滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN_TIPS,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "直达源码注册的血氧说明页，再用 QDEC_SET 模拟编码器滚动；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_067",
@@ -1038,8 +936,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先建立Blood Oxygen主页到说明页的导航历史，再执行人工右滑；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_068",
@@ -1051,8 +950,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_069",
@@ -1064,8 +964,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_070",
@@ -1077,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用佩戴和固定SpO2状态并真实等待稳定出值，再按5秒熄屏规则与实体主键分阶段截图；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_071",
@@ -1090,8 +992,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/App: 1.恢复手表与App连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_072",
@@ -1103,8 +1006,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_073",
@@ -1116,8 +1020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_074",
@@ -1129,8 +1034,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_075",
@@ -1142,8 +1048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_076",
@@ -1155,8 +1062,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_077",
@@ -1168,8 +1076,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_078",
@@ -1178,16 +1087,12 @@
       "precondition_text": "1.手表正确佩戴且对应传感器可采样",
       "steps_text": "1.连续完成20次手动血氧测量",
       "expected_text": "1.手表未出现死机或异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_079",
@@ -1199,8 +1104,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SPO2_080",
@@ -1209,17 +1115,12 @@
       "precondition_text": "1.手表显示Blood Oxygen主页面",
       "steps_text": "1.在默认亮度下观察最近值区域",
       "expected_text": "1.血氧数值与单位无重叠或裁切",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:BLOOD_OXYGEN,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

@@ -115,6 +115,25 @@ class SaveEvidenceTest(unittest.TestCase):
         self.assertEqual(payload["execution_status"], "ERROR")
         self.assertEqual(payload["execution_reason"], "GUI_TREE 回包不完整")
 
+    def test_incomplete_evidence_overrides_precomputed_agent_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "result.json"
+            result = CaseRunResult(
+                case_id="DYNAMIC_001",
+                sheet="demo",
+                expected_text="显示正确",
+                precomputed_verdict="PASS",
+                precomputed_reason="Agent 判断符合预期",
+                evidence_contract={
+                    "complete": False,
+                    "issues": [{"message": "Agent-loop 探索没有取得截图"}],
+                },
+            )
+            save_evidence(result, None, output)
+            payload = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(payload["verdict"], "ERROR")
+        self.assertEqual(payload["reason"], "Agent-loop 探索没有取得截图")
+
 
 class VisionEvidenceTest(unittest.TestCase):
     def _images(self, root: Path) -> tuple[str, str, str]:
@@ -284,6 +303,23 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         self.assertEqual(decision.verdict, "ERROR")
         self.assertEqual(decision.reason, "业务动作未执行")
         visual.assert_not_called()
+
+    def test_runner_gate_also_precedes_precomputed_agent_verdict(self) -> None:
+        result = CaseRunResult(
+            case_id="DYNAMIC_GATE",
+            sheet="demo",
+            expected_text="显示结果页",
+            precomputed_verdict="PASS",
+            precomputed_reason="Agent 判断符合预期",
+            evidence_contract={
+                "complete": False,
+                "issues": [{"message": "Agent-loop 探索没有取得截图"}],
+            },
+        )
+        decision = judge_case_result(result)
+
+        self.assertEqual(decision.verdict, "ERROR")
+        self.assertEqual(decision.reason, "Agent-loop 探索没有取得截图")
 
     def test_runner_gate_keeps_cannot_verify_for_complete_but_unreadable_visual_evidence(self) -> None:
         result = CaseRunResult(

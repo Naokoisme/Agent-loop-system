@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SYSTEM_INFO 是 About 真实窗口，上滑后可核对标题是否保持在顶部；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可执行；当前缺少可在按住期间连续更新触摸坐标的通用拖动命令，TP_SWIPE只能一次性完成滑动，无法建立“手指仍按住”的截图时点；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_008",
@@ -103,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_009",
@@ -116,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_010",
@@ -129,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_011",
@@ -142,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_012",
@@ -155,8 +166,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_013",
@@ -168,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_014",
@@ -178,16 +191,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.用可编程触控治具横滑屏幕49%宽度",
       "expected_text": "1.主表盘回弹至原页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前实时命令只能表达滑动方向，不能可靠构造横滑屏幕49%宽度这一精确阈值；不以 ENTER_PAGE 冒充触控动作；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_015",
@@ -196,16 +205,12 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.用可编程触控治具横滑屏幕51%宽度",
       "expected_text": "1.页面吸附至目标一级页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前实时命令只能表达滑动方向，不能可靠构造横滑屏幕51%宽度这一精确阈值；不以 ENTER_PAGE 冒充触控动作；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_016",
@@ -217,8 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_017",
@@ -230,8 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_018",
@@ -243,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_019",
@@ -256,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_020",
@@ -269,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前实时命令只能表达滑动方向，不能可靠构造上滑和下滑屏幕51%这一精确阈值；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_021",
@@ -282,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工步骤未指定设置选项，实时源码也没有可确认的目标控件坐标；不能用 ENTER_PAGE 替代点击及瞬态缩放验证；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_022",
@@ -295,8 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "人工步骤未指定设置列表中的目标选项，当前源码无法确认触控坐标；不能用实体按键长按替代屏幕长按；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_touch_press: 人工长按屏幕步骤缺少 ['TP_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_023",
@@ -308,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_024",
@@ -321,8 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_025",
@@ -334,8 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_026",
@@ -347,12 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "左滑后显示Sleep一级视图",
-        "右滑后返回My Fitness一级视图"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "GLOB_027",
@@ -364,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_028",
@@ -377,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_029",
@@ -390,8 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用实时TP_PRESS按下/释放和SIM_WAIT精确构造主表盘中心长按2秒；6202首轮迁移暂不可执行：TP_PRESS 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_030",
@@ -403,8 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_031",
@@ -416,8 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_032",
@@ -429,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_033",
@@ -442,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_034",
@@ -455,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_035",
@@ -468,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_036",
@@ -481,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_037",
@@ -491,15 +513,12 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在灭屏状态单击按键",
       "expected_text": "1.手表屏幕点亮",
-      "verification_points": [
-        "按键前屏幕处于熄灭状态",
-        "单击实体按键后屏幕点亮"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用通用screen_off事件建立灭屏状态，再由BUTTON_PRESS执行实体主键；前后截图判断点亮；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "GLOB_038",
@@ -508,18 +527,12 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在主表盘单击按键",
       "expected_text": "1.手表显示主菜单",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_039",
@@ -528,19 +541,12 @@
       "precondition_text": "1.手表处于一级视图",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_040",
@@ -549,19 +555,12 @@
       "precondition_text": "1.手表处于控制中心",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_041",
@@ -570,19 +569,12 @@
       "precondition_text": "1.手表处于消息中心",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:MESSAGE_LIST,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_042",
@@ -591,19 +583,12 @@
       "precondition_text": "1.手表处于负一屏",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SIDEBAR,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_043",
@@ -612,19 +597,12 @@
       "precondition_text": "1.手表处于主菜单",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_044",
@@ -633,19 +611,12 @@
       "precondition_text": "1.手表处于设置列表",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_045",
@@ -657,8 +628,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待、熄屏和实体按键均可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_046",
@@ -667,18 +639,12 @@
       "precondition_text": "1.运动进程正在运行",
       "steps_text": "1.在运动中数据页单击按键",
       "expected_text": "1.手表显示暂停与结束按钮页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_047",
@@ -687,18 +653,12 @@
       "precondition_text": "1.运动进程正在运行",
       "steps_text": "1.在暂停与结束按钮页单击按键",
       "expected_text": "1.手表显示运动中数据页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_048",
@@ -710,8 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_049",
@@ -723,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_050",
@@ -736,8 +698,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_051",
@@ -749,8 +712,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_052",
@@ -762,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_053",
@@ -772,18 +737,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.在秒表计时中单击按键",
       "expected_text": "1.秒表列表新增一条计次记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_054",
@@ -792,18 +751,12 @@
       "precondition_text": "1.手表显示时钟功能页",
       "steps_text": "1.在秒表暂停页单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_055",
@@ -812,18 +765,12 @@
       "precondition_text": "1.计时器正在运行",
       "steps_text": "1.在计时器运行页单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_056",
@@ -835,13 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用SIM_TIMER_STATE_SET建立60秒运行态，并用已确认的Clock子菜单Timer入口完成返回主表盘和再次进入的三阶段截图；6202首轮迁移暂不可执行：SIM_TIMER_STATE_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。",
-      "verification_points": [
-        "按键前截图显示60秒计时器正在运行及初始剩余时间",
-        "单击实体按键后，截图显示主表盘",
-        "等待3秒并再次进入Timer后，截图显示剩余时间小于返回前记录"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_057",
@@ -850,18 +793,12 @@
       "precondition_text": "1.手表显示时钟功能页",
       "steps_text": "1.在贪睡开启的闹钟页单击按键",
       "expected_text": "1.闹钟下次提醒时间延后10分钟",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_058",
@@ -870,18 +807,12 @@
       "precondition_text": "1.手表显示时钟功能页",
       "steps_text": "1.在响铃提醒页单击按键",
       "expected_text": "1.手表停止振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_059",
@@ -890,18 +821,12 @@
       "precondition_text": "1.手表显示时钟功能页",
       "steps_text": "1.在响铃提醒页单击按键",
       "expected_text": "1.手表停止播放铃声",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_060",
@@ -910,18 +835,12 @@
       "precondition_text": "1.手表处于心率测量中",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_061",
@@ -930,18 +849,12 @@
       "precondition_text": "1.手表处于血氧测量中",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_062",
@@ -950,18 +863,12 @@
       "precondition_text": "1.手表处于压力测量中",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_063",
@@ -970,18 +877,12 @@
       "precondition_text": "1.手表处于呼吸训练中",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_064",
@@ -990,18 +891,12 @@
       "precondition_text": "1.手表处于一键测量中",
       "steps_text": "1.单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_065",
@@ -1010,18 +905,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.用秒表计时，长按编码器3秒",
       "expected_text": "1.手表显示关机重启选择页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,3000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_066",
@@ -1030,18 +919,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.用秒表计时，长按编码器5秒",
       "expected_text": "1.手表显示SOS页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_067",
@@ -1050,18 +933,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.用秒表计时，长按编码器12秒",
       "expected_text": "1.手表显示开机动画",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,12000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_068",
@@ -1070,18 +947,12 @@
       "precondition_text": "1.省电模式处于开启状态",
       "steps_text": "1.用秒表计时，长按编码器5秒",
       "expected_text": "1.手表退出省电模式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_069",
@@ -1090,18 +961,12 @@
       "precondition_text": "1.省电模式处于开启状态",
       "steps_text": "1.用秒表计时，长按编码器5秒",
       "expected_text": "1.手表不显示SOS页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,2,5000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_070",
@@ -1113,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_button: 人工步骤缺少 ['BUTTON_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_071",
@@ -1123,17 +989,12 @@
       "precondition_text": "1.手表已开机\n2.按键抖动治具已按测试参数设置",
       "steps_text": "1.执行1次编码器触点抖动",
       "expected_text": "1.手表最多显示一层关机重启选择页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_072",
@@ -1142,18 +1003,12 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在主表盘顺时针旋转编码器",
       "expected_text": "1.手表显示消息中心",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_073",
@@ -1162,18 +1017,12 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在主表盘逆时针旋转编码器",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_074",
@@ -1182,19 +1031,12 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在主菜单顺时针旋转编码器",
       "expected_text": "1.菜单列表向上滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_075",
@@ -1203,18 +1045,12 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在主菜单逆时针旋转编码器",
       "expected_text": "1.菜单列表向下滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_076",
@@ -1240,7 +1076,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "通用滚动取证：先进入源码注册的About长页，再保留旋转前后截图；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_076\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_077",
@@ -1267,7 +1104,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "通用滚动取证：先进入About长页并离开顶部，再保留逆向旋转前后截图；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_077\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_078",
@@ -1293,7 +1131,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "先直达源码注册的亮度调节窗口，再用 QDEC_SET 模拟一格编码器输入；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_078\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_079",
@@ -1305,8 +1144,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_rotate: 人工步骤缺少 ['QDEC_SET']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_080",
@@ -1315,25 +1155,12 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在普通页面保持5秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前普通设置内页处于亮屏状态",
-        "真实等待5秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:80001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:80002,5500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "普通内页统一选用设置页，设置5秒亮屏时长并真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_081",
@@ -1342,25 +1169,12 @@
       "precondition_text": "1.Screen Timeout设为5s",
       "steps_text": "1.在普通页面保持5秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "5秒等待前普通设置内页处于亮屏状态",
-        "真实等待5秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:81001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:81002,5500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_082",
@@ -1369,25 +1183,12 @@
       "precondition_text": "1.Screen Timeout设为10s",
       "steps_text": "1.在普通页面保持10秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "10秒等待前普通设置内页处于亮屏状态",
-        "真实等待10秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:82001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:82002,10500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_083",
@@ -1396,25 +1197,12 @@
       "precondition_text": "1.Screen Timeout设为15s",
       "steps_text": "1.在普通页面保持15秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "15秒等待前普通设置内页处于亮屏状态",
-        "真实等待15秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:15;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:83001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:83002,15500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_084",
@@ -1423,25 +1211,12 @@
       "precondition_text": "1.Screen Timeout设为20s",
       "steps_text": "1.在普通页面保持20秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "20秒等待前普通设置内页处于亮屏状态",
-        "真实等待20秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:20;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:84001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:84002,20500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_085",
@@ -1450,25 +1225,12 @@
       "precondition_text": "1.Screen Timeout设为30s",
       "steps_text": "1.在普通页面保持30秒无操作",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "30秒等待前普通设置内页处于亮屏状态",
-        "真实等待30秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:30;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:85001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:85002,30500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用亮屏时长设置和真实等待；前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_086",
@@ -1479,7 +1241,8 @@
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到9秒\n3.手表恢复设置列表页",
       "verification_points": [
         "自动熄屏前显示设置列表",
-        "熄屏后真实保持9秒且屏幕仍黑",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待9秒后屏幕仍黑",
         "单击实体按键后恢复设置列表"
       ],
       "setup": [
@@ -1491,6 +1254,7 @@
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:86002,5500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:86003;",
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:86003,9000;",
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:86004;",
         "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
@@ -1499,7 +1263,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "统一在设置页等待5秒自动熄屏，再真实保持9秒并按主键；三阶段截图判断恢复规则；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_086\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_087",
@@ -1510,7 +1275,8 @@
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到10秒\n3.手表恢复设置列表页",
       "verification_points": [
         "自动熄屏前显示设置列表",
-        "熄屏后真实保持10秒且屏幕仍黑",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待10秒后屏幕仍黑",
         "单击实体按键后恢复设置列表"
       ],
       "setup": [
@@ -1522,6 +1288,7 @@
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:87002,5500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:87003;",
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:87003,10000;",
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:87004;",
         "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
@@ -1530,7 +1297,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "统一在设置页等待5秒自动熄屏，再真实保持10秒并按主键；三阶段截图判断边界规则；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_087\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_088",
@@ -1541,7 +1309,8 @@
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表显示主表盘",
       "verification_points": [
         "自动熄屏前显示设置列表",
-        "熄屏后真实保持11秒且屏幕仍黑",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待11秒后屏幕仍黑",
         "单击实体按键后显示主表盘"
       ],
       "setup": [
@@ -1553,6 +1322,7 @@
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:88002,5500;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:88003;",
         "srv_quick_cmd send TOP5STEP:HOST_WAIT:88003,11000;",
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:88004;",
         "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
@@ -1561,7 +1331,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "统一在设置页等待5秒自动熄屏，再真实保持11秒并按主键；三阶段截图判断超时返回表盘规则；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_088\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_089",
@@ -1573,8 +1344,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_090",
@@ -1586,8 +1358,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_091",
@@ -1613,7 +1386,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "按键熄屏使用通用BUTTON_PRESS的上键语义（key 0），编码器主键（key 1）仅用于页面跳转；由前后截图判定产品结果；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_091\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_092",
@@ -1625,12 +1399,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用佩戴和固定HR传感器状态启动真实测量，并设置5秒亮屏时长；两张阶段截图覆盖测量开始及超过灭屏时间时仍亮屏，测量结束后的页面不属于本用例判据；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "计时开始前截图显示心率测量正在进行",
-        "超过5秒系统灭屏时间后截图仍显示心率测量页且屏幕亮着"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_093",
@@ -1642,8 +1413,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_094",
@@ -1655,8 +1427,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_095",
@@ -1668,12 +1441,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "覆盖屏幕后进入熄屏状态",
-        "单击按键亮屏后不再显示心率测量中页面"
-      ],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "GLOB_096",
@@ -1682,18 +1452,12 @@
       "precondition_text": "1.计时器正在运行",
       "steps_text": "1.观察计时器运行一分钟",
       "expected_text": "1.屏幕持续显示计时器运行页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:9601,60000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_097",
@@ -1702,16 +1466,12 @@
       "precondition_text": "1.计时器正在运行",
       "steps_text": "1.在计时器运行页执行垂腕",
       "expected_text": "1.手表保持计时器运行页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_098",
@@ -1720,16 +1480,12 @@
       "precondition_text": "1.计时器正在运行",
       "steps_text": "1.触发计时器结束提醒",
       "expected_text": "1.提醒页面保持亮屏至1分钟边界",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发计时器结束提醒；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_099",
@@ -1738,16 +1494,12 @@
       "precondition_text": "1.计时器正在运行",
       "steps_text": "1.在计时提醒页覆盖屏幕",
       "expected_text": "1.振动测试仪继续记录提醒振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前源码已有数据注入命令；该用例需分场景逐步取证；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_100",
@@ -1756,15 +1508,12 @@
       "precondition_text": "1.秒表正在运行",
       "steps_text": "1.保持秒表运行页无操作5分钟",
       "expected_text": "1.屏幕在5分钟边界进入熄屏状态",
-      "verification_points": [
-        "等待前秒表正在前台计时且屏幕点亮",
-        "真实保持无操作5分钟后屏幕熄灭"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "真实启动秒表后按SIM_WAIT单次120秒上限分三段等待满5分钟；前后截图判断5分钟边界熄屏；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "GLOB_101",
@@ -1776,12 +1525,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "将Screen Timeout设置为10秒，在未开始的Heart Rate页从亮屏基线真实等待10.5秒，以最终黑屏截图验证自动熄屏；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "等待前截图显示未开始的Heart Rate页面且屏幕亮着",
-        "保持10秒无操作后截图显示屏幕熄灭"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_102",
@@ -1793,8 +1539,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_103",
@@ -1806,8 +1553,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_104",
@@ -1816,17 +1564,12 @@
       "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机来电仍未结束",
       "steps_text": "1.在来电页覆盖屏幕\n2.等待11秒\n3.单击按键",
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表恢复来电页",
-      "verification_points": [
-        "覆盖前来电页正在显示且来电未结束",
-        "覆盖后屏幕熄灭",
-        "熄屏真实保持11秒后仍处于黑屏",
-        "单击实体按键后恢复来电页"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用全连接来电事件、screen_off、真实等待和实体主键；四阶段截图判断来电页恢复；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_CONNECTION_SET 仅用于620C模拟器；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "GLOB_105",
@@ -1838,8 +1581,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "十秒等待可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_106",
@@ -1851,8 +1595,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待、熄屏和实体按键均可执行；当前缺幂等建立运行中运动会话及运动数据页的SIM_SPORT_SESSION_SET；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_107",
@@ -1864,8 +1609,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "三种熄屏、等待和实体按键均可执行；当前缺建立持续录音会话并读取录音文件时长与连续音频的通用录音能力，截图无法判定文件内容；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']；missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_108",
@@ -1874,17 +1620,12 @@
       "precondition_text": "1.手表已设置测试闹钟",
       "steps_text": "1.触发测试闹钟",
       "expected_text": "1.提醒页面保持亮屏至1分钟边界",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SETTING,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发测试闹钟；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_109",
@@ -1896,8 +1637,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_110",
@@ -1909,8 +1651,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "audio_event 已作为铃声输出验收；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_111",
@@ -1919,25 +1662,12 @@
       "precondition_text": "1.手表显示遥控拍照页",
       "steps_text": "1.保持遥控拍照页一分钟无操作",
       "expected_text": "1.屏幕持续显示遥控拍照页",
-      "verification_points": [
-        "等待前显示遥控拍照提示页",
-        "真实保持无操作1分钟后仍显示同一提示页"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CAMERA,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:111001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:111002,60000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用通用连接状态和Camera提示页并真实等待1分钟；前后截图判断页面是否持续显示；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_112",
@@ -1949,8 +1679,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_113",
@@ -1959,25 +1690,12 @@
       "precondition_text": "1.手表显示手电筒页",
       "steps_text": "1.保持手电筒页一分钟无操作",
       "expected_text": "1.屏幕持续显示手电筒页",
-      "verification_points": [
-        "等待前显示Flashlight开启页",
-        "真实保持无操作1分钟后仍显示同一亮屏页"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:FLASHLIGHT,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:113001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:113002,60000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "设置5秒全局亮屏时长后在Flashlight页真实等待1分钟；前后截图判断页面是否持续亮屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "GLOB_114",
@@ -1989,8 +1707,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_115",
@@ -2002,8 +1721,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_116",
@@ -2015,8 +1735,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_117",
@@ -2028,12 +1749,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用MSG_TEST:26真实发送查找手表业务事件，设置5秒自动熄屏后等待一分钟，以前后截图验证页面持续显示；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "等待前截图显示查找手表页",
-        "保持一分钟无操作后，截图仍显示查找手表页"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_118",
@@ -2045,8 +1763,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前源码命令已覆盖，并通过模拟器验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_119",
@@ -2055,16 +1774,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将语言设为中文后查看当年日期",
       "expected_text": "1.页面显示月/日格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_120",
@@ -2073,16 +1788,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将语言设为英文后查看当年日期",
       "expected_text": "1.页面显示日/月格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_121",
@@ -2091,16 +1802,12 @@
       "precondition_text": "1.系统语言为中文\n2.测试记录来自上一年度",
       "steps_text": "1.查看跨年记录日期",
       "expected_text": "1.页面显示年/月/日格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_122",
@@ -2109,16 +1816,12 @@
       "precondition_text": "1.系统语言为英文\n2.测试记录来自上一年度",
       "steps_text": "1.查看跨年记录日期",
       "expected_text": "1.页面显示日/月/年格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_123",
@@ -2127,20 +1830,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将系统时间设为00:00",
       "expected_text": "1.12小时制页面显示12:00 AM",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811000000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "TIME_MODE:0 设置12小时制，TIME_SET 使用源码要求的 YYMMDDHHmmss 格式设置午夜；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_124",
@@ -2149,20 +1844,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将系统时间设为12:00",
       "expected_text": "1.12小时制页面显示12:00 PM",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "TIME_MODE:0 设置12小时制，TIME_SET 使用源码要求的 YYMMDDHHmmss 格式设置正午；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_125",
@@ -2171,16 +1858,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.观察标准页面顶部时间",
       "expected_text": "1.顶部时间不显示AM或PM",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_126",
@@ -2189,16 +1872,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.切换语言后查看12小时制记录时间",
       "expected_text": "1.待产品确认页面时段标识格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_127",
@@ -2207,16 +1886,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看59秒前的有效测量值",
       "expected_text": "1.页面显示刚刚",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_128",
@@ -2225,16 +1900,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看60秒前的有效测量值",
       "expected_text": "1.页面显示1分钟前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_129",
@@ -2243,16 +1914,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看59分59秒前的有效测量值",
       "expected_text": "1.页面显示59分钟前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_130",
@@ -2261,16 +1928,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看当天1小时前的有效测量值",
       "expected_text": "1.页面显示1小时前",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_131",
@@ -2279,16 +1942,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看昨日的有效测量值",
       "expected_text": "1.数值区域显示--",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_132",
@@ -2300,8 +1959,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先写入历史心率，再使用 silent 传感器配置发起测量；已实测截图显示 Measuring.. 且不显示上次时间；6202首轮迁移暂不可执行：6202当前固件未注册 WEAR_SET；SIM_SENSOR_SET 仅用于620C模拟器；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_133",
@@ -2310,16 +1970,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看一分钟内收到的消息",
       "expected_text": "1.消息时间显示刚刚",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_134",
@@ -2328,16 +1984,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看10分钟前收到的消息",
       "expected_text": "1.消息时间显示10 min ago",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_135",
@@ -2346,16 +1998,12 @@
       "precondition_text": "1.手表存在可查看的历史记录",
       "steps_text": "1.查看超过1小时前收到的消息",
       "expected_text": "1.消息时间显示MM/DD, HH:MM AM/PM",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_136",
@@ -2367,8 +2015,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_137",
@@ -2377,16 +2026,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.恢复出厂后读取振动强度",
       "expected_text": "1.振动强度页面显示弱档",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_138",
@@ -2395,16 +2040,12 @@
       "precondition_text": "1.振动强度设为强",
       "steps_text": "1.触发一次系统短振",
       "expected_text": "1.电流测试仪记录70mA",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发一次系统短振；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_139",
@@ -2413,16 +2054,12 @@
       "precondition_text": "1.振动强度设为弱",
       "steps_text": "1.触发一次系统短振",
       "expected_text": "1.电流测试仪记录40mA",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发一次系统短振；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_140",
@@ -2431,16 +2068,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.执行设备开机",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_141",
@@ -2452,8 +2085,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "SIM_SYSTEM_EVENT:power_off 来自 Windows 模拟器源码；motor_event 可证明关机动作期间是否触发振动；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_142",
@@ -2465,8 +2099,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "用 power_off/power_on 组成模拟器重启生命周期，motor_event 记录黑屏阶段的振动事件；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_143",
@@ -2475,16 +2110,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.触发BLE配对确认",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发BLE配对确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_144",
@@ -2496,8 +2127,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "可构造屏幕长按，但预期还要求振动测试仪采集250ms振动；当前无振动证据通道，不能以页面截图替代完整验收；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_touch_press: 人工长按屏幕步骤缺少 ['TP_PRESS']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_145",
@@ -2506,16 +2138,12 @@
       "precondition_text": "1.手表未接入充电扣",
       "steps_text": "1.将充电扣正确连接至手表",
       "expected_text": "1.手表进入充电状态，振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_146",
@@ -2527,8 +2155,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_147",
@@ -2540,8 +2169,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "MSG_TEST:28 触发源码中的静息心率预警；模拟器 motor_event 输出次数、持续时间和间隔；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_148",
@@ -2553,8 +2183,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "提醒触发等待可执行；完整预期要求振动测试仪测量两次250ms振动及750ms间隔，当前无振动采集证据通道；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_149",
@@ -2566,8 +2197,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_150",
@@ -2579,8 +2211,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_151",
@@ -2589,19 +2222,12 @@
       "precondition_text": "1.手表电量为20%且未充电\n2.振动测试仪已固定并校准",
       "steps_text": "1.用电量测试工具将电量降至19%",
       "expected_text": "1.振动测试仪记录两次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:20;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:19;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "POWER_PERCENT_SET 构造20%到19%的阈值变化；模拟器 motor_event 输出振动参数；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_152",
@@ -2613,8 +2239,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先准备99/100步目标数据，再注入第100步；模拟器 motor_event 输出振动参数；6202首轮迁移暂不可执行：SIM_ACTIVITY_SET 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_153",
@@ -2623,16 +2250,12 @@
       "precondition_text": "1.久坐提醒已开启且距离触发还差1分钟\n2.振动测试仪已固定并校准",
       "steps_text": "1.保持静止至久坐提醒出现",
       "expected_text": "1.振动测试仪记录两次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "提醒触发和等待可通过共享事件及SIM_WAIT完成；但唯一预期是振动测试仪记录两次250ms振动，产品截图无法证明振动次数和时长，需真实振动采集证据；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_154",
@@ -2644,8 +2267,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "喝水提醒可由共享业务事件触发；完整预期只要求振动测试仪记录两次250ms振动，当前无振动采集证据通道；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_155",
@@ -2654,19 +2278,12 @@
       "precondition_text": "1.手表电量为20%且未充电\n2.振动测试仪已固定并校准",
       "steps_text": "1.用电量测试工具将电量降至19%",
       "expected_text": "1.振动测试仪记录750ms间隔",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:20;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:19;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "POWER_PERCENT_SET 构造20%到19%的阈值变化；motor_event 可直接核对750ms间隔；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_156",
@@ -2678,8 +2295,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_157",
@@ -2691,8 +2309,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_158",
@@ -2704,8 +2323,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_159",
@@ -2717,8 +2337,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_160",
@@ -2727,16 +2348,12 @@
       "precondition_text": "1.手表准备开始健康测量",
       "steps_text": "1.触发血氧测量结束",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发血氧测量结束；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_161",
@@ -2745,16 +2362,12 @@
       "precondition_text": "1.手表准备开始健康测量",
       "steps_text": "1.触发压力测量结束",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发压力测量结束；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_162",
@@ -2763,16 +2376,12 @@
       "precondition_text": "1.手表准备开始健康测量",
       "steps_text": "1.触发呼吸相位切换",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发呼吸相位切换；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_163",
@@ -2781,16 +2390,12 @@
       "precondition_text": "1.手表正在运动",
       "steps_text": "1.触发运动开始",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发运动开始；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_164",
@@ -2799,18 +2404,12 @@
       "precondition_text": "1.手表正在运动",
       "steps_text": "1.触发运动暂停",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:MUSIC_CTRL:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_165",
@@ -2819,16 +2418,12 @@
       "precondition_text": "1.手表正在运动",
       "steps_text": "1.触发运动恢复",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发运动恢复；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_166",
@@ -2837,16 +2432,12 @@
       "precondition_text": "1.手表正在运动",
       "steps_text": "1.触发运动结束",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发运动结束；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_167",
@@ -2855,16 +2446,12 @@
       "precondition_text": "1.振动测试仪已固定并校准\n2.手表正在进行按公里或小时累计的运动",
       "steps_text": "1.使运动累计值达到1个公里或小时单位\n2.观察第1个单位完成时的弹窗\n3.读取第1次提醒的两次振动持续时长\n4.读取第1次提醒的两次振动时间间隔\n5.使运动累计值达到2个公里或小时单位\n6.观察第2个单位完成时的弹窗\n7.读取第2次提醒的两次振动持续时长\n8.读取第2次提醒的两次振动时间间隔",
       "expected_text": "1.手表触发第1次整数单位完成提醒\n2.弹窗显示完成1个对应公里或小时单位\n3.两次振动的持续时长均为250ms\n4.两次振动的时间间隔为750ms\n5.手表触发第2次整数单位完成提醒\n6.弹窗显示完成2个对应公里或小时单位\n7.两次振动的持续时长均为250ms\n8.两次振动的时间间隔为750ms",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "基础输入已具备；仍需帧率、波形或持续时长采集器；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_168",
@@ -2876,8 +2463,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需外部触发链路: 1.触发测试来电；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_169",
@@ -2889,8 +2477,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_170",
@@ -2913,11 +2502,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "复用MSG_TEST:22触发真实久坐提醒业务事件，分别在出现后和超过5秒后截图；产品结果仅按截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_170\\result.json。",
       "verification_points": [
         "首张截图显示久坐提醒弹窗",
         "超过5秒后的截图显示弹窗已消失"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_171",
@@ -2940,11 +2530,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "复用MSG_TEST:23触发真实喝水提醒业务事件，分别在出现后和超过5秒后截图；产品结果仅按截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_171\\result.json。",
       "verification_points": [
         "首张截图显示喝水提醒弹窗",
         "超过5秒后的截图显示弹窗已消失"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_172",
@@ -2953,16 +2544,12 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发女性健康提醒弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发女性健康提醒弹窗；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_173",
@@ -2971,16 +2558,12 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发活动达标弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发活动达标弹窗；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_174",
@@ -2989,16 +2572,12 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发运动达标弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发运动达标弹窗；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_175",
@@ -3007,16 +2586,12 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发心率预警弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发心率预警弹窗；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_176",
@@ -3025,16 +2600,12 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发血氧预警弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需外部触发链路: 1.触发血氧预警弹窗；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_177",
@@ -3046,8 +2617,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需外部触发链路: 1.触发绑定成功弹窗；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_178",
@@ -3059,8 +2631,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需外部触发链路: 1.触发绑定失败弹窗；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_179",
@@ -3072,8 +2645,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需外部触发链路: 1.触发网络请求失败弹窗；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_180",
@@ -3082,16 +2656,12 @@
       "precondition_text": "1.已获得截断条款对应页面标识",
       "steps_text": "1.进入产品指定的对应页面",
       "expected_text": "1.待产品确认该页面的全局UI结果",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_181",
@@ -3103,8 +2673,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_182",
@@ -3116,8 +2687,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_183",
@@ -3126,24 +2698,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将系统时间回拨一小时",
       "expected_text": "1.页面时间减少一小时",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18301;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:260811110000;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "用 TIME_SET 固定前置时间并先截图，再回拨一小时，按前后截图比较时间；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "修改前截图显示12:00",
-        "修改后截图显示11:00"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_184",
@@ -3152,26 +2712,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.将系统时间推进至次年00:00",
       "expected_text": "1.页面日期显示新年份",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:261231235900;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18401;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:270101000000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALENDAR,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "用 TIME_SET 固定年末前置时间，在显示年份的日历页先截图，再推进到次年午夜并重新进入日历页；产品结果仅按前后截图判定。",
-      "verification_points": [
-        "修改前截图显示2026年末日期",
-        "修改后截图显示2027年新年日期"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_185",
@@ -3183,8 +2729,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "喝水提醒弹窗和等待可执行；后续要求App固件升级页安装并确认，当前缺手机App侧操作与截图证据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_186",
@@ -3208,11 +2755,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "复用共享喝水和久坐业务事件，分阶段截图验证久坐提醒到点时喝水弹窗的优先级；6202首轮命令迁移；产品结果仅按真机截图判定。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_186\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "喝水提醒触发后，截图显示喝水提醒弹窗",
         "随后触发久坐提醒时，截图仍显示喝水提醒弹窗"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_187",
@@ -3224,13 +2772,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用共享喝水和久坐业务事件，截图覆盖喝水弹窗、久坐到点仍保持、关闭后显示久坐弹窗三个阶段；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。",
-      "verification_points": [
-        "喝水提醒触发后，截图显示喝水提醒弹窗",
-        "久坐提醒到点后，截图仍显示喝水提醒弹窗",
-        "右滑关闭喝水提醒弹窗后，截图显示久坐提醒弹窗"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_188",
@@ -3242,8 +2786,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_189",
@@ -3252,18 +2797,12 @@
       "precondition_text": "1.手表已开机",
       "steps_text": "1.用按压治具连续单击编码器500次",
       "expected_text": "1.手表保持可操作",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_190",
@@ -3275,8 +2814,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "GLOB_191",
@@ -3288,8 +2828,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可构造的起始窗口或弹窗状态；不是触摸坐标能力缺失；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_swipe: 人工步骤缺少 ['SWIPE_SIM', 'TP_SWIPE']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

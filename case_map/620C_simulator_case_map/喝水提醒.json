@@ -8,12 +8,10 @@
     "expected_text": "1.App显示喝水提醒开关与时间配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_002",
@@ -24,12 +22,10 @@
     "expected_text": "1.手表开始喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_003",
@@ -40,12 +36,10 @@
     "expected_text": "1.手表停止喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_004",
@@ -56,12 +50,10 @@
     "expected_text": "1.手表继续使用断连前喝水提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_005",
@@ -72,12 +64,10 @@
     "expected_text": "1.手表采用App最新喝水提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_006",
@@ -88,12 +78,10 @@
     "expected_text": "1.手表继续使用重启前喝水提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_007",
@@ -104,12 +92,10 @@
     "expected_text": "1.手表只保留一个喝水提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_008",
@@ -120,12 +106,10 @@
     "expected_text": "1.开关显示关闭",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_009",
@@ -136,12 +120,10 @@
     "expected_text": "1.手表显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_010",
@@ -152,12 +134,10 @@
     "expected_text": "1.手表显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_011",
@@ -168,12 +148,10 @@
     "expected_text": "1.手表显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_012",
@@ -184,12 +162,10 @@
     "expected_text": "1.手表显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_013",
@@ -200,12 +176,10 @@
     "expected_text": "1.间隔显示1小时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_014",
@@ -216,12 +190,10 @@
     "expected_text": "1.手表从09:17开始本轮计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_015",
@@ -232,12 +204,10 @@
     "expected_text": "1.开始时间显示09:00",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_016",
@@ -248,12 +218,10 @@
     "expected_text": "1.手表开始喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_017",
@@ -264,12 +232,10 @@
     "expected_text": "1.手表不显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_018",
@@ -280,12 +246,10 @@
     "expected_text": "1.手表按新的开始时间重建喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_019",
@@ -296,12 +260,10 @@
     "expected_text": "1.待产品确认：喝水提醒是否支持跨日监测时段",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_020",
@@ -312,12 +274,10 @@
     "expected_text": "1.设备日志记录当前时刻为计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_021",
@@ -328,12 +288,10 @@
     "expected_text": "1.待产品确认：重启后喝水提醒计时继续或重置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖佩戴/传感器采样; 需恢复出厂/重启/OTA 链路; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_022",
@@ -344,12 +302,10 @@
     "expected_text": "1.手表不立即重复显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 配置由 App 下发,模拟器无 App 链路; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_023",
@@ -360,12 +316,10 @@
     "expected_text": "1.手表显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_024",
@@ -376,12 +330,10 @@
     "expected_text": "1.页面显示水滴铃铛图标",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_025",
@@ -392,12 +344,10 @@
     "expected_text": "1.页面显示Take a Sip!",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_026",
@@ -408,12 +358,10 @@
     "expected_text": "1.喝水提醒弹窗自动关闭",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_027",
@@ -424,12 +372,10 @@
     "expected_text": "1.手表按250毫秒振动两次",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需振动采集仪; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_028",
@@ -440,12 +386,10 @@
     "expected_text": "1.振动测试仪记录到两次独立短振波形\n2.每次短振持续250毫秒，两次短振之间间隔750毫秒",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需振动采集仪"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_029",
@@ -456,12 +400,10 @@
     "expected_text": "1.设备以醒来时刻建立新的喝水提醒计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_030",
@@ -472,12 +414,10 @@
     "expected_text": "1.待产品确认：喝水计时是否从运动结束时刻重启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_031",
@@ -488,12 +428,10 @@
     "expected_text": "1.喝水提醒弹窗关闭",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "提醒弹窗本身不可触发(依赖 App 下发+等待)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_032",
@@ -502,24 +440,12 @@
     "precondition_text": "1.手表显示喝水提醒弹窗",
     "steps_text": "1.单击实体按键",
     "expected_text": "1.喝水提醒弹窗关闭",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:23;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:3201,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3201;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用MSG_TEST:23发送真实喝水提醒业务事件，实体主键短按前后截图验证关闭",
-    "verification_points": [
-      "按键前截图显示喝水提醒弹窗",
-      "单击实体按键后，截图显示喝水提醒弹窗已关闭"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_033",
@@ -530,12 +456,10 @@
     "expected_text": "1.页面保持喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_034",
@@ -546,12 +470,10 @@
     "expected_text": "1.页面保持喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_035",
@@ -562,12 +484,10 @@
     "expected_text": "1.页面保持喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_036",
@@ -576,24 +496,12 @@
     "precondition_text": "1.手表显示喝水提醒弹窗",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.页面保持喝水提醒弹窗",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:23;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:3601,500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3601;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用MSG_TEST:23发送真实喝水提醒业务事件，编码器旋转前后截图验证弹窗保持",
-    "verification_points": [
-      "旋转编码器前截图显示喝水提醒弹窗",
-      "旋转编码器后截图仍显示喝水提醒弹窗且页面不变"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_037",
@@ -604,12 +512,10 @@
     "expected_text": "1.设备以弹窗关闭时刻建立下一轮喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 提醒弹窗本身不可触发(依赖 App 下发+等待)"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_038",
@@ -620,12 +526,10 @@
     "expected_text": "1.设备以自动关闭时刻建立下一轮喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_039",
@@ -636,12 +540,10 @@
     "expected_text": "1.设备不建立下一轮喝水提醒计时",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_040",
@@ -652,12 +554,10 @@
     "expected_text": "1.手表继续使用原喝水提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_041",
@@ -668,12 +568,10 @@
     "expected_text": "1.设备建立新一天喝水提醒计时起点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需时间/时区推进链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_042",
@@ -684,12 +582,10 @@
     "expected_text": "1.待产品确认：勿扰下喝水提醒弹窗与振动结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需振动采集仪; 需长时等待/时序; 预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_043",
@@ -700,12 +596,10 @@
     "expected_text": "1.设备仍保留喝水提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_044",
@@ -716,12 +610,10 @@
     "expected_text": "1.设备仍保留喝水提醒计时器",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_045",
@@ -732,12 +624,10 @@
     "expected_text": "1.手表继续使用升级前喝水提醒配置",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_046",
@@ -748,12 +638,10 @@
     "expected_text": "1.手表不显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_047",
@@ -764,12 +652,10 @@
     "expected_text": "1.手表不显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_048",
@@ -780,12 +666,10 @@
     "expected_text": "1.消息弹窗保持在前台\n2.消息关闭后显示喝水提醒弹窗",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 依赖特殊状态(消息/勿扰/低电/充电/运动/睡眠); 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_049",
@@ -796,12 +680,10 @@
     "expected_text": "1.App显示升级确认\n2.手表切换为Firmware Update进度页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 配置由 App 下发,模拟器无 App 链路; 需恢复出厂/重启/OTA 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_050",
@@ -812,12 +694,10 @@
     "expected_text": "1.手表未出现死机或异常重启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖佩戴/传感器采样; 需长时等待/时序"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_051",
@@ -828,12 +708,10 @@
     "expected_text": "1.两平台配置均可同步到手表",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "配置由 App 下发,模拟器无 App 链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HYD_052",
@@ -844,11 +722,9 @@
     "expected_text": "1.图标与文案无重叠或裁切",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖 App 配置下发与提醒触发链路"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

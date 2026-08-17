@@ -6,17 +6,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App前台存在高于当前版本的可安装固件包",
     "steps_text": "1.在App进入固件升级页",
     "expected_text": "1.App显示可升级版本和安装入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_002",
@@ -25,17 +20,12 @@
     "precondition_text": "1.App检测到的固件版本等于手表当前版本",
     "steps_text": "1.在App检查固件更新",
     "expected_text": "1.App不提供重复安装入口",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_003",
@@ -46,12 +36,10 @@
     "expected_text": "1.待产品确认：App错误提示和手表是否收到升级请求",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_004",
@@ -60,17 +48,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.App处于前台\n3.手表电量为50%",
     "steps_text": "1.在App点击安装\n2.在手表确认升级",
     "expected_text": "1.手表收到升级确认请求\n2.手表显示Firmware Update进度页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_005",
@@ -79,17 +62,12 @@
     "precondition_text": "1.App已打开升级页\n2.手表电量为50%",
     "steps_text": "1.将App切到后台\n2.尝试触发安装",
     "expected_text": "1.App进入后台\n2.手表不进入Firmware Update进度页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_006",
@@ -98,17 +76,12 @@
     "precondition_text": "1.手表已连接Titan Smart World App\n2.App已打开固件升级页并检测到可安装固件\n3.手表电量为29%",
     "steps_text": "1.在App固件升级页点击“安装”\n2.查看手表是否出现升级确认页\n3.等待10秒后查看手表升级状态",
     "expected_text": "1.App显示电量过低提示\n2.手表不出现升级确认页\n3.手表未开始升级",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_007",
@@ -117,17 +90,12 @@
     "precondition_text": "1.手表已连接Titan Smart World App\n2.App已打开固件升级页并检测到可安装固件\n3.手表电量为30%",
     "steps_text": "1.在App固件升级页点击“安装”",
     "expected_text": "1.手表收到升级请求并显示升级确认页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_008",
@@ -136,17 +104,12 @@
     "precondition_text": "1.手表已连接Titan Smart World App\n2.App已打开固件升级页并检测到可安装固件\n3.手表电量为31%",
     "steps_text": "1.在App固件升级页点击“安装”",
     "expected_text": "1.手表收到升级请求并显示升级确认页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_009",
@@ -155,17 +118,12 @@
     "precondition_text": "1.App已向手表发出升级请求",
     "steps_text": "1.在手表选择取消",
     "expected_text": "1.手表不进入升级进度页，App结束本次安装请求",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_010",
@@ -174,19 +132,12 @@
     "precondition_text": "1.App已向手表发出升级请求\n2.手表电量不低于30%",
     "steps_text": "1.在手表确认升级",
     "expected_text": "1.页面显示固件图标和实时百分比和Updating...",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_011",
@@ -195,16 +146,12 @@
     "precondition_text": "1.升级流程可停留或采样于0%",
     "steps_text": "1.观察手表升级页面",
     "expected_text": "1.页面显示0%和Updating...",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_012",
@@ -213,16 +160,12 @@
     "precondition_text": "1.升级流程可停留或采样于1%",
     "steps_text": "1.观察手表升级页面",
     "expected_text": "1.页面显示1%和Updating...",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_013",
@@ -231,16 +174,12 @@
     "precondition_text": "1.升级流程可停留或采样于50%",
     "steps_text": "1.观察手表升级页面",
     "expected_text": "1.页面显示50%和Updating...",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_014",
@@ -249,16 +188,12 @@
     "precondition_text": "1.升级流程可停留或采样于99%",
     "steps_text": "1.观察手表升级页面",
     "expected_text": "1.页面显示99%和Updating...",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_015",
@@ -267,16 +202,12 @@
     "precondition_text": "1.升级流程可停留或采样于100%",
     "steps_text": "1.观察手表升级页面",
     "expected_text": "1.页面显示升级完成阶段，准备重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_016",
@@ -285,27 +216,12 @@
     "precondition_text": "1.手表正在执行固件升级",
     "steps_text": "1.等待超过系统自动灭屏时间",
     "expected_text": "1.手表保持Firmware Update进度页亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:1601,start;",
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:1602,progress,50;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;",
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1603,screen_on;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1601;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1604,6500;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用SIM_OTA_EVENT建立真实50%升级业务状态，设置5秒自动熄屏后等待6.5秒，以前后截图验证进度页保持亮屏",
-    "verification_points": [
-      "等待前截图显示Firmware Update进度页",
-      "等待超过自动熄屏时间后，截图仍显示Firmware Update进度页且屏幕亮着"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_017",
@@ -314,26 +230,12 @@
     "precondition_text": "1.手表正在执行固件升级",
     "steps_text": "1.执行覆盖熄屏",
     "expected_text": "1.手表保持Firmware Update进度页亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:1701,start;",
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:1702,progress,50;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1701;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1703,screen_off;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:1704,500;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用共享OTA事件建立50%升级状态，再发送系统熄屏事件；以前后截图检查升级页是否拒绝覆盖熄屏",
-    "verification_points": [
-      "覆盖熄屏前截图显示Firmware Update进度页",
-      "发送熄屏事件后截图仍显示Firmware Update进度页且屏幕亮着"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_018",
@@ -342,18 +244,12 @@
     "precondition_text": "1.手表正在执行固件升级",
     "steps_text": "1.执行垂腕动作",
     "expected_text": "1.手表保持Firmware Update进度页亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,wrist_down;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前源码命令已覆盖，并通过模拟器验证"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_019",
@@ -362,24 +258,12 @@
     "precondition_text": "1.手表正在执行固件升级",
     "steps_text": "1.尝试右滑退出升级页\n2.尝试单击编码器",
     "expected_text": "1.手表保持升级页面\n2.手表保持升级页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "右滑和单击编码器后分别采集页面树，确认两次交互均未退出升级页",
-    "verification_points": [
-      "右滑后检查仍为升级页面",
-      "单击编码器后再次检查仍为升级页面"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_020",
@@ -388,18 +272,12 @@
     "precondition_text": "1.手表正在传输固件包",
     "steps_text": "1.断开设备数据连接",
     "expected_text": "1.手表显示红色X和Update Failed，短振250ms",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前源码命令已覆盖，并通过模拟器验证"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_021",
@@ -408,26 +286,12 @@
     "precondition_text": "1.手表正在显示Update Failed页",
     "steps_text": "1.保持无操作3秒",
     "expected_text": "1.失败提示页消失",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:2101,start;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:2102,fail;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2103,300;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:2101;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:2104,3500;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "用SIM_OTA_EVENT发送真实失败业务事件，截图覆盖Update Failed基线和3秒后的自动消失",
-    "verification_points": [
-      "等待前截图显示Update Failed页",
-      "保持无操作3秒后，截图显示失败提示页已消失"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_022",
@@ -436,16 +300,12 @@
     "precondition_text": "1.OTA传输进度为1%",
     "steps_text": "1.断开设备数据连接\n2.恢复设备连接\n3.在App继续升级",
     "expected_text": "1.手表显示Update Failed\n2.设备业务连接恢复\n3.升级从已保存断点附近继续，不从0%重新传输",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_023",
@@ -454,16 +314,12 @@
     "precondition_text": "1.OTA传输进度为25%",
     "steps_text": "1.断开设备数据连接\n2.恢复设备连接\n3.在App继续升级",
     "expected_text": "1.手表显示Update Failed\n2.设备业务连接恢复\n3.升级从已保存断点附近继续，不从0%重新传输",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_024",
@@ -472,16 +328,12 @@
     "precondition_text": "1.OTA传输进度为50%",
     "steps_text": "1.断开设备数据连接\n2.恢复设备连接\n3.在App继续升级",
     "expected_text": "1.手表显示Update Failed\n2.设备业务连接恢复\n3.升级从已保存断点附近继续，不从0%重新传输",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_025",
@@ -490,16 +342,12 @@
     "precondition_text": "1.OTA传输进度为75%",
     "steps_text": "1.断开设备数据连接\n2.恢复设备连接\n3.在App继续升级",
     "expected_text": "1.手表显示Update Failed\n2.设备业务连接恢复\n3.升级从已保存断点附近继续，不从0%重新传输",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_026",
@@ -508,16 +356,12 @@
     "precondition_text": "1.OTA传输进度为99%",
     "steps_text": "1.断开设备数据连接\n2.恢复设备连接\n3.在App继续升级",
     "expected_text": "1.手表显示Update Failed\n2.设备业务连接恢复\n3.升级从已保存断点附近继续，不从0%重新传输",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_027",
@@ -528,12 +372,10 @@
     "expected_text": "1.待产品确认：断点保存粒度和允许回退的进度范围",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_028",
@@ -545,12 +387,9 @@
     "setup": [],
     "actions": [],
     "collect": [],
-    "unable": true,
-    "note": "完成事件会主动结束当前PC模拟器进程；当前单会话截图执行器无法在同一用例中重启新进程并证明自动重启，不能把进程退出回执当作产品截图证据",
-    "verification_points": [
-      "完成前截图显示OTA进度接近100%",
-      "发送完成事件并等待后，截图显示手表已离开升级页并完成自动重启"
-    ]
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_029",
@@ -559,16 +398,12 @@
     "precondition_text": "1.OTA已完成且手表进入重启",
     "steps_text": "1.测量重启阶段振动",
     "expected_text": "1.手表产生一次250ms短振",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_030",
@@ -577,16 +412,12 @@
     "precondition_text": "1.OTA已成功完成",
     "steps_text": "1.等待手表开机\n2.进入About查看固件版本",
     "expected_text": "1.手表进入主表盘\n2.About显示目标新版本号",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "OTA完成和等待开机可执行；SIM_OTA_EVENT不会替换当前构建的固件版本号，当前缺可安装目标镜像并在About显示目标新版本的通用升级能力"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_031",
@@ -595,18 +426,12 @@
     "precondition_text": "1.OTA成功且手表已开机",
     "steps_text": "1.依次进入主菜单和天气和设置",
     "expected_text": "1.三个页面均可打开，不显示升级残留进度",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_032",
@@ -617,12 +442,10 @@
     "expected_text": "1.设备业务连接恢复\n2.待产品确认：人工重试入口和重试次数",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_033",
@@ -633,12 +456,10 @@
     "expected_text": "1.待产品确认：是否回滚旧版本和旧版本可用性和恢复入口",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_034",
@@ -649,12 +470,10 @@
     "expected_text": "1.待产品确认：升级是否继续和低电提示和失败恢复",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_035",
@@ -663,17 +482,12 @@
     "precondition_text": "1.手表控制的音乐正在播放\n2.App前台可发起OTA",
     "steps_text": "1.在App发起升级\n2.在手表确认升级\n3.等待升级完成开机",
     "expected_text": "1.音乐被OTA流程打断\n2.手表显示升级进度页\n3.原音乐任务不自动续播",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_036",
@@ -682,17 +496,12 @@
     "precondition_text": "1.手表正在通话\n2.App前台可发起OTA",
     "steps_text": "1.在App发起升级\n2.在手表确认升级\n3.等待升级完成开机",
     "expected_text": "1.当前通话被OTA流程打断\n2.手表显示升级进度页\n3.原通话不自动恢复",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_037",
@@ -701,17 +510,12 @@
     "precondition_text": "1.手表正在记录运动\n2.App前台可发起OTA",
     "steps_text": "1.在App发起升级\n2.在手表确认升级\n3.等待升级完成开机",
     "expected_text": "1.当前运动被OTA流程打断\n2.手表显示升级进度页\n3.原运动不自动继续",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_038",
@@ -720,16 +524,12 @@
     "precondition_text": "1.手表正在执行固件升级",
     "steps_text": "1.从手机发送一条通知",
     "expected_text": "1.手表保持Firmware Update进度页，升级进度继续",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_039",
@@ -738,27 +538,12 @@
     "precondition_text": "1.手表正在执行固件升级\n2.闹钟即将到点",
     "steps_text": "1.等待闹钟触发时点",
     "expected_text": "1.手表保持Firmware Update进度页，升级进度继续",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260812080055;",
-      "srv_quick_cmd send TOP5STEP:SIM_ALARM_SET:3901,0,8,1,0,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:3902,start;",
-      "srv_quick_cmd send TOP5STEP:SIM_OTA_EVENT:3903,progress,50;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:3901;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:3904,10000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "固定RTC到08:00:55并建立08:01一次性闹钟，同时用SIM_OTA_EVENT建立50%升级状态，等待跨越触发点后截图验证升级页优先级",
-    "verification_points": [
-      "闹钟触发前截图显示Firmware Update进度页和当前升级进度",
-      "跨越08:01闹钟触发点后，截图仍显示Firmware Update进度页且升级流程未被闹钟页覆盖"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_040",
@@ -769,12 +554,10 @@
     "expected_text": "1.App显示当前升级条件\n2.待产品确认：充电中是否允许升级\n3.待产品确认：手表显示升级页还是充电页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_041",
@@ -783,16 +566,12 @@
     "precondition_text": "1.准备5个可顺序升级的测试固件包\n2.设备电量充足",
     "steps_text": "1.连续完成5轮OTA升级",
     "expected_text": "1.每轮均完成重启，手表无不可恢复状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "OTA_042",
@@ -801,16 +580,11 @@
     "precondition_text": "1.准备支持版本范围内Android和iOS手机\n2.两平台App均在前台",
     "steps_text": "1.分别完成一次固件升级",
     "expected_text": "1.两平台均可完成发起和传输和重启和版本校验",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:OTA,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

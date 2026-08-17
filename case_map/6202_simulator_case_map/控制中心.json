@@ -1,8 +1,6 @@
 {
   "profile": "6202_W5230_SIMULATOR",
   "sheet": "控制中心",
-  "execution_supported": false,
-  "unavailable_reason": "6202 模拟器尚无已验证的控制中心入口和分页面状态建立路径；只截取表盘不能执行控制中心用例。",
   "cases": [
     {
       "case_id": "CTRL_001",
@@ -11,11 +9,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在主表盘下滑",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,50,205,220,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前6202模拟器实测从DIAL下滑(205,50)->(205,220)进入控制中心；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_001/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_001/result.json。",
+      "verification_points": [
+        "从主表盘下滑后显示控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_002",
@@ -27,13 +36,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "左滑后显示控制中心第3页",
-        "单击编码器后返回主表盘",
-        "主表盘下滑后显示控制中心第1页"
-      ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "CTRL_003",
@@ -45,8 +50,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_004",
@@ -55,11 +61,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.左滑至控制中心第2页",
       "expected_text": "1.页面显示两行三列快捷图标",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,250,60,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前5803控制中心为纵向可滚动快捷列表，左滑后画面保持该列表；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_004/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_004/result.json。",
+      "verification_points": [
+        "左滑后页面显示两行三列快捷图标"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_005",
@@ -68,11 +85,23 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.左滑至控制中心第3页",
       "expected_text": "1.页面仅显示QR Hub图标",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,250,60,250,0;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,250,60,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前5803控制中心连续左滑后仍保持纵向快捷列表，未出现QR Hub页；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_005/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_005/result.json。",
+      "verification_points": [
+        "连续左滑后页面仅显示QR Hub图标"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_006",
@@ -81,11 +110,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在控制中心上滑",
       "expected_text": "1.手表返回主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,430,205,80,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前6202模拟器实测控制中心上滑返回DIAL；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_006/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_006/result.json。",
+      "verification_points": [
+        "在控制中心上滑后返回主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_007",
@@ -94,11 +134,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在控制中心单击编码器",
       "expected_text": "1.手表返回主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前6202模拟器实测控制中心单击编码器返回DIAL；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_007/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_007/result.json。",
+      "verification_points": [
+        "在控制中心单击编码器后返回主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_008",
@@ -110,8 +161,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_009",
@@ -123,8 +175,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_010",
@@ -136,8 +189,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_011",
@@ -149,8 +203,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_012",
@@ -159,16 +214,12 @@
       "precondition_text": "1.手表未接入充电器",
       "steps_text": "1.接入充电器\n2.观察控制中心状态栏",
       "expected_text": "1.手表进入充电状态\n2.电量区域显示充电图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
+      "verification_points": [],
       "unable": false,
-      "note": "2026-08-07 实测: SIM_CHARGE:1 可注入充电事件(CHARGING 弹窗),但弹窗遮挡控制中心状态栏,MAIN 单击关闭弹窗会退出到 DIAL,充电图标无法可靠采集; 仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CTRL_013",
@@ -180,8 +231,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_014",
@@ -193,8 +245,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_015",
@@ -206,8 +259,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_016",
@@ -219,8 +273,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_017",
@@ -232,8 +287,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_018",
@@ -245,8 +301,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_019",
@@ -255,15 +312,25 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.从第1页左滑\n2.从第2页左滑",
       "expected_text": "1.手表显示控制中心第2页\n2.手表显示控制中心第3页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "verification_points": [
-        "从第1页左滑后显示控制中心第2页",
-        "从第2页左滑后显示控制中心第3页"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
       ],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,250,60,250,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:350,250,60,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "verification_points": [
+        "第一次左滑后显示控制中心第2页",
+        "第二次左滑后显示控制中心第3页"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前5803控制中心两次左滑后的独立截图均保持同一纵向列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_019/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_019/result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_020",
@@ -272,11 +339,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在第1页右滑",
       "expected_text": "1.页面保持控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:60,250,350,250,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16当前6202模拟器实测控制中心右滑后保持原列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_020/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_020/result.json。",
+      "verification_points": [
+        "在第1页右滑后页面仍保持控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_021",
@@ -288,8 +366,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_022",
@@ -301,8 +380,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_023",
@@ -311,11 +391,24 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击暗色勿扰图标",
       "expected_text": "1.勿扰图标变为高亮",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "勿扰图标身份按布局推断(上行第1),实测未验证高亮切换；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:71,283,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测暗色勿扰图标中心(71,283)，点击后当前产品先显示Enable确认弹窗；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_023/result.json。",
+      "verification_points": [
+        "点击前勿扰图标为暗色",
+        "点击暗色勿扰图标后图标变为高亮"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_024",
@@ -324,11 +417,26 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击高亮勿扰图标",
       "expected_text": "1.勿扰图标变为暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "勿扰图标身份按布局推断(上行第1),实测未验证高亮切换；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:71,283,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:293,410,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:71,283,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测点击暗色勿扰并确认可建立紫色高亮前置，再次点击(71,283)恢复暗色；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_024/result.json。",
+      "verification_points": [
+        "点击前勿扰图标为高亮",
+        "点击高亮勿扰图标后图标变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_025",
@@ -337,16 +445,12 @@
       "precondition_text": "1.定时勿扰已开启",
       "steps_text": "1.将系统时间推进至定时勿扰时段",
       "expected_text": "1.勿扰图标自动高亮",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
+      "verification_points": [],
       "unable": false,
-      "note": "定时勿扰时段依赖精确时间推进；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CTRL_026",
@@ -355,16 +459,12 @@
       "precondition_text": "1.仅定时勿扰已开启",
       "steps_text": "1.将系统时间推进至定时勿扰结束点",
       "expected_text": "1.勿扰图标自动变为暗色",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
+      "verification_points": [],
       "unable": false,
-      "note": "定时勿扰时段依赖精确时间推进；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CTRL_027",
@@ -376,8 +476,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_028",
@@ -389,8 +490,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_029",
@@ -402,8 +504,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_030",
@@ -415,8 +518,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "亮度图标身份按布局推断(上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_031",
@@ -428,8 +532,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "亮度图标身份按布局推断(上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_032",
@@ -441,8 +546,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "亮度图标身份按布局推断(上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_033",
@@ -454,8 +560,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "亮度图标身份按布局推断(上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_034",
@@ -467,8 +574,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "亮度图标身份按布局推断(上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_035",
@@ -480,13 +588,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "点击亮度图标后显示第4档样式",
-        "上滑后返回主表盘",
-        "再次进入控制中心后亮度图标仍显示第4档样式"
-      ],
-      "unable": true,
-      "note": "当前402x256 SHORTCUT Designer确认亮度事件绑定在第1页control_buttons_row_1中间控件，(201,92)位于该控件内；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "verification_points": [],
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "CTRL_036",
@@ -495,16 +599,12 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在设置页将亮度调整为非整档值",
       "expected_text": "1.待产品确认控制中心图标对应档位",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
+      "verification_points": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CTRL_037",
@@ -516,8 +616,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_038",
@@ -526,11 +627,24 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击高亮抬腕图标",
       "expected_text": "1.抬腕亮屏图标变为暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "抬腕图标身份按布局推断(上行第3)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,113,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测Raise to wake中心(205,113)，当前模拟器点击后显示硬件报错/心率未校验页；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_038/result.json。",
+      "verification_points": [
+        "点击前抬腕亮屏图标为高亮",
+        "点击高亮抬腕图标后图标变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_039",
@@ -542,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "抬腕图标身份按布局推断(上行第3)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_040",
@@ -555,8 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "设置页联动操作: 1.在设置页关闭抬腕亮屏；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_041",
@@ -568,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_042",
@@ -578,11 +695,25 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击高亮通话蓝牙图标",
       "expected_text": "1.通话蓝牙图标变为暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "通话BT图标身份按布局推断(下行第1),实测点击跳 SHORTCUT；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:4201,hfp,1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4201;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:71,113,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4202;"
+      ],
+      "unable": false,
+      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1返回applied，当前SHORTCUT中Call BT中心(71,113)，点击前后各有独立新截图；探索证据：D:/Agent-loop-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_042/exploration.json。 正式Runner verdict=PASS；evidence_contract=COMPLETE；独立审计=PROMOTABLE_PASS；正式截图证明Call BT由绿色高亮变为暗灰色；审计PROMOTABLE_PASS。 正式结果：D:/Agent-loop-evidence/control-center-batch20-third-20260816/formal/6202_SIM_01/CTRL_042/result.json。",
+      "verification_points": [
+        "点击前Call BT图标为高亮",
+        "点击高亮Call BT图标后变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_043",
@@ -594,8 +725,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "通话BT图标身份按布局推断(下行第1)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_044",
@@ -604,11 +736,25 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在手机端断开BT通话连接",
       "expected_text": "1.通话蓝牙图标显示暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/循环: 1.在手机端断开BT通话连接；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:4401,hfp,1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4401;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:4402,hfp,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4402;"
+      ],
+      "unable": false,
+      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1和hfp,0均返回applied，断开前后各有独立新截图；探索证据：D:/Agent-loop-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_044/exploration.json。 正式Runner verdict=FAIL；evidence_contract=COMPLETE；独立审计=PROMOTABLE_FAIL；正式截图证明模拟手机侧断开HFP后Call BT仍保持绿色高亮，属于产品真实FAIL；审计PROMOTABLE_FAIL。 正式结果：D:/Agent-loop-evidence/control-center-batch20-third-20260816/formal/6202_SIM_02/CTRL_044/result.json。",
+      "verification_points": [
+        "断开前Call BT图标为高亮",
+        "模拟手机侧断开HFP后Call BT图标变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_045",
@@ -620,8 +766,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_046",
@@ -633,8 +780,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "实测点击查找手机图标进入 NO_PAIR_TIP(未配对提示)；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_047",
@@ -643,11 +791,25 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.观察控制中心第1页Settings图标\n2.点击Settings图标",
       "expected_text": "1.Settings Action图标显示常亮\n2.手表显示设置列表页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "实测点击 Settings 图标进入 SETTING 页；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,180,205,430,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:71,90,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测纵向列表下拉到顶部后Settings中心约(71,90)，点击进入SETTING列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_047/result.json。",
+      "verification_points": [
+        "控制中心Settings Action图标显示常亮",
+        "点击Settings后显示设置列表页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_048",
@@ -659,8 +821,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_049",
@@ -669,16 +832,12 @@
       "precondition_text": "1.手表已恢复出厂并进入控制中心第2页",
       "steps_text": "1.观察第2页第1行左侧Power Saving图标",
       "expected_text": "1.Power Saving图标位于第2页第1行左侧，显示默认关闭状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
+      "verification_points": [],
       "unable": false,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CTRL_050",
@@ -690,8 +849,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "省电图标身份按 CTRL_048 顺序推断(第2页上行第1)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_051",
@@ -703,8 +863,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖外部设备/循环: 1.恢复出厂后进入控制中心第2页；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_052",
@@ -713,11 +874,24 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击高亮静音图标",
       "expected_text": "1.静音图标变为暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "静音图标身份按 CTRL_048 顺序推断(第2页上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:339,113,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测Silent中心(339,113)，默认橙色高亮点击后变为灰色扬声器图标；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_052/result.json。",
+      "verification_points": [
+        "点击前静音图标为高亮",
+        "点击高亮静音图标后图标变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_053",
@@ -726,11 +900,25 @@
       "precondition_text": "1.静音已关闭且控制中心图标为暗色",
       "steps_text": "1.点击暗色静音图标",
       "expected_text": "1.静音状态变为开启，图标显示高亮",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "静音图标身份按 CTRL_048 顺序推断(第2页上行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:339,113,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:339,113,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测Silent中心(339,113)，先点击建立灰色暗态，再次点击恢复橙色高亮；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_053/result.json。",
+      "verification_points": [
+        "点击前静音图标为暗色",
+        "点击暗色静音图标后图标变为高亮"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_054",
@@ -742,8 +930,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备: 2.触发测试来电；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_055",
@@ -752,11 +941,24 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.观察控制中心第2页Flashlight图标\n2.点击Flashlight图标",
       "expected_text": "1.Flashlight Action图标显示常亮\n2.手表显示手电筒页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": true,
-      "note": "手电筒图标身份按 CTRL_048 顺序推断(第2页上行第3)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SHORTCUT,0;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:339,283,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "unable": false,
+      "note": "2026-08-16实测Flashlight中心(339,283)，点击进入白色全屏手电筒页；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_055/result.json。",
+      "verification_points": [
+        "控制中心Flashlight Action图标显示常亮",
+        "点击Flashlight后显示手电筒页面"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_056",
@@ -768,8 +970,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "AOD图标身份按 CTRL_048 顺序推断(第2页下行第1)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_057",
@@ -781,8 +984,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "设置页联动操作: 1.在设置页开启AOD；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_058",
@@ -794,8 +998,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "设置页联动操作: 1.在设置页关闭AOD；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_059",
@@ -807,8 +1012,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闹钟图标身份按 CTRL_048 顺序推断(第2页下行第2)；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标；TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_060",
@@ -820,8 +1026,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闹钟状态设置: 1.创建一个启用状态的闹钟；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_061",
@@ -833,8 +1040,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "闹钟状态设置: 1.关闭全部闹钟；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_062",
@@ -846,8 +1054,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_063",
@@ -859,8 +1068,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_064",
@@ -872,8 +1082,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07: FACTORY_RESET 命令已实测可用(恢复出厂进引导页),但执行器无重启/重连语义,仍需 unable; 依赖恢复出厂/App 配对状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_065",
@@ -885,8 +1096,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_066",
@@ -898,8 +1110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/循环: 1.连续左右滑动控制中心30轮；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_067",
@@ -911,8 +1124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/循环: 1.连续切换勿扰开关20次；6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_068",
@@ -924,8 +1138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖外部设备/循环: 1.分别使用Android手机与iOS手机修改抬腕设置；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CTRL_069",
@@ -937,8 +1152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_SWIPE 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

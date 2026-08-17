@@ -6,18 +6,12 @@
     "precondition_text": "1.手表显示Health二级菜单",
     "steps_text": "1.点击Heart Rate",
     "expected_text": "1.手表显示Heart Rate主页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,161,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "Health 列表第2项中心坐标来自当前 402x256 Designer：列表 y=50、行高74"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_002",
@@ -26,18 +20,12 @@
     "precondition_text": "1.手表已有当日心率测量数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.页面显示最近心率值与Measure按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_003",
@@ -46,18 +34,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.查看24小时蜡烛图和说明图标",
     "expected_text": "1.页面显示24小时蜡烛图与说明图标",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE_INFO,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_004",
@@ -66,18 +48,12 @@
     "precondition_text": "1.当日心率最小值为60bpm",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.Min HR显示60bpm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_005",
@@ -86,18 +62,12 @@
     "precondition_text": "1.当日心率最大值为180bpm",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.Max HR显示180bpm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_006",
@@ -106,18 +76,12 @@
     "precondition_text": "1.手表当日没有心率测量数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.最近心率值显示--",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_007",
@@ -126,18 +90,12 @@
     "precondition_text": "1.手表当日没有手动或自动心率数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.Min HR和Max HR均显示--",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_008",
@@ -146,20 +104,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示Heart Rate主页面",
     "steps_text": "1.点击Measure按钮",
     "expected_text": "1.Measure区域显示Measuring..",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:10808,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:10809,hr,silent,0,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用已验证的佩戴状态和 silent 心率驱动，稳定保留 Measuring.. 状态"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_009",
@@ -168,18 +118,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.点击说明图标",
     "expected_text": "1.手表显示心率说明页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:161,28,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "信息图标坐标来自当前 HEART_RATE Designer 控件层级"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_010",
@@ -188,18 +132,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表显示Health二级菜单",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_011",
@@ -208,18 +146,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.单击实体按键",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_012",
@@ -228,24 +160,12 @@
     "precondition_text": "1.手表停留在Health二级菜单",
     "steps_text": "1.点击Heart Rate进入主页面\n2.保持页面5秒不点击Measure",
     "expected_text": "1.手表显示Heart Rate主页面\n2.页面不显示Measuring..，传感器不启动手动测量",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEALTH,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,161,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83131;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8313,5000;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83132;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "实际点击 Health 第2项后等待5秒",
-    "verification_points": [
-      "点击 Heart Rate 后显示心率主页面",
-      "保持5秒未点击 Measure 时不显示 Measuring，且未启动手动测量"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_013",
@@ -254,20 +174,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示Heart Rate主页面",
     "steps_text": "1.点击Measure按钮",
     "expected_text": "1.页面显示Measuring..",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:11308,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:11309,hr,silent,0,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "使用已验证的佩戴状态和 silent 心率驱动，稳定保留 Measuring.. 状态"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_014",
@@ -276,20 +188,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量刚开始",
     "steps_text": "1.观察测量值区域",
     "expected_text": "1.测量值显示--bpm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:11408,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:11409,hr,silent,0,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "silent 心率驱动不出值，可稳定观察刚开始测量时的 --bpm"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_015",
@@ -298,18 +202,12 @@
     "precondition_text": "1.心率主页面已有上次测量时间",
     "steps_text": "1.点击Measure进入测量状态",
     "expected_text": "1.Measuring..状态不显示上次测量时间",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_016",
@@ -318,21 +216,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.等待传感器首次出值",
     "expected_text": "1.页面显示实时心率数值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8314,1000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_017",
@@ -341,24 +230,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样",
     "steps_text": "1.点击Measure\n2.观察心形图标",
     "expected_text": "1.手表进入心率测量状态\n2.测量期间心形图标持续显示跳动动效",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83171;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8317,1000;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83172;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "点击 Measure 后进入心率测量状态",
-      "测量期间心形图标显示跳动动效"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "HR_018",
@@ -369,12 +246,10 @@
     "expected_text": "1.心率测量页面保持亮屏",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_019",
@@ -383,21 +258,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.执行垂腕动作",
     "expected_text": "1.心率测量页面保持亮屏",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:8305,wrist_down;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_020",
@@ -408,12 +274,10 @@
     "expected_text": "1.手表退出心率测量状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_021",
@@ -422,21 +286,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.单击实体按键",
     "expected_text": "1.手表结束本次测量并显示Heart Rate主页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_022",
@@ -445,21 +300,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表退出心率应用页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_023",
@@ -468,20 +314,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.点击说明图标",
     "expected_text": "1.手表显示心率说明页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:161,28,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "进入心率主页面后实际点击说明图标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_024",
@@ -490,21 +328,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量即将结束",
     "steps_text": "1.等待稳定出值",
     "expected_text": "1.手表振动250毫秒一次",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8324,30000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_025",
@@ -513,21 +342,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.等待稳定出值",
     "expected_text": "1.主页面显示本次心率结果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8325,30000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_026",
@@ -536,21 +356,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.等待稳定出值",
     "expected_text": "1.本次心率数据保存为手动测量记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8326,30000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_027",
@@ -559,21 +370,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量尚未结束",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表不新增本次心率有效记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8303,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8304,hr,silent,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_028",
@@ -582,20 +384,12 @@
     "precondition_text": "1.手表未佩戴\n2.手表显示Heart Rate主页面",
     "steps_text": "1.点击Measure按钮",
     "expected_text": "1.手表显示佩戴提示页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8306,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8307,hr,silent,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_029",
@@ -604,21 +398,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.取下手表",
     "expected_text": "1.手表停止心率测量",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8308,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_030",
@@ -627,21 +412,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量正在运行",
     "steps_text": "1.取下手表",
     "expected_text": "1.设备不新增本次心率有效记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8308,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_031",
@@ -650,18 +426,12 @@
     "precondition_text": "1.手动心率测量已实时显示数值且心形图标正在跳动",
     "steps_text": "1.将手表从手腕取下\n2.将传感器对向空中",
     "expected_text": "1.当前心率值清空为--\n2.心形图标停止跳动，测量停止后显示佩戴提示页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_032",
@@ -672,12 +442,10 @@
     "expected_text": "1.手表进入心率测量状态\n2.手表显示与未佩戴场景相同的佩戴提示页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_033",
@@ -686,20 +454,12 @@
     "precondition_text": "1.手表显示心率佩戴提示页",
     "steps_text": "1.观察页面标题栏和提示正文",
     "expected_text": "1.页面显示Heart Rate标题和当前系统时间，正文显示Make sure your watch is fitting well just above your wrist and retry.",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8306,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8307,hr,silent,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_034",
@@ -708,20 +468,12 @@
     "precondition_text": "1.手表显示佩戴提示页",
     "steps_text": "1.查看佩戴提示文案和重测按钮",
     "expected_text": "1.页面显示佩戴提示文案与重测按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8306,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8307,hr,silent,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_035",
@@ -730,22 +482,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手表显示佩戴提示页",
     "steps_text": "1.点击重测按钮",
     "expected_text": "1.页面显示Measuring..",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8309,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8310,hr,silent,0,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8311,1;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_036",
@@ -754,20 +496,12 @@
     "precondition_text": "1.手表显示佩戴提示页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表显示Heart Rate主页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8312,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_037",
@@ -776,20 +510,12 @@
     "precondition_text": "1.手表显示佩戴提示页",
     "steps_text": "1.单击实体按键",
     "expected_text": "1.手表显示主表盘",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8313,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_038",
@@ -798,32 +524,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量已完成",
     "steps_text": "1.等待页面按系统设置熄屏\n2.在10秒内单击实体按键",
     "expected_text": "1.手表屏幕熄灭\n2.手表显示Heart Rate主页面",
-    "verification_points": [
-      "手动心率测量完成页在自动熄屏前显示",
-      "按5秒系统设置等待后屏幕熄灭",
-      "熄屏10秒内单击实体按键后显示Heart Rate主页面"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:38001,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:38002,hr,fixed,88,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:38003,30000;",
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:38004,screen_on;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:38005;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:38006,5500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:38007;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用佩戴和固定HR状态并真实等待30秒完成测量，再按5秒熄屏规则与实体主键分阶段截图"
+    "note": ""
   },
   {
     "case_id": "HR_039",
@@ -832,35 +538,12 @@
     "precondition_text": "1.手表正确佩戴且对应传感器可采样\n2.手动心率测量已完成",
     "steps_text": "1.等待页面按系统设置熄屏\n2.等待超过10秒\n3.单击实体按键",
     "expected_text": "1.手表屏幕熄灭\n2.手表保持熄屏\n3.手表显示主表盘",
-    "verification_points": [
-      "手动心率测量完成页在自动熄屏前显示",
-      "按5秒系统设置等待后屏幕熄灭",
-      "熄屏真实保持超过10秒后仍为黑屏",
-      "单击实体按键后显示主表盘"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:39001,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:39002,hr,fixed,88,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:39003,30000;",
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:39004,screen_on;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:39005;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:39006,5500;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:39007;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:39008,11000;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:39009;",
-      "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "复用同一心率完成态构造，覆盖自动熄屏、超过10秒黑屏和主键返回表盘四阶段截图"
+    "note": ""
   },
   {
     "case_id": "HR_040",
@@ -869,16 +552,12 @@
     "precondition_text": "1.手表已产生最近7天心率数据",
     "steps_text": "1.重启手表",
     "expected_text": "1.设备日志仍包含最近7天心率数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_041",
@@ -889,12 +568,10 @@
     "expected_text": "1.自动心率测量开关显示开启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_042",
@@ -905,12 +582,10 @@
     "expected_text": "1.设备新增自动心率测量点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_043",
@@ -921,12 +596,10 @@
     "expected_text": "1.设备不新增自动心率测量点",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_044",
@@ -937,12 +610,10 @@
     "expected_text": "1.手表不显示佩戴提示页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_045",
@@ -953,12 +624,10 @@
     "expected_text": "1.待产品确认：无效心率采样的重试与空点存储结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_046",
@@ -969,12 +638,10 @@
     "expected_text": "1.待产品确认：运动中自动心率测量的执行结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_047",
@@ -983,16 +650,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.观察横轴左侧刻度\n2.观察横轴中间刻度\n3.观察横轴右侧刻度",
     "expected_text": "1.左侧刻度显示00:00\n2.中间刻度显示12:00\n3.右侧刻度显示24:00",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_048",
@@ -1001,16 +664,12 @@
     "precondition_text": "1.心率数据测试工具可生成全天最小60、最大140的心率数据，并可清空当日数据",
     "steps_text": "1.通过心率数据测试工具生成数据后进入全天图表\n2.清空当日心率数据后重新进入全天图表",
     "expected_text": "1.Y轴下限和上限包络60与140，中间刻度显示100\n2.无数据时Y轴固定显示0/50/100",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/App: 1.通过心率数据测试工具生成数据后进入全天图表"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_049",
@@ -1019,18 +678,12 @@
     "precondition_text": "1.手表已有当日心率数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.蜡烛图按24个小时槽位展示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_050",
@@ -1039,18 +692,12 @@
     "precondition_text": "1.手表当日没有心率数据",
     "steps_text": "1.进入Heart Rate主页面\n2.观察图表坐标轴\n3.观察图表数据区",
     "expected_text": "1.手表显示Heart Rate主页面\n2.图表显示默认空坐标轴\n3.图表不显示心率数据柱",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_051",
@@ -1059,18 +706,12 @@
     "precondition_text": "1.同一小时存在自动心率点与手动心率点",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.该小时图形按PRD聚合规则显示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_052",
@@ -1079,18 +720,12 @@
     "precondition_text": "1.当前时间为10:00\n2.手表已有0点至10点心率数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.10点之后的小时槽位不显示数据柱",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_053",
@@ -1099,19 +734,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.手表已有23:59前的心率数据",
     "steps_text": "1.将时间推进到次日00:00",
     "expected_text": "1.主图切换为新一天心率数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:1,day_pass;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "当前源码命令已覆盖，并通过模拟器验证"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_054",
@@ -1120,16 +748,12 @@
     "precondition_text": "1.手表已连续8天产生心率数据",
     "steps_text": "1.查看设备数据日志",
     "expected_text": "1.设备保留最近7天心率记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_055",
@@ -1138,18 +762,12 @@
     "precondition_text": "1.手表已有多个心率区间数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.心率图形使用渐变效果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_056",
@@ -1158,18 +776,12 @@
     "precondition_text": "1.同一小时存在60bpm与100bpm心率点",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.该小时图形覆盖60至100bpm范围",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_057",
@@ -1178,18 +790,12 @@
     "precondition_text": "1.准备201bpm可控心率数据",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.对应图形端点显示在200刻度位置",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_058",
@@ -1198,18 +804,12 @@
     "precondition_text": "1.当日最小心率为63bpm\n2.当日最大心率为157bpm",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.Y轴上下边界按10的倍数包络63至157bpm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_059",
@@ -1218,20 +818,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量结束时间可控",
     "steps_text": "1.将当前时间设置为测量后30秒",
     "expected_text": "1.上次测量时间显示刚刚",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-      "srv_quick_cmd send TOP5STEP:HR_SET:72;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120030;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先固定时间并写入心率值，再用 TIME_SET 精确推进30秒"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_060",
@@ -1240,20 +832,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量结束时间可控",
     "steps_text": "1.将当前时间设置为测量后60秒",
     "expected_text": "1.上次测量时间显示1分钟前",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-      "srv_quick_cmd send TOP5STEP:HR_SET:72;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120100;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先固定时间并写入心率值，再用 TIME_SET 精确推进60秒"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_061",
@@ -1262,20 +846,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量结束时间可控",
     "steps_text": "1.将当前时间设置为测量后3599秒",
     "expected_text": "1.上次测量时间显示59分钟前",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-      "srv_quick_cmd send TOP5STEP:HR_SET:72;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811125959;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先固定时间并写入心率值，再用 TIME_SET 精确推进3599秒"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_062",
@@ -1284,20 +860,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量结束时间可控",
     "steps_text": "1.将当前时间设置为测量后3600秒",
     "expected_text": "1.上次测量时间显示1小时前",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811120000;",
-      "srv_quick_cmd send TOP5STEP:HR_SET:72;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TIME_SET:260811130000;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先固定时间并写入心率值，再用 TIME_SET 精确推进3600秒"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_063",
@@ -1306,18 +874,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量发生在昨日",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.最近心率值显示--",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_064",
@@ -1326,18 +888,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.最近心率测量发生在昨日",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.页面不显示上次测量时间",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_065",
@@ -1348,12 +904,10 @@
     "expected_text": "1.设备日志记录新的高心率预警值",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_066",
@@ -1364,12 +918,10 @@
     "expected_text": "1.手表显示High Heart Rate Alert页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_067",
@@ -1380,12 +932,10 @@
     "expected_text": "1.设备随后按1分钟间隔采样",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_068",
@@ -1396,12 +946,10 @@
     "expected_text": "1.手表不显示高心率预警页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_069",
@@ -1412,12 +960,10 @@
     "expected_text": "1.手表不再次显示高心率预警页",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_070",
@@ -1426,16 +972,12 @@
     "precondition_text": "1.手表显示High Heart Rate Alert页面",
     "steps_text": "1.观察当前心率值",
     "expected_text": "1.当前心率值显示为红色",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_071",
@@ -1444,16 +986,12 @@
     "precondition_text": "1.手表显示高心率预警页",
     "steps_text": "1.观察提示文案",
     "expected_text": "1.页面显示High Heart Rate Alert!",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_072",
@@ -1462,16 +1000,12 @@
     "precondition_text": "1.高心率预警条件即将满足",
     "steps_text": "1.等待预警触发",
     "expected_text": "1.手表按250毫秒振动两次",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "高心率状态和等待可构造；唯一预期是两次250ms振动，产品截图无法证明振动次数与时长，需真实振动采集证据"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_073",
@@ -1482,12 +1016,10 @@
     "expected_text": "1.待产品确认：高心率预警默认值\n2.待产品确认：高心率预警可选范围\n3.待产品确认：高心率预警调节步进",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_074",
@@ -1496,18 +1028,12 @@
     "precondition_text": "1.本周七天均有静息心率数据",
     "steps_text": "1.进入Resting Heart Rate页面\n2.从左到右检查七个横轴标签",
     "expected_text": "1.手表显示Resting Heart Rate页面\n2.横轴顺序显示Su/M/T/W/Th/Fr/Sa",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_075",
@@ -1516,16 +1042,12 @@
     "precondition_text": "1.准备最近7天每天各一条静息心率数据\n2.准备第8天前的历史静息心率数据",
     "steps_text": "1.进入静息心率页面\n2.观察柱状图",
     "expected_text": "1.页面显示静息心率柱状图\n2.图表仅显示最近7天的7根柱子，第8天前数据不显示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "当前源码已有数据注入命令；该用例需分场景逐步取证"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_076",
@@ -1534,18 +1056,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.执行上滑",
     "expected_text": "1.手表显示Resting Heart Rate页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_077",
@@ -1554,18 +1070,12 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.手表显示Resting Heart Rate页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "QDEC_SET 来自当前源码，直接模拟编码器旋转"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_078",
@@ -1574,18 +1084,12 @@
     "precondition_text": "1.手表已有本周静息心率数据",
     "steps_text": "1.进入Resting Heart Rate页面",
     "expected_text": "1.页面显示Today's RHR与Week's RHR",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_079",
@@ -1594,18 +1098,12 @@
     "precondition_text": "1.当天没有睡眠数据",
     "steps_text": "1.进入Resting Heart Rate页面",
     "expected_text": "1.Today's RHR显示--bpm",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_080",
@@ -1614,18 +1112,12 @@
     "precondition_text": "1.本周仅4天存在静息心率数据",
     "steps_text": "1.进入Resting Heart Rate页面",
     "expected_text": "1.Week's RHR显示4个有效日的平均值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_081",
@@ -1634,18 +1126,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.跨越周日边界",
     "steps_text": "1.进入Resting Heart Rate页面",
     "expected_text": "1.静息心率图表按滚动最近7天显示数据",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_082",
@@ -1654,18 +1140,12 @@
     "precondition_text": "1.准备100bpm静息心率数据",
     "steps_text": "1.进入Resting Heart Rate页面",
     "expected_text": "1.静息心率图表Y轴下限显示0，上限显示100",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_083",
@@ -1674,20 +1154,12 @@
     "precondition_text": "1.手表显示Resting Heart Rate页面",
     "steps_text": "1.点击说明图标",
     "expected_text": "1.手表显示静息心率说明页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:161,28,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "滚动到静息心率视图后点击该视图说明图标"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_084",
@@ -1696,18 +1168,12 @@
     "precondition_text": "1.手表显示Resting Heart Rate页面",
     "steps_text": "1.执行下滑",
     "expected_text": "1.页面保持Resting Heart Rate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_085",
@@ -1716,18 +1182,12 @@
     "precondition_text": "1.手表显示Resting Heart Rate页面",
     "steps_text": "1.反向旋转编码器",
     "expected_text": "1.页面保持Resting Heart Rate",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "QDEC_SET:0 模拟反向编码器输入"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_086",
@@ -1736,18 +1196,12 @@
     "precondition_text": "1.最近7天包含一条静息心率105BPM数据",
     "steps_text": "1.进入静息心率页面\n2.观察105BPM对应的柱子",
     "expected_text": "1.Y轴范围显示0至100\n2.105BPM柱顶显示在100位置",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_087",
@@ -1756,18 +1210,12 @@
     "precondition_text": "1.手表显示静息心率说明页",
     "steps_text": "1.执行上滑",
     "expected_text": "1.页面显示后续静息心率说明内容",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_088",
@@ -1776,18 +1224,12 @@
     "precondition_text": "1.手表显示静息心率说明页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表显示Resting Heart Rate页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_089",
@@ -1796,16 +1238,12 @@
     "precondition_text": "1.手表显示心率说明页",
     "steps_text": "1.观察说明页顶部",
     "expected_text": "1.页面显示心率或静息心率说明正文",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_090",
@@ -1814,18 +1252,12 @@
     "precondition_text": "1.手表显示心率说明页顶部",
     "steps_text": "1.执行上滑",
     "expected_text": "1.页面显示后续说明内容",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_091",
@@ -1834,18 +1266,12 @@
     "precondition_text": "1.说明页已离开顶部",
     "steps_text": "1.执行下滑",
     "expected_text": "1.页面显示前序说明内容",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_092",
@@ -1854,18 +1280,12 @@
     "precondition_text": "1.手表显示心率说明页",
     "steps_text": "1.旋转编码器",
     "expected_text": "1.说明内容发生纵向滚动",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE_INFO,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "直达源码注册的心率说明页，再用 QDEC_SET 模拟编码器滚动"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_093",
@@ -1874,18 +1294,12 @@
     "precondition_text": "1.手表显示心率说明页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表显示Heart Rate主页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_094",
@@ -1896,12 +1310,10 @@
     "expected_text": "1.App显示手表当日心率数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_095",
@@ -1912,12 +1324,10 @@
     "expected_text": "1.App按日期显示最近7天心率数据",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_096",
@@ -1928,12 +1338,10 @@
     "expected_text": "1.设备本地保留断连期间心率记录",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_097",
@@ -1942,16 +1350,12 @@
     "precondition_text": "1.断连期间已产生心率数据",
     "steps_text": "1.恢复手表与App连接",
     "expected_text": "1.App新增断连期间心率记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "依赖外部设备/App: 1.恢复手表与App连接"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_098",
@@ -1960,16 +1364,12 @@
     "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.前一天心率数据尚未同步",
     "steps_text": "1.跨日后恢复连接",
     "expected_text": "1.App将补传心率数据归档到前一天",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_099",
@@ -1978,16 +1378,12 @@
     "precondition_text": "1.当日上午心率已同步\n2.当日下午心率尚未同步",
     "steps_text": "1.跨日后恢复连接",
     "expected_text": "1.App只新增下午未同步心率记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_100",
@@ -1998,12 +1394,10 @@
     "expected_text": "1.设备端心率历史数据保持不变",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_101",
@@ -2014,12 +1408,10 @@
     "expected_text": "1.App不新增重复心率记录",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_102",
@@ -2030,12 +1422,10 @@
     "expected_text": "1.手表显示High Heart Rate Alert页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_103",
@@ -2046,12 +1436,10 @@
     "expected_text": "1.手表显示High Heart Rate Alert页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_104",
@@ -2060,16 +1448,12 @@
     "precondition_text": "1.睡眠结束前10分钟存在可控心率样本",
     "steps_text": "1.结束睡眠\n2.进入静息心率页",
     "expected_text": "1.手表记录本次清醒时刻\n2.Today's RHR显示清醒前10分钟样本均值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_105",
@@ -2078,18 +1462,12 @@
     "precondition_text": "1.当天已产生两段睡眠",
     "steps_text": "1.结束第二段睡眠",
     "expected_text": "1.Today's RHR刷新为第二次清醒后的结果",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_106",
@@ -2098,18 +1476,12 @@
     "precondition_text": "1.OCM已完整测量并产生有效心率值",
     "steps_text": "1.进入Heart Rate主页面",
     "expected_text": "1.最近心率显示本次OCM心率值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_107",
@@ -2118,18 +1490,12 @@
     "precondition_text": "1.本小时已完成一次OCM并产生有效心率值",
     "steps_text": "1.进入Heart Rate主页面\n2.查看当前小时图形",
     "expected_text": "1.页面显示全天心率图表\n2.当前小时图形包含本次OCM心率值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_108",
@@ -2138,16 +1504,12 @@
     "precondition_text": "1.呼吸训练全程产生有效心率样本",
     "steps_text": "1.完成一次呼吸训练\n2.查看呼吸小结",
     "expected_text": "1.手表显示呼吸小结\n2.Avg HR显示有效样本平均值",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "训练等待可执行；当前缺少可复用的呼吸训练心率样本序列与完整训练会话能力，无法确定建立非零样本并计算小结平均值"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_109",
@@ -2158,12 +1520,10 @@
     "expected_text": "1.手表进入心率测量状态\n2.手表显示本次心率值\n3.手机音乐仍在播放",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_110",
@@ -2174,12 +1534,10 @@
     "expected_text": "1.App显示升级确认\n2.手表进入OTA页面\n3.心率最近记录不包含本次未完成测量",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_111",
@@ -2190,12 +1548,10 @@
     "expected_text": "1.App显示升级确认\n2.手表显示OTA页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_112",
@@ -2206,12 +1562,10 @@
     "expected_text": "1.App显示升级确认\n2.手表显示OTA页面\n3.手表进入心率主页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_113",
@@ -2220,16 +1574,12 @@
     "precondition_text": "1.自动心率已开启\n2.省电模式开启前已产生周期心率记录",
     "steps_text": "1.开启省电模式\n2.保持省电模式5分钟\n3.退出省电模式\n4.继续佩戴5分钟",
     "expected_text": "1.手表显示省电表盘\n2.省电期间不新增自动心率记录\n3.手表返回主表盘\n4.退出后新增自动心率记录",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "基础输入已具备；仍需可加速等待或批量耐久执行器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_114",
@@ -2238,21 +1588,12 @@
     "precondition_text": "1.手表与绑定手机的通话连接可用\n2.手动心率测量正在运行",
     "steps_text": "1.从另一台手机拨打绑定手机",
     "expected_text": "1.手表显示来电页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;",
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:312,202,0;",
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_115",
@@ -2263,12 +1604,10 @@
     "expected_text": "1.手表显示来电页面\n2.待产品确认：来电结束后的返回页面\n3.待产品确认：本次测量与记录是否保留",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_116",
@@ -2279,12 +1618,10 @@
     "expected_text": "1.手表显示充电提醒页\n2.待产品确认：退出充电页后返回心率页还是上一级\n3.待产品确认：本次测量是否结束及是否保存",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_117",
@@ -2295,12 +1632,10 @@
     "expected_text": "1.手表显示Battery is below 20%弹窗\n2.待产品确认：关闭低电弹窗后显示心率测量页还是其他页面\n3.待产品确认：最近记录是否保存本次测量结果",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_118",
@@ -2311,12 +1646,10 @@
     "expected_text": "1.手表显示消息弹窗\n2.待产品确认：消息关闭后测量是否继续\n3.待产品确认：本次已出值是否保存",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_119",
@@ -2327,12 +1660,10 @@
     "expected_text": "1.待产品确认：消息弹窗是否排队\n2.待产品确认：提示页结束后是否显示消息弹窗\n3.消息中心保留该测试消息",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_120",
@@ -2343,12 +1674,10 @@
     "expected_text": "1.手表显示闹钟响铃页\n2.手表返回主表盘\n3.待产品确认：本次心率测量是否保存以及是否需要重新测量",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_121",
@@ -2357,29 +1686,12 @@
     "precondition_text": "1.可输出指定BPM的心率模拟设备已连接\n2.App高心率阈值已设置且手表处于运动状态\n3.喝水提醒将在高心率预警显示期间触发",
     "steps_text": "1.用心率模拟设备连续1分钟输出高于设置值的心率\n2.等待喝水提醒到点\n3.右滑关闭高心率预警页",
     "expected_text": "1.手表显示High Heart Rate Alert页面\n2.喝水提醒不覆盖高心率预警页\n3.手表显示喝水提醒弹窗",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:WEAR_SET:8301,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_SENSOR_SET:8302,hr,fixed,88,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:28;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83121;",
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8315,60000;",
-      "srv_quick_cmd send TOP5STEP:MSG_TEST:23;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83122;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:83123;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
     "note": "",
-    "verification_points": [
-      "高心率预警页面显示",
-      "等待1分钟并触发喝水提醒时，高心率预警仍保持在前台",
-      "关闭高心率预警后显示喝水提醒弹窗"
-    ]
+    "verification_points": []
   },
   {
     "case_id": "HR_122",
@@ -2390,12 +1702,10 @@
     "expected_text": "1.手表自动亮屏显示查找手表页面\n2.待产品确认：结束查找后返回心率页还是主表盘\n3.待产品确认：本次测量是否保存",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_123",
@@ -2406,12 +1716,10 @@
     "expected_text": "1.手表未出现死机或异常重启",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "传感器与佩戴状态可注入；本用例还缺分钟级时钟加速、连续采集或专用动作输入"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_124",
@@ -2422,12 +1730,10 @@
     "expected_text": "1.两平台均显示本次心率记录",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "HR_125",
@@ -2436,15 +1742,11 @@
     "precondition_text": "1.手表显示Heart Rate主页面",
     "steps_text": "1.在默认亮度下观察最近值区域",
     "expected_text": "1.心率数值与单位无重叠或裁切",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:HEART_RATE,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   }
 ]

@@ -9,6 +9,7 @@ import unittest
 import zlib
 from collections import deque
 from pathlib import Path
+from unittest import mock
 
 from agent_loop_system.tools.mtp_screenshot import (
     MtpCaptureProvider,
@@ -77,9 +78,13 @@ class FakeTransport:
 
 
 class FakeMtpSystem:
-    def __init__(self, *, valid_bmp: bool = True) -> None:
+    def __init__(
+        self, *, valid_bmp: bool = True, width: int = 410, height: int = 502
+    ) -> None:
         self.usb_states: list[bool] = []
         self.valid_bmp = valid_bmp
+        self.width = width
+        self.height = height
 
     def wait_for_usb(self, *, present: bool, timeout: float) -> None:
         self.usb_states.append(present)
@@ -89,7 +94,7 @@ class FakeMtpSystem:
     ) -> Path:
         target = destination_dir / file_name
         if self.valid_bmp:
-            make_bmp(target)
+            make_bmp(target, width=self.width, height=self.height)
         else:
             target.write_bytes(b"old-or-broken")
         return target
@@ -150,6 +155,7 @@ class MtpScreenshotTest(unittest.TestCase):
         captured: dict[str, object] = {}
 
         def runner(argv, **kwargs):
+            captured["argv"] = argv
             captured["script"] = base64.b64decode(argv[-1]).decode("utf-16le")
             captured["timeout"] = kwargs["timeout"]
             env = kwargs["env"]
@@ -166,7 +172,52 @@ class MtpScreenshotTest(unittest.TestCase):
         self.assertEqual(target.name, "agent_capture_9.bmp")
         self.assertIn("$discoveryDeadline", str(captured["script"]))
         self.assertIn("Start-Sleep -Milliseconds 500", str(captured["script"]))
+        self.assertIn(
+            "$ProgressPreference = 'SilentlyContinue'",
+            str(captured["script"]),
+        )
+        self.assertIn("[Console]::OutputEncoding", str(captured["script"]))
+        self.assertIn("-NoLogo", captured["argv"])
+        self.assertIn("-OutputFormat", captured["argv"])
+        self.assertIn("Text", captured["argv"])
         self.assertEqual(captured["timeout"], 10.2)
+
+    def test_windows_mtp_error_filters_progress_clixml(self) -> None:
+        clixml = """#< CLIXML
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj S="progress" RefId="0"><MS><S N="Activity">Preparing modules</S></MS></Obj>
+  <S S="Error">USB state did not reach the requested value_x000D__x000A_</S>
+</Objs>"""
+
+        def runner(argv, **_kwargs):
+            return subprocess.CompletedProcess(argv, 2, "", clixml)
+
+        system = WindowsMtpSystem(runner=runner)
+        with self.assertRaises(MtpScreenshotError) as context:
+            system._run("exit 2", timeout=0.1)
+
+        message = str(context.exception)
+        self.assertIn("USB state did not reach the requested value", message)
+        self.assertNotIn("#< CLIXML", message)
+        self.assertNotIn("Preparing modules", message)
+
+    def test_windows_mtp_error_hides_progress_only_clixml(self) -> None:
+        clixml = """#< CLIXML
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj S="progress" RefId="0"><MS><S N="Activity">Preparing modules</S></MS></Obj>
+</Objs>"""
+
+        def runner(argv, **_kwargs):
+            return subprocess.CompletedProcess(argv, 2, "", clixml)
+
+        system = WindowsMtpSystem(runner=runner)
+        with self.assertRaises(MtpScreenshotError) as context:
+            system._run("exit 2", timeout=0.1)
+
+        message = str(context.exception)
+        self.assertIn("PowerShell exited with code 2 without diagnostics", message)
+        self.assertNotIn("#< CLIXML", message)
+        self.assertNotIn("Preparing modules", message)
 
     def test_capture_runs_full_flow_and_validates_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_dir:
@@ -378,6 +429,24 @@ class MtpScreenshotTest(unittest.TestCase):
 
 
 class MtpCaptureProviderTest(unittest.TestCase):
+    def test_provider_uses_6204_project_geometry(self) -> None:
+        serial = FakeBorrowedSession()
+        mtp = FakeMtpSystem(width=466, height=466)
+        with mock.patch.dict(
+            "os.environ", {"W30_HARDWARE_PROJECT": "6204_W5230"}
+        ):
+            provider = MtpCaptureProvider(
+                serial,
+                sequence_start=6204,
+                usb_timeout=0.1,
+                mtp_timeout=0.1,
+                mtp_system=mtp,
+            )
+            frame = provider.capture(timeout=0.01)
+
+        self.assertEqual((frame.metadata.width, frame.metadata.height), (466, 466))
+        self.assertEqual(frame.metadata.data_size, 466 * 466 * 3)
+
     def test_provider_borrows_serial_and_returns_generic_frame(self) -> None:
         serial = FakeBorrowedSession()
         mtp = FakeMtpSystem()

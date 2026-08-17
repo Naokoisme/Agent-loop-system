@@ -9,17 +9,12 @@
       "precondition_text": "1.手表未接入充电器",
       "steps_text": "1.接入充电器",
       "expected_text": "1.手表显示充电提醒页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测 SIM_CHARGE:1 弹 CHARGING 充电弹窗（模拟接入充电器）；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_002",
@@ -28,16 +23,12 @@
       "precondition_text": "1.手表未接入充电器",
       "steps_text": "1.接入充电器",
       "expected_text": "1.振动测试仪记录一次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "充电页可达(SIM_CHARGE:1)但预期需振动采集仪,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_003",
@@ -46,17 +37,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.观察充电页顶部",
       "expected_text": "1.页面显示MM/DD, Weekday",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测 SIM_CHARGE:1 进充电页；观察类步骤由 collect 采集判定；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_004",
@@ -65,18 +51,12 @@
       "precondition_text": "1.手表处于充电状态",
       "steps_text": "1.将系统时间制设为24小时",
       "expected_text": "1.充电页显示HH:MM",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:1;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；TIME_MODE:1=24小时制，SIM_CHARGE:1 进充电页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_005",
@@ -85,18 +65,12 @@
       "precondition_text": "1.手表处于充电状态",
       "steps_text": "1.将系统时间制设为12小时",
       "expected_text": "1.充电页显示12小时制时段标识",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_MODE:0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；TIME_MODE:0=12小时制，SIM_CHARGE:1 进充电页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_006",
@@ -105,18 +79,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.将系统电量设为56%",
       "expected_text": "1.充电页显示56%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:56;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；POWER_PERCENT_SET 设电量后 SIM_CHARGE:1 进充电页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_007",
@@ -125,18 +93,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.将系统电量设为1%",
       "expected_text": "1.充电页显示1%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:1;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；1% 电量充电页正常显示（无低电弹窗干扰）；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_008",
@@ -145,18 +107,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.将系统电量设为50%",
       "expected_text": "1.充电页显示50%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:50;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_009",
@@ -165,18 +121,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.将系统电量设为100%",
       "expected_text": "1.充电页显示100%",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:100;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_010",
@@ -185,17 +135,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.观察一个完整充电动画周期",
       "expected_text": "1.充电圆环完成一次0%至100%动画",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；充电动画为动态效果，collect 截图由 LLM 判定近似；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_011",
@@ -204,16 +149,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.采集一个完整充电动画周期",
       "expected_text": "1.视频分析得到周期为3秒",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "充电页可达但充电动画周期需动态视频分析,collect 静态截图无法判定,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_012",
@@ -222,16 +163,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.观察连续三个动画周期",
       "expected_text": "1.三个周期均完成满圈动画",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "充电页可达但连续动画周期为动态场景,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_013",
@@ -240,19 +177,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.短按返回按键\n2.观察返回页面",
       "expected_text": "1.手表退出充电页\n2.返回页面不显示充电圆环",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测 MAIN 单击退出充电页（BUTTON_PRESS:1,1,0）；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_014",
@@ -261,25 +191,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长已设为10秒",
       "steps_text": "1.等待所设亮屏时长",
       "expected_text": "1.手表在设定时长到达时熄屏",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待10秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:14001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:14002,10500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_015",
@@ -288,25 +205,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长设为5秒",
       "steps_text": "1.在充电页等待5秒",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待5秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:15001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:15002,5500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_016",
@@ -315,25 +219,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长设为10秒",
       "steps_text": "1.在充电页等待10秒",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待10秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:10;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:16001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:16002,10500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_017",
@@ -342,25 +233,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长设为15秒",
       "steps_text": "1.在充电页等待15秒",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待15秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:15;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:17001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:17002,15500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_018",
@@ -369,25 +247,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长设为20秒",
       "steps_text": "1.在充电页等待20秒",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待20秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:20;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:18002,20500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_019",
@@ -396,25 +261,12 @@
       "precondition_text": "1.手表处于充电页\n2.系统亮屏时长设为30秒",
       "steps_text": "1.在充电页等待30秒",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "真实等待30秒后屏幕熄灭"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:30;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:19002,30500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用DISPLAY_TIME_SET和充电事件建立前置状态，SIM_WAIT真实等待并用前后截图判断熄屏；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_020",
@@ -423,28 +275,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.等待充电页熄屏\n2.单击按键",
       "expected_text": "1.手表进入熄屏状态\n2.手表恢复充电提醒页",
-      "verification_points": [
-        "等待前显示充电页且屏幕点亮",
-        "到达5秒亮屏时长后屏幕熄灭",
-        "单击实体按键后恢复充电提醒页"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:5;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:20001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:20002,5500;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:20003;",
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "复用亮屏时长、充电事件、真实等待和通用实体按键；三阶段截图覆盖熄屏与恢复；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": ""
     },
     {
       "case_id": "CHG_021",
@@ -453,19 +289,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.短按返回按键",
       "expected_text": "1.手表返回上一级页面",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测 MAIN 单击退出充电页返回上一级；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_022",
@@ -474,19 +303,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.短按返回按键",
       "expected_text": "1.系统仍保持充电状态",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测 MAIN 单击关闭充电弹窗；充电状态保持由后续 SIM_CHARGE:0 对比近似判定；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_023",
@@ -498,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07 实测右滑(SWIPE_SIM:3,0)关闭充电弹窗返回上一级；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_024",
@@ -508,17 +331,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.断开充电器",
       "expected_text": "1.手表关闭充电提醒页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "当前真实源码没有充电断开命令；原 SIM_CHARGE:0 从未注册，不能执行；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_025",
@@ -527,17 +345,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.观察充电页顶部",
       "expected_text": "1.页面显示MM/DD, Weekday",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；观察类步骤由 collect 采集判定；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_026",
@@ -549,8 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07 实测上滑保持充电页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_027",
@@ -562,8 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07 实测下滑保持充电页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_028",
@@ -575,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "2026-08-07 实测左滑保持充电页；6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_029",
@@ -585,19 +401,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.在充电页旋转编码器",
       "expected_text": "1.页面保持充电提醒页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测编码器旋转保持充电页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_030",
@@ -606,16 +415,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具执行20%降至19%",
       "expected_text": "1.手表显示Battery is below 20%弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发(POWER_PERCENT_SET:1 无弹窗,2026-08-07 复测),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_031",
@@ -624,16 +429,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具执行10%降至9%",
       "expected_text": "1.手表显示Battery is below 10%弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发(POWER_PERCENT_SET:1 无弹窗,2026-08-07 复测),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_032",
@@ -642,16 +443,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具执行5%降至4%",
       "expected_text": "1.手表显示Battery is below 5%弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_033",
@@ -660,16 +457,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具将电量降至20%",
       "expected_text": "1.手表不显示低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_034",
@@ -678,16 +471,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具将电量降至10%",
       "expected_text": "1.手表不显示低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_035",
@@ -696,16 +485,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.用电量测试工具将电量降至5%",
       "expected_text": "1.手表不显示低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_036",
@@ -717,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗链路不通(依赖低电弹窗),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_037",
@@ -730,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗链路不通(依赖低电弹窗),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_038",
@@ -740,16 +527,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.触发20%低电弹窗",
       "expected_text": "1.振动测试仪记录两次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通+需振动采集仪,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_039",
@@ -758,16 +541,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.触发10%低电弹窗",
       "expected_text": "1.振动测试仪记录两次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通+需振动采集仪,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_040",
@@ -776,16 +555,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.触发5%低电弹窗",
       "expected_text": "1.振动测试仪记录两次250ms振动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通+需振动采集仪,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_041",
@@ -794,16 +569,12 @@
       "precondition_text": "1.省电模式处于关闭状态",
       "steps_text": "1.触发10%低电弹窗",
       "expected_text": "1.振动测试仪记录750ms间隔",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通+需振动采集仪,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_042",
@@ -815,8 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_043",
@@ -828,8 +600,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_044",
@@ -841,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗实测仍不触发,仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_045",
@@ -854,8 +628,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗链路不通(依赖低电通知),仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_046",
@@ -867,8 +642,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗链路不通+需等待时序,仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_047",
@@ -880,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "低电弹窗链路不通(依赖低电通知),仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_048",
@@ -893,12 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用低电业务事件建立通知页，实体主键短按前后各截图验证关闭；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "按键前截图显示低电通知页",
-        "单击实体按键后，截图显示低电通知已关闭"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_049",
@@ -907,16 +681,12 @@
       "precondition_text": "1.10%低电提醒已触发一次",
       "steps_text": "1.将电量从9%充至11%\n2.将电量从10%降至9%",
       "expected_text": "1.系统电量显示11%\n2.手表再次显示10%低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_050",
@@ -925,18 +695,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.对比充电页电量与系统日志",
       "expected_text": "1.两处电量百分比相同",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:56;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；无系统日志入口，近似比对充电页电量显示与实际注入值；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_051",
@@ -945,16 +709,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.连续插拔充电器20次",
       "expected_text": "1.最终页面与最终充电状态一致",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "充电页可达但连续插拔 20 次为循环场景,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_052",
@@ -963,16 +723,12 @@
       "precondition_text": "1.手表已接入充电器且电量为10%",
       "steps_text": "1.用电量测试工具将电量从10%降至9%",
       "expected_text": "1.手表不显示Battery is below 10%弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "低电弹窗链路不通,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_053",
@@ -981,16 +737,12 @@
       "precondition_text": "1.手表正在显示低电弹窗",
       "steps_text": "1.在低电弹窗显示时接入充电器",
       "expected_text": "1.手表关闭低电弹窗",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖低电弹窗+真实充电器,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_054",
@@ -999,16 +751,12 @@
       "precondition_text": "1.手表正在显示低电弹窗",
       "steps_text": "1.在低电弹窗显示时接入充电器",
       "expected_text": "1.待产品确认：退出充电页后的返回位置",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖低电弹窗+预期待产品确认,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_055",
@@ -1017,16 +765,12 @@
       "precondition_text": "1.省电模式处于开启状态",
       "steps_text": "1.在省电表盘接入充电器",
       "expected_text": "1.手表退出省电模式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "依赖低电弹窗(省电模式链路),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_056",
@@ -1038,8 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖另一台手机发消息(外部设备),仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_057",
@@ -1051,8 +796,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App 安装升级(外部链路)+待产品确认,仍 unable；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_058",
@@ -1061,16 +807,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.保持充电页面可见八小时",
       "expected_text": "1.手表未发生异常重启",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "充电页可达但 8 小时长稳为长时间场景,仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_059",
@@ -1079,16 +821,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.分别接入三套合规充电器",
       "expected_text": "1.每套充电器均触发充电页",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "需三套真实合规充电器(外部设备),仍 unable；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "CHG_060",
@@ -1097,20 +835,12 @@
       "precondition_text": "1.手表已接入充电器并显示充电页",
       "steps_text": "1.观察1%与100%两种电量页面",
       "expected_text": "1.日期时间电量均保持完整可读",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:1;",
-        "srv_quick_cmd send TOP5STEP:MSG_TEST:35;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:POWER_PERCENT_SET:100;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-07 实测；先 1% 后切 100% 观察两种电量充电页；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

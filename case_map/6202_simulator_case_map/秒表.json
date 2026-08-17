@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "BLOCKED_PRECONDITION_UNAVAILABLE：2026-08-14核对6202_W5230当前Project.cmake与实际模拟器，Stopwatch是一级独立应用，构建产物未注册CLOCK_SUBMENU窗口；无法建立原用例要求的‘Clock二级菜单’前置条件，不能用ENTER_PAGE:STOPWATCH冒充点击入口。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "BLOCKED_PRECONDITION_UNAVAILABLE：2026-08-14真实打开6202负一屏SIDEBAR并截图核对，当前产品使用独立应用卡片，不存在原用例要求的‘Clock卡显示Stopwatch入口’前置状态；不能用独立Stopwatch卡或ENTER_PAGE直达替代原始业务入口。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_003",
@@ -35,21 +37,12 @@
       "precondition_text": "1.秒表已重置",
       "steps_text": "1.进入Stopwatch",
       "expected_text": "1.主计时显示00:00.00，计次按钮置灰，开始按钮可用",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：从主表盘使用6202当前源码真实注册的STOPWATCH入口进入秒表。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_003；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
-      "verification_points": [
-        "进入Stopwatch后主计时显示00:00.00、计次按钮置灰且开始按钮可用"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_004",
@@ -74,10 +67,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4001;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；使用当前410x502页面左侧按钮实测坐标(113,428)，未启动状态点击后计时与列表保持不变。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_004；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_004\\result.json。",
       "verification_points": [
         "未开始状态点击置灰计次按钮后主计时仍为00:00.00且没有计次记录"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_005",
@@ -102,10 +96,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:5001;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；使用当前410x502页面右侧开始按钮实测坐标(297,428)，点击后进入计时态。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_005；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_005\\result.json。",
       "verification_points": [
         "点击开始并等待后主计时增加，页面显示计次和暂停按钮"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_006",
@@ -114,29 +109,12 @@
       "precondition_text": "1.秒表已开始且总时长少于1小时",
       "steps_text": "1.观察主计时",
       "expected_text": "1.主计时显示MM:SS.cs格式",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:800;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:800;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:6001;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实启动短时计时、返回主表盘并重新进入，核对一小时内显示格式。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_006；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
-      "verification_points": [
-        "一小时内主计时使用MM:SS.cs格式显示"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_007",
@@ -148,8 +126,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待可执行，但完整等待1小时会占用单模拟器；当前缺把秒表单调计时安全推进到59:59附近的通用状态命令，不能用系统RTC代替秒表时钟；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_008",
@@ -176,10 +155,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:8001;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实启动后点击当前页面计次坐标(113,428)，生成第1条计次。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_008；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_008\\result.json。",
       "verification_points": [
         "点击计次后列表新增序号1和当前累计时间"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_009",
@@ -207,10 +187,11 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:9001;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立第1条计次后再次点击计次，核对第2条排序。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_009；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_009\\result.json。",
       "verification_points": [
         "第二次计次后序号2显示在序号1上方"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_010",
@@ -219,56 +200,12 @@
       "precondition_text": "1.秒表正在计时且已有28条计次",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.列表新增第29条计次记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:10001;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实逐次建立28条记录后触发第29次计次。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_010；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
-      "verification_points": [
-        "点击计次后列表新增第29条记录"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_011",
@@ -277,57 +214,12 @@
       "precondition_text": "1.秒表正在计时且已有29条计次",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.列表新增第30条计次记录",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:11001;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实逐次建立29条记录后触发第30次计次。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_011；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
-      "verification_points": [
-        "点击计次后列表新增第30条记录"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_012",
@@ -385,11 +277,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:12002;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立30条记录，在再次点击置灰计次按钮前后分别截图核对按钮与记录上限。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_012；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=2/2，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_012\\result.json。",
       "verification_points": [
         "已有30条计次时左侧计次按钮显示置灰",
         "再次点击置灰计次按钮后列表仍保持30条计次"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_013",
@@ -414,7 +307,8 @@
         "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
         "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
         "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;"
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:13000;"
       ],
       "actions": [
         "srv_quick_cmd send TOP5STEP:TP_SWIPE:205,360,205,230,0;",
@@ -424,10 +318,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:13001;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立8条记录，并在6202当前计次区域执行已验证上滑手势。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_013；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_013\\result.json。",
       "verification_points": [
-        "在计次区域上滑后列表显示较旧的计次记录"
-      ]
+        "动作前截图显示较新的计次记录",
+        "上滑后截图显示较旧的计次记录"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_014",
@@ -465,11 +361,12 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:14002;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立8条记录，先上滑离开顶部截图，再下滑并截图对比较旧与较新记录。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_retry_20260814_180500\\SW_014；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=2/2，独立审计=PROMOTABLE_PASS。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_014\\result.json。",
       "verification_points": [
         "下滑前计次列表已离开顶部并显示较旧计次记录",
         "下滑后计次列表显示较新的高序号记录"
-      ]
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_015",
@@ -509,7 +406,8 @@
         "旋转后计次列表沿旋转方向滚动"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立8条记录，使用6202当前注册的QDEC_SET:1，旋转前后分别截图。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_015；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=2/2，独立审计=PROMOTABLE_PASS。"
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_015\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_016",
@@ -518,31 +416,12 @@
       "precondition_text": "1.秒表已生成至少3条计次记录",
       "steps_text": "1.观察计次列表中的序号",
       "expected_text": "1.每条计次序号均使用蓝色字体显示",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:16001;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立3条记录后重新进入观察；截图明确显示序号3/2/1为白色而非原始预期的蓝色，保留产品真实FAIL。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_016；verdict=FAIL，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_FAIL。",
-      "verification_points": [
-        "计次列表中至少3条记录的序号均使用蓝色字体显示"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_017",
@@ -554,8 +433,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前没有把秒表单调计时推进到1小时以上的通用模拟器能力，不能用系统时间或伪造显示代替；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_018",
@@ -590,7 +470,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18003;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；使用同一右侧实测坐标依状态触发开始和暂停，暂停前、暂停后、真实等待3秒后各截图。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_018；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=3/3，独立审计=PROMOTABLE_PASS。"
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_018\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_019",
@@ -624,7 +505,8 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19002;"
       ],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立暂停态后点击右侧继续按钮并等待1秒，继续前后分别截图。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_019；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=2/2，独立审计=PROMOTABLE_PASS。"
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_019\\result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_020",
@@ -633,31 +515,12 @@
       "precondition_text": "1.秒表处于暂停状态且已有计次记录",
       "steps_text": "1.点击重置按钮",
       "expected_text": "1.主计时回到00:00.00，计次列表清空，计次按钮置灰",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:200;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:113,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:20001;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；真实建立含计次的暂停态，再点击已切换为重置功能的左侧按钮。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_020；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=1/1，独立审计=PROMOTABLE_PASS。",
-      "verification_points": [
-        "点击重置后主计时回到00:00.00、计次列表清空且计次按钮置灰"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_021",
@@ -666,35 +529,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.执行右滑\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表退出秒表页\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [
-        "右滑前秒表正在计时",
-        "右滑后已退出秒表页",
-        "真实等待10秒并重新进入后主计时增加约10秒"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:21001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:21002;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:10000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:300;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:21003;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；使用6202实测为右滑的SWIPE_SIM:3退出，真实等待10秒后从源码注册入口重新进入，三阶段分别截图。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_021；verdict=PASS，evidence_contract=COMPLETE，检查点/截图=3/3，独立审计=PROMOTABLE_PASS。"
+      "note": ""
     },
     {
       "case_id": "SW_022",
@@ -703,35 +543,12 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.单击编码器\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表返回主表盘\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [
-        "按键前秒表正在计时",
-        "单击编码器后显示主表盘",
-        "真实等待10秒并重新进入后主计时增加约10秒"
-      ],
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,250,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:TP_CLICK:297,428,1;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:1000;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22001;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22002;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:10000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;",
-        "srv_quick_cmd send TOP5STEP:HOST_WAIT:300;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:22003;"
-      ],
+      "verification_points": [],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "2026-08-14已验证：页面进入后先在空白计次区(205,250)执行无副作用预触摸，以稳定当前6202虚拟输入；使用6202已验证的BUTTON_PRESS:1,1,0单击编码器；截图明确显示按键后仍停留秒表页而非主表盘，保留产品真实FAIL。 正式Agent-loop Runner证据目录：D:\\Agent-loop-system\\evidence\\6202_stopwatch_formal_20260814_174700\\SW_022；verdict=FAIL，evidence_contract=COMPLETE，检查点/截图=3/3，独立审计=PROMOTABLE_FAIL。"
+      "note": ""
     },
     {
       "case_id": "SW_023",
@@ -743,8 +560,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "基础输入已具备；仍需可加速等待或批量耐久执行器；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_024",
@@ -756,8 +574,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_025",
@@ -766,17 +585,12 @@
       "precondition_text": "1.秒表正在计时\n2.系统已配置全局灭屏时间流",
       "steps_text": "1.执行覆盖熄屏\n2.等待全局灭屏时间流结束后点亮屏幕",
       "expected_text": "1.屏幕熄灭，秒表计时继续\n2.手表显示主表盘，重新进入秒表后计时值包含熄屏时长",
-      "verification_points": [
-        "覆盖前秒表正在计时",
-        "覆盖后屏幕熄灭",
-        "熄屏超过10秒后点亮显示主表盘",
-        "重新进入秒表后计时值包含熄屏时长"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用screen_off、真实等待、实体主键和时钟子菜单入口；四阶段截图覆盖熄屏、超时返回和后台计时；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_026",
@@ -785,17 +599,12 @@
       "precondition_text": "1.秒表正在计时\n2.系统已配置全局灭屏时间流",
       "steps_text": "1.执行垂腕熄屏\n2.等待全局灭屏时间流结束后点亮屏幕",
       "expected_text": "1.屏幕熄灭，秒表计时继续\n2.手表显示主表盘，重新进入秒表后计时值包含熄屏时长",
-      "verification_points": [
-        "垂腕前秒表正在计时",
-        "垂腕后屏幕熄灭",
-        "熄屏超过10秒后点亮显示主表盘",
-        "重新进入秒表后计时值包含熄屏时长"
-      ],
+      "verification_points": [],
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "复用wrist_down、真实等待、实体主键和时钟子菜单入口；四阶段截图覆盖熄屏、超时返回和后台计时；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标；SIM_SYSTEM_EVENT 仅用于620C模拟器。"
+      "unable": false,
+      "note": ""
     },
     {
       "case_id": "SW_027",
@@ -807,8 +616,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待1秒本身可执行；当前缺把秒表业务单调时钟可靠建立到23:59:58的通用状态命令，不能用系统RTC冒充秒表计时；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_028",
@@ -820,8 +630,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_029",
@@ -833,14 +644,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "verification_points": [
-        "快速点击5次后仍只有一个秒表且计时有效",
-        "快速点击10次后仍只有一个秒表且计时不倒退",
-        "快速点击15次后仍只有一个秒表且计时继续",
-        "快速点击20次后仍只有一个秒表且计时不倒退"
-      ],
-      "unable": true,
-      "note": "复用当前402x256秒表开始/暂停共享按钮坐标，按人工步骤实际点击20次并分阶段截图；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "SW_030",
@@ -849,16 +655,12 @@
       "precondition_text": "1.秒表正在后台计时",
       "steps_text": "1.重启手表\n2.重新进入Stopwatch",
       "expected_text": "1.手表完成开机\n2.待产品确认：秒表进程和计次记录是否恢复",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_031",
@@ -870,8 +672,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "等待本身可由SIM_WAIT执行；最终要求查看手机音乐播放状态，当前手表截图无法判定手机侧结果；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_032",
@@ -883,8 +686,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_wait: 人工步骤缺少 ['HOST_WAIT', 'SIM_WAIT']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_033",
@@ -896,8 +700,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App/外部: 1.让手机收到来电；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "verification_points": [],
+      "note": ""
     },
     {
       "case_id": "SW_034",
@@ -909,8 +714,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "依赖 App/外部: 1.从手机发送一条通知；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_035",
@@ -922,8 +728,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "预期结果待产品确认；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "SW_036",
@@ -932,17 +739,12 @@
       "precondition_text": "1.手表电量和供电可支持长时测试",
       "steps_text": "1.启动秒表\n2.持续计时23小时",
       "expected_text": "1.秒表持续计时，手表无异常重启\n2.主计时接近23:00:00",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:STOPWATCH,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "可切换模拟电源状态，但不等同进程重启、恢复出厂或持久化校验；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     }
   ]
 }

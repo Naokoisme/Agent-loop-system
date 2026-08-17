@@ -1,1450 +1,912 @@
 [
-    {
-        "case_id":  "SREC_001",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表显示Sports二级菜单",
-        "steps_text":  "1.点击Sports Records",
-        "expected_text":  "1.手表显示运动记录列表或空状态页",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_SUBMENU,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,149,1;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "使用当前源码注册窗口直接验证 Sports Records 目标页"
-    },
-    {
-        "case_id":  "SREC_002",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表存在至少1条已保存运动记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.手表显示运动记录列表",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_003",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表没有已保存运动记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.手表显示No Sports Records.空状态页",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_004",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示运动记录空状态页",
-        "steps_text":  "1.查看运动图标和No Sports Records.文案",
-        "expected_text":  "1.页面居中显示运动图标与No Sports Records.",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_005",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示运动记录空状态页",
-        "steps_text":  "1.执行右滑",
-        "expected_text":  "1.手表显示Sports二级菜单",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_006",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示运动记录空状态页",
-        "steps_text":  "1.单击实体按键",
-        "expected_text":  "1.手表显示主表盘",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_007",
-        "sheet":  "运动记录",
-        "priority":  "P2",
-        "precondition_text":  "1.手表显示运动记录空状态页",
-        "steps_text":  "1.执行上滑",
-        "expected_text":  "1.页面保持No Sports Records.空态",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_008",
-        "sheet":  "运动记录",
-        "priority":  "P2",
-        "precondition_text":  "1.手表显示运动记录空状态页",
-        "steps_text":  "1.执行下滑",
-        "expected_text":  "1.页面保持No Sports Records.空态",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_009",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表存在运动记录",
-        "steps_text":  "1.进入Sports Records\n2.观察列表项图标\n3.观察列表项数据\n4.观察列表项时间",
-        "expected_text":  "1.手表显示运动记录列表\n2.列表项显示运动图标\n3.列表项显示运动数据\n4.列表项显示日期时间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_010",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录超过一屏",
-        "steps_text":  "1.执行上滑",
-        "expected_text":  "1.列表显示后续运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_011",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录列表已离开顶部",
-        "steps_text":  "1.执行下滑",
-        "expected_text":  "1.列表显示前序运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:1,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_012",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录超过一屏",
-        "steps_text":  "1.旋转编码器",
-        "expected_text":  "1.运动记录列表发生纵向滚动",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0,6;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "先用源码中的 SET_SPORT_RECORD_DATA 构造超过一屏的记录，再用 QDEC_SET 滚动"
-    },
-    {
-        "case_id":  "SREC_013",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示运动记录列表",
-        "steps_text":  "1.执行右滑",
-        "expected_text":  "1.手表显示Sports二级菜单",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_014",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示运动记录列表",
-        "steps_text":  "1.单击实体按键",
-        "expected_text":  "1.手表显示主表盘",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_015",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.存在一条已保存Outdoor Run记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.Outdoor Run条目显示距离数据",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_016",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.存在一条已保存Strength记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.Strength条目显示卡路里数据",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:4;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_017",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.存在Walking与Cycling运动记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.两条记录显示各自运动类型图标",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_018",
-        "sheet":  "运动记录",
-        "priority":  "P2",
-        "precondition_text":  "1.列表同时存在距离类与非距离类记录",
-        "steps_text":  "1.观察两类记录数据",
-        "expected_text":  "1.距离类不显示卡路里单位",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_019",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.记录日期为2025年6月23日",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.记录日期显示23/06/25",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_020",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.系统时间制为24小时\n2.记录时间为22:24",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.记录时间显示22:24",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_021",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.系统时间制为12小时\n2.记录时间为上午09:24",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.记录时间显示09:24 AM",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_022",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.系统时间制为12小时\n2.记录时间为22:24",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.记录时间显示10:24 PM",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_023",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录列表存在晚间记录\n2.系统时间制为24小时",
-        "steps_text":  "1.将系统时间制切换为12小时\n2.重新进入Sports Records",
-        "expected_text":  "1.系统设置显示12小时制\n2.晚间记录显示PM标识",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811210000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:TIME_MODE:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TIME_MODE:1;",
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "先在21:00构造晚间记录并以24小时制进入列表，再切换为12小时制重新进入；最终页面可合并证明时间制与PM显示",
-        "verification_points":  [
-                                    "Sports Records以12小时制显示且晚间记录带PM标识"
-                                ]
-    },
-    {
-        "case_id":  "SREC_024",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已绑定配套App且App数据连接可用\n2.存在带时间戳的运动记录",
-        "steps_text":  "1.在App切换设备时区",
-        "expected_text":  "1.运动记录时间按新时区显示",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
-    },
-    {
-        "case_id":  "SREC_025",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.先后保存Walking与Cycling记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.Cycling记录显示在Walking上方",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811180000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811190000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:1;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_026",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.昨日与今日各保存一条运动记录",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.今日记录显示在昨日记录上方",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811180000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260812180000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_027",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录列表存在多条记录",
-        "steps_text":  "1.重启手表\n2.重新进入Sports Records",
-        "expected_text":  "1.手表完成开机\n2.记录仍按时间倒序排列",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811180000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811190000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:4;",
-                      "srv_quick_cmd send TOP5STEP:TIME_SET:260811200000;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:1;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:271,power_off;",
-                        "srv_quick_cmd send TOP5STEP:SIM_SYSTEM_EVENT:272,power_on;",
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "SET_SPORT_RECORD_DATA 每次只创建一条；按18:00/19:00/20:00分别构造三条，再执行模拟器关机/开机并重进列表",
-        "verification_points":  [
-                                    "开机后Sports Records仍显示三条记录并按20:00、19:00、18:00倒序排列"
-                                ]
-    },
-    {
-        "case_id":  "SREC_028",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.已保存一条较新运动记录",
-        "steps_text":  "1.将系统时间回拨\n2.保存另一条运动记录",
-        "expected_text":  "1.系统时间显示回拨后的时间\n2.列表按两条记录时间戳倒序排列",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "当前源码已有数据注入命令；该用例需分场景逐步取证"
-    },
-    {
-        "case_id":  "SREC_029",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已连续保存1条有效运动",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.列表包含1条运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_030",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已连续保存19条有效运动",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.列表包含19条运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0,19;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83001;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83002;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83003;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83004;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83005;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83006;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83007;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83008;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83009;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83010;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "",
-        "verification_points":  [
-                                    "第1屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第2屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第3屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第4屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第5屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第6屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第7屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第8屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第9屏显示记录列表连续片段，全部截图合计覆盖19条记录",
-                                    "第10屏显示记录列表连续片段，全部截图合计覆盖19条记录"
-                                ]
-    },
-    {
-        "case_id":  "SREC_031",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已连续保存20条有效运动",
-        "steps_text":  "1.进入Sports Records",
-        "expected_text":  "1.列表包含20条运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0,20;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83001;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83002;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83003;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83004;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83005;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83006;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83007;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83008;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83009;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:83010;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "",
-        "verification_points":  [
-                                    "第1屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第2屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第3屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第4屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第5屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第6屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第7屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第8屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第9屏显示记录列表连续片段，全部截图合计覆盖20条记录",
-                                    "第10屏显示记录列表连续片段，全部截图合计覆盖20条记录"
-                                ]
-    },
-    {
-        "case_id":  "SREC_032",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表已保存20条有效运动",
-        "steps_text":  "1.保存第21条有效运动",
-        "expected_text":  "1.列表不再显示最早的第1条记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0,20;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "用当前源码的运动记录写入命令构造20条前置记录，再写入第21条验证上限淘汰"
-    },
-    {
-        "case_id":  "SREC_033",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表已保存20条有效运动",
-        "steps_text":  "1.保存第21条有效运动",
-        "expected_text":  "1.列表包含第2至第21条记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0,20;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "用当前源码的运动记录写入命令构造20条前置记录，再写入第21条验证保留范围"
-    },
-    {
-        "case_id":  "SREC_034",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.第21条记录已触发FIFO覆盖",
-        "steps_text":  "1.重启手表\n2.重新进入Sports Records",
-        "expected_text":  "1.手表完成开机\n2.列表仍包含最新20条记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "SET_SPORT_RECORD_DATA 每次只创建一条，参数0,20不会批量创建20条；当前缺少批量构造21条且时间递增的命令，需要新增 SIM_SPORT_RECORD_BATCH_SET"
-    },
-    {
-        "case_id":  "SREC_035",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已绑定配套App且App数据连接可用\n2.第21条记录已覆盖手表最早记录",
-        "steps_text":  "1.在App执行下拉同步",
-        "expected_text":  "1.待产品确认：App是否删除被手表覆盖的最早记录",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "预期结果待产品确认"
-    },
-    {
-        "case_id":  "SREC_036",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.列表存在一条Outdoor Run记录",
-        "steps_text":  "1.点击该Outdoor Run条目",
-        "expected_text":  "1.手表显示该次运动的Workout Summary",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  "使用源码命令清空并写入一条 Outdoor Run 记录，再点击首条列表项"
-    },
-    {
-        "case_id":  "SREC_037",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.列表存在两条不同运动记录",
-        "steps_text":  "1.点击较早记录",
-        "expected_text":  "1.小结显示较早记录的日期时间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:4;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,206,1;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_038",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示历史Workout Summary",
-        "steps_text":  "1.执行右滑",
-        "expected_text":  "1.手表显示Sports Records列表",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_039",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表显示历史Workout Summary",
-        "steps_text":  "1.单击实体按键",
-        "expected_text":  "1.手表显示主表盘",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:BUTTON_PRESS:1,1,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_040",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.存在一条已保存距离类运动记录",
-        "steps_text":  "1.点击该记录",
-        "expected_text":  "1.小结显示该运动适用的完整字段",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_041",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.存在一条已保存Outdoor Run记录",
-        "steps_text":  "1.点击该Outdoor Run记录\n2.查看运动用时\n3.查看总距离\n4.查看平均配速\n5.查看总步数\n6.查看总卡路里\n7.查看最大步频\n8.查看平均步频\n9.查看心率曲线\n10.查看心率统计\n11.查看运动日期与时间",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总距离\n4.小结显示该记录的平均配速\n5.小结显示该记录的总步数\n6.小结显示该记录的总卡路里\n7.小结显示该记录的最大步频\n8.小结显示该记录的平均步频\n9.小结显示该记录运动时段内的心率曲线\n10.小结显示平均心率和最小-最大心率及心率区间\n11.小结显示该记录的运动日期与时间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:0;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:4101;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:4102;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:4103;"
-                    ],
-        "verification_points":  [
-                                    "进入 Outdoor Run 的 Workout Summary，并显示用时、距离、配速、步数和卡路里",
-                                    "向下浏览后显示最大/平均步频和心率曲线、心率统计",
-                                    "继续向下浏览后显示该记录的运动日期与时间"
-                                ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_042",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.存在一条已按确认规则保存的基础类或骑行运动记录",
-        "steps_text":  "1.点击该基础类或骑行记录\n2.查看运动用时\n3.查看总卡路里\n4.查看心率曲线\n5.查看心率统计\n6.查看运动日期与时间\n7.检查距离类字段",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总卡路里\n4.小结显示该记录运动时段内的心率曲线\n5.小结显示平均心率和最小-最大心率及心率区间\n6.小结显示该记录的运动日期与时间\n7.小结不显示距离和配速和步数和步频字段",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:4;",
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:TP_CLICK:201,102,1;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:4201;",
-                        "srv_quick_cmd send TOP5STEP:SWIPE_SIM:0,0;",
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:4202;"
-                    ],
-        "verification_points":  [
-                                    "进入基础类或骑行记录的 Workout Summary，并显示用时和卡路里",
-                                    "向下浏览后显示心率曲线、心率统计和日期时间，且不出现不适用的距离类字段"
-                                ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_043",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.运动前存在高心率数据\n2.当前运动期间存在可控心率数据",
-        "steps_text":  "1.进入该次Workout Summary",
-        "expected_text":  "1.心率区间不计入运动前数据",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_044",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.运动期间存在可控心率数据\n2.运动结束后存在高心率数据",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取心率区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.心率区间时长与占比不计入运动结束后的高心率数据",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_045",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.用户年龄为30岁\n2.运动记录包含心率数据",
-        "steps_text":  "1.进入该次Workout Summary",
-        "expected_text":  "1.心率区间按190bpm最大心率划分",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_046",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录包含五区间有效心率数据",
-        "steps_text":  "1.进入该次Workout Summary",
-        "expected_text":  "1.小结显示五个心率区间的时长与占比色条",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_047",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.用户年龄为20岁\n2.该运动记录包含100、119和120bpm心率样本",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取热身与燃脂区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.100和119bpm计入热身区间，120bpm不计入热身而计入燃脂区间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_048",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.用户年龄为20岁\n2.该运动记录包含120、139和140bpm心率样本",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取燃脂与有氧耐力区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.120和139bpm计入燃脂区间，140bpm不计入燃脂而计入有氧耐力区间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_049",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.用户年龄为20岁\n2.该运动记录包含140、159和160bpm心率样本",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取有氧与无氧耐力区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.140和159bpm计入有氧耐力区间，160bpm不计入有氧而计入无氧耐力区间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_050",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.用户年龄为20岁\n2.该运动记录包含160、179和180bpm心率样本",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取无氧耐力与极限区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.160和179bpm计入无氧耐力区间，180bpm不计入无氧而计入极限区间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_051",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.用户年龄为20岁\n2.该运动记录包含179、180和200bpm心率样本",
-        "steps_text":  "1.进入该次Workout Summary\n2.读取极限区间统计",
-        "expected_text":  "1.手表显示该次运动的Workout Summary\n2.179bpm不计入极限区间，180和200bpm计入极限区间",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_END_DATA_SHOW,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_052",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已绑定配套App且App数据连接可用\n2.已存在一条运动记录\n3.App用户年龄原为30岁",
-        "steps_text":  "1.在App将年龄改为40岁\n2.重新进入该记录小结",
-        "expected_text":  "1.App保存年龄40岁\n2.区间按180bpm最大心率划分",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
-    },
-    {
-        "case_id":  "SREC_053",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表已绑定配套App且App数据连接可用\n2.手表已保存当日运动记录",
-        "steps_text":  "1.在App执行下拉同步",
-        "expected_text":  "1.App显示当日运动记录",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
-    },
-    {
-        "case_id":  "SREC_054",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表已绑定配套App且App数据连接可用\n2.手表已保存多日运动记录",
-        "steps_text":  "1.在App执行下拉同步",
-        "expected_text":  "1.App按日期显示多日运动历史",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
-    },
-    {
-        "case_id":  "SREC_055",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表与App已断开连接",
-        "steps_text":  "1.完成一次有效运动\n2.保存本次运动",
-        "expected_text":  "1.手表显示运动结束页\n2.Sports Records列表新增本次运动",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8701,app,0;",
-                      "srv_quick_cmd send TOP5STEP:CLEAR_ALL_SPORT_RECORD:;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:1,1;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_056",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.运动记录列表中不存在本次测试运动\n2.距离类运动时长60秒、距离200米、卡路里0千卡",
-        "steps_text":  "1.在暂停结束页触发结束\n2.确认结束本次数据不足的运动\n3.进入Sports Records查找本次运动",
-        "expected_text":  "1.手表显示数据过少提示\n2.手表结束本次运动，Workout Summary不显示\n3.Sports Records列表不新增本次运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "需时间推进/触发链路: 1.在暂停结束页触发结束"
-    },
-    {
-        "case_id":  "SREC_057",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.断连期间已保存运动记录",
-        "steps_text":  "1.恢复手表与App连接",
-        "expected_text":  "1.App新增断连期间运动记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "依赖外部设备/App: 1.恢复手表与App连接"
-    },
-    {
-        "case_id":  "SREC_058",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.前一天运动记录尚未同步",
-        "steps_text":  "1.跨日后恢复连接",
-        "expected_text":  "1.App将记录归档到前一天",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
-    },
-    {
-        "case_id":  "SREC_059",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.上午记录已同步\n2.下午记录尚未同步",
-        "steps_text":  "1.跨日后恢复连接",
-        "expected_text":  "1.App只新增下午未同步记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
-    },
-    {
-        "case_id":  "SREC_060",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.一条运动记录缺少有效心率数据",
-        "steps_text":  "1.点击该运动记录",
-        "expected_text":  "1.心率区间区域不显示伪造数值",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "现有 SET_SPORT_RECORD_DATA 固定写入有效心率数据，无法构造缺少有效心率的数据记录；需新增可配置 data_type/心率样本的 SIM_SPORT_RECORD_SET"
-    },
-    {
-        "case_id":  "SREC_061",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.手表已保存运动记录\n2.App同步链路不可用",
-        "steps_text":  "1.在App执行下拉同步",
-        "expected_text":  "1.手表Sports Records仍保留原记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:8702,app,0;",
-                      "srv_quick_cmd send TOP5STEP:SET_SPORT_RECORD_DATA:1,1;"
-                  ],
-        "actions":  [
-                        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    },
-    {
-        "case_id":  "SREC_062",
-        "sheet":  "运动记录",
-        "priority":  "P0",
-        "precondition_text":  "1.手表已保存运动记录",
-        "steps_text":  "1.完成一次OTA升级",
-        "expected_text":  "1.Sports Records仍显示升级前记录",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "OTA事件与等待可模拟界面流程；本用例要求升级镜像、进程重启重连及升级前运动记录持久化，当前SIM_OTA_EVENT不替代真实升级和持久化验证"
-    },
-    {
-        "case_id":  "SREC_063",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.运动记录列表存在20条记录",
-        "steps_text":  "1.用可编程触控治具上下滚动列表500次",
-        "expected_text":  "1.手表未出现死机或异常重启",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "基础输入已具备；仍需可加速等待或批量耐久执行器"
-    },
-    {
-        "case_id":  "SREC_064",
-        "sheet":  "运动记录",
-        "priority":  "P1",
-        "precondition_text":  "1.准备Android与iOS支持版本手机\n2.手表已保存运动记录",
-        "steps_text":  "1.分别连接Android与iOS执行同步",
-        "expected_text":  "1.两平台均显示本次运动记录",
-        "setup":  [
-
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  true,
-        "note":  "手表侧状态和数据可模拟；最终断言发生在手机 App，仍需 App 侧观察器"
-    },
-    {
-        "case_id":  "SREC_065",
-        "sheet":  "运动记录",
-        "priority":  "P2",
-        "precondition_text":  "1.列表包含距离类与非距离类记录",
-        "steps_text":  "1.观察列表项图标\n2.观察列表项数据\n3.观察列表项时间",
-        "expected_text":  "1.图标清晰可见\n2.数据清晰可见\n3.日期时间清晰可见",
-        "setup":  [
-                      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:SPORT_RECORD,0;"
-                  ],
-        "actions":  [
-
-                    ],
-        "collect":  [
-                        "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-                        "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-                    ],
-        "unable":  false,
-        "note":  ""
-    }
+  {
+    "case_id": "SREC_001",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表显示Sports二级菜单",
+    "steps_text": "1.点击Sports Records",
+    "expected_text": "1.手表显示运动记录列表或空状态页",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_002",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表存在至少1条已保存运动记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.手表显示运动记录列表",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_003",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表没有已保存运动记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.手表显示No Sports Records.空状态页",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_004",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示运动记录空状态页",
+    "steps_text": "1.查看运动图标和No Sports Records.文案",
+    "expected_text": "1.页面居中显示运动图标与No Sports Records.",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_005",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示运动记录空状态页",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Sports二级菜单",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_006",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示运动记录空状态页",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_007",
+    "sheet": "运动记录",
+    "priority": "P2",
+    "precondition_text": "1.手表显示运动记录空状态页",
+    "steps_text": "1.执行上滑",
+    "expected_text": "1.页面保持No Sports Records.空态",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_008",
+    "sheet": "运动记录",
+    "priority": "P2",
+    "precondition_text": "1.手表显示运动记录空状态页",
+    "steps_text": "1.执行下滑",
+    "expected_text": "1.页面保持No Sports Records.空态",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_009",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表存在运动记录",
+    "steps_text": "1.进入Sports Records\n2.观察列表项图标\n3.观察列表项数据\n4.观察列表项时间",
+    "expected_text": "1.手表显示运动记录列表\n2.列表项显示运动图标\n3.列表项显示运动数据\n4.列表项显示日期时间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_010",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录超过一屏",
+    "steps_text": "1.执行上滑",
+    "expected_text": "1.列表显示后续运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_011",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录列表已离开顶部",
+    "steps_text": "1.执行下滑",
+    "expected_text": "1.列表显示前序运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_012",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录超过一屏",
+    "steps_text": "1.旋转编码器",
+    "expected_text": "1.运动记录列表发生纵向滚动",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_013",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示运动记录列表",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Sports二级菜单",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_014",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示运动记录列表",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_015",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.存在一条已保存Outdoor Run记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.Outdoor Run条目显示距离数据",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_016",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.存在一条已保存Strength记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.Strength条目显示卡路里数据",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_017",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.存在Walking与Cycling运动记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.两条记录显示各自运动类型图标",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_018",
+    "sheet": "运动记录",
+    "priority": "P2",
+    "precondition_text": "1.列表同时存在距离类与非距离类记录",
+    "steps_text": "1.观察两类记录数据",
+    "expected_text": "1.距离类不显示卡路里单位",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_019",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.记录日期为2025年6月23日",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.记录日期显示23/06/25",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_020",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.系统时间制为24小时\n2.记录时间为22:24",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.记录时间显示22:24",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_021",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.系统时间制为12小时\n2.记录时间为上午09:24",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.记录时间显示09:24 AM",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_022",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.系统时间制为12小时\n2.记录时间为22:24",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.记录时间显示10:24 PM",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_023",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录列表存在晚间记录\n2.系统时间制为24小时",
+    "steps_text": "1.将系统时间制切换为12小时\n2.重新进入Sports Records",
+    "expected_text": "1.系统设置显示12小时制\n2.晚间记录显示PM标识",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_024",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.存在带时间戳的运动记录",
+    "steps_text": "1.在App切换设备时区",
+    "expected_text": "1.运动记录时间按新时区显示",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_025",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.先后保存Walking与Cycling记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.Cycling记录显示在Walking上方",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_026",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.昨日与今日各保存一条运动记录",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.今日记录显示在昨日记录上方",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_027",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录列表存在多条记录",
+    "steps_text": "1.重启手表\n2.重新进入Sports Records",
+    "expected_text": "1.手表完成开机\n2.记录仍按时间倒序排列",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_028",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.已保存一条较新运动记录",
+    "steps_text": "1.将系统时间回拨\n2.保存另一条运动记录",
+    "expected_text": "1.系统时间显示回拨后的时间\n2.列表按两条记录时间戳倒序排列",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_029",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已连续保存1条有效运动",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.列表包含1条运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_030",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已连续保存19条有效运动",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.列表包含19条运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_031",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已连续保存20条有效运动",
+    "steps_text": "1.进入Sports Records",
+    "expected_text": "1.列表包含20条运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_032",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表已保存20条有效运动",
+    "steps_text": "1.保存第21条有效运动",
+    "expected_text": "1.列表不再显示最早的第1条记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_033",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表已保存20条有效运动",
+    "steps_text": "1.保存第21条有效运动",
+    "expected_text": "1.列表包含第2至第21条记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_034",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.第21条记录已触发FIFO覆盖",
+    "steps_text": "1.重启手表\n2.重新进入Sports Records",
+    "expected_text": "1.手表完成开机\n2.列表仍包含最新20条记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_035",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.第21条记录已覆盖手表最早记录",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.待产品确认：App是否删除被手表覆盖的最早记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_036",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.列表存在一条Outdoor Run记录",
+    "steps_text": "1.点击该Outdoor Run条目",
+    "expected_text": "1.手表显示该次运动的Workout Summary",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_037",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.列表存在两条不同运动记录",
+    "steps_text": "1.点击较早记录",
+    "expected_text": "1.小结显示较早记录的日期时间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_038",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示历史Workout Summary",
+    "steps_text": "1.执行右滑",
+    "expected_text": "1.手表显示Sports Records列表",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_039",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表显示历史Workout Summary",
+    "steps_text": "1.单击实体按键",
+    "expected_text": "1.手表显示主表盘",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_040",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.存在一条已保存距离类运动记录",
+    "steps_text": "1.点击该记录",
+    "expected_text": "1.小结显示该运动适用的完整字段",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_041",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.存在一条已保存Outdoor Run记录",
+    "steps_text": "1.点击该Outdoor Run记录\n2.查看运动用时\n3.查看总距离\n4.查看平均配速\n5.查看总步数\n6.查看总卡路里\n7.查看最大步频\n8.查看平均步频\n9.查看心率曲线\n10.查看心率统计\n11.查看运动日期与时间",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总距离\n4.小结显示该记录的平均配速\n5.小结显示该记录的总步数\n6.小结显示该记录的总卡路里\n7.小结显示该记录的最大步频\n8.小结显示该记录的平均步频\n9.小结显示该记录运动时段内的心率曲线\n10.小结显示平均心率和最小-最大心率及心率区间\n11.小结显示该记录的运动日期与时间",
+    "setup": [],
+    "actions": [],
+    "verification_points": [],
+    "collect": [],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SREC_042",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.存在一条已按确认规则保存的基础类或骑行运动记录",
+    "steps_text": "1.点击该基础类或骑行记录\n2.查看运动用时\n3.查看总卡路里\n4.查看心率曲线\n5.查看心率统计\n6.查看运动日期与时间\n7.检查距离类字段",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.小结显示该记录的运动用时\n3.小结显示该记录的总卡路里\n4.小结显示该记录运动时段内的心率曲线\n5.小结显示平均心率和最小-最大心率及心率区间\n6.小结显示该记录的运动日期与时间\n7.小结不显示距离和配速和步数和步频字段",
+    "setup": [],
+    "actions": [],
+    "verification_points": [],
+    "collect": [],
+    "unable": false,
+    "note": ""
+  },
+  {
+    "case_id": "SREC_043",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.运动前存在高心率数据\n2.当前运动期间存在可控心率数据",
+    "steps_text": "1.进入该次Workout Summary",
+    "expected_text": "1.心率区间不计入运动前数据",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_044",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.运动期间存在可控心率数据\n2.运动结束后存在高心率数据",
+    "steps_text": "1.进入该次Workout Summary\n2.读取心率区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.心率区间时长与占比不计入运动结束后的高心率数据",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_045",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.用户年龄为30岁\n2.运动记录包含心率数据",
+    "steps_text": "1.进入该次Workout Summary",
+    "expected_text": "1.心率区间按190bpm最大心率划分",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_046",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录包含五区间有效心率数据",
+    "steps_text": "1.进入该次Workout Summary",
+    "expected_text": "1.小结显示五个心率区间的时长与占比色条",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_047",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含100、119和120bpm心率样本",
+    "steps_text": "1.进入该次Workout Summary\n2.读取热身与燃脂区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.100和119bpm计入热身区间，120bpm不计入热身而计入燃脂区间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_048",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含120、139和140bpm心率样本",
+    "steps_text": "1.进入该次Workout Summary\n2.读取燃脂与有氧耐力区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.120和139bpm计入燃脂区间，140bpm不计入燃脂而计入有氧耐力区间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_049",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含140、159和160bpm心率样本",
+    "steps_text": "1.进入该次Workout Summary\n2.读取有氧与无氧耐力区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.140和159bpm计入有氧耐力区间，160bpm不计入有氧而计入无氧耐力区间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_050",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含160、179和180bpm心率样本",
+    "steps_text": "1.进入该次Workout Summary\n2.读取无氧耐力与极限区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.160和179bpm计入无氧耐力区间，180bpm不计入无氧而计入极限区间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_051",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.用户年龄为20岁\n2.该运动记录包含179、180和200bpm心率样本",
+    "steps_text": "1.进入该次Workout Summary\n2.读取极限区间统计",
+    "expected_text": "1.手表显示该次运动的Workout Summary\n2.179bpm不计入极限区间，180和200bpm计入极限区间",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_052",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.已存在一条运动记录\n3.App用户年龄原为30岁",
+    "steps_text": "1.在App将年龄改为40岁\n2.重新进入该记录小结",
+    "expected_text": "1.App保存年龄40岁\n2.区间按180bpm最大心率划分",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_053",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已保存当日运动记录",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.App显示当日运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_054",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表已保存多日运动记录",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.App按日期显示多日运动历史",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_055",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表与App已断开连接",
+    "steps_text": "1.完成一次有效运动\n2.保存本次运动",
+    "expected_text": "1.手表显示运动结束页\n2.Sports Records列表新增本次运动",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_056",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.运动记录列表中不存在本次测试运动\n2.距离类运动时长60秒、距离200米、卡路里0千卡",
+    "steps_text": "1.在暂停结束页触发结束\n2.确认结束本次数据不足的运动\n3.进入Sports Records查找本次运动",
+    "expected_text": "1.手表显示数据过少提示\n2.手表结束本次运动，Workout Summary不显示\n3.Sports Records列表不新增本次运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_057",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.断连期间已保存运动记录",
+    "steps_text": "1.恢复手表与App连接",
+    "expected_text": "1.App新增断连期间运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_058",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.可控制手表日期、时间、12/24小时制、跨日与时区场景\n2.前一天运动记录尚未同步",
+    "steps_text": "1.跨日后恢复连接",
+    "expected_text": "1.App将记录归档到前一天",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_059",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.上午记录已同步\n2.下午记录尚未同步",
+    "steps_text": "1.跨日后恢复连接",
+    "expected_text": "1.App只新增下午未同步记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_060",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.一条运动记录缺少有效心率数据",
+    "steps_text": "1.点击该运动记录",
+    "expected_text": "1.心率区间区域不显示伪造数值",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_061",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.手表已保存运动记录\n2.App同步链路不可用",
+    "steps_text": "1.在App执行下拉同步",
+    "expected_text": "1.手表Sports Records仍保留原记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_062",
+    "sheet": "运动记录",
+    "priority": "P0",
+    "precondition_text": "1.手表已保存运动记录",
+    "steps_text": "1.完成一次OTA升级",
+    "expected_text": "1.Sports Records仍显示升级前记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_063",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.运动记录列表存在20条记录",
+    "steps_text": "1.用可编程触控治具上下滚动列表500次",
+    "expected_text": "1.手表未出现死机或异常重启",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_064",
+    "sheet": "运动记录",
+    "priority": "P1",
+    "precondition_text": "1.准备Android与iOS支持版本手机\n2.手表已保存运动记录",
+    "steps_text": "1.分别连接Android与iOS执行同步",
+    "expected_text": "1.两平台均显示本次运动记录",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  },
+  {
+    "case_id": "SREC_065",
+    "sheet": "运动记录",
+    "priority": "P2",
+    "precondition_text": "1.列表包含距离类与非距离类记录",
+    "steps_text": "1.观察列表项图标\n2.观察列表项数据\n3.观察列表项时间",
+    "expected_text": "1.图标清晰可见\n2.数据清晰可见\n3.日期时间清晰可见",
+    "setup": [],
+    "actions": [],
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
+  }
 ]

@@ -6,19 +6,12 @@
     "precondition_text": "1.手表已绑定并连接App\n2.手表显示Titan Q二级菜单",
     "steps_text": "1.点击AI Voice",
     "expected_text": "1.手表显示AI Voice待机页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1001,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TITAN_Q,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,250,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "统一用 all_phone 建立 App/HFP 连接，再从 Titan Q 真实点击 AI Voice"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_002",
@@ -27,17 +20,12 @@
     "precondition_text": "1.手表当前未绑定App",
     "steps_text": "1.进入AI Voice",
     "expected_text": "1.页面显示断连图标和配对文案和返回按钮和Pair Now",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "未绑定前置必须使用 APP_CONNECT:0；进入后直接截图完整未绑定页"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_003",
@@ -46,19 +34,12 @@
     "precondition_text": "1.手表显示AI Voice未绑定页",
     "steps_text": "1.点击Pair Now",
     "expected_text": "1.手表显示Scan to Pair二维码页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:TP_CLICK:201,128,1;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先建立未绑定页，再真实点击可见 Pair Now"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_004",
@@ -67,19 +48,12 @@
     "precondition_text": "1.手表已绑定配套App\n2.设备业务连接不可用",
     "steps_text": "1.进入AI Voice",
     "expected_text": "1.页面显示断开图标和Check the connection between your smart watch and the app文案，无按钮",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:4001,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:4002,app,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先保留绑定关系再断开 App 业务通道，覆盖已绑定但业务连接不可用的共享状态"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_005",
@@ -88,20 +62,12 @@
     "precondition_text": "1.手表正在显示AI Voice未连接页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表退出未连接页，用户可在恢复连接后重新进入AI Voice",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:5001,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:5002,app,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先形成已绑定但未连接页，再执行右滑；恢复后重新进入由后续独立用例验证"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_006",
@@ -110,17 +76,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用",
     "steps_text": "1.进入AI Voice",
     "expected_text": "1.页面显示绿色静态语音球和Tap to speak",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:6001,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "collect": [],
     "unable": false,
-    "note": "all_phone 同时建立 App 与 HFP，进入后截图绿色语音球及 Tap to speak"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_007",
@@ -129,18 +90,12 @@
     "precondition_text": "1.手表显示AI Voice待机页",
     "steps_text": "1.执行右滑",
     "expected_text": "1.手表返回进入AI Voice前的页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_008",
@@ -149,25 +104,12 @@
     "precondition_text": "1.手表显示AI Voice待机页",
     "steps_text": "1.保持无操作1分钟",
     "expected_text": "1.手表屏幕熄灭",
-    "verification_points": [
-      "等待前AI Voice待机页处于亮屏状态",
-      "真实保持无操作1分钟后屏幕熄灭"
-    ],
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:DISPLAY_TIME_SET:30;",
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:8001;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_WAIT:8002,60000;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "verification_points": [],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先复用App连接状态建立AI Voice待机页，设置30秒亮屏时长并真实等待1分钟；前后截图判断是否熄屏"
+    "note": ""
   },
   {
     "case_id": "VOICE_009",
@@ -176,17 +118,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机语音助手可用",
     "steps_text": "1.点击语音球",
     "expected_text": "1.页面显示蓝色音频波形，手表开始采集语音",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "来电页、通话页、连接状态和记录可模拟；最终拨号或双向音频结果仍需手机侧观察器"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_010",
@@ -195,17 +132,12 @@
     "precondition_text": "1.AI Voice正在监听\n2.手机语音助手具备麦克风权限",
     "steps_text": "1.对手表说出一条明确指令",
     "expected_text": "1.手机语音助手接收到该指令，进入处理状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "手表侧状态和页面可模拟；仍需手机 App 或外部设备结果验收"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_011",
@@ -214,17 +146,12 @@
     "precondition_text": "1.AI Voice指令已传给手机\n2.手机语音助手返回可播报回复",
     "steps_text": "1.等待助手回复",
     "expected_text": "1.手表扬声器播出手机语音助手返回的内容",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "等待本身可执行；当前缺手机语音助手返回可播报音频的外部输入，且扬声器播出内容不能由手表截图判定"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_012",
@@ -233,16 +160,12 @@
     "precondition_text": "1.AI Voice正在播报回复",
     "steps_text": "1.等待播报完成",
     "expected_text": "1.页面恢复绿色语音球和Tap to speak",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "等待本身可执行；当前缺建立AI Voice正在播报回复状态及播报完成业务事件的通用命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_013",
@@ -251,17 +174,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手表显示AI Voice待机页",
     "steps_text": "1.点击语音球\n2.说出一条语音指令",
     "expected_text": "1.手表进入AI Voice监听状态\n2.手表保持AI Voice进行中页面",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_014",
@@ -270,18 +188,12 @@
     "precondition_text": "1.AI Voice处于监听或播报状态",
     "steps_text": "1.执行右滑",
     "expected_text": "1.当前会话结束，手表返回上一级",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": ""
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_015",
@@ -290,18 +202,12 @@
     "precondition_text": "1.AI Voice正在监听或播报",
     "steps_text": "1.断开设备业务连接",
     "expected_text": "1.当前会话结束，页面显示未连接提示",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "APP_CONNECT 会更新连接状态并发送源码中的 APP 连接状态事件"
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_016",
@@ -310,29 +216,12 @@
     "precondition_text": "1.手表正在显示AI Voice未连接页",
     "steps_text": "1.恢复设备连接\n2.执行右滑\n3.重新进入AI Voice",
     "expected_text": "1.设备业务连接恢复\n2.手表退出未连接页\n3.页面显示AI Voice待机页",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:89160,all_phone,1;",
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:89161,app,0;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
-    "actions": [
-      "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:89162,app,1;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:89161;",
-      "srv_quick_cmd send TOP5STEP:SWIPE_SIM:3,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:89162;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;",
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:89163;"
-    ],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
+    "setup": [],
+    "actions": [],
+    "collect": [],
     "unable": false,
-    "note": "先形成已绑定但 App 业务断开页，再恢复 app 通道、退出并重新进入；修改待新运行验证",
-    "verification_points": [
-      "恢复设备业务连接",
-      "右滑后退出未连接页",
-      "重新进入 AI Voice 后显示待机页"
-    ]
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_017",
@@ -343,12 +232,10 @@
     "expected_text": "1.待产品确认：超时时长和手表页面文案或返回状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_018",
@@ -359,12 +246,10 @@
     "expected_text": "1.待产品确认：手表页面和手机提示和会话结束状态",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_019",
@@ -375,12 +260,10 @@
     "expected_text": "1.待产品确认：手表提示和手机提示和恢复入口",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_020",
@@ -391,12 +274,10 @@
     "expected_text": "1.待产品确认：离线回复和超时或错误页面",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_021",
@@ -407,12 +288,10 @@
     "expected_text": "1.待产品确认：Android和iOS的唤起能力和失败反馈",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_022",
@@ -421,16 +300,12 @@
     "precondition_text": "1.AI Voice正在播报",
     "steps_text": "1.让手机收到来电\n2.结束来电\n3.点击语音球",
     "expected_text": "1.AI Voice播报被中断\n2.会话不自动续播\n3.手表重新进入监听状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_023",
@@ -439,16 +314,12 @@
     "precondition_text": "1.AI Voice正在播报\n2.消息通知已开启",
     "steps_text": "1.向绑定手机发送一条测试消息\n2.关闭消息弹窗\n3.点击语音球",
     "expected_text": "1.AI Voice当前播报被中断\n2.手表不自动续会话\n3.手表重新进入监听状态",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_024",
@@ -459,12 +330,10 @@
     "expected_text": "1.待产品确认：音乐暂停和播放位置\n2.待产品确认：音乐是否自动恢复",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_025",
@@ -475,12 +344,10 @@
     "expected_text": "1.待产品确认：助手播报是否受勿扰限制",
     "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "预期结果待产品确认"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_026",
@@ -489,17 +356,12 @@
     "precondition_text": "1.手表已绑定配套App且App数据连接可用\n2.手机语音助手可用",
     "steps_text": "1.连续完成50轮提问和播报",
     "expected_text": "1.每轮均可回到待机页，手表无异常重启",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   },
   {
     "case_id": "VOICE_027",
@@ -508,16 +370,11 @@
     "precondition_text": "1.准备支持版本范围内Android和iOS手机\n2.两平台助手和权限均可用",
     "steps_text": "1.分别完成一次提问和播报",
     "expected_text": "1.两平台均可从手表采集语音，由手表播报回复",
-    "setup": [
-      "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-      "srv_quick_cmd send TOP5STEP:ENTER_PAGE:VOICE_ASSISTANT_INTERACTION,0;"
-    ],
+    "setup": [],
     "actions": [],
-    "collect": [
-      "srv_quick_cmd send TOP5STEP:GUI_TREE:1;",
-      "srv_quick_cmd send TOP5STEP:SCREENSHOT_PRINT:;"
-    ],
-    "unable": true,
-    "note": "联系人、通话记录和连接状态可注入；当前缺该通话状态转换的专用事件命令"
+    "collect": [],
+    "unable": false,
+    "note": "",
+    "verification_points": []
   }
 ]

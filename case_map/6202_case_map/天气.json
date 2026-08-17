@@ -12,8 +12,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "直接进入当前源码注册的 WEATHER_HOME，验证天气业务页或引导页；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_002",
@@ -25,8 +26,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "当前项目 MENU_CUSTOM_SORT 中 Weather 为第 8 项；MenuList 编码器每次移动一项后点击屏幕中心；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_003",
@@ -38,8 +40,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_004",
@@ -51,8 +54,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_005",
@@ -64,8 +68,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "Pair Now 会进入当前模拟器不稳定的配对流程，尚无已验证的安全触发命令；6202首轮命令迁移；产品结果仅按真机截图判定。；6202静态审计暂不可执行：missing_click: 人工步骤缺少 ['BUTTON_PRESS', 'TP_CLICK']。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_006",
@@ -77,8 +82,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "使用页面统一右滑返回动作；返回目标由窗口栈决定；6202首轮迁移暂不可执行：TP_CLICK 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_007",
@@ -90,8 +96,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 WEATHER_CLEAR: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_008",
@@ -103,8 +110,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件；危险真机命令 WEATHER_CLEAR: clear or erase。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_009",
@@ -116,8 +124,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_010",
@@ -129,8 +138,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_011",
@@ -142,8 +152,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_012",
@@ -152,19 +163,12 @@
       "precondition_text": "1.手表显示天气长页面",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.天气页面沿旋转方向滚动",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_013",
@@ -176,8 +180,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：SWIPE_SIM 缺少6202已验证坐标。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_014",
@@ -189,8 +194,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_015",
@@ -202,8 +208,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步风速、湿度及至少3天预报的步骤无法执行，用ENTER_PAGE进入天气页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_016",
@@ -215,12 +222,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "两种时间制下分别重新进入 Weather 并采集标题栏与 Last updated；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "24小时制下标题栏时间和Last updated均按15:05格式显示",
-        "12小时制下标题栏时间和Last updated均按03:05 PM格式显示"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_017",
@@ -232,11 +236,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Clear 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Clear 文案和对应天气图标，合并证明 Clear 数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_018",
@@ -248,8 +250,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步Snow天气步骤无法执行，且知识库未提供Snow对应的WEATHER_SET类型值；用ENTER_PAGE进入天气页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_019",
@@ -261,8 +264,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_020",
@@ -274,8 +278,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_021",
@@ -287,8 +292,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用 WEATHER_SET 注入 Few Clouds 天气数据，并用 ENTER_PAGE 进入页面验证GUI。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_022",
@@ -300,11 +306,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Scattered Clouds 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Scattered Clouds 文案和对应图标，合并证明该天气数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_023",
@@ -316,8 +320,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步天气步骤无法执行，且知识库未提供Thunderstorm对应的WEATHER_SET类型值；用ENTER_PAGE进入页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_024",
@@ -329,11 +334,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Broken Clouds 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Broken Clouds 文案和对应图标，合并证明该天气数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_025",
@@ -345,11 +348,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Rain 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Rain 文案和对应图标，合并证明 Rain 数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_026",
@@ -361,11 +362,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Heavy Rain 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Heavy Rain 文案和对应图标，合并证明该天气数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_027",
@@ -377,11 +376,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Windy 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Windy 文案和对应图标，合并证明 Windy 数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_028",
@@ -393,8 +390,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_029",
@@ -406,11 +404,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Fog 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Fog 文案和对应图标，合并证明 Fog 数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_030",
@@ -422,11 +418,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Sandstorm 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Sandstorm 文案和对应图标，合并证明该天气数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_031",
@@ -438,11 +432,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 Snow Shower 文案和图标，可同时证明数据接收与页面渲染；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示 Snow Shower 文案和对应图标，合并证明该天气数据已接收并渲染"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_032",
@@ -454,8 +446,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；知识库未提供Typhoon对应的WEATHER_SET类型值，无法注入该天气数据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_033",
@@ -467,8 +460,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "WEATHER_SET不支持下发日出、日落时间，无法满足前置条件并准确切换昼夜状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_034",
@@ -480,8 +474,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_035",
@@ -493,8 +488,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "WEATHER_SET 只能注入当前天气、温度、能见度、UV 和风力，不能注入日出/日落时间；需要新增 SIM_WEATHER_SET_EXT 才能验证按日出日落切换图标；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_036",
@@ -506,8 +502,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "缺少可注入日出日落时间的命令，无法满足前置条件并准确设置日出后、日落后时间；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_037",
@@ -519,8 +516,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "前置天气数据包含日出日落时间，现有WEATHER_SET命令不支持注入该字段；操作步骤也未提供可用于TIME_SET的具体日期和日出、日落时间，需App下发或外部设备配合，无法生成可执行命令。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_038",
@@ -532,8 +530,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法可靠执行：WEATHER_SET不支持注入日出、日落时间，且用例未提供具体日出日落时刻；12:00和20:00仅为代表性时间，不能保证分别位于日出后和日落后。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_039",
@@ -542,23 +541,12 @@
       "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
       "steps_text": "1.将手表时间设为05:59\n2.进入Weather",
       "expected_text": "1.手表时间修改成功\n2.页面显示夜间天气图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,32,20,10,1,2;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:190801055900;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "最终 Weather 页面同时显示 05:59 标题时间和夜间图标，可合并证明设时与图标判断；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "Weather 页面标题时间为05:59且显示夜间天气图标"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_040",
@@ -567,23 +555,12 @@
       "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
       "steps_text": "1.将手表时间设为06:00\n2.进入Weather",
       "expected_text": "1.手表时间修改成功\n2.页面显示日间天气图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,101280601,32,25,10,3,2;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:250101060000;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "最终 Weather 页面同时显示 06:00 标题时间和日间图标，可合并证明设时与图标判断；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "Weather 页面标题时间为06:00且显示日间天气图标"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_041",
@@ -592,23 +569,12 @@
       "precondition_text": "1.天气类型支持日夜图标\n2.天气数据不含日出日落时间",
       "steps_text": "1.将手表时间设为17:59\n2.进入Weather",
       "expected_text": "1.手表时间修改成功\n2.页面显示日间天气图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:TestCity,0,32,20,10,1,2;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:TIME_SET:250101175900;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "最终 Weather 页面同时显示 17:59 标题时间和日间图标，可合并证明设时与图标判断；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "Weather 页面标题时间为17:59且显示日间天气图标"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_042",
@@ -620,11 +586,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同时显示 18:00 标题时间和夜间图标，可合并证明设时与图标判断；6202首轮迁移暂不可执行：危险真机命令 WEATHER_CLEAR: clear or erase。",
-      "verification_points": [
-        "Weather 页面标题时间为18:00且显示夜间天气图标"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_043",
@@ -633,20 +597,12 @@
       "precondition_text": "1.天气数据包含06:30日出和18:30日落\n2.天气类型支持日夜图标",
       "steps_text": "1.将手表时间设为06:29\n2.将手表时间设为06:30\n3.将手表时间设为18:30",
       "expected_text": "1.页面显示夜间图标\n2.页面切换为日间图标\n3.页面切换为夜间图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SWITCH:1;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,100,1,25,10,3,2;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "WEATHER_SET 不包含日出/日落字段，当前命令无法建立 06:30 日出和 18:30 日落前置数据；需要新增 SIM_WEATHER_SET_EXT；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_044",
@@ -658,8 +614,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "WEATHER_SET 参数不包含 AQI，第二个参数是天气 code，不能用 code=0 冒充 AQI=0；需要新增 SIM_WEATHER_SET_EXT 或 SIM_WEATHER_AQI_SET；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_045",
@@ -671,8 +628,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需App下发AQI=50，现有命令不支持AQI数据注入；仅能进入天气页面采集GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_046",
@@ -684,8 +642,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步AQI=51步骤无法执行；当前命令无AQI注入参数，用ENTER_PAGE进入Weather页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_047",
@@ -697,8 +656,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步步骤无法执行，用ENTER_PAGE进入天气页面验证GUI；现有命令无法注入AQI=100；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_048",
@@ -710,8 +670,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App下发AQI=101的步骤无法执行，现有天气命令不支持AQI字段；用ENTER_PAGE进入天气页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_049",
@@ -723,8 +684,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=200；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_050",
@@ -736,8 +698,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App触发步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=201；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_051",
@@ -749,8 +712,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "App同步步骤无法执行，用ENTER_PAGE进入页面验证GUI；现有命令不支持注入AQI=300；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_052",
@@ -762,8 +726,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "现有命令不支持下发AQI=301，无法建立验证所需天气数据。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_053",
@@ -775,8 +740,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "AQI=400无可用注入命令，且同步天气数据需要App执行，无法建立验证所需数据。；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_054",
@@ -788,8 +754,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "无法执行App天气同步，且现有命令不支持注入AQI=401，无法构造目标GUI状态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_055",
@@ -801,11 +768,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=0 与 Low，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=0且等级为Low"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_056",
@@ -817,11 +782,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=2 与 Low，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=2且等级为Low"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_057",
@@ -833,11 +796,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=3 与 Moderate，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=3且等级为Moderate"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_058",
@@ -849,11 +810,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=5 与 Moderate，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=5且等级为Moderate"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_059",
@@ -865,11 +824,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=6 与 High，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=6且等级为High"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_060",
@@ -881,11 +838,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=7 与 High，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=7且等级为High"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_061",
@@ -897,11 +852,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=8 与 Very High，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=8且等级为Very High"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_062",
@@ -913,11 +866,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=10 与 Very High，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=10且等级为Very High"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_063",
@@ -929,11 +880,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终指标区同屏显示 UV=11 与 Extreme，可合并证明接收值和等级映射；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 指标区显示UV=11且等级为Extreme"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_064",
@@ -942,24 +891,12 @@
       "precondition_text": "1.手表已同步当天完整天气数据",
       "steps_text": "1.断开设备数据连接\n2.进入Weather",
       "expected_text": "1.手表进入断连状态\n2.页面显示断连前最后一次天气和Last updated时间",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,0,0,25,10,3,2;"
-      ],
-      "actions": [
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:0;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:WEATHER_HOME,0;"
-      ],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
       "unable": false,
-      "note": "最终 Weather 页面显示断连前城市、天气和 Last updated，可同时证明断连后仍使用缓存；6202首轮命令迁移；产品结果仅按真机截图判定。",
-      "verification_points": [
-        "断连后 Weather 页面仍显示断连前最后一次天气和Last updated时间"
-      ]
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_065",
@@ -971,11 +908,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 未获取提示同时证明跨日后旧缓存失效和页面进入空态；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "次日00:00进入Weather后旧缓存失效且页面显示未获取天气提示"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_066",
@@ -987,11 +922,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 未获取提示同时证明 day_pass 后旧缓存失效和页面进入空态；6202首轮迁移暂不可执行：SIM_SYSTEM_EVENT 仅用于620C模拟器。",
-      "verification_points": [
-        "day_pass后旧天气缓存失效且页面显示未获取天气提示"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_067",
@@ -1003,11 +936,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "最终 Weather 页面同屏显示 NewCity 和新的 Last updated，可合并证明同步与刷新；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "Weather 页面显示NewCity及新的Last updated时间"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_068",
@@ -1019,8 +950,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_069",
@@ -1032,8 +964,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "天气同步需App或外部网络触发，无法执行；用ENTER_PAGE进入Weather页面验证GUI；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_070",
@@ -1045,8 +978,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需App保持不刷新并长时间等待缓存超时，且预期结果待产品确认，当前无法执行验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_071",
@@ -1058,12 +992,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "先采集 Weather 主页新数据，再进入负一屏采集同一城市和核心天气数据；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。",
-      "verification_points": [
-        "手表Weather主页显示新同步的Shenzhen天气数据",
-        "负一屏天气卡显示同一城市和核心天气数据"
-      ]
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_072",
@@ -1072,20 +1003,12 @@
       "precondition_text": "1.天气数据支持日夜图标\n2.手表显示有效天气",
       "steps_text": "1.修改手表时区使日期跨日\n2.进入Weather",
       "expected_text": "1.系统日期按新时区变化\n2.页面按新日期判断缓存有效性和日夜图标",
-      "setup": [
-        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:1;",
-        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:DIAL,0;",
-        "srv_quick_cmd send TOP5STEP:TIME_SET:250101235900;",
-        "srv_quick_cmd send TOP5STEP:APP_CONNECT:1;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SWITCH:1;",
-        "srv_quick_cmd send TOP5STEP:WEATHER_SET:Shenzhen,100,0,25,10,5,2;"
-      ],
+      "setup": [],
       "actions": [],
-      "collect": [
-        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
-      ],
+      "collect": [],
       "unable": false,
-      "note": "TIME_SET 只修改 RTC，不能修改时区；当前没有 SIM_TIMEZONE_SET，无法证明“按新时区”跨日和重算日夜图标；6202首轮命令迁移；产品结果仅按真机截图判定。"
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_073",
@@ -1097,8 +1020,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "手机音乐是否继续播放属于外部设备音频状态，无法通过手表GUI截图验证；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_074",
@@ -1110,8 +1034,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     },
     {
       "case_id": "WTHR_075",
@@ -1123,8 +1048,9 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": true,
-      "note": "需分别通过Android和iOS手机同步同一组天气数据，涉及外部设备操作，无法用模拟器命令执行跨平台对比；6202首轮迁移暂不可执行：需要手机、蓝牙、网络或其他外部条件。"
+      "unable": false,
+      "note": "",
+      "verification_points": []
     }
   ]
 }

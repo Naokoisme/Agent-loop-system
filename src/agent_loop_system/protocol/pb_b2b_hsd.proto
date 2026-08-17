@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+//ICE
+message _HsdIce {
+    repeated string labels = 1;//max_count:3 max_length:63
+}
+
+//家长模式
+message _HsdParentalMode {
+    bool isEnabled = 1;//家长模式开关
+    bool timeSettingEnabled = 2;//时间设置开关
+    bool enterSettingEnabled = 3;//进入设置开关
+    bool alarmSettingEnabled = 4;//闹钟设置开关
+    bool gameDurationEnabled = 5;//游戏时长设置开关
+    int32 gameStartMinuteOffset = 6;//游戏开始时间段，零点开始的偏移分钟数
+    int32 gameEndMinuteOffset = 7;//游戏结束时间段，零点开始的偏移分钟数
+}
+
+//课堂模式
+message _HsdClassRoomMode {
+    bool isEnabled = 1;//是否开启
+    int32 start = 2;//开始时间，零点开始的偏移分钟数
+    int32 end = 3;//结束时间，零点开始的偏移分钟数
+    int32 repeat = 4;//星期重复标志位
+}
+
+//任务
+message _HsdTask {
+    int32 id = 1;//任务ID
+    int32 time = 2;//执行时间，距零点的偏移分钟数，如11:30=11*60+30
+    string label = 3;//标签，max_length:32
+    bool isEnabled = 4;//是否启用
+    int32 repeat = 5;//星期重复标志位，0表示仅一次
+    int32 type = 6;//任务类型
+    int32 state = 7;//当天任务状态：0-未开始，1-进行中，2-已完成
+    int32 coins = 8;//完成任务后奖励的金币数
+    string description = 9;//详细描述，max_length:100
+    bool isTimeEnabled = 10;//是否需要设置时间，false则设备不显示时间
+}
+
+//任务信息
+message _HsdTaskInfo {
+    int32 totalCoins = 1;//当前总金币数
+    repeated _HsdTask items = 2;//任务列表,max_count:5
+}
+
+//兑换任务奖励结果
+message _HsdTaskExchangeResult {
+    bool success = 1;//是否兑换成功
+}
+
+//习惯
+message _HsdHabit {
+    int32 id = 1;//习惯ID
+    int32 type = 2;//习惯类型
+    string label = 3;//标签，max_length:32
+    int32 time = 4;//执行时间，距零点的偏移分钟数，如11:30=11*60+30
+    int32 duration = 5;//习惯时长（单位分钟）
+    int32 repeat = 6;//星期重复标志位，0表示仅一次
+    int32 state = 7;//习惯状态
+    int32 reachGoalDays = 8;//已达成目标天数
+    int32 maxReachGoalDays = 9;//最大达成目标天数
+    int32 taskDays = 10;//任务天数
+    int32 associatedFunction = 11;//关联功能
+    int32 remindDuration = 12;//提醒时长（单位秒）
+    int32 remindAdvance = 13;//提前提醒分钟数（单位分钟）
+    int32 latestAchieveGoalMonth = 14;//最近达成目标月份[1-12]
+    int32 latestAchieveGoalDay = 15;//最近达成目标日期[1-31]
+    int32 achieveGoalRepeat = 16;//过去一周达成目标的星期标志位
+}
+
+//习惯列表
+message _HsdHabitList {
+    repeated _HsdHabit items = 1;//习惯列表,max_count:10
+}
+
+//使用信息
+message _HsdUsageInfo {
+    int32 type = 1;//类型
+    int32 count = 2;//次数
+}
+
+//使用信息列表（每天一组）
+message _HsdUsageInfoList {
+    repeated _HsdUsageInfo items = 1;//使用信息列表,max_count:100
+}
+
+//游戏记录
+message _HsdGameRecord {
+    int32 timestamp = 1;//时间戳，距离2000年始的秒数
+    int32 gameType = 2;//游戏类型
+    int32 duration = 3;//游戏时长（秒）
+    int32 score = 4;//得分
+    int32 level = 5;//等级
+}
+
+//游戏最高记录列表
+message _HsdGameRecordList {
+    repeated _HsdGameRecord items = 1;//游戏记录列表,max_count:10
+}
+
+//游戏排名趋势
+message _HsdGameRankingTrend {
+    int32 gameType = 1;//游戏类型
+    int32 ranking = 2;//排名，0-255
+    int32 trend = 3;//趋势，0-下降，1-不变，2-上升
+}
+
+//游戏排名趋势列表
+message _HsdGameRankingTrendList {
+    repeated _HsdGameRankingTrend items = 1;//游戏排名趋势列表,max_count:30
+}
+

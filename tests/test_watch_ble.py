@@ -4,11 +4,20 @@ import asyncio
 import unittest
 from types import SimpleNamespace
 
+from agent_loop_system.protocol import (
+    pb_config_pb2,
+    pb_env_pb2,
+    pb_notice_pb2,
+    pb_setting_pb2,
+)
 from agent_loop_system.tools.watch_app_protocol import (
     BIND_COMMAND,
     WatchAppFrame,
+    WatchAppMessageDecoder,
     WatchAuthRequest,
     encode_frame,
+    encode_protobuf,
+    fragment_payload,
 )
 from agent_loop_system.tools.watch_ble import (
     BLOCKED_BY_CLASSIC_BT_GATE,
@@ -22,6 +31,7 @@ from agent_loop_system.tools.watch_ble import (
     WatchBleDevice,
     WatchBlePairingError,
     WatchBlePairingTimeoutError,
+    WatchBleProtocolError,
     WatchBleTimeoutError,
     _build_parser,
     _error_payload,
@@ -270,6 +280,181 @@ class WatchBleClientTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(len(data) <= 7 for data, _ in fake.writes))
         self.assertTrue(all(response is False for _, response in fake.writes))
         self.assertEqual(result.bind_time, 987)
+
+    async def test_exchange_sends_semantic_chunks_and_reassembles_response(self) -> None:
+        factory = FakeClientFactory(chunk_size=37)
+        wrapper = WatchBleClient("AA:01", client_factory=factory)
+        await wrapper.connect()
+        fake = factory.instances[0]
+        command = 0x0201
+        response_payload = b"r" * 2200
+        fake.response_bytes = b"".join(
+            encode_frame(frame)
+            for frame in fragment_payload(
+                command,
+                0,
+                response_payload,
+                max_data_length=700,
+            )
+        )
+        fake.response_slices = (5, 11, 3, 97)
+        fake.respond_on_write = True
+
+        request_payload = b"q" * 2500
+        response = await wrapper.exchange_multipart(
+            command,
+            (
+                request_payload[:900],
+                request_payload[900:1800],
+                request_payload[1800:],
+            ),
+        )
+
+        self.assertEqual(response.payload, response_payload)
+        self.assertEqual(response.fragment_count, 4)
+        request_decoder = WatchAppMessageDecoder()
+        request_messages = []
+        for chunk, without_response in fake.writes:
+            self.assertFalse(without_response)
+            request_messages.extend(request_decoder.feed(chunk))
+        self.assertEqual(len(request_messages), 1)
+        self.assertEqual(request_messages[0].payload, request_payload)
+        self.assertEqual(request_messages[0].fragment_count, 3)
+
+        with self.assertRaisesRegex(WatchBleProtocolError, "single-frame limit"):
+            await wrapper.exchange(command, request_payload, timeout=0.01)
+
+    async def test_send_and_exchange_protobuf_cover_nonblocking_and_blocking_commands(self) -> None:
+        factory = FakeClientFactory(chunk_size=64)
+        wrapper = WatchBleClient("AA:01", client_factory=factory)
+        await wrapper.connect()
+        fake = factory.instances[0]
+
+        sequence = await wrapper.send_protobuf(
+            0x0219,
+            pb_config_pb2._FunctionConfig(flags=b"\x03"),
+        )
+        self.assertEqual(sequence, 0)
+
+        fake.response_bytes = encode_frame(
+            WatchAppFrame(
+                0x0204,
+                1,
+                encode_protobuf(pb_config_pb2._CommonResponse(result=0)),
+            )
+        )
+        fake.respond_on_write = True
+        response = await wrapper.exchange_protobuf(
+            0x0204,
+            pb_config_pb2._FunctionConfig(flags=b"\x01"),
+            pb_config_pb2._CommonResponse,
+        )
+        self.assertEqual(response.result, 0)
+
+        write_count = len(fake.writes)
+        with self.assertRaisesRegex(
+            WatchBleProtocolError, "_AppNotice.content.*801 bytes"
+        ):
+            await wrapper.send_protobuf(
+                0x0401,
+                pb_notice_pb2._AppNotice(content="x" * 801),
+            )
+        self.assertEqual(len(fake.writes), write_count)
+
+    async def test_exchange_protobuf_chunks_keeps_each_fragment_decodable(self) -> None:
+        factory = FakeClientFactory(chunk_size=19)
+        wrapper = WatchBleClient("AA:01", client_factory=factory)
+        await wrapper.connect()
+        fake = factory.instances[0]
+        first = pb_setting_pb2._AlarmList()
+        first.items.add(id=1, hour=7)
+        second = pb_setting_pb2._AlarmList()
+        second.items.add(id=2, hour=8)
+        fake.response_bytes = encode_frame(
+            WatchAppFrame(
+                0x0239,
+                0,
+                encode_protobuf(pb_config_pb2._CommonResponse(result=0)),
+            )
+        )
+        fake.respond_on_write = True
+
+        response = await wrapper.exchange_protobuf_chunks(
+            0x0239,
+            (first, second),
+            pb_config_pb2._CommonResponse,
+        )
+        self.assertEqual(response.result, 0)
+
+        decoder = WatchAppMessageDecoder()
+        outbound = []
+        for chunk, _ in fake.writes:
+            outbound.extend(decoder.feed(chunk))
+        self.assertEqual(len(outbound), 1)
+        merged = pb_setting_pb2._AlarmList()
+        merged.ParseFromString(outbound[0].payload)
+        self.assertEqual([item.id for item in merged.items], [1, 2])
+
+    async def test_concurrent_exchanges_are_routed_by_command_and_sequence(self) -> None:
+        factory = FakeClientFactory(chunk_size=13)
+        wrapper = WatchBleClient("AA:01", client_factory=factory, timeout=1.0)
+        await wrapper.connect()
+        fake = factory.instances[0]
+
+        first_task = asyncio.create_task(
+            wrapper.exchange_multipart(0x0203, (b"a" * 650, b"a" * 650))
+        )
+        second_task = asyncio.create_task(
+            wrapper.exchange_multipart(0x0309, (b"b" * 700, b"b" * 700))
+        )
+        for _ in range(100):
+            if wrapper.pending_exchange_count == 2 and fake.writes:
+                break
+            await asyncio.sleep(0)
+        self.assertEqual(wrapper.pending_exchange_count, 2)
+        pending_keys = tuple(wrapper._pending_requests)
+        self.assertEqual({command for command, _ in pending_keys}, {0x0203, 0x0309})
+
+        for command, sequence in reversed(pending_keys):
+            fake.response_bytes = encode_frame(
+                WatchAppFrame(command, sequence, f"reply-{command:04x}".encode())
+            )
+            fake._emit_response(fake.services.write)
+
+        first, second = await asyncio.gather(first_task, second_task)
+        self.assertEqual(first.payload, b"reply-0203")
+        self.assertEqual(second.payload, b"reply-0309")
+        self.assertEqual(wrapper.pending_exchange_count, 0)
+
+        decoder = WatchAppMessageDecoder()
+        outbound = []
+        for chunk, _ in fake.writes:
+            outbound.extend(decoder.feed(chunk))
+        self.assertEqual(
+            {(message.command, len(message.payload)) for message in outbound},
+            {(0x0203, 1300), (0x0309, 1400)},
+        )
+
+    async def test_unsolicited_device_message_can_be_received_and_decoded(self) -> None:
+        factory = FakeClientFactory()
+        wrapper = WatchBleClient("AA:01", client_factory=factory)
+        await wrapper.connect()
+        fake = factory.instances[0]
+        payload = encode_protobuf(pb_env_pb2._BatteryInfo(level=87, charging=1))
+
+        fake.notify_callback(
+            fake.services.notify,
+            bytearray(encode_frame(WatchAppFrame(0x030A, 77, payload))),
+        )
+        envelope, battery = await wrapper.receive_protobuf(
+            pb_env_pb2._BatteryInfo,
+            timeout=0.1,
+        )
+
+        self.assertEqual(envelope.command, 0x030A)
+        self.assertEqual(envelope.sequence, 77)
+        self.assertEqual(battery.level, 87)
+        self.assertEqual(battery.charging, 1)
 
     async def test_ignores_wrong_command_and_sequence_then_times_out(self) -> None:
         factory = FakeClientFactory()

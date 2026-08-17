@@ -16,14 +16,19 @@ class HardwareTargetConfigTest(unittest.TestCase):
     def _tree(self, root: Path, project: str = "6202_W5230") -> None:
         app = root / "app"
         (app / "projects" / project).mkdir(parents=True)
-        (app / "comm" / "TuoBu" / "quick_cmd").mkdir(parents=True)
+        quick_cmd_dir = (
+            app / "comm" / "quick_cmd"
+            if project == "6204_W5230"
+            else app / "comm" / "TuoBu" / "quick_cmd"
+        )
+        quick_cmd_dir.mkdir(parents=True)
         (root / "core" / "comm" / "srv" / "test").mkdir(parents=True)
         (app / "ProjectConfig.cmake").write_text(
             f"set(PROJECT {project})\n", encoding="utf-8"
         )
         for path in (
             app / "projects" / project / "Project.cmake",
-            app / "comm" / "TuoBu" / "quick_cmd" / "gui_comm_quick_cmd.c",
+            quick_cmd_dir / "gui_comm_quick_cmd.c",
             root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c",
         ):
             path.write_text("// test\n", encoding="utf-8")
@@ -44,6 +49,30 @@ class HardwareTargetConfigTest(unittest.TestCase):
                 config = HardwareTargetConfig.from_env()
             self.assertEqual(config.source_root, root.resolve())
             self.assertEqual(config.project, "6202_W5230")
+
+    def test_6204_uses_its_project_specific_quick_cmd_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._tree(root, project="6204_W5230")
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "W30_HARDWARE_SOURCE_ROOT": str(root),
+                    "W30_HARDWARE_WORKSPACE_ROOT": str(root),
+                    "W30_HARDWARE_PROJECT": "6204_W5230",
+                },
+                clear=True,
+            ):
+                config = HardwareTargetConfig.from_env()
+            self.assertEqual(config.project, "6204_W5230")
+            self.assertEqual(
+                config.app_quick_cmd,
+                root.resolve()
+                / "app"
+                / "comm"
+                / "quick_cmd"
+                / "gui_comm_quick_cmd.c",
+            )
 
     def test_project_mismatch_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
