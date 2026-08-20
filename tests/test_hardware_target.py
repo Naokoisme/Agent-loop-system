@@ -29,7 +29,7 @@ class HardwareTargetConfigTest(unittest.TestCase):
         for path in (
             app / "projects" / project / "Project.cmake",
             quick_cmd_dir / "gui_comm_quick_cmd.c",
-            root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c",
+            root / "core" / "comm" / "srv" / "test" / "srv_quick_cmd_handler.c",
         ):
             path.write_text("// test\n", encoding="utf-8")
 

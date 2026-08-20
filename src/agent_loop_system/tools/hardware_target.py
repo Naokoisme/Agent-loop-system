@@ -32,7 +32,7 @@ class HardwareTargetConfig:
             / "comm"
             / "srv"
             / "test"
-            / "hlq_quick_cmd_handler.c"
+            / "srv_quick_cmd_handler.c"
         )
 
     @property

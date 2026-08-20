@@ -21,7 +21,7 @@ Windows 模拟器只启用窄范围命令桥：
 
 这样不会把 Zephyr 的整套测试代码拉进 Windows 构建，同时保留 Agent-loop 所需的 `srv_quick_cmd` 与 GUI quick-command 模块。
 
-6202 的项目自有命令桥是 `core/comm/srv/test/hlq_quick_cmd_handler.c/.h`。CMake、protobuf 命令入口和 GUI 命令消费者都只接入这组 HLQ 文件；遗留 `srv_quick_cmd_handler.c/.h` 保留作项目历史参考，但不再参与任何构建。Agent-loop 不允许在 HLQ 缺失时回退读取遗留文件。
+6202 的项目自有命令桥是 `core/comm/srv/test/srv_quick_cmd_handler.c/.h`。CMake 在启用 `CONFIG_TOPSTEP_COMM_TEST` 或 `CONFIG_TOPSTEP_COMM_QUICK_CMD` 时编译这一份实现，protobuf 命令入口和 GUI 命令消费者也使用同一入口。Agent-loop 直接从该文件提取当前命令表；文件缺失时应明确报错，不能回退到历史文件或跨项目缓存。
 
 ## Agent-loop 启动条件
 
