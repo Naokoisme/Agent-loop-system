@@ -2636,6 +2636,29 @@ class FrontendDataTest(unittest.TestCase):
             import io
             wb = openpyxl.load_workbook(io.BytesIO(xlsx_bytes))
             self.assertIn("自动化测试用例_v1", wb.sheetnames)
+            ws = wb["自动化测试用例_v1"]
+            self.assertEqual(ws.freeze_panes, "A2")
+            self.assertEqual(ws.auto_filter.ref, f"A1:I{ws.max_row}")
+            self.assertFalse(ws.sheet_view.showGridLines)
+            self.assertEqual(ws.page_setup.orientation, "landscape")
+            self.assertEqual(ws.column_dimensions["E"].width, 46)
+            self.assertEqual(ws.row_dimensions[1].height, 28)
+
+            header = ws["A1"]
+            self.assertEqual(header.font.name, "宋体")
+            self.assertEqual(header.font.sz, 11)
+            self.assertTrue(header.font.bold)
+            self.assertEqual(header.fill.fgColor.rgb[-6:], "1F4E78")
+            self.assertEqual(header.border.left.style, "thin")
+
+            case_row = next(row for row in ws.iter_rows(min_row=2) if row[1].value == "CALC_NEW_01")
+            self.assertEqual(case_row[0].font.name, "宋体")
+            self.assertEqual(case_row[1].font.name, "Times New Roman")
+            self.assertEqual(case_row[1].font.sz, 10)
+            self.assertTrue(case_row[4].alignment.wrap_text)
+            self.assertEqual(case_row[4].alignment.vertical, "top")
+            self.assertEqual(case_row[4].border.bottom.style, "thin")
+            self.assertGreaterEqual(ws.row_dimensions[case_row[0].row].height, 22)
 
     def test_excel_import_preview_and_confirm(self) -> None:
         _, base = self._server()
@@ -2960,6 +2983,39 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(by_verdict["CANNOT_VERIFY"]["批次编号"], "batch-cannot-verify")
         self.assertEqual(detail.freeze_panes, "A2")
         self.assertEqual(detail.auto_filter.ref, "A1:O4")
+
+        summary_header = summary["A1"]
+        self.assertEqual(summary_header.font.name, "宋体")
+        self.assertEqual(summary_header.font.sz, 11)
+        self.assertTrue(summary_header.font.bold)
+        self.assertEqual(summary_header.border.left.style, "thin")
+        self.assertEqual(summary["B1"].font.name, "Times New Roman")
+        self.assertEqual(summary["B1"].font.sz, 10)
+        self.assertEqual(summary.column_dimensions["A"].width, 22)
+        self.assertEqual(summary.page_setup.orientation, "portrait")
+
+        module_sheet = workbook["高频失败模块"]
+        self.assertEqual(module_sheet["A1"].font.name, "宋体")
+        self.assertEqual(module_sheet["A1"].font.sz, 11)
+        self.assertEqual(module_sheet["A1"].border.bottom.style, "thin")
+        self.assertEqual(module_sheet.freeze_panes, "A2")
+
+        verdict_rows = {
+            detail.cell(row_index, 5).value: row_index
+            for row_index in range(2, detail.max_row + 1)
+        }
+        error_row = verdict_rows["ERROR"]
+        self.assertEqual(detail["A1"].font.name, "宋体")
+        self.assertEqual(detail["A1"].font.sz, 11)
+        self.assertEqual(detail.cell(error_row, 3).font.name, "Times New Roman")
+        self.assertEqual(detail.cell(error_row, 5).font.name, "Times New Roman")
+        self.assertTrue(detail.cell(error_row, 5).font.bold)
+        self.assertTrue(detail.cell(error_row, 11).alignment.wrap_text)
+        self.assertEqual(detail.cell(error_row, 11).border.right.style, "thin")
+        self.assertEqual(detail.column_dimensions["K"].width, 60)
+        self.assertGreater(detail.row_dimensions[error_row].height, 22)
+        self.assertLessEqual(detail.row_dimensions[error_row].height, 120)
+        self.assertEqual(detail.page_setup.orientation, "landscape")
 
     def test_environments_and_config_endpoints(self) -> None:
         _, base = self._server()

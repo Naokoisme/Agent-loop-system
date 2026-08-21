@@ -3296,6 +3296,164 @@ class WebApplication:
 
 # --- 0.4.0 增强业务辅助方法与协议实现 ---
 
+
+_EXCEL_CHINESE_FONT_NAME = "宋体"
+_EXCEL_LATIN_FONT_NAME = "Times New Roman"
+_EXCEL_HEADER_FILL = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
+_EXCEL_SUMMARY_FILL = openpyxl.styles.PatternFill("solid", fgColor="D9EAF7")
+_EXCEL_ZEBRA_FILL = openpyxl.styles.PatternFill("solid", fgColor="F7F9FC")
+_EXCEL_THIN_BORDER = openpyxl.styles.Border(
+    left=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    right=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    top=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    bottom=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+)
+_EXCEL_HEADER_FONT = openpyxl.styles.Font(
+    name=_EXCEL_CHINESE_FONT_NAME,
+    size=11,
+    bold=True,
+    color="FFFFFF",
+)
+_EXCEL_SUMMARY_FONT = openpyxl.styles.Font(
+    name=_EXCEL_CHINESE_FONT_NAME,
+    size=11,
+    bold=True,
+)
+_EXCEL_BODY_FONTS = {
+    (True, False): openpyxl.styles.Font(name=_EXCEL_CHINESE_FONT_NAME, size=10),
+    (True, True): openpyxl.styles.Font(name=_EXCEL_CHINESE_FONT_NAME, size=10, bold=True),
+    (False, False): openpyxl.styles.Font(name=_EXCEL_LATIN_FONT_NAME, size=10),
+    (False, True): openpyxl.styles.Font(name=_EXCEL_LATIN_FONT_NAME, size=10, bold=True),
+}
+
+
+def _excel_body_font(value: Any, *, bold: bool = False) -> openpyxl.styles.Font:
+    """按单元格主要内容选择中文或西文字体。"""
+    text = str(value or "")
+    has_chinese = any(
+        "\u3400" <= character <= "\u9fff" or "\uf900" <= character <= "\ufaff"
+        for character in text
+    )
+    return _EXCEL_BODY_FONTS[(has_chinese, bold)]
+
+
+def _excel_display_units(value: Any) -> int:
+    """估算 Excel 中一段文本占用的半角字符宽度。"""
+    return sum(2 if ord(character) > 127 else 1 for character in str(value or ""))
+
+
+def _excel_wrapped_line_count(value: Any, column_width: float) -> int:
+    usable_width = max(1, int(column_width) - 2)
+    lines = str(value or "").splitlines() or [""]
+    return sum(max(1, (_excel_display_units(line) + usable_width - 1) // usable_width) for line in lines)
+
+
+def _excel_set_adaptive_row_heights(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    wrap_columns: set[int],
+    min_height: float = 22,
+    max_height: float = 96,
+) -> None:
+    """给长文本留足显示空间，同时限制异常堆栈造成的超高行。"""
+    for row_index in range(2, sheet.max_row + 1):
+        wrapped_lines = 1
+        for column_index in wrap_columns:
+            column = openpyxl.utils.get_column_letter(column_index)
+            wrapped_lines = max(
+                wrapped_lines,
+                _excel_wrapped_line_count(sheet.cell(row_index, column_index).value, widths[column]),
+            )
+        sheet.row_dimensions[row_index].height = min(
+            max_height,
+            max(min_height, 6 + 15 * wrapped_lines),
+        )
+
+
+def _excel_configure_sheet(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    orientation: str,
+    zoom: int,
+    repeat_header: bool,
+) -> None:
+    sheet.sheet_view.showGridLines = False
+    sheet.sheet_view.zoomScale = zoom
+    for column, width in widths.items():
+        sheet.column_dimensions[column].width = width
+    sheet.page_setup.orientation = orientation
+    sheet.page_setup.paperSize = sheet.PAPERSIZE_A4
+    sheet.page_setup.fitToWidth = 1
+    sheet.page_setup.fitToHeight = 0
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+    sheet.page_margins = openpyxl.worksheet.page.PageMargins(
+        left=0.3,
+        right=0.3,
+        top=0.5,
+        bottom=0.5,
+        header=0.2,
+        footer=0.2,
+    )
+    if repeat_header:
+        sheet.print_title_rows = "1:1"
+
+
+def _excel_style_table(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    wrap_columns: set[int],
+    center_columns: set[int],
+    orientation: str = "landscape",
+    zoom: int = 90,
+    max_row_height: float = 96,
+) -> None:
+    """为普通表格统一应用字体、边框、对齐、筛选和打印布局。"""
+    _excel_configure_sheet(
+        sheet,
+        widths=widths,
+        orientation=orientation,
+        zoom=zoom,
+        repeat_header=True,
+    )
+    sheet.freeze_panes = "A2"
+    last_column = openpyxl.utils.get_column_letter(len(widths))
+    sheet.auto_filter.ref = f"A1:{last_column}{max(sheet.max_row, 1)}"
+    sheet.row_dimensions[1].height = 28
+
+    for cell in sheet[1]:
+        cell.fill = _EXCEL_HEADER_FILL
+        cell.font = _EXCEL_HEADER_FONT
+        cell.border = _EXCEL_THIN_BORDER
+        cell.alignment = openpyxl.styles.Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True,
+        )
+
+    for row_index, row in enumerate(sheet.iter_rows(min_row=2), start=2):
+        for column_index, cell in enumerate(row, start=1):
+            cell.font = _excel_body_font(cell.value)
+            cell.border = _EXCEL_THIN_BORDER
+            if row_index % 2 == 0:
+                cell.fill = _EXCEL_ZEBRA_FILL
+            if column_index in wrap_columns:
+                cell.alignment = openpyxl.styles.Alignment(vertical="top", wrap_text=True)
+            elif column_index in center_columns:
+                cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+            else:
+                cell.alignment = openpyxl.styles.Alignment(vertical="center")
+
+    _excel_set_adaptive_row_heights(
+        sheet,
+        widths=widths,
+        wrap_columns=wrap_columns,
+        max_height=max_row_height,
+    )
+
+
 def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
     """生成标准 9 列表头的 Excel 测试用例工作簿。"""
     wb = openpyxl.Workbook()
@@ -3323,7 +3481,17 @@ def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
                     str(item.get("mapping_status") or ""),
                     str(item.get("note") or ""),
                 ])
-                
+
+    _excel_style_table(
+        ws,
+        widths={
+            "A": 18, "B": 16, "C": 10, "D": 28, "E": 46,
+            "F": 46, "G": 12, "H": 14, "I": 30,
+        },
+        wrap_columns={4, 5, 6, 9},
+        center_columns={1, 2, 3, 7, 8},
+    )
+
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
@@ -3736,27 +3904,30 @@ def _style_report_overview_sheets(
     summary_sheet: Any,
     module_sheet: Any,
 ) -> None:
-    summary_sheet.sheet_view.showGridLines = False
-    summary_sheet.column_dimensions["A"].width = 20
-    summary_sheet.column_dimensions["B"].width = 30
-    summary_fill = openpyxl.styles.PatternFill("solid", fgColor="D9EAF7")
+    _excel_configure_sheet(
+        summary_sheet,
+        widths={"A": 22, "B": 34},
+        orientation="portrait",
+        zoom=100,
+        repeat_header=False,
+    )
     for row in summary_sheet.iter_rows(min_row=1, max_col=2):
-        row[0].fill = summary_fill
-        row[0].font = openpyxl.styles.Font(bold=True)
+        summary_sheet.row_dimensions[row[0].row].height = 24
         for cell in row:
-            cell.alignment = openpyxl.styles.Alignment(vertical="center")
+            cell.font = _excel_body_font(cell.value)
+            cell.border = _EXCEL_THIN_BORDER
+            cell.alignment = openpyxl.styles.Alignment(vertical="center", wrap_text=True)
+        row[0].fill = _EXCEL_SUMMARY_FILL
+        row[0].font = _EXCEL_SUMMARY_FONT
 
-    module_sheet.sheet_view.showGridLines = False
-    module_sheet.freeze_panes = "A2"
-    module_sheet.auto_filter.ref = f"A1:D{max(module_sheet.max_row, 1)}"
-    for column, width in {"A": 20, "B": 14, "C": 14, "D": 14}.items():
-        module_sheet.column_dimensions[column].width = width
-    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
-    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
-    for cell in module_sheet[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+    _excel_style_table(
+        module_sheet,
+        widths={"A": 22, "B": 14, "C": 14, "D": 14},
+        wrap_columns={1},
+        center_columns={2, 3, 4},
+        orientation="portrait",
+        zoom=100,
+    )
 
 
 def _add_report_abnormal_sheet(
@@ -3784,24 +3955,18 @@ def _add_report_abnormal_sheet(
             item.get("screenshot_count", 0),
         ])
 
-    sheet.freeze_panes = "A2"
-    sheet.auto_filter.ref = f"A1:O{max(sheet.max_row, 1)}"
-    sheet.sheet_view.showGridLines = False
-    sheet.row_dimensions[1].height = 24
     widths = {
         "A": 20, "B": 14, "C": 16, "D": 10, "E": 14, "F": 14,
         "G": 24, "H": 32, "I": 32, "J": 42, "K": 60, "L": 18,
         "M": 24, "N": 60, "O": 14,
     }
-    for column, width in widths.items():
-        sheet.column_dimensions[column].width = width
-
-    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
-    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
-    for cell in sheet[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+    _excel_style_table(
+        sheet,
+        widths=widths,
+        wrap_columns={2, 6, 7, 8, 9, 10, 11, 14},
+        center_columns={1, 3, 4, 5, 12, 13, 15},
+        max_row_height=120,
+    )
 
     verdict_fills = {
         "FAIL": openpyxl.styles.PatternFill("solid", fgColor="FCE8E6"),
@@ -3809,12 +3974,9 @@ def _add_report_abnormal_sheet(
         "CANNOT_VERIFY": openpyxl.styles.PatternFill("solid", fgColor="E5E7EB"),
     }
     for row in sheet.iter_rows(min_row=2):
-        for cell in row:
-            cell.alignment = openpyxl.styles.Alignment(vertical="top", wrap_text=True)
         row[0].number_format = "yyyy-mm-dd hh:mm:ss"
         row[4].fill = verdict_fills.get(str(row[4].value or ""), verdict_fills["ERROR"])
-        row[4].font = openpyxl.styles.Font(bold=True)
-        row[14].alignment = openpyxl.styles.Alignment(horizontal="center", vertical="top")
+        row[4].font = _excel_body_font(row[4].value, bold=True)
 
 
 def _get_reports_summary_data(

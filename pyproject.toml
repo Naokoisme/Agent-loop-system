@@ -12,6 +12,7 @@ dependencies = [
     "langchain-openai>=0.2",
     "pydantic>=2.7",
     "pillow>=12.3.0",
+    "openpyxl>=3.1,<4",
     "bleak>=2.0,<4",
     "protobuf>=6.31,<7",
     "winrt-windows-devices-bluetooth-rfcomm>=3.2,<4",
