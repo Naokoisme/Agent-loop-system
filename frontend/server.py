@@ -51,6 +51,9 @@ WORKFLOW_NODES = (
 TEST_WORKFLOW_NODES = ("load", "execute", "judge", "record")
 SAFE_SEGMENT = re.compile(r"^[A-Za-z0-9_.-]+$")
 TEST_SCREENSHOT_FILE = re.compile(r"^screenshot(?:-\d{2,3})?\.bmp$")
+LIVE_TEST_SCREENSHOT_FILE = re.compile(
+    r"^(?:screenshot(?:-\d{2,3})?|step_\d{2,3})\.bmp$"
+)
 MAX_BODY_BYTES = 50 * 1024 * 1024  # 50 MB 支持大容量 Excel/用例数据上传
 MAX_PORT_SEARCH_ATTEMPTS = 500_000
 MAX_LOG_CHARS = 200_000
@@ -2535,12 +2538,24 @@ class CaseTestManager:
         if current_dir and current_dir.is_dir() and current_token:
             points = current_case.get("verification_points", [])
             labels = points if isinstance(points, list) else []
-            for index, path in enumerate(sorted(current_dir.glob("screenshot*.bmp")), start=1):
-                if not TEST_SCREENSHOT_FILE.fullmatch(path.name):
-                    continue
+            live_paths = sorted(
+                (
+                    path
+                    for path in current_dir.iterdir()
+                    if path.is_file() and LIVE_TEST_SCREENSHOT_FILE.fullmatch(path.name)
+                ),
+                key=lambda path: path.name,
+            )
+            for index, path in enumerate(live_paths, start=1):
+                step_match = re.fullmatch(r"step_(\d{2,3})\.bmp", path.name)
+                fallback_label = (
+                    f"探索步骤 {int(step_match.group(1)) + 1}"
+                    if step_match
+                    else f"检查点 {index}"
+                )
                 screenshots.append({
                     "index": index,
-                    "label": str(labels[index - 1]) if index <= len(labels) else f"检查点 {index}",
+                    "label": str(labels[index - 1]) if index <= len(labels) else fallback_label,
                     "url": (
                         f"/api/tests/jobs/{quote(job_id, safe='')}/screenshots/"
                         f"{quote(current_token, safe='')}/{quote(path.name, safe='')}"
@@ -2557,7 +2572,7 @@ class CaseTestManager:
     def screenshot_path(self, job_id: str, token: str, file_name: str) -> Path:
         job_id = _safe_segment(job_id, "任务编号")
         token = _safe_segment(token, "用例运行编号")
-        if not TEST_SCREENSHOT_FILE.fullmatch(file_name):
+        if not LIVE_TEST_SCREENSHOT_FILE.fullmatch(file_name):
             raise ValueError("截图文件名不合法")
         with self._lock:
             if job_id not in self._jobs:

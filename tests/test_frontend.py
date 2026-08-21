@@ -2015,6 +2015,43 @@ class FrontendDataTest(unittest.TestCase):
         self.assertIsNotNone(snapshot["recent_results"][0]["history_id"])
         self.assertEqual(len(snapshot["live_screenshots"]), 1)
 
+    def test_case_test_manager_exposes_dynamic_exploration_screenshots(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        job_id = "live-step-screenshots"
+        token = "0001-CALC_001"
+        current_dir = self.paths.runtime_jobs / job_id / token
+        current_dir.mkdir(parents=True, exist_ok=True)
+        (current_dir / "step_00.bmp").write_bytes(b"BM-step-0")
+        (current_dir / "step_01.bmp").write_bytes(b"BM-step-1")
+        (current_dir / "step_00_capture_original.bmp").write_bytes(b"BM-sidecar")
+        manager._jobs[job_id] = {
+            "id": job_id,
+            "type": "batch",
+            "status": "running",
+            "total": 1,
+            "completed": 0,
+            "current_runtime_dir": str(current_dir),
+            "current_case_data": {"verification_points": []},
+            "current_case_token": token,
+        }
+
+        snapshot = manager.get(job_id)
+
+        self.assertIsNotNone(snapshot)
+        self.assertEqual(
+            [item["label"] for item in snapshot["live_screenshots"]],
+            ["探索步骤 1", "探索步骤 2"],
+        )
+        self.assertTrue(snapshot["live_screenshots"][0]["url"].endswith("/step_00.bmp"))
+        self.assertEqual(
+            manager.screenshot_path(job_id, token, "step_01.bmp"),
+            current_dir / "step_01.bmp",
+        )
+        with self.assertRaisesRegex(ValueError, "截图文件名不合法"):
+            manager.screenshot_path(job_id, token, "step_00_capture_original.bmp")
+        with self.assertRaises(ValueError):
+            manager.screenshot_path(job_id, token, "../step_00.bmp")
+
     def test_hardware_batch_stops_before_cases_when_external_session_is_inactive(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         job_id = "hardware-preflight"

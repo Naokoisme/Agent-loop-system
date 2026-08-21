@@ -1231,8 +1231,15 @@ pre, code { font-family: var(--font-ui); }
 .trace-fail { color: var(--red); }
 .single-evidence { max-width: 560px; }
 .checkpoint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; }
-.checkpoint-grid .evidence-frame img,
-.checkpoint-grid .evidence-missing { aspect-ratio: 402 / 256; }
+.checkpoint-grid .evidence-frame img { aspect-ratio: 402 / 256; }
+.checkpoint-grid .evidence-missing {
+  grid-column: 1 / -1;
+  min-height: 96px;
+  aspect-ratio: auto;
+  border: 1px dashed var(--line);
+  border-radius: 11px;
+  background: var(--surface-soft);
+}
 
 .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .evidence-frame { overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-soft); }
