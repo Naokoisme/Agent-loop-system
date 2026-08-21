@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
+from agent_loop_system.internal_dispatcher import build_child_command
 from agent_loop_system.tools.case_map import validated_case_entries
 from agent_loop_system.tools.external_execution_history import (
     read_external_execution_history,
@@ -1796,23 +1797,23 @@ class CaseTestManager:
         result_file = job_dir / "test_result.json"
         screenshot = job_dir / "screenshot.bmp"
         started_at = _now()
-        argv = [
-            sys.executable,
-            "-m",
-            "agent_loop_system.tools.test",
-            "--sheet",
-            str(case["file_sheet"]),
-            "--case-id",
-            str(case["case_id"]),
-            "--target",
-            project_meta["execution_target"],
-            "--case-map-profile",
-            project_meta["case_map_profile"],
-            "--result-file",
-            str(result_file),
-            "--screenshot-path",
-            str(screenshot),
-        ]
+        argv = build_child_command(
+            "test",
+            [
+                "--sheet",
+                str(case["file_sheet"]),
+                "--case-id",
+                str(case["case_id"]),
+                "--target",
+                project_meta["execution_target"],
+                "--case-map-profile",
+                project_meta["case_map_profile"],
+                "--result-file",
+                str(result_file),
+                "--screenshot-path",
+                str(screenshot),
+            ],
+        )
         stdout = ""
         stderr = ""
         return_code: int | None = None
@@ -2234,19 +2235,19 @@ class JobManager:
             job["progress_file"] = str(progress_file)
             job["result_file"] = str(result_file)
 
-        argv = [
-            sys.executable,
-            "-m",
-            "agent_loop_system",
-            "--defect",
-            job["defect"],
-            "--task-id",
-            job["defect"],
-            "--progress-file",
-            str(progress_file),
-            "--result-file",
-            str(result_file),
-        ]
+        argv = build_child_command(
+            "agent",
+            [
+                "--defect",
+                job["defect"],
+                "--task-id",
+                job["defect"],
+                "--progress-file",
+                str(progress_file),
+                "--result-file",
+                str(result_file),
+            ],
+        )
         stdout = ""
         stderr = ""
         return_code: int | None = None
@@ -3865,16 +3866,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         force: bool,
         log_file: str,
     ) -> None:
-        argv = [
-            sys.executable, "-m", "agent_loop_system.tools.defect_store",
-            "--import-all",
-        ]
+        extra = ["--import-all"]
         if force:
-            argv.append("--force")
+            extra.append("--force")
         if include_completed:
-            argv.append("--include-completed")
+            extra.append("--include-completed")
         if limit and limit > 0:
-            argv.extend(["--limit", str(limit)])
+            extra.extend(["--limit", str(limit)])
+        argv = build_child_command("defect-store", extra)
         try:
             with open(log_file, "w", encoding="utf-8") as f:
                 process = subprocess.run(
