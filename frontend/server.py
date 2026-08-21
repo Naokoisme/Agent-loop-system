@@ -3714,7 +3714,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             try:
                 upgrade_info = prepare_upgrade(self.app.paths.root, manifest_source=manifest_source)
                 staging_dir = Path(upgrade_info["staging_dir"])
-                launch_update_script(self.app.paths.root, staging_dir, parent_pid=os.getpid())
+                launch_update_script(
+                    self.app.paths.root,
+                    staging_dir,
+                    parent_pid=os.getpid(),
+                    target_version=upgrade_info["target_version"],
+                )
                 self._json({
                     "status": "upgrading",
                     "target_version": upgrade_info["target_version"],
