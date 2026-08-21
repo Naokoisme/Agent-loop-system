@@ -43,7 +43,8 @@ WORKFLOW_NODES = (
 TEST_WORKFLOW_NODES = ("load", "execute", "judge", "record")
 SAFE_SEGMENT = re.compile(r"^[A-Za-z0-9_.-]+$")
 TEST_SCREENSHOT_FILE = re.compile(r"^screenshot(?:-\d{2,3})?\.bmp$")
-MAX_BODY_BYTES = 64 * 1024
+MAX_BODY_BYTES = 50 * 1024 * 1024  # 50 MB 支持大容量 Excel/用例数据上传
+MAX_PORT_SEARCH_ATTEMPTS = 500_000
 MAX_LOG_CHARS = 200_000
 HISTORY_SCHEMA_VERSION = 2
 DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
@@ -2399,7 +2400,7 @@ def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
 
 
 def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
-    """解析 base64 编码的 Excel 用例表格。"""
+    """解析 base64 编码的 Excel 用例表格（支持单 Sheet 或多 Sheet 工作簿）。"""
     try:
         data = base64.b64decode(file_base64)
     except Exception as exc:
@@ -2409,82 +2410,87 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
     except Exception as exc:
         raise ValueError(f"Excel 文件无法解析: {exc}")
         
-    sheet_name = "自动化测试用例_v1" if "自动化测试用例_v1" in wb.sheetnames else wb.sheetnames[0]
-    ws = wb[sheet_name]
-    rows = list(ws.iter_rows(values_only=True))
-    if not rows:
-        raise ValueError("Excel 表格为空")
-        
-    header_idx = 0
-    col_map: dict[str, int] = {}
-    for idx, row in enumerate(rows[:5]):
-        if not row:
-            continue
-        row_str = [str(c).strip() if c is not None else "" for c in row]
-        temp_map = {}
-        for c_idx, cell in enumerate(row_str):
-            if not cell:
-                continue
-            if any(k in cell for k in ["模块", "Sheet", "sheet"]):
-                temp_map["sheet"] = c_idx
-            elif any(k in cell for k in ["用例编号", "用例ID", "case_id", "编号"]):
-                temp_map["case_id"] = c_idx
-            elif any(k in cell for k in ["优先级", "priority"]):
-                temp_map["priority"] = c_idx
-            elif any(k in cell for k in ["前置条件", "前置", "precondition"]):
-                temp_map["precondition_text"] = c_idx
-            elif any(k in cell for k in ["操作步骤", "测试步骤", "步骤", "steps"]):
-                temp_map["steps_text"] = c_idx
-            elif any(k in cell for k in ["预期结果", "预期", "expected"]):
-                temp_map["expected_text"] = c_idx
-            elif any(k in cell for k in ["不可自动化", "unable"]):
-                temp_map["unable"] = c_idx
-            elif any(k in cell for k in ["固化状态", "mapping_status"]):
-                temp_map["mapping_status"] = c_idx
-            elif any(k in cell for k in ["备注", "note"]):
-                temp_map["note"] = c_idx
-        if "case_id" in temp_map or "expected_text" in temp_map:
-            header_idx = idx
-            col_map = temp_map
-            break
-            
-    if "case_id" not in col_map and "sheet" not in col_map:
-        raise ValueError("未识别到有效的用例表头（需包含'用例编号'或'模块'）")
-        
+    target_sheets = ["自动化测试用例_v1"] if "自动化测试用例_v1" in wb.sheetnames else wb.sheetnames
     parsed_cases: list[dict[str, Any]] = []
-    for row_num, row in enumerate(rows[header_idx + 1:], start=header_idx + 2):
-        if not row or all(c is None or str(c).strip() == "" for c in row):
+
+    for sheet_name in target_sheets:
+        ws = wb[sheet_name]
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows:
             continue
-        case_id = str(row[col_map["case_id"]]).strip() if "case_id" in col_map and col_map["case_id"] < len(row) and row[col_map["case_id"]] is not None else ""
-        sheet = str(row[col_map["sheet"]]).strip() if "sheet" in col_map and col_map["sheet"] < len(row) and row[col_map["sheet"]] is not None else "通用"
-        if not case_id:
+            
+        header_idx = -1
+        col_map: dict[str, int] = {}
+        for idx, row in enumerate(rows[:10]):
+            if not row:
+                continue
+            row_str = [str(c).strip() if c is not None else "" for c in row]
+            temp_map = {}
+            for c_idx, cell in enumerate(row_str):
+                if not cell:
+                    continue
+                if any(k in cell for k in ["模块", "Sheet", "sheet"]):
+                    temp_map["sheet"] = c_idx
+                elif any(k in cell for k in ["用例编号", "用例ID", "case_id", "编号", "用例标识"]):
+                    temp_map["case_id"] = c_idx
+                elif any(k in cell for k in ["优先级", "priority"]):
+                    temp_map["priority"] = c_idx
+                elif any(k in cell for k in ["前置条件", "前置", "precondition"]):
+                    temp_map["precondition_text"] = c_idx
+                elif any(k in cell for k in ["操作步骤", "测试步骤", "步骤", "steps"]):
+                    temp_map["steps_text"] = c_idx
+                elif any(k in cell for k in ["预期结果", "预期", "expected"]):
+                    temp_map["expected_text"] = c_idx
+                elif any(k in cell for k in ["不可自动化", "unable"]):
+                    temp_map["unable"] = c_idx
+                elif any(k in cell for k in ["固化状态", "mapping_status"]):
+                    temp_map["mapping_status"] = c_idx
+                elif any(k in cell for k in ["备注", "note"]):
+                    temp_map["note"] = c_idx
+            if "case_id" in temp_map or "expected_text" in temp_map:
+                header_idx = idx
+                col_map = temp_map
+                break
+                
+        if header_idx == -1 or "case_id" not in col_map:
             continue
-        
-        priority = str(row[col_map["priority"]]).strip() if "priority" in col_map and col_map["priority"] < len(row) and row[col_map["priority"]] is not None else "P1"
-        precondition = str(row[col_map["precondition_text"]]).strip() if "precondition_text" in col_map and col_map["precondition_text"] < len(row) and row[col_map["precondition_text"]] is not None else ""
-        steps = str(row[col_map["steps_text"]]).strip() if "steps_text" in col_map and col_map["steps_text"] < len(row) and row[col_map["steps_text"]] is not None else ""
-        expected = str(row[col_map["expected_text"]]).strip() if "expected_text" in col_map and col_map["expected_text"] < len(row) and row[col_map["expected_text"]] is not None else ""
-        note = str(row[col_map["note"]]).strip() if "note" in col_map and col_map["note"] < len(row) and row[col_map["note"]] is not None else ""
-        unable_raw = str(row[col_map["unable"]]).strip() if "unable" in col_map and col_map["unable"] < len(row) and row[col_map["unable"]] is not None else ""
-        unable = unable_raw in {"是", "true", "True", "1", "Y", "yes"}
-        mapping_status = str(row[col_map["mapping_status"]]).strip() if "mapping_status" in col_map and col_map["mapping_status"] < len(row) and row[col_map["mapping_status"]] is not None else ""
-        
-        parsed_cases.append({
-            "case_id": case_id,
-            "sheet": sheet,
-            "priority": priority,
-            "precondition_text": precondition,
-            "steps_text": steps,
-            "expected_text": expected,
-            "verification_points": [expected] if expected else [],
-            "setup": [],
-            "actions": [],
-            "collect": ["srv_quick_cmd send TOP5STEP:GUI_TREE:1;"],
-            "unable": unable,
-            "mapping_status": mapping_status,
-            "note": note,
-            "_row_number": row_num,
-        })
+            
+        for row_num, row in enumerate(rows[header_idx + 1:], start=header_idx + 2):
+            if not row or all(c is None or str(c).strip() == "" for c in row):
+                continue
+            case_id = str(row[col_map["case_id"]]).strip() if "case_id" in col_map and col_map["case_id"] < len(row) and row[col_map["case_id"]] is not None else ""
+            sheet = str(row[col_map["sheet"]]).strip() if "sheet" in col_map and col_map["sheet"] < len(row) and row[col_map["sheet"]] is not None else sheet_name
+            if not case_id:
+                continue
+            
+            priority = str(row[col_map["priority"]]).strip() if "priority" in col_map and col_map["priority"] < len(row) and row[col_map["priority"]] is not None else "P1"
+            precondition = str(row[col_map["precondition_text"]]).strip() if "precondition_text" in col_map and col_map["precondition_text"] < len(row) and row[col_map["precondition_text"]] is not None else ""
+            steps = str(row[col_map["steps_text"]]).strip() if "steps_text" in col_map and col_map["steps_text"] < len(row) and row[col_map["steps_text"]] is not None else ""
+            expected = str(row[col_map["expected_text"]]).strip() if "expected_text" in col_map and col_map["expected_text"] < len(row) and row[col_map["expected_text"]] is not None else ""
+            note = str(row[col_map["note"]]).strip() if "note" in col_map and col_map["note"] < len(row) and row[col_map["note"]] is not None else ""
+            unable_raw = str(row[col_map["unable"]]).strip() if "unable" in col_map and col_map["unable"] < len(row) and row[col_map["unable"]] is not None else ""
+            unable = unable_raw in {"是", "true", "True", "1", "Y", "yes"}
+            mapping_status = str(row[col_map["mapping_status"]]).strip() if "mapping_status" in col_map and col_map["mapping_status"] < len(row) and row[col_map["mapping_status"]] is not None else ""
+            
+            parsed_cases.append({
+                "case_id": case_id,
+                "sheet": sheet,
+                "priority": priority,
+                "precondition_text": precondition,
+                "steps_text": steps,
+                "expected_text": expected,
+                "verification_points": [expected] if expected else [],
+                "setup": [],
+                "actions": [],
+                "collect": ["srv_quick_cmd send TOP5STEP:GUI_TREE:1;"],
+                "unable": unable,
+                "mapping_status": mapping_status or ("PROMOTED" if unable else "UNKNOWN"),
+                "note": note,
+                "_row_number": row_num,
+            })
+            
+    if not parsed_cases:
+        raise ValueError("未识别到有效的用例数据（需包含'用例编号'表头且有内容）")
     return parsed_cases
 
 

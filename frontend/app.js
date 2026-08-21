@@ -1658,7 +1658,7 @@ async function renderTests() {
         });
         const data = await resp.json();
         if (!resp.ok) {
-          excelErrorBox.textContent = `[${data.error_code || '错误'}] ${data.row_number ? `第 ${data.row_number} 行: ` : ''}${data.message || '文件解析失败'}`;
+          excelErrorBox.textContent = `[${data.error_code || '提示'}] ${data.row_number ? `第 ${data.row_number} 行: ` : ''}${data.message || data.error || '文件解析失败'}`;
           excelErrorBox.style.display = 'block';
           submitExcelBtn.textContent = '无法导入';
           submitExcelBtn.disabled = true;
