@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+//绑定/登录请求
+message _AuthRequest {
+  string userId = 1;//用户id，32个F为专门用于生产测试的id。max-len=32
+  int32 system = 2;//系统类型，0 为IOS, 1为Android
+  string version = 3;//系统版本，max-len=16
+  string brand = 4;//品牌，max-len=16
+  string model = 5;//型号，max-len=16
+  string authCode = 6;//验证码，max-len=16
+  _UserInfo user = 7;//授权时，同时设置用户信息。
+  _TimeInfo time = 8;//授权时，同时设置时间信息。
+}
+
+//绑定/登录响应
+message _AuthResponse {
+  /**
+   * 0：表示成功
+   * 1：失败，不匹配的userId，仅出现在login模式
+   * 2：失败，用户取消了绑定，仅出现在bind模式
+   * 3：失败，用户长时间无响应，绑定超时，仅出现在bind模式
+   * 4：IOS13以下的情况，等效于绑定成功（0的状态），但经典蓝牙未连接
+   * 5：手环电量不足，无法删除数据。
+   * 6：手环正在恢复出厂。
+   * 7：需要用户去操作恢复出厂，设备才允许重新被绑定
+   * 127：失败，未知.
+   */
+  int32 result = 1;
+  /**
+   * 0：代表第一次绑定
+   * 1：之前已经绑定过
+   * 仅在绑定成功时，这个值才有意义。否则忽略这个值。
+   */
+  int32 everBind = 2;
+
+  /**
+   * 这个用户首次绑定的时间戳（秒）。
+   * 通常用于判断手表此次绑定是否清除了数据
+   * 仅在绑定/登录成功时，这个值才有意义。否则忽略这个值。
+   * 这个时间戳被当做token使用，所以使用标准时间戳，而不是其他地方的距2000年始秒数
+   */
+  int64 bindTime = 3;
+}
+
+//用户信息
+message _UserInfo {
+  int32 gender = 1;//0女，1男
+  int32 age = 2;//年龄
+  int32 height = 3;//身高，单位cm
+  float weight = 4;//体重，单位kg
+}
+
+//时间信息
+message _TimeInfo {
+  int32 timestamp = 1;//时间戳，距离2000年始的秒数
+  sint32 zoneOffset = 2;//时区偏移，单位秒。
+}
+
+//解绑响应
+message _UnAuthResponse {
+  int32 result = 1;//0：成功；1：失败电量不足；127：失败未知
+}
+
+//电量信息
+message _BatteryInfo {
+  int32 level = 1;//电量百分比(1~100)
+  int32 charging = 2;//是否充电中，0否，1是
+}
+
+//语言信息
+message _LanguageInfo {
+  int32 language = 1;//语言代号，参考fitcloud语言代号
+}
+
+//APP状态
+message _AppStatus {
+  int32 isForeground = 1;//是否前台，0否，1是
+  int32 permissionSms = 2;//是否有短信权限，0否，1是
+  int32 permissionLocation = 3;//是否有定位权限，0否，1是
+  int32 permissionCamera = 4;//是否有相机权限，0否，1是
+}
+
+// 语言列表
+message _LanguageList {
+  bytes items = 1;//max_size=64
+}
+
+//经纬度信息
+message _LocationInfo {
+  int32 longitude = 1;//经度 *1000000
+  int32 latitude = 2; //纬度 *1000000
+  int32 snr = 3;//信噪比
+}
+
+//蓝牙信息
+message _BluetoothInfo {
+  string ble_mac = 1;//ble地址。max-len=32
+  string ble_name = 2;//ble名称。max-len=32
+  int32 ble_status = 3;//ble连接状态。0未连接，1已连接，2已就绪(连接且打开了Notify)
+  string bt_mac = 4;//bt地址。max-len=32
+  string bt_name = 5;//bt名称。max-len=32
+  int32 bt_status = 6;//bt连接状态。0未连接，1已连接，2已就绪(连接且打开了SPP)
+}

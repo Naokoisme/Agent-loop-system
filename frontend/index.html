@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Agent自动化测试平台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/tests?view=overview" data-route="/overview" aria-label="返回项目总览">
+      <strong>Agent-loop</strong>
+      <small id="brand-system-version">v—</small>
+    </a>
+    <nav class="primary-nav" aria-label="工作台一级导航">
+      <a href="/tests?view=overview" data-route="/overview" data-nav="overview"><span aria-hidden="true">⌂</span>项目总览</a>
+      <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
+      <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
+      <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
+      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>缺陷闭环</a>
+      <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
+    </nav>
+    <div class="topbar-actions">
+      <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
+      <label class="global-target-picker" for="global-target-select">
+        <span class="sr-only">当前测试目标</span>
+        <select id="global-target-select" aria-label="切换全局测试目标">
+          <option value="620C_W6830">620C 模拟器</option>
+          <option value="6202_W5230_SIMULATOR">6202 模拟器</option>
+          <option value="6202_W5230">6202 真机</option>
+        </select>
+        <span id="global-target-status" class="target-health-inline"><i></i><span>尚未检查</span></span>
+      </label>
+      <button id="open-system-settings" class="icon-button settings-nav-btn" type="button" aria-label="打开系统设置" title="系统设置">⚙</button>
+    </div>
+  </header>
+  <main id="app" class="app-shell" aria-live="polite">
+    <section class="loading-state">
+      <div class="spinner"></div>
+      <p>正在读取本地数据…</p>
+    </section>
+  </main>
+  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
+    <form id="system-settings-form">
+      <header class="dialog-head">
+        <div>
+          <h2 id="settings-dialog-title">系统设置</h2>
+        </div>
+        <button id="close-system-settings" class="dialog-close" type="button" aria-label="关闭">×</button>
+      </header>
+
+      <div class="settings-tabs-nav">
+        <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">🤖 大模型</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="ones">📋 ONES 平台</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机串口</button>
+
+      </div>
+
+      <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+        <!-- Tab 1: LLM -->
+        <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <label for="cfg-openai-api-key" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">API Key</label>
+            <div style="display: flex; gap: 6px;">
+              <input id="cfg-openai-api-key" type="password" class="input" placeholder="sk-..." style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+              <button type="button" class="button button-secondary toggle-secret-btn" data-target="cfg-openai-api-key" style="padding: 4px 10px; font-size: 12px;">显示</button>
+            </div>
+          </div>
+          <div>
+            <label for="cfg-openai-base-url" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Base URL</label>
+            <input id="cfg-openai-base-url" type="text" class="input" placeholder="https://api.openai.com/v1" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-openai-model" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">模型名称</label>
+              <input id="cfg-openai-model" type="text" class="input" placeholder="gpt-4o" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+            <div style="width: 130px;">
+              <label for="cfg-openai-timeout" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">超时(秒)</label>
+              <input id="cfg-openai-timeout" type="number" class="input" placeholder="120" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: ONES -->
+        <div class="settings-tab-pane" data-settings-pane="ones" style="display: none; flex-direction: column; gap: 12px;">
+          <div>
+            <label for="cfg-ones-base-url" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">ONES 地址</label>
+            <input id="cfg-ones-base-url" type="text" class="input" placeholder="https://ones.topstepht.com:8443" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-ones-email" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">账号 (邮箱)</label>
+              <input id="cfg-ones-email" type="text" class="input" placeholder="例如: name@topstep-tech.com" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+            <div style="flex: 1;">
+              <label for="cfg-ones-password" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">密码</label>
+              <input id="cfg-ones-password" type="password" class="input" placeholder="ONES 密码" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="btn-ones-login" type="button" class="button button-primary" style="padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;">🔑 一键同步凭据</button>
+            <span id="ones-login-status" style="font-size: 12px; color: var(--ink-soft);"></span>
+          </div>
+
+          <details style="margin-top: 4px; padding: 8px 12px; background: var(--surface-soft); border-radius: 6px; border: 1px solid var(--line);">
+            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">▼ 高级选项 (Token / 团队 ID)</summary>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+              <div>
+                <label for="cfg-ones-auth-token" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">访问令牌</label>
+                <div style="display: flex; gap: 6px;">
+                  <input id="cfg-ones-auth-token" type="password" class="input" placeholder="已自动获取" style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                  <button type="button" class="button button-secondary toggle-secret-btn" data-target="cfg-ones-auth-token" style="padding: 4px 10px; font-size: 12px;">显示</button>
+                </div>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <div style="flex: 1;">
+                  <label for="cfg-ones-team-uuid" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">团队 UUID</label>
+                  <input id="cfg-ones-team-uuid" type="text" class="input" placeholder="已自动获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                </div>
+                <div style="flex: 1;">
+                  <label for="cfg-ones-user-id" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">用户 ID</label>
+                  <input id="cfg-ones-user-id" type="text" class="input" placeholder="已自动获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Tab 3: Hardware -->
+        <div class="settings-tab-pane" data-settings-pane="hardware" style="display: none; flex-direction: column; gap: 12px;">
+          <div>
+            <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口端口</label>
+            <input id="cfg-hw-port" type="text" class="input" placeholder="例如 COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            <small style="color: var(--ink-soft); font-size: 11px;">插上手表后，查看 SuperCom 界面左侧新增的 COM 口</small>
+          </div>
+
+          <details style="margin-top: 4px; padding: 8px 12px; background: var(--surface-soft); border-radius: 6px; border: 1px solid var(--line);">
+            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">▼ 高级选项 (波特率 / 通信通道)</summary>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+              <div style="display: flex; gap: 12px;">
+                <div style="flex: 1;">
+                  <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
+                  <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                </div>
+                <div style="flex: 1;">
+                  <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">通信通道</label>
+                  <select id="cfg-hw-transport" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--line);">
+                    <option value="supercom" selected>supercom (内置管道)</option>
+                    <option value="direct">direct (直连串口)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">截图通道</label>
+                <select id="cfg-hw-capture" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--line);">
+                  <option value="mtp" selected>mtp (USB MTP 传输)</option>
+                  <option value="ble">ble (低功耗蓝牙传输)</option>
+                </select>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div id="settings-error-box" class="error-banner" style="display: none; color: #d32f2f; background: #ffebee; padding: 8px 12px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></div>
+      </div>
+
+      <footer class="dialog-actions" style="margin-top: 16px;">
+        <button id="cancel-system-settings" class="button button-secondary" type="button">取消</button>
+        <button id="submit-system-settings" class="button" type="submit">保存设置</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="update-dialog" class="import-dialog" aria-labelledby="update-dialog-title" style="max-width: 520px; width: 90vw;">
+    <header class="dialog-head">
+      <div>
+        <h2 id="update-dialog-title">系统升级提醒</h2>
+      </div>
+      <button id="close-update-dialog" class="dialog-close" type="button" aria-label="关闭">×</button>
+    </header>
+    <div class="dialog-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px 0;">
+      <div style="background: var(--surface-soft); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--line);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; color: var(--ink-soft);">最新版本: <strong id="update-target-version" style="color: #4f46e5; font-size: 15px;">v0.0.0</strong></span>
+          <span style="font-size: 12px; color: var(--ink-soft);">当前版本: <span id="update-current-version">v—</span></span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">📋 更新日志</div>
+        <ul id="update-changelog-list" style="margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-soft); line-height: 1.6;">
+        </ul>
+      </div>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 6px; font-size: 11px; color: #166534;">
+        🛡️ <strong>数据安全承诺</strong>：升级过程仅替换系统程序，您的测试用例 (<code>case_map/</code>)、测试历史记录 (<code>history/</code>) 与环境变量配置 (<code>.env</code>) 将完整保留不受影响。
+      </div>
+    </div>
+    <footer class="dialog-actions" style="margin-top: 8px;">
+      <button id="cancel-update-btn" class="button button-secondary" type="button">稍后提醒</button>
+      <button id="btn-start-upgrade" class="button button-primary" type="button" style="background: #4f46e5; color: white;">🚀 一键自动升级</button>
+    </footer>
+  </dialog>
+
+  <div id="upgrade-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.88); z-index: 99999; color: white; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 20px;">
+    <div class="spinner" style="width: 44px; height: 44px; border-width: 4px; border-top-color: #6366f1;"></div>
+    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">正在自动升级系统...</h3>
+    <div id="upgrade-overlay-status" style="margin: 0; font-size: 13px; color: #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; max-width: 420px; line-height: 1.5;">正在从 NAS 同步最新版本产物并解压暂存...</div>
+    <small style="color: #94a3b8; font-size: 11px;">升级完成后系统将自动重启并刷新页面，请勿关闭窗口</small>
+  </div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime state and project-specific test data
+.runtime/
+artifacts/
+evidence/
+history/
+logs/
+defects/
+defects_img/
+Data/
+case_map/*
+!case_map/README.md
+
+# External profiles and firmware artifacts
+profiles/
+firmware/
+*.up3
+*.prd
+*.dcf
+*.fot
+
+# Build and package output
+.work/
+build/
+dist/
+node_modules/
+
+# Local databases and transient files
+*.db
+*.db-wal
+*.db-shm
+*.log
+*.tmp
+*.bak
+nul
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

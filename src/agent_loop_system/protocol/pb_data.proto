@@ -1,0 +1,196 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+message _DataItem {
+  int32 timestamp = 1;//时间戳，距离2000年始的秒数
+  int32 value = 2;//值：心率，血氧，压力
+}
+
+message _DataItem2 {
+  int32 timestamp = 1;//时间戳，距离2000年始的秒数
+  int32 value = 2;//值：心率，血氧，压力，收缩压
+  int32 value2 = 3;//值2：舒张压
+}
+
+//某一天的活动数据
+message _ActivityDay {
+  int32 s_timestamp = 1;//数据开始的时间戳，距离2000年始的秒数
+  int32 e_timestamp = 2;//数据结束的时间戳，距离2000年始的秒数
+  repeated int32 steps = 3;//每30分钟一个数据，步数，max_count=48
+  repeated int32 calories = 4;//每30分钟一个数据，卡路里小卡，max_count=48
+  repeated int32 distance = 5;//每30分钟一个数据，距离米，max_count=48
+  repeated int32 duration = 6;//每30分钟一个数据，活动时长分钟，max_count=48
+  repeated int32 sport_duration = 7;//每30分钟一个数据，运动时长分钟，max_count=48
+  repeated int32 number = 8;//每30分钟一个数据，活动次数，max_count=48
+}
+
+//某一天的心率数据
+message _HeartRateDay {
+  int32 s_timestamp = 1;//数据开始的时间戳，距离2000年始的秒数
+  int32 e_timestamp = 2;//数据结束的时间戳，距离2000年始的秒数
+  repeated _DataItem manual_data = 3;//手动的心率数据，max_count=200
+  bytes auto_data = 4;//每5分钟一个数据，max_size=288
+  repeated _DataItem resting_data = 5;//静息心率，max_count=10
+  repeated _DataItem max_min_data = 6;//当天最大最小值
+}
+
+//某一天的压力数据
+message _PressureDay {
+  int32 s_timestamp = 1;//数据开始的时间戳，距离2000年始的秒数
+  int32 e_timestamp = 2;//数据结束的时间戳，距离2000年始的秒数
+  repeated _DataItem manual_data = 3;//手动的压力数据，max_count=200
+  bytes auto_data = 4;//每5分钟一个数据，max_size=288
+  repeated _DataItem max_min_data = 5;//当天最大最小值
+}
+
+//某一天的血氧数据
+message _BloodOxygenDay {
+  int32 s_timestamp = 1;//数据开始的时间戳，距离2000年始的秒数
+  int32 e_timestamp = 2;//数据结束的时间戳，距离2000年始的秒数
+  repeated _DataItem manual_data = 3;//手动的血氧数据，max_count=200
+  bytes auto_data = 4;//每5分钟一个数据，max_size=288
+  repeated _DataItem max_min_data = 5;//当天最大最小值
+}
+
+//某一天的血压数据
+message _BloodPressureDay {
+  int32 s_timestamp = 1;//数据开始的时间戳，距离2000年始的秒数
+  int32 e_timestamp = 2;//数据结束的时间戳，距离2000年始的秒数
+  repeated _DataItem2 manual_data = 3;//手动的血压数据，max_count=200。
+  bytes auto_data = 4;  //每5分钟一组(收缩压,舒张压)数据，max_size=576。
+  repeated _DataItem2 max_min_data = 5;//当天最大最小值
+}
+
+//某一天的睡眠数据
+message _SleepDay {
+  int32 timestamp = 1;//这天0点的时间戳，距离2000年始的秒数
+  message Item {
+    int32 timestamp = 1;//时间戳，距离2000年始的秒数
+    int32 duration = 2;//持续时间，单位秒
+    int32 type = 3;//睡眠类型。0清醒，1浅睡，2深睡，3快速眼动
+  }
+  repeated Item items = 2;//睡眠数据，max_count=100
+}
+
+//同步开始
+message _SyncStartRequest {
+  int32 start = 1; //数据开始的时间戳，距离2000年始的秒数
+  int32 end = 2; //数据结束的时间戳，距离2000年始的秒数
+  int32 type = 3;//类型：1心率，2血氧，3血压，4压力，5睡眠，6活动，7运动
+}
+
+//每次手表数据更新时会记录更新时间，如果请求时间小于当前的更新时间，则这次可以不上传数据
+message _SyncStartResponse {
+  int32 type = 1;//类型
+  int32 result = 2;//0 成功进入，1 数据未更新(数据更新时间小于请求开始时间),127未知失败
+}
+
+//同步结束
+message _SyncStopRequest {
+  int32 type = 1;//类型
+}
+
+//实时测量操作(开始/结束)
+message _RealtimeOperation {
+  int32 type = 1;//类型，和同步数据类型一致：1心率，2血氧，3血压，4压力
+  int32 action = 2;//0 停止，1开始
+  int32 duration = 3;//持续时间，秒
+}
+
+//实时测量数据
+message _RealtimeData {
+  int32 value = 2;//值：心率，血氧，压力，收缩压
+  int32 value2 = 3;//值2：舒张压
+}
+
+//运动记录
+message _SportRecord {
+  int32 start = 1;//开始时间戳，距离2000年始的秒数
+  int32 end = 2;//结束时间戳，距离2000年始的秒数
+  int32 type = 3;//运动类型，参考瑞昱运动类型
+  int32 duration = 4;//持续时间，秒
+  int32 steps = 5;//步数
+  float distance = 6;//距离。米
+  float calories = 7;//卡路里。千卡
+  int32 hr_max = 8;//最大心率
+  int32 hr_min = 9;//最小心率
+  int32 hr_avg = 10;//平均心率
+  int32 cadence_max = 11;//最大步频。步/每分
+  int32 cadence_min = 12;//最小步频。步/每分
+  int32 cadence_avg = 13;//平均步频。步/每分
+  int32 pace_max = 14;//最大配速。秒/每千米
+  int32 pace_min = 15;//最小配速。秒/每千米
+  int32 pace_avg = 16;//平均配速。秒/每千米
+  int32 speed_max = 17;//最大速度。米/分钟
+  int32 speed_min = 18;//最小速度。米/分钟
+  int32 speed_avg = 19;//平均速度。米/分钟
+  int32 hr_warm_up = 20;//心率热身时间，单位秒
+  int32 hr_fat_burning = 21;//心率燃脂时间，单位秒
+  int32 hr_aerobic = 22;//心率有氧时间，单位秒
+  int32 hr_anaerobic = 23;//心率无氧时间，单位秒
+  int32 hr_limit = 24;//心率极限时间，单位秒
+  /**
+   * 显示配置:
+   * 1.持续时间
+   * 2.心率
+   * 3.步数
+   * 4.距离
+   * 5.卡路里
+   * 6.平均速度
+   * 7.平均配速
+   * 8.平均步频
+   * 9.平均步幅
+   * 10.累计上升
+   * 11.累计下降
+   * 12.游泳趟数
+   * 13.游泳划水次数
+   * 14.泳姿
+   * 15.游泳划水频率
+   * 16.游泳效率
+   * 17.触发次数
+   * 18.触发频率
+   * 19.中断次数
+   * 20.连续次数
+   */
+  bytes display_configs = 25;//max_size=32
+  string file_detail = 26;//max-len:31//详情文件名
+  /*
+  _SportSwim swim = 26;
+  _SportRopeSkipping rope_skipping = 27;
+  _SportRowingMachine rowing_machine = 28;
+  */
+}
+
+//游泳
+//message _SportSwim {
+//  /**
+//   * 1.自由泳
+//   * 2.蛙泳
+//   * 3.仰泳
+//   * 4.蝶泳
+//   */
+//  int32 style = 1;//泳姿
+//  int32 trips = 2;//游泳趟数
+//  int32 stroke_num = 3;//划水次数
+//  int32 stroke_rate = 4;//划水频率
+//  int32 efficiency = 5;//游泳效率
+//}
+
+//跳绳
+//message _SportRopeSkipping {
+//  int32 count = 1;//跳绳次数
+//  int32 trip_rope = 2;//绊绳次数
+//  int32 max_jump = 3;//最大连续跳绳个数
+//}
+
+//划船机
+//message _SportRowingMachine {
+//  int32 count = 1;//划船次数
+//  int32 max_freq = 2;//最大划桨频率
+//  int32 min_freq = 3;//最小划桨频率
+//  int32 avg_freq = 4;//平均划桨频率
+//}

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package agent_loop_system.protocol;
+
+option java_package = "com.topstep.wearkit.prototb.internal.pb";
+option java_multiple_files = true;
+
+message _AppNotice {
+  int32 type = 1;//类型，见_NotificationFlag
+  string title = 2;//标题，可能为空，max-len=100
+  string content = 3;//内容，可能为空，max-len=800
+}
+
+message _TelephonyNotice {
+  /**
+   * 1:来电
+   * 2:接听
+   * 3:拒接
+   * 4:未接
+   */
+  int32 type = 1;
+  string phone = 2;//电话号码，不为空，max-len=31
+  string name = 3;//姓名，可能为空，max-len=31
+}
+
+message _HangupRequest {
+  string phone = 1;//电话号码，不为空，max-len=31
+  int32 endCall = 2;//App 是否需要结束通话。0不需要 由手环自己做。1需要。
+  string sendSms = 3;//App 是否需要发送短信给来电人。不为空时，发送此短信。max-len=400
+}
+
+message _HangupResponse {
+  int32 endCall = 1;//挂断结果。0成功，1失败没权限，127失败未知
+  int32 sendSms = 2;//短信结果。0成功，1失败没权限，127失败未知
+}
+
+message _SOSRequest {
+  string phone = 1;//电话号码，不为空，max-len=31
+}
+
+message _QuickCmd {
+  string cmd = 1;//快速测试指令。如 TOP5STEP:STEP:123;
+}
