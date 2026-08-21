@@ -319,38 +319,6 @@ function moduleCategory(moduleName) {
   return FUNCTION_CATEGORY_NAMES.find(name => FUNCTION_CATEGORIES[name].includes(moduleName)) || '其他';
 }
 
-function caseMatchesState(item, state) {
-  if (!state || state === 'all') return true;
-  if (state === 'externally_explored') return Boolean(item.external_explored);
-  return String(item.maturity_state || 'unexplored') === state;
-}
-
-function filterCatalogItems(items, {query = '', state = 'all', category = 'all', module = ''} = {}) {
-  const normalizedQuery = String(query || '').trim().toLocaleLowerCase('zh-CN');
-  const categoryModules = category !== 'all' && FUNCTION_CATEGORIES[category] ? FUNCTION_CATEGORIES[category] : null;
-  return (items || []).filter(item => {
-    const sheet = String(item.file_sheet || item.sheet || '');
-    if (module && sheet !== module) return false;
-    if (categoryModules && !categoryModules.includes(sheet)) return false;
-    if (!caseMatchesState(item, state)) return false;
-    if (!normalizedQuery) return true;
-    const searchText = [item.case_id, item.sheet, item.precondition_text, item.steps_text, item.expected_text, item.note]
-      .map(value => String(value || '').toLocaleLowerCase('zh-CN')).join('\n');
-    return searchText.includes(normalizedQuery);
-  });
-}
-
-function summarizeCases(items = []) {
-  const result = {all: 0, unexplored: 0, externally_explored: 0, explored_unsolidified: 0, solidified: 0};
-  for (const item of items) {
-    result.all += 1;
-    const maturity = String(item.maturity_state || 'unexplored');
-    if (Object.hasOwn(result, maturity)) result[maturity] += 1;
-    if (item.external_explored) result.externally_explored += 1;
-  }
-  return result;
-}
-
 function verdictCounts(items = []) {
   const counts = {PASS: 0, FAIL: 0, ERROR: 0, CANNOT_VERIFY: 0, PENDING: 0, RUNNING: 0};
   for (const item of items) {
@@ -1164,15 +1132,11 @@ function renderCaseCategoryTabs(activeCategory = 'all') {
   return `<button type="button" class="${activeCategory === 'all' ? 'is-active' : ''}" data-case-category="all">全部</button>${FUNCTION_CATEGORY_NAMES.map(name => `<button type="button" class="${activeCategory === name ? 'is-active' : ''}" data-case-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('')}`;
 }
 
-function renderModuleSidebar(items = [], activeCategory = 'all', activeModule = '') {
-  const counts = new Map();
-  for (const item of items) {
-    const sheet = String(item.file_sheet || item.sheet || '未分类');
-    counts.set(sheet, (counts.get(sheet) || 0) + 1);
-  }
+function renderModuleSidebar(moduleCounts = {}, catalogTotal = 0, activeCategory = 'all', activeModule = '') {
+  const counts = new Map(Object.entries(moduleCounts || {}));
   const modules = activeCategory === 'all' ? ALL_FUNCTION_MODULES : (FUNCTION_CATEGORIES[activeCategory] || []);
   const categoryTotal = modules.reduce((total, name) => total + Number(counts.get(name) || 0), 0);
-  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${activeCategory === 'all' ? items.length : categoryTotal}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
+  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${activeCategory === 'all' ? Number(catalogTotal || 0) : categoryTotal}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
 }
 
 async function refreshTests(query, page, {
@@ -1190,25 +1154,22 @@ async function refreshTests(query, page, {
   if (!list || !pager || !count) return;
   list.classList.add('is-loading');
   try {
-    const catalog = await loadCaseCatalog(project, {force});
-    if (token !== testListRequestToken) return;
     if (category !== 'all' && !Object.hasOwn(FUNCTION_CATEGORIES, category)) category = 'all';
     if (module && (!ALL_FUNCTION_MODULES.includes(module) || (category !== 'all' && !FUNCTION_CATEGORIES[category].includes(module)))) module = '';
-    const scopeItems = filterCatalogItems(catalog.items, {query, state: 'all', category, module});
-    const filteredItems = scopeItems.filter(item => caseMatchesState(item, state));
-    const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
-    const safePage = Math.min(Math.max(1, Number(page) || 1), totalPages);
-    const pageItems = filteredItems.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-    const payload = {
-      ...catalog,
-      items: pageItems,
-      page: safePage,
-      page_size: PAGE_SIZE,
-      total: filteredItems.length,
-      total_pages: totalPages,
-      state_filter: state,
-      summary: summarizeCases(scopeItems)
-    };
+    if (force) invalidateCaseCatalog(project);
+    const request = new URLSearchParams({
+      project,
+      q: query,
+      state,
+      page: String(page),
+      page_size: String(PAGE_SIZE)
+    });
+    const requestedModules = module
+      ? [module]
+      : (category !== 'all' ? FUNCTION_CATEGORIES[category] : []);
+    requestedModules.forEach(name => request.append('module', name));
+    const payload = await api(`/api/tests?${request.toString()}`);
+    if (token !== testListRequestToken) return;
     ensureTestSelectionProject(payload.project);
     rememberProject(payload.project);
     const projectTarget = document.querySelector('#test-project-target');
@@ -1220,7 +1181,7 @@ async function refreshTests(query, page, {
     const categoryTabs = document.querySelector('#case-category-tabs');
     if (categoryTabs) categoryTabs.innerHTML = renderCaseCategoryTabs(category);
     const moduleSidebar = document.querySelector('#case-module-sidebar');
-    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(catalog.items, category, module);
+    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(payload.module_counts, payload.catalog_total, category, module);
     updateBatchLaunch(payload.batch_summary);
     const returnTo = buildTestListUrl(query, payload.page || 1, selected, payload.project, category, module);
     list.innerHTML = testRows(currentTestPageItems, query, selected, returnTo);
@@ -1271,7 +1232,7 @@ async function renderTests() {
         </div>
       </div>
       <div class="case-workspace-grid">
-        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar([], initial.category, initial.module)}</aside>
+        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar({}, 0, initial.category, initial.module)}</aside>
         <div class="case-main-column">
           <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards({}, initial.state)}</section>
           <details class="batch-launch case-batch-launch">
@@ -3511,7 +3472,7 @@ function OverviewPage(project = currentProject()) {
   return {
     async load() {
       const [catalog, active, defects, repair, reports, environments] = await Promise.all([
-        loadCaseCatalog(project),
+        api(`/api/tests/overview?project=${encodeURIComponent(project)}&recent_limit=7&exception_limit=6`),
         optionalApi('/api/tests/active'),
         optionalApi('/api/defects?page=1&page_size=6'),
         optionalApi('/api/run/active'),
@@ -3524,15 +3485,12 @@ function OverviewPage(project = currentProject()) {
       const {catalog, active, defects, repair, reports, environments, refreshedAt} = data;
       const jobs = active.data ? activeTestJobs(active.data) : [];
       const activeBatch = jobs.find(job => job.type === 'batch') || null;
-      const verdicts = verdictCounts(catalog.items);
-      const recentExceptions = catalog.items
-        .filter(item => ['FAIL', 'ERROR', 'CANNOT_VERIFY', 'SKIP'].includes(String(item.latest_verdict || '').toUpperCase()))
-        .sort((left, right) => String(right.last_run_at || '').localeCompare(String(left.last_run_at || '')));
-      const recentCases = catalog.items.filter(item => item.last_run_at)
-        .sort((left, right) => String(right.last_run_at || '').localeCompare(String(left.last_run_at || '')));
+      const verdicts = catalog.verdict_summary || verdictCounts([]);
+      const recentExceptions = catalog.recent_exceptions || [];
+      const recentCases = catalog.recent_items || [];
       const profiles = catalog.projects || Object.values(TEST_PROJECTS);
       const environmentItems = environments.data?.items || [];
-      const total = Number(catalog.summary?.all || catalog.items.length);
+      const total = Number(catalog.summary?.all || 0);
       const completed = activeBatch ? Number(activeBatch.completed || 0) : 0;
       const batchTotal = activeBatch ? Number(activeBatch.total || 0) : 0;
       const percent = batchTotal ? Math.round(completed * 100 / batchTotal) : 0;
@@ -3545,7 +3503,7 @@ function OverviewPage(project = currentProject()) {
       return `${Components.pageHeader({title: '项目总览', intro: '实时掌握测试执行状态、用例质量与环境健康度', updatedAt: formatTime(refreshedAt), actions: `<button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
         <section class='workspace-panel environment-overview-panel'><header><div><h2>环境就绪状态</h2><p>协议来自项目配置；就绪状态只采用真实环境检查结果</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project))}'>环境中心 ›</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.id === profile.project || item.project === profile.project), project)).join('')}</div></section>
         <section class='workspace-kpi-grid'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '已固化', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最新结果 PASS', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最新结果 FAIL', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最新结果 ERROR', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
-        <section class='overview-primary-grid'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article><article class='workspace-panel quick-actions-panel'><header><div><h2>快捷操作</h2><p>常用入口</p></div></header><div class='quick-action-grid'><a href='${escapeHtml(pageUrl('/cases', project))}'>${icon('runs', 22)}<span><strong>新建执行</strong><small>选择并运行用例</small></span></a><a href='${escapeHtml(pageUrl('/cases', project))}'>${icon('plus', 22)}<span><strong>添加用例</strong><small>新建或导入</small></span></a><a href='${escapeHtml(pageUrl('/reports', project))}'>${icon('reports', 22)}<span><strong>测试报告</strong><small>查看结果快照</small></span></a><a href='${escapeHtml(pageUrl('/defects', project))}'>${icon('defects', 22)}<span><strong>缺陷闭环</strong><small>处理失败缺陷</small></span></a><a href='${escapeHtml(pageUrl('/environments', project))}'>${icon('environments', 22)}<span><strong>环境中心</strong><small>核对测试链路</small></span></a></div></article></section>
+        <section class='overview-primary-grid'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
         <section class='overview-secondary-grid'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel'><header><div><h2>报告概览</h2><p>${reportAvailable ? '报告聚合接口' : '当前用例最新结果快照'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable ? Components.unavailableState('趋势数据暂不可用', '当前后端未提供 /api/reports/summary，未伪造历史趋势。') : ''}</article></section>
         <section class='workspace-panel defect-overview-strip'><header><div><h2>缺陷闭环概览</h2><p>缺陷队列与当前自动修复任务</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷闭环</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${Number(defectSummary.all || 0)}</strong></div><div><span>已通过</span><strong>${Number(defectSummary.passed || 0)}</strong></div><div><span>失败</span><strong>${Number(defectSummary.failed || 0)}</strong></div><div><span>待处理</span><strong>${Number(defectSummary.pending || 0)}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
         <section class='workspace-panel daily-digest'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '来自报告聚合接口' : '报告接口尚未提供，空缺项不以 0 冒充'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
@@ -3599,19 +3557,19 @@ function ExecutionPage(project = currentProject()) {
   return {
     async load() {
       const view = ['queue', 'running', 'completed', 'interrupted'].includes(new URLSearchParams(location.search).get('view')) ? new URLSearchParams(location.search).get('view') : 'running';
-      const [catalog, active, jobs] = await Promise.all([
-        loadCaseCatalog(project),
+      const [recent, active, jobs] = await Promise.all([
+        optionalApi(`/api/tests/recent?project=${encodeURIComponent(project)}&limit=8`),
         optionalApi('/api/tests/active'),
         optionalApi(`/api/tests/jobs?project=${encodeURIComponent(project)}&status=${encodeURIComponent(view)}&page=1&page_size=20`)
       ]);
-      return {catalog, active, jobs, view};
+      return {recent, active, jobs, view};
     },
     render(data) {
       const activeJobs = data.active.data ? activeTestJobs(data.active.data).filter(job => !job.project || job.project === project) : [];
       const activeJob = activeJobs.find(job => job.type === 'batch') || activeJobs[0] || null;
       const jobItems = data.jobs.data?.items || [];
-      const recent = data.catalog.items.filter(item => item.last_run_at).sort((left, right) => String(right.last_run_at).localeCompare(String(left.last_run_at)));
-      const recentResults = recent.slice(0, 8).map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, pageUrl('/runs', project)))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
+      const recentItems = data.recent.data?.items || [];
+      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, pageUrl('/runs', project)))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
       const listArea = data.view === 'running'
         ? renderActiveExecution(activeJob, project)
         : data.jobs.data
@@ -3743,13 +3701,17 @@ function ReportsPage(project = currentProject()) {
       const filters = reportParams();
       const query = new URLSearchParams({project, from: filters.from, to: filters.to});
       if (filters.module) query.set('module', filters.module);
-      const [catalog, summary, runs] = await Promise.all([
-        loadCaseCatalog(project),
+      const [summary, runs] = await Promise.all([
         optionalApi(`/api/reports/summary?${query.toString()}`),
         optionalApi(`/api/reports/runs?scope=${filters.view === 'batches' ? 'batch' : 'case'}&${query.toString()}&page=1&page_size=20`)
       ]);
-      const report = summary.data || buildSnapshotReport(catalog.items, filters);
-      return {catalog, summary, runs, report, filters};
+      let fallbackItems = [];
+      if (!summary.data) {
+        const catalog = await loadCaseCatalog(project);
+        fallbackItems = catalog.items || [];
+      }
+      const report = summary.data || buildSnapshotReport(fallbackItems, filters);
+      return {summary, runs, report, filters};
     },
     render(data) {
       const {report, filters, summary, runs} = data;
@@ -3822,16 +3784,16 @@ function environmentCheckRows(checks = []) {
 function EnvironmentPage(project = currentProject()) {
   return {
     async load() {
-      const [catalog, config, environments, update] = await Promise.all([
-        loadCaseCatalog(project),
+      const [projects, config, environments, update] = await Promise.all([
+        api('/api/tests/projects'),
         optionalApi('/api/config'),
         optionalApi('/api/environments'),
         optionalApi('/api/update-check')
       ]);
-      return {catalog, config, environments, update, section: environmentSection()};
+      return {projects, config, environments, update, section: environmentSection()};
     },
     render(data) {
-      const profiles = data.catalog.projects || [];
+      const profiles = data.projects.items || [];
       const profile = profiles.find(item => item.project === project) || testProject(project);
       const environmentItems = data.environments.data?.items || [];
       const environmentItem = environmentItems.find(item => item.id === project || item.project === project) || null;

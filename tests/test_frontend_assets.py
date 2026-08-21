@@ -235,6 +235,39 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertIn(".test-metric-group {", self.stylesheet)
         self.assertNotIn(".asset-metrics", self.stylesheet)
 
+    def test_case_catalog_cold_start_uses_compact_server_queries(self) -> None:
+        for token in (
+            "const payload = await api(`/api/tests?${request.toString()}`);",
+            "request.append('module', name)",
+            "payload.module_counts",
+            "/api/tests/overview?",
+            "/api/tests/recent?",
+            "api('/api/tests/projects')",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "const catalog = await loadCaseCatalog(project, {force});",
+            self.javascript,
+        )
+        self.assertEqual(self.javascript.count("loadCaseCatalog(project)"), 1)
+
+    def test_workspace_typography_scale_and_overview_shortcuts_are_clean(self) -> None:
+        for token in (
+            "--font-size-micro: 11px",
+            "--font-size-caption: 12px",
+            "--font-size-secondary: 13px",
+            "--font-size-table: 14px",
+            "--font-size-body: 15px",
+            "--font-size-section-title: 17px",
+            "font-size: var(--font-size-body);",
+            "font-size: var(--font-size-table);",
+            "grid-template-columns: 1.08fr .92fr;",
+        ):
+            self.assertIn(token, self.stylesheet)
+        self.assertNotIn("快捷操作", self.javascript)
+        self.assertNotIn(".quick-action-grid", self.stylesheet)
+        self.assertNotIn(".quick-actions-panel", self.stylesheet)
+
     def test_agent_test_queue_defaults_to_all_cases(self) -> None:
         for token in (
             "const DEFAULT_TEST_STATE = 'all';",
