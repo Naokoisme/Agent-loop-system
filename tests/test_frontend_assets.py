@@ -235,6 +235,22 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertIn(".test-metric-group {", self.stylesheet)
         self.assertNotIn(".asset-metrics", self.stylesheet)
 
+    def test_case_catalog_cold_start_uses_compact_server_queries(self) -> None:
+        for token in (
+            "const payload = await api(`/api/tests?${request.toString()}`);",
+            "request.append('module', name)",
+            "payload.module_counts",
+            "/api/tests/overview?",
+            "/api/tests/recent?",
+            "api('/api/tests/projects')",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "const catalog = await loadCaseCatalog(project, {force});",
+            self.javascript,
+        )
+        self.assertEqual(self.javascript.count("loadCaseCatalog(project)"), 1)
+
     def test_agent_test_queue_defaults_to_all_cases(self) -> None:
         for token in (
             "const DEFAULT_TEST_STATE = 'all';",

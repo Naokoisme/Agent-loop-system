@@ -561,11 +561,24 @@ class FrontendDataTest(unittest.TestCase):
             "error": 0,
             "pass": 0,
         })
+        self.assertEqual(payload["module_counts"], {"计算器": 2})
+        self.assertEqual(payload["catalog_total"], 2)
+        self.assertEqual(payload["verdict_summary"]["PENDING"], 2)
+        queried = self.cases.list(query="显示正确")
+        self.assertEqual(queried["summary"]["all"], 1)
+        self.assertEqual([row["case_id"] for row in queried["items"]], ["CALC_001"])
+        self.assertEqual(
+            [row["case_id"] for row in self.cases.list(modules={"计算器"})["items"]],
+            ["CALC_001", "CALC_002"],
+        )
+        missing_module = self.cases.list(modules={"不存在的模块"})
+        self.assertEqual(missing_module["items"], [])
+        self.assertEqual(missing_module["summary"]["all"], 0)
+        self.assertEqual(missing_module["module_counts"], {"计算器": 2})
         self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="solidified")["items"]], ["CALC_001"])
         self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="externally_explored")["items"]], ["CALC_001"])
         self.assertEqual([row["case_id"] for row in self.cases.list(state_filter="unexplored")["items"]], ["CALC_002"])
         self.assertEqual(self.cases.list(state_filter="explored_unsolidified")["items"], [])
-        self.assertEqual([row["case_id"] for row in self.cases.list(query="显示正确")["items"]], ["CALC_001"])
         detail = self.cases.get("计算器", "CALC_001")
         self.assertEqual(detail["precondition_text"], "已进入计算器")
         self.assertEqual(detail["actions"], ["srv_quick_cmd send TOP5STEP:TP_CLICK:10,20,1;"])
@@ -829,6 +842,20 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(summarize.call_count, 1)
             self.assertEqual(first["items"][0]["latest_verdict"], "FAIL")
             self.assertEqual(second["items"][0]["history_count"], 1)
+            with patch.object(
+                self.cases,
+                "_all",
+                side_effect=AssertionError("recent 不应重建完整用例目录"),
+            ):
+                recent = self.cases.recent(limit=1)
+            self.assertEqual(recent["items"][0]["case_id"], "CALC_001")
+            self.assertEqual(recent["items"][0]["latest_verdict"], "FAIL")
+
+            with patch.object(self.cases, "_all", wraps=self.cases._all) as load_all:
+                overview = self.cases.overview(recent_limit=1, exception_limit=1)
+            load_all.assert_called_once_with("620C_W6830")
+            self.assertEqual(overview["recent_items"][0]["case_id"], "CALC_001")
+            self.assertEqual(overview["recent_exceptions"][0]["latest_verdict"], "FAIL")
 
             second_id = record("PASS")
             updated = self.cases.list()
@@ -1364,6 +1391,21 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/tests?state=all&page=1&page_size=20", timeout=3) as response:
             payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual([item["case_id"] for item in payload["items"]], ["CALC_001", "CALC_002"])
+        self.assertEqual(payload["module_counts"], {"计算器": 2})
+        with urlopen(base + "/api/tests?module=%E4%B8%8D%E5%AD%98%E5%9C%A8", timeout=3) as response:
+            missing_module = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(missing_module["items"], [])
+        self.assertEqual(missing_module["summary"]["all"], 0)
+        with urlopen(base + "/api/tests/projects", timeout=3) as response:
+            projects = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(len(projects["items"]), 3)
+        with urlopen(base + "/api/tests/overview", timeout=3) as response:
+            overview = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(overview["catalog_total"], 2)
+        self.assertEqual(overview["recent_items"], [])
+        with urlopen(base + "/api/tests/recent?limit=8", timeout=3) as response:
+            recent = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(recent["items"], [])
         with urlopen(base + "/api/tests/%E8%AE%A1%E7%AE%97%E5%99%A8/CALC_001", timeout=3) as response:
             detail = json.loads(response.read().decode("utf-8"))
         self.assertEqual(detail["expected_text"], "显示正确")

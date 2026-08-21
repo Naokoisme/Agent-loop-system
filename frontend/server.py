@@ -1718,6 +1718,78 @@ class CaseMapRepository:
             "issues": self._unique_issues(issues + list(rollback_issues or [])),
         }
 
+    @staticmethod
+    def _history_fields(history: dict[str, Any] | None) -> dict[str, Any]:
+        latest = history.get("latest") if history else None
+        history_count = int(history.get("history_count") or 0) if history else 0
+        latest_verdict = str(latest.get("verdict") or "").upper() if latest else ""
+        if history_count == 0:
+            normalized_verdict = "PENDING"
+        elif latest_verdict == "SKIP":
+            normalized_verdict = "CANNOT_VERIFY"
+        elif latest_verdict in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
+            normalized_verdict = latest_verdict
+        else:
+            normalized_verdict = "ERROR"
+        return {
+            "last_run_at": latest.get("timestamp") if latest else None,
+            "history_count": history_count,
+            "latest_verdict": normalized_verdict,
+        }
+
+    @staticmethod
+    def _maturity_summary(rows: list[dict[str, Any]]) -> dict[str, int]:
+        return {
+            "all": len(rows),
+            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
+            "externally_explored": sum(bool(row["external_explored"]) for row in rows),
+            "explored_unsolidified": sum(
+                row["maturity_state"] == "explored_unsolidified" for row in rows
+            ),
+            "solidified": sum(bool(row["is_promoted"]) for row in rows),
+        }
+
+    @classmethod
+    def _batch_summary(cls, rows: list[dict[str, Any]]) -> dict[str, int]:
+        return {
+            category: sum(cls.run_category(row) == category for row in rows)
+            for category in cls.RUN_CATEGORIES
+        }
+
+    @staticmethod
+    def _module_counts(rows: list[dict[str, Any]]) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for row in rows:
+            sheet = str(row.get("file_sheet") or row.get("sheet") or "未分类")
+            counts[sheet] = counts.get(sheet, 0) + 1
+        return counts
+
+    @staticmethod
+    def _verdict_summary(rows: list[dict[str, Any]]) -> dict[str, int]:
+        counts = {
+            "PASS": 0,
+            "FAIL": 0,
+            "ERROR": 0,
+            "CANNOT_VERIFY": 0,
+            "PENDING": 0,
+            "RUNNING": 0,
+        }
+        for row in rows:
+            verdict = str(row.get("latest_verdict") or "PENDING").upper()
+            key = verdict if verdict in counts else "PENDING"
+            counts[key] += 1
+        return counts
+
+    @staticmethod
+    def _compact_result(row: dict[str, Any]) -> dict[str, Any]:
+        return {
+            key: row.get(key)
+            for key in (
+                "project", "case_id", "sheet", "file_sheet", "last_run_at",
+                "history_count", "latest_verdict",
+            )
+        }
+
     def _all(
         self,
         project: str = DEFAULT_TEST_PROJECT,
@@ -1760,18 +1832,7 @@ class CaseMapRepository:
                     )},
                 }
                 history = history_index.get((path.stem, case_id))
-                latest = history.get("latest") if history else None
-                row["last_run_at"] = latest.get("timestamp") if latest else None
-                row["history_count"] = int(history.get("history_count") or 0) if history else 0
-                latest_verdict = str(latest.get("verdict") or "").upper() if latest else ""
-                if row["history_count"] == 0:
-                    row["latest_verdict"] = "PENDING"
-                elif latest_verdict == "SKIP":
-                    row["latest_verdict"] = "CANNOT_VERIFY"
-                elif latest_verdict in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
-                    row["latest_verdict"] = latest_verdict
-                else:
-                    row["latest_verdict"] = "ERROR"
+                row.update(self._history_fields(history))
                 row["external_explored"] = case_id in externally_explored_ids
                 # 外部探索账本与映射固化是两条独立事实轴。显式的站内候选
                 # 复跑也能形成 PROMOTED，但绝不能伪造一条“外部探索”记录。
@@ -1794,6 +1855,7 @@ class CaseMapRepository:
         page_size: int = 20,
         state_filter: str = "all",
         project: str = DEFAULT_TEST_PROJECT,
+        modules: set[str] | None = None,
     ) -> dict[str, Any]:
         project_meta = _test_project(project)
         project = project_meta["project"]
@@ -1801,19 +1863,10 @@ class CaseMapRepository:
         if state_filter not in self.FILTERS:
             raise ValueError("state 参数不合法")
         rows = self._all(project)
-        batch_summary = {
-            category: sum(self.run_category(row) == category for row in rows)
-            for category in self.RUN_CATEGORIES
-        }
-        summary = {
-            "all": len(rows),
-            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
-            "externally_explored": sum(row["external_explored"] for row in rows),
-            "explored_unsolidified": sum(
-                row["maturity_state"] == "explored_unsolidified" for row in rows
-            ),
-            "solidified": sum(row["is_promoted"] for row in rows),
-        }
+        batch_summary = self._batch_summary(rows)
+        module_counts = self._module_counts(rows)
+        verdict_summary = self._verdict_summary(rows)
+        catalog_total = len(rows)
         keywords = [word.casefold() for word in query.strip().split() if word]
         if keywords:
             rows = [
@@ -1830,6 +1883,12 @@ class CaseMapRepository:
                     for word in keywords
                 )
             ]
+        normalized_modules = {
+            str(module).strip() for module in (modules or set()) if str(module).strip()
+        }
+        if normalized_modules:
+            rows = [row for row in rows if row["file_sheet"] in normalized_modules]
+        summary = self._maturity_summary(rows)
         if state_filter == "unexplored":
             rows = [row for row in rows if row["maturity_state"] == "unexplored"]
         elif state_filter == "externally_explored":
@@ -1851,11 +1910,79 @@ class CaseMapRepository:
             "total_pages": total_pages,
             "summary": summary,
             "batch_summary": batch_summary,
+            "module_counts": module_counts,
+            "verdict_summary": verdict_summary,
+            "catalog_total": catalog_total,
             "state_filter": state_filter,
             **{key: project_meta[key] for key in (
                 "project", "project_label", "execution_target", "execution_target_label"
             )},
             "projects": _test_project_options(),
+        }
+
+    def overview(
+        self,
+        *,
+        project: str = DEFAULT_TEST_PROJECT,
+        recent_limit: int = 7,
+        exception_limit: int = 6,
+    ) -> dict[str, Any]:
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        rows = self._all(project)
+        recent = sorted(
+            (row for row in rows if row.get("last_run_at")),
+            key=lambda row: str(row.get("last_run_at") or ""),
+            reverse=True,
+        )
+        exceptions = [
+            row for row in recent
+            if str(row.get("latest_verdict") or "").upper()
+            in {"FAIL", "ERROR", "CANNOT_VERIFY", "SKIP"}
+        ]
+        return {
+            "summary": self._maturity_summary(rows),
+            "batch_summary": self._batch_summary(rows),
+            "module_counts": self._module_counts(rows),
+            "verdict_summary": self._verdict_summary(rows),
+            "catalog_total": len(rows),
+            "recent_items": [
+                self._compact_result(row) for row in recent[:recent_limit]
+            ],
+            "recent_exceptions": [
+                self._compact_result(row) for row in exceptions[:exception_limit]
+            ],
+            **{key: project_meta[key] for key in (
+                "project", "project_label", "execution_target", "execution_target_label"
+            )},
+            "projects": _test_project_options(),
+        }
+
+    def recent(
+        self,
+        *,
+        project: str = DEFAULT_TEST_PROJECT,
+        limit: int = 8,
+    ) -> dict[str, Any]:
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        rows: list[dict[str, Any]] = []
+        for (sheet, case_id), history in self.history.summary_index(project=project).items():
+            row = {
+                "project": project,
+                "case_id": case_id,
+                "sheet": sheet,
+                "file_sheet": sheet,
+                **self._history_fields(history),
+            }
+            if row["last_run_at"]:
+                rows.append(row)
+        rows.sort(key=lambda row: str(row.get("last_run_at") or ""), reverse=True)
+        return {
+            "items": rows[:limit],
+            **{key: project_meta[key] for key in (
+                "project", "project_label", "execution_target", "execution_target_label"
+            )},
         }
 
     def get(
@@ -3874,12 +4001,37 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"status": "ok"})
             return
 
+        if path == "/api/tests/projects":
+            self._json({"items": _test_project_options()})
+            return
+
+        if path == "/api/tests/overview":
+            project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
+            recent_limit = self._positive_int(query, "recent_limit", 7, maximum=20)
+            exception_limit = self._positive_int(query, "exception_limit", 6, maximum=20)
+            self._json(self.app.cases.overview(
+                project=project,
+                recent_limit=recent_limit,
+                exception_limit=exception_limit,
+            ))
+            return
+
+        if path == "/api/tests/recent":
+            project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
+            limit = self._positive_int(query, "limit", 8, maximum=50)
+            self._json(self.app.cases.recent(project=project, limit=limit))
+            return
+
         if path == "/api/tests":
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
             keyword = query.get("q", [""])[0]
             state_filter = query.get("state", ["all"])[0]
             project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
+            modules = {
+                str(value).strip() for value in query.get("module", [])
+                if str(value).strip()
+            }
             self._json(
                 self.app.cases.list(
                     query=keyword,
@@ -3887,6 +4039,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     page_size=page_size,
                     state_filter=state_filter,
                     project=project,
+                    modules=modules,
                 )
             )
             return
