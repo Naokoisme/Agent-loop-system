@@ -377,6 +377,29 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
         self.assertIn(".batch-active-row", self.stylesheet)
 
+    def test_workspace_live_polling_updates_sections_without_rerouting(self) -> None:
+        for token in (
+            "function patchRenderedSections(root, markup, attributeName)",
+            "patchRenderedSections(root, controller.render(nextData), 'data-overview-live')",
+            "patchRenderedSections(root, controller.render(nextData), 'data-execution-live')",
+            "refreshTimer = setTimeout(() => refreshLiveSections(root), 2000)",
+            "pollTimer = setTimeout(() => refreshLiveSections(root), 2000)",
+            "root.addEventListener('click', clickHandler)",
+            "window.scrollTo(scrollX, scrollY)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("setTimeout(() => route(), 2000)", self.javascript)
+
+    def test_empty_checkpoint_gallery_is_compact(self) -> None:
+        for token in (
+            ".checkpoint-grid .evidence-frame img { aspect-ratio: 402 / 256; }",
+            ".checkpoint-grid .evidence-missing {",
+            "grid-column: 1 / -1;",
+            "min-height: 96px;",
+            "aspect-ratio: auto;",
+        ):
+            self.assertIn(token, self.stylesheet)
+
 
 if __name__ == "__main__":
     unittest.main()

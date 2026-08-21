@@ -2015,6 +2015,43 @@ class FrontendDataTest(unittest.TestCase):
         self.assertIsNotNone(snapshot["recent_results"][0]["history_id"])
         self.assertEqual(len(snapshot["live_screenshots"]), 1)
 
+    def test_case_test_manager_exposes_dynamic_exploration_screenshots(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        job_id = "live-step-screenshots"
+        token = "0001-CALC_001"
+        current_dir = self.paths.runtime_jobs / job_id / token
+        current_dir.mkdir(parents=True, exist_ok=True)
+        (current_dir / "step_00.bmp").write_bytes(b"BM-step-0")
+        (current_dir / "step_01.bmp").write_bytes(b"BM-step-1")
+        (current_dir / "step_00_capture_original.bmp").write_bytes(b"BM-sidecar")
+        manager._jobs[job_id] = {
+            "id": job_id,
+            "type": "batch",
+            "status": "running",
+            "total": 1,
+            "completed": 0,
+            "current_runtime_dir": str(current_dir),
+            "current_case_data": {"verification_points": []},
+            "current_case_token": token,
+        }
+
+        snapshot = manager.get(job_id)
+
+        self.assertIsNotNone(snapshot)
+        self.assertEqual(
+            [item["label"] for item in snapshot["live_screenshots"]],
+            ["探索步骤 1", "探索步骤 2"],
+        )
+        self.assertTrue(snapshot["live_screenshots"][0]["url"].endswith("/step_00.bmp"))
+        self.assertEqual(
+            manager.screenshot_path(job_id, token, "step_01.bmp"),
+            current_dir / "step_01.bmp",
+        )
+        with self.assertRaisesRegex(ValueError, "截图文件名不合法"):
+            manager.screenshot_path(job_id, token, "step_00_capture_original.bmp")
+        with self.assertRaises(ValueError):
+            manager.screenshot_path(job_id, token, "../step_00.bmp")
+
     def test_hardware_batch_stops_before_cases_when_external_session_is_inactive(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         job_id = "hardware-preflight"
@@ -2599,6 +2636,29 @@ class FrontendDataTest(unittest.TestCase):
             import io
             wb = openpyxl.load_workbook(io.BytesIO(xlsx_bytes))
             self.assertIn("自动化测试用例_v1", wb.sheetnames)
+            ws = wb["自动化测试用例_v1"]
+            self.assertEqual(ws.freeze_panes, "A2")
+            self.assertEqual(ws.auto_filter.ref, f"A1:I{ws.max_row}")
+            self.assertFalse(ws.sheet_view.showGridLines)
+            self.assertEqual(ws.page_setup.orientation, "landscape")
+            self.assertEqual(ws.column_dimensions["E"].width, 46)
+            self.assertEqual(ws.row_dimensions[1].height, 28)
+
+            header = ws["A1"]
+            self.assertEqual(header.font.name, "宋体")
+            self.assertEqual(header.font.sz, 11)
+            self.assertTrue(header.font.bold)
+            self.assertEqual(header.fill.fgColor.rgb[-6:], "1F4E78")
+            self.assertEqual(header.border.left.style, "thin")
+
+            case_row = next(row for row in ws.iter_rows(min_row=2) if row[1].value == "CALC_NEW_01")
+            self.assertEqual(case_row[0].font.name, "宋体")
+            self.assertEqual(case_row[1].font.name, "Times New Roman")
+            self.assertEqual(case_row[1].font.sz, 10)
+            self.assertTrue(case_row[4].alignment.wrap_text)
+            self.assertEqual(case_row[4].alignment.vertical, "top")
+            self.assertEqual(case_row[4].border.bottom.style, "thin")
+            self.assertGreaterEqual(ws.row_dimensions[case_row[0].row].height, 22)
 
     def test_excel_import_preview_and_confirm(self) -> None:
         _, base = self._server()
@@ -2923,6 +2983,39 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(by_verdict["CANNOT_VERIFY"]["批次编号"], "batch-cannot-verify")
         self.assertEqual(detail.freeze_panes, "A2")
         self.assertEqual(detail.auto_filter.ref, "A1:O4")
+
+        summary_header = summary["A1"]
+        self.assertEqual(summary_header.font.name, "宋体")
+        self.assertEqual(summary_header.font.sz, 11)
+        self.assertTrue(summary_header.font.bold)
+        self.assertEqual(summary_header.border.left.style, "thin")
+        self.assertEqual(summary["B1"].font.name, "Times New Roman")
+        self.assertEqual(summary["B1"].font.sz, 10)
+        self.assertEqual(summary.column_dimensions["A"].width, 22)
+        self.assertEqual(summary.page_setup.orientation, "portrait")
+
+        module_sheet = workbook["高频失败模块"]
+        self.assertEqual(module_sheet["A1"].font.name, "宋体")
+        self.assertEqual(module_sheet["A1"].font.sz, 11)
+        self.assertEqual(module_sheet["A1"].border.bottom.style, "thin")
+        self.assertEqual(module_sheet.freeze_panes, "A2")
+
+        verdict_rows = {
+            detail.cell(row_index, 5).value: row_index
+            for row_index in range(2, detail.max_row + 1)
+        }
+        error_row = verdict_rows["ERROR"]
+        self.assertEqual(detail["A1"].font.name, "宋体")
+        self.assertEqual(detail["A1"].font.sz, 11)
+        self.assertEqual(detail.cell(error_row, 3).font.name, "Times New Roman")
+        self.assertEqual(detail.cell(error_row, 5).font.name, "Times New Roman")
+        self.assertTrue(detail.cell(error_row, 5).font.bold)
+        self.assertTrue(detail.cell(error_row, 11).alignment.wrap_text)
+        self.assertEqual(detail.cell(error_row, 11).border.right.style, "thin")
+        self.assertEqual(detail.column_dimensions["K"].width, 60)
+        self.assertGreater(detail.row_dimensions[error_row].height, 22)
+        self.assertLessEqual(detail.row_dimensions[error_row].height, 120)
+        self.assertEqual(detail.page_setup.orientation, "landscape")
 
     def test_environments_and_config_endpoints(self) -> None:
         _, base = self._server()
