@@ -724,6 +724,7 @@ class RunnerSelectionTest(unittest.TestCase):
             case,
             screenshot_path="D:/evidence/dynamic.bmp",
             target="simulator",
+            project="620C_W6830",
         )
         simulator.assert_not_called()
 

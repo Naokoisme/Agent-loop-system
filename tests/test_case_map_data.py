@@ -187,6 +187,21 @@ class CaseMapDataContractTest(unittest.TestCase):
                     case_id,
                 )
 
+    def test_6202_menu_032_uses_workout_copy_without_switching_language(self) -> None:
+        item = _cases("6202_case_map")["MENU_032"]
+
+        self.assertEqual(item["expected_text"], "1.第2项显示Workout")
+        self.assertEqual(
+            item["verification_points"],
+            ["滚动至List主菜单顶部后，第2项显示Workout"],
+        )
+        commands = [
+            wire
+            for field in ("setup", "actions", "collect")
+            for wire in item.get(field, [])
+        ]
+        self.assertFalse(any("LANGUAGE_SET" in wire for wire in commands))
+
     def test_620c_promotions_if_any_have_formal_steps(self) -> None:
         cases = _cases("620C_simulator_case_map")
         promoted = [

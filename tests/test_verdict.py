@@ -237,7 +237,15 @@ class VisionEvidenceTest(unittest.TestCase):
 
 
 class TestCaseVisionEvidenceTest(unittest.TestCase):
-    def _judge(self, screenshots, verification_points):
+    def _judge(
+        self,
+        screenshots,
+        verification_points,
+        *,
+        expected_text="先显示按钮，点击后显示测量中",
+        project="",
+        translations_path=None,
+    ):
         captured: dict[str, list[dict]] = {}
 
         class Structured:
@@ -249,12 +257,36 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
             def with_structured_output(self, schema):
                 return Structured()
 
-        with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
+        environment = {"OPENAI_API_KEY": "sk-test"}
+        if translations_path is None:
+            translation_patch = mock.patch(
+                "agent_loop_system.tools.test.visual_translation_context",
+                return_value="",
+            )
+        else:
+            from agent_loop_system.tools.visual_translations import (
+                visual_translation_context,
+            )
+
+            translation_patch = mock.patch(
+                "agent_loop_system.tools.test.visual_translation_context",
+                side_effect=lambda selected_project, texts: visual_translation_context(
+                    selected_project,
+                    texts,
+                    document_path=translations_path,
+                ),
+            )
+        with mock.patch.dict("os.environ", environment), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
             "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
-        ):
-            verdict = judge_test_with_vision("先显示按钮，点击后显示测量中", screenshots, verification_points)
+        ), translation_patch:
+            verdict = judge_test_with_vision(
+                expected_text,
+                screenshots,
+                verification_points,
+                project=project,
+            )
         return verdict, captured.get("content", [])
 
     def test_each_verification_point_is_paired_with_one_screenshot(self) -> None:
@@ -278,13 +310,64 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         self.assertIn("判定截图 1，对应验证点：显示 Measure 按钮", labels)
         self.assertIn("判定截图 2，对应验证点：显示 Measuring", labels)
         prompt = labels[0]
-        self.assertIn("唯一证据是下方模拟器截图", prompt)
+        self.assertIn("唯一证据是下方截图", prompt)
         self.assertIn("不得假设或索要 GUI_TREE", prompt)
         self.assertIn("有效数值和明确完成时间", prompt)
         self.assertIn("不得把旁边的再次测量按钮或操作提示误读为仍在测量", prompt)
         self.assertIn("不得把相邻用例或先前截图的页面内容套用", prompt)
         self.assertIn("不得臆造图中不存在的列表、文字或按钮", prompt)
         self.assertNotIn("terminal_json", prompt)
+
+    def test_6202_prompt_only_includes_current_checkpoint_translation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            screenshot = root / "timer.bmp"
+            translations = root / "Translations.json"
+            Image.new("RGB", (4, 4), "white").save(screenshot)
+            translations.write_text(
+                json.dumps(
+                    {
+                        "CustomerNumber": "2-赛博",
+                        "TranslationNumber": "客户编号2-1（传音oraimo）",
+                        "Version": 30,
+                        "Entries": [
+                            {
+                                "Key": "STR_Timer",
+                                "Translations": {
+                                    "zh-CN": "计时器",
+                                    "en-US": "Timer",
+                                    "fr-FR": "Minuteur",
+                                },
+                            },
+                            {
+                                "Key": "STR_Workout_rem",
+                                "Translations": {
+                                    "zh-CN": "运动",
+                                    "en-US": "Workout",
+                                },
+                            },
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8-sig",
+            )
+            verdict, content = self._judge(
+                [{"path": str(screenshot)}],
+                ["Clock子菜单第3项显示Timer"],
+                expected_text="第3项显示Timer",
+                project="6202_W5230",
+                translations_path=translations,
+            )
+
+        prompt = next(item["text"] for item in content if item["type"] == "text")
+        self.assertEqual(verdict.verdict, "PASS")
+        self.assertIn("STR_Timer", prompt)
+        self.assertIn('en-US="Timer"', prompt)
+        self.assertIn('zh-CN="计时器"', prompt)
+        self.assertNotIn("STR_Workout_rem", prompt)
+        self.assertNotIn("Minuteur", prompt)
+        self.assertNotIn("LANGUAGE_SET", prompt)
 
     def test_missing_checkpoint_screenshot_cannot_verify(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -376,6 +459,30 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
 
         self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "截图内容无法辨认")
+
+    def test_runner_passes_6202_project_to_visual_translation_lookup(self) -> None:
+        result = CaseRunResult(
+            case_id="MENU_032",
+            sheet="主菜单",
+            expected_text="第2项显示Workout",
+            evidence_contract={"complete": True, "issues": []},
+            screenshots=[{"path": "screenshot.bmp"}],
+            verification_points=["第2项显示Workout"],
+            provenance={"project": "6202_W5230"},
+        )
+        with mock.patch(
+            "agent_loop_system.tools.test.judge_test_with_vision",
+            return_value=Verdict(verdict="FAIL", reason="第2项不是Workout"),
+        ) as visual:
+            decision = judge_case_result(result)
+
+        self.assertEqual(decision.verdict, "FAIL")
+        visual.assert_called_once_with(
+            result.expected_text,
+            result.screenshots,
+            result.verification_points,
+            project="6202_W5230",
+        )
 
 
 if __name__ == "__main__":

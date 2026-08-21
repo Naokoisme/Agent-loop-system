@@ -630,6 +630,7 @@ def interactive_reproduce(
                     verdict = judge_test_with_vision(
                         str(test_case.get("expected_text") or ""),
                         screenshots,
+                        project=str(test_case.get("project") or ""),
                     )
                 trace.verdict = verdict.verdict
                 outcome = {

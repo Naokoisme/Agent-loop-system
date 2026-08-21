@@ -479,7 +479,7 @@
       "priority": "P1",
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
-      "expected_text": "1.第2项显示Sports",
+      "expected_text": "1.第2项显示Workout",
       "setup": [
         ":ENTER_PAGE:DIAL,0",
         ":BUTTON_PRESS:1,1,0"
@@ -491,9 +491,9 @@
         ":HOST_SCREENSHOT:1"
       ],
       "unable": false,
-      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；真机当前第2项实际显示Sports record，保留原始预期Sports。",
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；原始术语Sports已按6202 Version 30资源STR_Workout_rem规范为Workout，真机当前第2项实际显示Sports record。",
       "verification_points": [
-        "滚动至List主菜单顶部后，第2项显示Sports"
+        "滚动至List主菜单顶部后，第2项显示Workout"
       ],
       "mapping_status": "PROMOTED"
     },
