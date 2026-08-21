@@ -203,7 +203,9 @@ def judge_with_vision(
     defect_image_paths 为缺陷原图/规格参考图；
     reference_screenshot 非空时为修复前截图，用于对比判定修复效果。
     """
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    api_key = get_llm_api_key()
     if not api_key or api_key.startswith("暂时"):
         return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
@@ -217,12 +219,9 @@ def judge_with_vision(
         return Verdict(verdict="CANNOT_VERIFY", reason=f"截图读取失败: {screenshot_path}")
 
     try:
-        llm = ChatOpenAI(
-            model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-            api_key=api_key,
-            base_url=os.environ.get("OPENAI_BASE_URL") or None,
-            timeout=get_llm_request_timeout(),
-        )
+        llm = create_chat_llm()
+        if llm is None:
+            return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
         return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 初始化出错：{exc}")
 
@@ -321,7 +320,9 @@ def judge_test_with_vision(
     verification_points: list[str] | None = None,
 ) -> Verdict:
     """只根据检查点截图判定普通测试；命令输出和 GUI_TREE 不进入 LLM。"""
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    api_key = get_llm_api_key()
     if not api_key or api_key.startswith("暂时"):
         return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
@@ -349,12 +350,9 @@ def judge_test_with_vision(
         encoded_screenshots.append((index, label, path, encoded))
 
     try:
-        llm = ChatOpenAI(
-            model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-            api_key=api_key,
-            base_url=os.environ.get("OPENAI_BASE_URL") or None,
-            timeout=get_llm_request_timeout(),
-        )
+        llm = create_chat_llm()
+        if llm is None:
+            return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
         return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 初始化出错：{exc}")
 

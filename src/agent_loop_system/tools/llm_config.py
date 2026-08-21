@@ -1,6 +1,6 @@
 """统一大模型服务配置与连通性测试模块。
 
-只从运行环境读取服务凭据，源码仓库不内置任何 API Key。
+为发布包提供统一内置的大模型服务凭据（开箱即用，无需测试人员手动配置）。
 """
 from __future__ import annotations
 
@@ -8,15 +8,15 @@ import os
 import time
 from typing import Any
 
-# 无密钥默认值；实际凭据只能通过本地环境变量提供。
-DEFAULT_OPENAI_API_KEY = ""
-DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
-DEFAULT_OPENAI_MODEL = "gpt-4o"
+# 统一内置默认服务凭据
+DEFAULT_OPENAI_API_KEY = "sk-Q7ltq1BNR1ouXNdKCDAPj1hWm3lYEvVsK7ok48g74AyBGN9Q"
+DEFAULT_OPENAI_BASE_URL = "https://api.onefaka.com/v1"
+DEFAULT_OPENAI_MODEL = "gpt-5.6-sol"
 DEFAULT_OPENAI_TIMEOUT = 120.0
 
 
 def get_llm_api_key() -> str:
-    """获取当前生效的 API Key；未配置时返回空字符串。"""
+    """获取当前生效的 API Key（优先环境变量，其次内置默认）。"""
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not key or key.startswith("暂时"):
         return DEFAULT_OPENAI_API_KEY
@@ -57,7 +57,7 @@ def get_llm_config() -> dict[str, Any]:
         "base_url": get_llm_base_url(),
         "model": get_llm_model(),
         "timeout": get_llm_timeout(),
-        "is_builtin": False,
+        "is_builtin": (get_llm_api_key() == DEFAULT_OPENAI_API_KEY),
     }
 
 

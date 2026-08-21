@@ -87,19 +87,9 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
 
 
 def _create_llm():
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key or api_key.startswith("暂时"):
-        return None
-    try:
-        from langchain_openai import ChatOpenAI
-    except ImportError:
-        return None
-    return ChatOpenAI(
-        model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-        api_key=api_key,
-        base_url=os.environ.get("OPENAI_BASE_URL") or None,
-        timeout=get_llm_request_timeout(),
-    )
+    from agent_loop_system.tools.llm_config import create_chat_llm
+
+    return create_chat_llm()
 
 
 def _load_images(image_dir: str | None) -> list[tuple[str, str]]:

@@ -15,7 +15,7 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# Runtime state and project-specific test data
+# Agent-loop runtime data and generated evidence
 .runtime/
 artifacts/
 evidence/
@@ -23,35 +23,22 @@ history/
 logs/
 defects/
 defects_img/
-Data/
-case_map/*
-!case_map/README.md
+*.log
 
-# External profiles and firmware artifacts
-profiles/
-firmware/
-*.up3
-*.prd
-*.dcf
-*.fot
+# Local databases and transient state
+*.db
+*.db-wal
+*.db-shm
 
 # Build and package output
-.work/
 build/
 dist/
 node_modules/
 
-# Local databases and transient files
-*.db
-*.db-wal
-*.db-shm
-*.log
-*.tmp
-*.bak
-nul
-
-# Editor and operating-system files
+# Editor, operating-system, and temporary files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+*.tmp
+*.bak

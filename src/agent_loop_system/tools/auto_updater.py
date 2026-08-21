@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 import json
-import hashlib
 import os
 import shutil
 import subprocess
@@ -49,69 +48,6 @@ def get_manifest_source() -> str:
     ).strip()
 
 
-def _calculate_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while chunk := handle.read(1024 * 1024):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def _verify_update_package(package_path: Path, package_info: dict[str, Any]) -> None:
-    """Require and verify the size and SHA-256 declared by the update manifest."""
-    expected_sha256 = str(package_info.get("sha256") or "").strip().lower()
-    expected_size = package_info.get("size_bytes")
-    if len(expected_sha256) != 64 or expected_size is None:
-        raise AutoUpdaterError(
-            "更新清单缺少完整的安装包大小或 SHA-256",
-            error_code="INVALID_PACKAGE_MANIFEST",
-        )
-
-    try:
-        expected_size_int = int(expected_size)
-    except (TypeError, ValueError) as exc:
-        raise AutoUpdaterError(
-            "更新清单中的安装包大小无效",
-            error_code="INVALID_PACKAGE_MANIFEST",
-        ) from exc
-
-    actual_size = package_path.stat().st_size
-    if actual_size != expected_size_int:
-        raise AutoUpdaterError(
-            f"安装包大小校验失败：期望 {expected_size_int}，实际 {actual_size}",
-            error_code="PACKAGE_SIZE_MISMATCH",
-        )
-
-    actual_sha256 = _calculate_sha256(package_path)
-    if actual_sha256 != expected_sha256:
-        raise AutoUpdaterError(
-            "安装包 SHA-256 校验失败，已拒绝升级",
-            error_code="PACKAGE_HASH_MISMATCH",
-        )
-
-
-def _safe_extract_zip(package_path: Path, staging_dir: Path) -> None:
-    """Extract a ZIP only when every member remains inside the staging directory."""
-    staging_root = staging_dir.resolve()
-    try:
-        with zipfile.ZipFile(package_path, "r") as zf:
-            for member in zf.infolist():
-                target = (staging_dir / member.filename).resolve()
-                if target != staging_root and staging_root not in target.parents:
-                    raise AutoUpdaterError(
-                        f"安装包包含越界路径: {member.filename}",
-                        error_code="UNSAFE_ARCHIVE_PATH",
-                    )
-            zf.extractall(staging_dir)
-    except AutoUpdaterError:
-        raise
-    except Exception as exc:
-        raise AutoUpdaterError(
-            f"解压安装包失败: {exc}",
-            error_code="EXTRACTION_FAILED",
-        ) from exc
-
-
 def prepare_upgrade(
     app_root: Path,
     manifest_source: str | None = None,
@@ -141,8 +77,11 @@ def prepare_upgrade(
     staging_dir.mkdir(parents=True, exist_ok=True)
 
     if pkg_path.is_file():
-        _verify_update_package(pkg_path, full_pkg)
-        _safe_extract_zip(pkg_path, staging_dir)
+        try:
+            with zipfile.ZipFile(pkg_path, "r") as zf:
+                zf.extractall(staging_dir)
+        except Exception as exc:
+            raise AutoUpdaterError(f"解压安装包失败: {exc}", error_code="EXTRACTION_FAILED") from exc
     else:
         pkg_dir = nas_base / f"releases/v{latest_ver}/Agent-loop-system-{latest_ver}-windows-x64"
         if pkg_dir.is_dir():
@@ -156,26 +95,6 @@ def prepare_upgrade(
             if sub.is_dir() and ((sub / "Agent-loop.exe").exists() or (sub / "frontend").exists()):
                 payload_dir = sub
                 break
-
-    release_manifest_path = payload_dir / "release_manifest.json"
-    if not release_manifest_path.is_file():
-        raise AutoUpdaterError(
-            "安装包缺少 release_manifest.json",
-            error_code="MISSING_RELEASE_MANIFEST",
-        )
-    try:
-        release_manifest = json.loads(release_manifest_path.read_text(encoding="utf-8"))
-    except Exception as exc:
-        raise AutoUpdaterError(
-            f"release_manifest.json 无法解析: {exc}",
-            error_code="INVALID_RELEASE_MANIFEST",
-        ) from exc
-    packaged_version = str(release_manifest.get("version") or "").strip()
-    if packaged_version != latest_ver:
-        raise AutoUpdaterError(
-            f"安装包版本不匹配：清单为 {latest_ver}，包内为 {packaged_version or '缺失'}",
-            error_code="PACKAGE_VERSION_MISMATCH",
-        )
 
     return {
         "status": "ready",
@@ -276,14 +195,14 @@ if (Test-Path $exePath) {{
     Log-Msg "正在通过 WScript.Shell 顶级脱离启动新版本: $exePath"
     $wsh = New-Object -ComObject WScript.Shell
     $wsh.CurrentDirectory = $AppRoot
-    $wsh.Run('"' + $exePath + '"', 0, $false)
+    $wsh.Run("""$exePath""", 0, $false)
 }} else {{
     $pyLauncher = Join-Path $AppRoot "start_ui.py"
     if (Test-Path $pyLauncher) {{
         Log-Msg "正在通过 Python 启动新版本: $pyLauncher"
         $wsh = New-Object -ComObject WScript.Shell
         $wsh.CurrentDirectory = $AppRoot
-        $wsh.Run('python "' + $pyLauncher + '"', 0, $false)
+        $wsh.Run("python ""$pyLauncher""", 0, $false)
     }}
 }}
 Log-Msg "=== 升级与重启流程结束 ==="

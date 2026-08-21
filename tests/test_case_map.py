@@ -563,8 +563,6 @@ class CaseMapExecutionTest(unittest.TestCase):
         )
 
     def test_620c_unsolidified_cases_have_no_fixed_mapping(self) -> None:
-        if not case_map.CASE_MAP_PROFILE_DIRS["620C_W6830"].is_dir():
-            self.skipTest("需要外部 620C_W6830 case-map Profile")
         cases = load_case_map(
             "SOS",
             target="simulator",

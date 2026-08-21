@@ -15,8 +15,6 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from agent_loop_system.version import __version__
-
 
 DATA_SAFETY_NOTICE = (
     "数据安全保证：升级版本时仅需替换主程序 Agent-loop.exe、_internal 与前端资源；"
@@ -26,7 +24,7 @@ DATA_SAFETY_NOTICE = (
 
 
 def get_current_system_version() -> str:
-    """动态获取当前安装版本：发布清单、环境变量、包版本依次回退。"""
+    """动态获取当前安装版本（优先读取 release_manifest.json，其次环境变量，默认 0.1.0）。"""
     try:
         from agent_loop_system.runtime_root import resolve_app_root
         manifest_p = resolve_app_root() / "release_manifest.json"
@@ -37,7 +35,7 @@ def get_current_system_version() -> str:
                 return v
     except Exception:
         pass
-    return os.environ.get("AGENT_LOOP_VERSION", __version__).strip() or __version__
+    return os.environ.get("AGENT_LOOP_VERSION", "0.1.0").strip() or "0.1.0"
 
 
 CURRENT_SYSTEM_VERSION = get_current_system_version()

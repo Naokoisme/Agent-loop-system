@@ -2372,7 +2372,7 @@ def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
     ws.title = "自动化测试用例_v1"
     headers = ["模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果", "不可自动化", "固化状态", "备注"]
     ws.append(headers)
-
+    
     project_meta = _test_project(project)
     case_map_root = paths.case_map / project_meta["case_map_dir"]
     if case_map_root.is_dir():
@@ -2392,7 +2392,7 @@ def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
                     str(item.get("mapping_status") or ""),
                     str(item.get("note") or ""),
                 ])
-
+                
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
@@ -2408,13 +2408,13 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
         wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True)
     except Exception as exc:
         raise ValueError(f"Excel 文件无法解析: {exc}")
-
+        
     sheet_name = "自动化测试用例_v1" if "自动化测试用例_v1" in wb.sheetnames else wb.sheetnames[0]
     ws = wb[sheet_name]
     rows = list(ws.iter_rows(values_only=True))
     if not rows:
         raise ValueError("Excel 表格为空")
-
+        
     header_idx = 0
     col_map: dict[str, int] = {}
     for idx, row in enumerate(rows[:5]):
@@ -2447,10 +2447,10 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
             header_idx = idx
             col_map = temp_map
             break
-
+            
     if "case_id" not in col_map and "sheet" not in col_map:
         raise ValueError("未识别到有效的用例表头（需包含'用例编号'或'模块'）")
-
+        
     parsed_cases: list[dict[str, Any]] = []
     for row_num, row in enumerate(rows[header_idx + 1:], start=header_idx + 2):
         if not row or all(c is None or str(c).strip() == "" for c in row):
@@ -2459,7 +2459,7 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
         sheet = str(row[col_map["sheet"]]).strip() if "sheet" in col_map and col_map["sheet"] < len(row) and row[col_map["sheet"]] is not None else "通用"
         if not case_id:
             continue
-
+        
         priority = str(row[col_map["priority"]]).strip() if "priority" in col_map and col_map["priority"] < len(row) and row[col_map["priority"]] is not None else "P1"
         precondition = str(row[col_map["precondition_text"]]).strip() if "precondition_text" in col_map and col_map["precondition_text"] < len(row) and row[col_map["precondition_text"]] is not None else ""
         steps = str(row[col_map["steps_text"]]).strip() if "steps_text" in col_map and col_map["steps_text"] < len(row) and row[col_map["steps_text"]] is not None else ""
@@ -2468,7 +2468,7 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
         unable_raw = str(row[col_map["unable"]]).strip() if "unable" in col_map and col_map["unable"] < len(row) and row[col_map["unable"]] is not None else ""
         unable = unable_raw in {"是", "true", "True", "1", "Y", "yes"}
         mapping_status = str(row[col_map["mapping_status"]]).strip() if "mapping_status" in col_map and col_map["mapping_status"] < len(row) and row[col_map["mapping_status"]] is not None else ""
-
+        
         parsed_cases.append({
             "case_id": case_id,
             "sheet": sheet,
@@ -2490,12 +2490,17 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
 
 def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     """读取当前运行时系统配置。"""
+    from agent_loop_system.tools.llm_config import get_llm_config
+    llm_cfg = get_llm_config()
     return {
         "llm": {
-            "api_key": os.environ.get("OPENAI_API_KEY", ""),
-            "base_url": os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-            "model": os.environ.get("OPENAI_MODEL", "gpt-4o"),
-            "timeout": int(os.environ.get("OPENAI_TIMEOUT", 120)),
+            "provider": "builtin",
+            "api_key": (llm_cfg["api_key"][:3] + "..." + llm_cfg["api_key"][-4:]) if llm_cfg["api_key"] else "",
+            "base_url": llm_cfg["base_url"],
+            "model": llm_cfg["model"],
+            "timeout": int(llm_cfg["timeout"]),
+            "is_builtin": llm_cfg["is_builtin"],
+            "status": "ready",
         },
         "ones": {
             "base_url": os.environ.get("ONES_BASE_URL", "https://ones.topstepht.com:8443"),
@@ -2510,11 +2515,11 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "capture_provider": os.environ.get("W30_HARDWARE_CAPTURE_PROVIDER", "mtp"),
         },
         "simulator": {
-            "source_root": os.environ.get("W30_SIMULATOR_SOURCE_ROOT", r"D:\Agent-loop-workspaceƐC_W6830"),
-            "workspace_root": os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", r"D:\Agent-loop-workspaceƐC_W6830"),
-            "simulator_path": os.environ.get("W30_SIMULATOR_PATH", r"D:\Agent-loop-workspaceƐC_W6830\core\gui\simulatorin\main.exe"),
-            "hardware_source_root": os.environ.get("W30_HARDWARE_SOURCE_ROOT", r"D:\Agent-loop-workspaceƐ2_W5230"),
-            "hardware_workspace_root": os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", r"D:\Agent-loop-workspaceƐ2_W5230"),
+            "source_root": os.environ.get("W30_SIMULATOR_SOURCE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
+            "workspace_root": os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
+            "simulator_path": os.environ.get("W30_SIMULATOR_PATH", r"D:\Agent-loop-workspace\620C_W6830\core\gui\simulator\bin\main.exe"),
+            "hardware_source_root": os.environ.get("W30_HARDWARE_SOURCE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
+            "hardware_workspace_root": os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
         },
     }
 
@@ -2532,7 +2537,7 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["OPENAI_MODEL"] = str(llm["model"])
         if "timeout" in llm and llm["timeout"] is not None:
             env_updates["OPENAI_TIMEOUT"] = str(llm["timeout"])
-
+            
     if "ones" in cfg and isinstance(cfg["ones"], dict):
         ones = cfg["ones"]
         if "base_url" in ones and ones["base_url"] is not None:
@@ -2543,7 +2548,7 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["ONES_TEAM_UUID"] = str(ones["team_uuid"])
         if "user_id" in ones and ones["user_id"] is not None:
             env_updates["ONES_USER_ID"] = str(ones["user_id"])
-
+            
     if "hardware" in cfg and isinstance(cfg["hardware"], dict):
         hw = cfg["hardware"]
         if "port" in hw and hw["port"] is not None:
@@ -2554,7 +2559,7 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_TRANSPORT"] = str(hw["transport"])
         if "capture_provider" in hw and hw["capture_provider"] is not None:
             env_updates["W30_HARDWARE_CAPTURE_PROVIDER"] = str(hw["capture_provider"])
-
+            
     if "simulator" in cfg and isinstance(cfg["simulator"], dict):
         sim = cfg["simulator"]
         if "source_root" in sim and sim["source_root"] is not None:
@@ -2567,15 +2572,15 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_SOURCE_ROOT"] = str(sim["hardware_source_root"])
         if "hardware_workspace_root" in sim and sim["hardware_workspace_root"] is not None:
             env_updates["W30_HARDWARE_WORKSPACE_ROOT"] = str(sim["hardware_workspace_root"])
-
+            
     for k, v in env_updates.items():
         os.environ[k] = v
-
+        
     env_file = paths.root / ".env"
     lines = []
     if env_file.is_file():
         lines = env_file.read_text(encoding="utf-8", errors="replace").splitlines()
-
+        
     existing_keys = set()
     new_lines = []
     for line in lines:
@@ -2588,11 +2593,11 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
                 new_lines.append(line)
         else:
             new_lines.append(line)
-
+            
     for k, v in env_updates.items():
         if k not in existing_keys:
             new_lines.append(f"{k}={v}")
-
+            
     env_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
 
@@ -2603,7 +2608,7 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
     for proj_key, proj_meta in TEST_PROJECTS.items():
         checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
-
+        
         # 1. 源码与工作区
         if proj_key == "620C_W6830":
             src_p = Path(cfg["simulator"]["source_root"])
@@ -2618,13 +2623,13 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"真机工作区就绪: {src_p}" if status == "pass" else f"真机源码目录不存在: {src_p}"
         checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
-
+        
         # 2. 项目配置
         case_map_p = paths.case_map / proj_meta["case_map_dir"]
         c_status = "pass" if case_map_p.is_dir() else "warning"
         c_detail = f"用例库已加载 ({len(list(case_map_p.glob('*.json')))} 个模块)" if c_status == "pass" else "用例库目录未找到"
         checks.append({"key": "config", "label": "项目配置", "status": c_status, "detail": c_detail})
-
+        
         # 3. 执行产物
         if is_hardware:
             port = cfg["hardware"]["port"]
@@ -2634,15 +2639,15 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             a_status = "pass" if art_p.is_file() else "warning"
             a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
             checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
-
+            
         # 4. 命令接口
         cmd_label = "SuperCom 命名管道" if is_hardware else "QuickCmd 协议接口"
         checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": f"{cmd_label} 已启用"})
-
+        
         # 5. 截图能力
         cap_label = "Windows MTP 传输" if is_hardware else "模拟器宿主窗口捕获"
         checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": f"{cap_label} 已配置"})
-
+        
         # 6. 大模型服务
         llm_ready = bool(cfg["llm"]["api_key"] and cfg["llm"]["base_url"])
         checks.append({
@@ -2651,11 +2656,11 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             "status": "pass" if llm_ready else "warning",
             "detail": f"模型 {cfg['llm']['model']} (已配置)" if llm_ready else "未配置 OPENAI_API_KEY",
         })
-
+        
         has_error = any(c["status"] == "error" for c in checks)
         has_warning = any(c["status"] == "warning" for c in checks)
         overall_status = "error" if has_error else ("partial" if has_warning else "ready")
-
+        
         items.append({
             "id": proj_key,
             "project": proj_key,
@@ -2676,7 +2681,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
     project_meta = _test_project(project)
     project_name = project_meta["project"]
     proj_root = history_store._project_root(project_name)
-
+    
     all_runs: list[dict[str, Any]] = []
     if proj_root.is_dir():
         for sheet_dir in proj_root.iterdir():
@@ -2693,7 +2698,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
                     run_data = _read_json(run_dir / "run.json")
                     if isinstance(run_data, dict):
                         all_runs.append(run_data)
-
+                        
     # Filter by date
     filtered_runs = []
     for r in all_runs:
@@ -2704,12 +2709,12 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
         if date_to and date_str and date_str > date_to:
             continue
         filtered_runs.append(r)
-
+        
     dist = {"PASS": 0, "FAIL": 0, "ERROR": 0, "CANNOT_VERIFY": 0}
     by_date: dict[str, dict[str, int]] = {}
     module_fails: dict[str, dict[str, int]] = {}
     recent_fails: list[dict[str, Any]] = []
-
+    
     for r in filtered_runs:
         v = str(r.get("verdict") or "ERROR").upper()
         if v == "SKIP":
@@ -2717,7 +2722,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
         if v not in dist:
             v = "ERROR"
         dist[v] += 1
-
+        
         ts = str(r.get("timestamp") or r.get("started_at") or "")
         date_str = ts[:10] if len(ts) >= 10 else "未知"
         if date_str not in by_date:
@@ -2731,7 +2736,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
             by_date[date_str]["error"] += 1
         else:
             by_date[date_str]["cannot_verify"] += 1
-
+            
         sheet = str(r.get("sheet") or "通用")
         if v in {"FAIL", "ERROR"}:
             if sheet not in module_fails:
@@ -2741,7 +2746,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
             else:
                 module_fails[sheet]["error"] += 1
             module_fails[sheet]["total"] += 1
-
+            
             recent_fails.append({
                 "case_id": str(r.get("case_id") or ""),
                 "sheet": sheet,
@@ -2751,7 +2756,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
                 "timestamp": ts,
                 "message": str(r.get("reason") or r.get("error") or "测试未通过"),
             })
-
+            
     trend = []
     for d_str in sorted(by_date.keys()):
         d_data = by_date[d_str]
@@ -2765,13 +2770,13 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
             "total": tot,
             "pass_rate": pass_rate,
         })
-
+        
     top_fail_modules = sorted(module_fails.values(), key=lambda m: m["total"], reverse=True)[:8]
     recent_fails.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
-
+    
     total_count = len(filtered_runs)
     pass_rate = round(dist["PASS"] * 100.0 / total_count, 1) if total_count > 0 else 0.0
-
+    
     return {
         "metrics": {
             "total": total_count,
@@ -2875,7 +2880,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             status_filter = query.get("status", ["running"])[0]
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
-
+            
             all_jobs_dict = dict(self.app.test_jobs._jobs)
             if self.app.paths.runtime_jobs.is_dir():
                 for j_dir in self.app.paths.runtime_jobs.iterdir():
@@ -2883,18 +2888,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                         st = _read_json(j_dir / BATCH_STATE_FILE)
                         if isinstance(st, dict):
                             all_jobs_dict[j_dir.name] = st
-
+                            
             items = []
             today_str = datetime.now().astimezone().strftime("%Y-%m-%d")
             completed_today = 0
             error_cnt = 0
             queued_cnt = 0
-
+            
             for jid, j in all_jobs_dict.items():
                 j_proj = str(j.get("project") or DEFAULT_TEST_PROJECT)
                 j_status = str(j.get("status") or "completed")
                 j_verdict = str(j.get("verdict") or "ERROR")
-
+                
                 if j_status in {"queued", "running", "finalizing"}:
                     queued_cnt += 1
                 if j_status in {"completed", "done"}:
@@ -2903,10 +2908,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                         completed_today += 1
                 if j_verdict in {"FAIL", "ERROR"} or j_status == "failed":
                     error_cnt += 1
-
+                    
                 if project and j_proj != project and project != "all":
                     continue
-
+                    
                 if status_filter == "queue":
                     if j_status != "queued":
                         continue
@@ -2919,7 +2924,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 elif status_filter == "interrupted":
                     if j_status not in {"cancelled", "interrupted", "failed"}:
                         continue
-
+                        
                 meta = _test_project(j_proj)
                 items.append({
                     "id": jid,
@@ -2932,12 +2937,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                     "started_at": j.get("started_at") or j.get("created_at"),
                     "finished_at": j.get("finished_at"),
                 })
-
+                
             items.sort(key=lambda x: str(x.get("finished_at") or x.get("started_at") or ""), reverse=True)
             total = len(items)
             offset = (page - 1) * page_size
             paged = items[offset:offset + page_size]
-
+            
             self._json({
                 "items": paged,
                 "total": total,
@@ -3016,7 +3021,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             src_cases = self.app.cases._all(project=source)
             tgt_cases = self.app.cases._all(project=target)
             tgt_map = {c["case_id"]: c for c in tgt_cases}
-
+            
             candidates = []
             for c in src_cases:
                 if not c.get("is_promoted") and c.get("mapping_status") != "PROMOTED":
@@ -3071,7 +3076,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_to = query.get("to", [None])[0]
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
-
+            
             items = []
             if scope == "batch":
                 if self.app.paths.runtime_jobs.is_dir():
@@ -3144,7 +3149,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
             summary_data = _get_reports_summary_data(self.app.paths, self.app.test_history, project, d_from, d_to, module)
-
+            
             wb = openpyxl.Workbook()
             ws_summary = wb.active
             ws_summary.title = "测试报告概览"
@@ -3156,12 +3161,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             ws_summary.append(["错误 (ERROR)", summary_data["metrics"]["error"]])
             ws_summary.append(["无法验证", summary_data["metrics"]["cannot_verify"]])
             ws_summary.append(["通过率", f"{summary_data['metrics']['pass_rate']}%"])
-
+            
             ws_fail = wb.create_sheet(title="高频失败模块")
             ws_fail.append(["模块名称", "FAIL 数量", "ERROR 数量", "异常合计"])
             for m in summary_data.get("top_fail_modules", []):
                 ws_fail.append([m.get("module", ""), m.get("fail", 0), m.get("error", 0), m.get("total", 0)])
-
+                
             buf = io.BytesIO()
             wb.save(buf)
             data = buf.getvalue()
@@ -3171,6 +3176,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         if path == "/api/environments":
             envs = _get_environments_status(self.app.paths)
             self._json({"items": envs})
+            return
+
+        if path == "/api/config/test-llm":
+            from agent_loop_system.tools.llm_config import test_llm_connectivity
+            res = test_llm_connectivity()
+            self._json(res, HTTPStatus.OK if res.get("ok") else HTTPStatus.BAD_GATEWAY)
             return
 
         if path == "/api/config":
@@ -3381,17 +3392,17 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise ValueError("用例编号 case_id 必填")
             if not sheet:
                 raise ValueError("模块 sheet 必填")
-
+                
             project_meta = _test_project(project)
             case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
             case_map_root.mkdir(parents=True, exist_ok=True)
             sheet_file = case_map_root / f"{sheet}.json"
-
+            
             entries = _case_entries(self.app.paths, sheet, project=project)
             for item in entries:
                 if isinstance(item, dict) and item.get("case_id") == case_id:
                     raise ValueError(f"用例编号 {case_id} 在模块 {sheet} 中已存在")
-
+                    
             new_entry = {
                 "case_id": case_id,
                 "sheet": sheet,
@@ -3407,7 +3418,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 "mapping_status": str(case_obj.get("mapping_status") or ""),
                 "note": str(case_obj.get("note") or "").strip(),
             }
-
+            
             raw = _read_json(sheet_file, [])
             if isinstance(raw, dict) and "cases" in raw:
                 raw["cases"].append(new_entry)
@@ -3417,7 +3428,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     raw = []
                 raw.append(new_entry)
                 _write_json(sheet_file, raw)
-
+                
             self._json({"status": "ok", "case_id": case_id})
             return
 
@@ -3434,16 +3445,16 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise ValueError("原用例编号 orig_case_id 必填")
             if not sheet:
                 raise ValueError("模块 sheet 必填")
-
+                
             project_meta = _test_project(project)
             case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
             sheet_file = case_map_root / f"{sheet}.json"
             if not sheet_file.is_file():
                 raise ValueError(f"模块文件 {sheet}.json 不存在")
-
+                
             raw = _read_json(sheet_file, [])
             case_list = raw.get("cases") if isinstance(raw, dict) and isinstance(raw.get("cases"), list) else (raw if isinstance(raw, list) else [])
-
+            
             target_idx = None
             for idx, item in enumerate(case_list):
                 if isinstance(item, dict) and item.get("case_id") == orig_case_id:
@@ -3451,12 +3462,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                     break
             if target_idx is None:
                 raise ValueError(f"未找到原用例 {orig_case_id}")
-
+                
             if case_id != orig_case_id:
                 for idx, item in enumerate(case_list):
                     if idx != target_idx and isinstance(item, dict) and item.get("case_id") == case_id:
                         raise ValueError(f"目标编号 {case_id} 已被其他用例占用")
-
+                        
             item = case_list[target_idx]
             item["case_id"] = case_id
             item["sheet"] = sheet
@@ -3474,7 +3485,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 item["note"] = str(case_obj["note"]).strip()
             if "unable" in case_obj:
                 item["unable"] = bool(case_obj["unable"])
-
+                
             _write_json(sheet_file, raw)
             self._json({"status": "ok", "case_id": case_id})
             return
@@ -3487,13 +3498,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             tgt_prof = str(body.get("target_profile") or "6202_W5230")
             if not case_id or not sheet:
                 raise ValueError("case_id 与 sheet 必填")
-
+                
             tgt_meta = _test_project(tgt_prof)
             src_cases = _case_entries(self.app.paths, sheet, project=src_prof)
             src_case = next((c for c in src_cases if isinstance(c, dict) and c.get("case_id") == case_id), None)
             if not src_case:
                 raise ValueError(f"在源项目 {src_prof} 中未找到用例 {case_id}")
-
+                
             tgt_root = self.app.paths.case_map / tgt_meta["case_map_dir"]
             tgt_root.mkdir(parents=True, exist_ok=True)
             tgt_sheet_f = tgt_root / f"{sheet}.json"
@@ -3501,7 +3512,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             is_envelope = isinstance(tgt_raw, dict) and "cases" in tgt_raw
             tgt_list = tgt_raw.get("cases") if is_envelope else (tgt_raw if isinstance(tgt_raw, list) else [])
             tgt_existing = next((c for c in tgt_list if isinstance(c, dict) and c.get("case_id") == case_id), None)
-
+            
             if tgt_existing is None:
                 new_tgt_case = dict(src_case)
                 new_tgt_case["mapping_status"] = ""
@@ -3511,7 +3522,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     _write_json(tgt_sheet_f, tgt_raw)
                 else:
                     _write_json(tgt_sheet_f, tgt_list)
-
+                    
             job = self.app.start_case_test(sheet=sheet, case_id=case_id, project=tgt_prof)
             self._json({"status": "ok", "job": job}, HTTPStatus.ACCEPTED)
             return
@@ -3523,18 +3534,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             project = str(body.get("project") or DEFAULT_TEST_PROJECT).strip()
             if not case_id or not sheet:
                 raise ValueError("case_id 与 sheet 必填")
-
+                
             project_meta = _test_project(project)
             latest_history = self.app.test_history.latest(sheet, case_id, project=project)
             if not latest_history:
                 self._json({"status": "failed", "audit": {"passed": False, "issues": ["未找到历史运行记录，必须先运行并通过测试"]}}, HTTPStatus.BAD_REQUEST)
                 return
-
+                
             verdict = str(latest_history.get("verdict") or "ERROR").upper()
             if verdict != "PASS":
                 self._json({"status": "failed", "audit": {"passed": False, "issues": [f"最新运行结果为 {verdict}，必须为 PASS 才能晋升"]}}, HTTPStatus.BAD_REQUEST)
                 return
-
+                
             case_root = self.app.paths.case_map / project_meta["case_map_dir"]
             sheet_f = case_root / f"{sheet}.json"
             raw = _read_json(sheet_f, [])
@@ -3552,7 +3563,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     _write_json(sheet_f, raw)
                 else:
                     _write_json(sheet_f, clist)
-
+                    
             ledger_file = case_root / "external_execution_history.jsonl"
             ledger_record = {
                 "case_id": case_id,
@@ -3564,7 +3575,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             }
             with ledger_file.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(ledger_record, ensure_ascii=False) + "\n")
-
+                
             self._json({"status": "ok", "audit": {"passed": True, "issues": []}})
             return
 
@@ -3574,13 +3585,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             b64_data = str(body.get("file_base64") or "").strip()
             if not b64_data:
                 raise ValueError("未提供 Excel 文件内容 (file_base64)")
-
+                
             parsed = _parse_excel_cases(b64_data)
             existing_cases = {c["case_id"] for c in self.app.cases._all(project=project)}
             new_cases = [c for c in parsed if c["case_id"] not in existing_cases]
             existing_count = len(parsed) - len(new_cases)
             modules = sorted({c["sheet"] for c in parsed})
-
+            
             self._json({
                 "new_count": len(new_cases),
                 "existing_count": existing_count,
@@ -3600,28 +3611,28 @@ class RequestHandler(BaseHTTPRequestHandler):
             overwrite_existing = bool(body.get("overwrite_existing", False))
             if not b64_data:
                 raise ValueError("未提供 Excel 文件内容 (file_base64)")
-
+                
             parsed = _parse_excel_cases(b64_data)
             project_meta = _test_project(project)
             case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
             case_map_root.mkdir(parents=True, exist_ok=True)
-
+            
             by_sheet: dict[str, list[dict[str, Any]]] = {}
             for c in parsed:
                 by_sheet.setdefault(c["sheet"], []).append(c)
-
+                
             imported_count = 0
             overwritten_count = 0
             skipped_count = 0
             modules_updated = set()
-
+            
             for sheet_name, sheet_cases in by_sheet.items():
                 sheet_file = case_map_root / f"{sheet_name}.json"
                 raw = _read_json(sheet_file, [])
                 is_dict_envelope = isinstance(raw, dict) and "cases" in raw
                 existing_list = raw.get("cases") if is_dict_envelope else (raw if isinstance(raw, list) else [])
                 existing_map = {item["case_id"]: item for item in existing_list if isinstance(item, dict) and item.get("case_id")}
-
+                
                 updated = False
                 for c in sheet_cases:
                     cid = c["case_id"]
@@ -3638,7 +3649,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         existing_map[cid] = clean_c
                         imported_count += 1
                         updated = True
-
+                        
                 if updated:
                     modules_updated.add(sheet_name)
                     if is_dict_envelope:
@@ -3646,7 +3657,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         _write_json(sheet_file, raw)
                     else:
                         _write_json(sheet_file, existing_list)
-
+                        
             self._json({
                 "imported_count": imported_count,
                 "overwritten_count": overwritten_count,
@@ -3661,6 +3672,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             envs = _get_environments_status(self.app.paths)
             target_env = next((e for e in envs if e["id"] == proj or e["project"] == proj), envs[0] if envs else {})
             self._json({"status": "ok", "result": target_env})
+            return
+
+        if path == "/api/config/test-llm":
+            from agent_loop_system.tools.llm_config import test_llm_connectivity
+            res = test_llm_connectivity()
+            self._json(res, HTTPStatus.OK if res.get("ok") else HTTPStatus.BAD_GATEWAY)
             return
 
         if path == "/api/config":

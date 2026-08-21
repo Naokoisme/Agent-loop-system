@@ -115,3 +115,4 @@ message _HsdGameRankingTrend {
 message _HsdGameRankingTrendList {
     repeated _HsdGameRankingTrend items = 1;//游戏排名趋势列表,max_count:30
 }
+

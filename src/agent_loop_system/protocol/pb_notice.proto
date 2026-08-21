@@ -41,3 +41,4 @@ message _SOSRequest {
 message _QuickCmd {
   string cmd = 1;//快速测试指令。如 TOP5STEP:STEP:123;
 }
+

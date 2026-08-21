@@ -3170,14 +3170,10 @@ function initSystemSettings() {
       const cfg = await resp.json();
 
       // LLM
-      const llmKey = document.querySelector('#cfg-openai-api-key');
-      const llmBase = document.querySelector('#cfg-openai-base-url');
-      const llmModel = document.querySelector('#cfg-openai-model');
-      const llmTimeout = document.querySelector('#cfg-openai-timeout');
-      if (llmKey) llmKey.value = cfg.llm?.api_key || '';
-      if (llmBase) llmBase.value = cfg.llm?.base_url || 'https://api.openai.com/v1';
-      if (llmModel) llmModel.value = cfg.llm?.model || 'gpt-4o';
-      if (llmTimeout) llmTimeout.value = cfg.llm?.timeout || 120;
+      const llmModel = document.querySelector('#llm-display-model');
+      const llmGateway = document.querySelector('#llm-display-gateway');
+      if (llmModel) llmModel.textContent = cfg.llm?.model || 'gpt-5.6-sol';
+      if (llmGateway) llmGateway.textContent = cfg.llm?.base_url || 'https://api.onefaka.com/v1';
 
       // ONES
       const onesBase = document.querySelector('#cfg-ones-base-url');
@@ -3198,18 +3194,6 @@ function initSystemSettings() {
       if (hwBaud) hwBaud.value = cfg.hardware?.baudrate || 1500000;
       if (hwTrans) hwTrans.value = cfg.hardware?.transport || 'supercom';
       if (hwCap) hwCap.value = cfg.hardware?.capture_provider || 'mtp';
-
-      // Simulator
-      const simSrc = document.querySelector('#cfg-sim-source');
-      const simWs = document.querySelector('#cfg-sim-workspace');
-      const simArt = document.querySelector('#cfg-sim-artifact');
-      const hwSrc = document.querySelector('#cfg-hw-source');
-      const hwWs = document.querySelector('#cfg-hw-workspace');
-      if (simSrc) simSrc.value = cfg.simulator?.source_root || '';
-      if (simWs) simWs.value = cfg.simulator?.workspace_root || '';
-      if (simArt) simArt.value = cfg.simulator?.simulator_path || '';
-      if (hwSrc) hwSrc.value = cfg.simulator?.hardware_source_root || '';
-      if (hwWs) hwWs.value = cfg.simulator?.hardware_workspace_root || '';
     } catch (err) {
       if (errorBox) {
         errorBox.textContent = `读取配置失败: ${err.message}`;
@@ -3225,10 +3209,44 @@ function initSystemSettings() {
   if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
   if (cancelBtn) cancelBtn.addEventListener('click', () => dialog.close());
 
+  // LLM Connectivity Test
+  const btnTestLlm = document.querySelector('#btn-test-llm');
+  const llmTestStatus = document.querySelector('#llm-test-status');
+  if (btnTestLlm) {
+    btnTestLlm.addEventListener('click', async () => {
+      btnTestLlm.disabled = true;
+      btnTestLlm.textContent = '⏳ 测试中…';
+      if (llmTestStatus) {
+        llmTestStatus.style.color = 'var(--ink-soft)';
+        llmTestStatus.textContent = '正在发起握手测试…';
+      }
+      try {
+        const resp = await fetch('/api/config/test-llm', { method: 'POST' });
+        const data = await resp.json();
+        if (data.ok) {
+          if (llmTestStatus) {
+            llmTestStatus.style.color = '#10b981';
+            llmTestStatus.textContent = `✅ 连通正常！响应耗时 ${data.latency_ms}ms (模型: ${data.model})`;
+          }
+        } else {
+          if (llmTestStatus) {
+            llmTestStatus.style.color = '#ef4444';
+            llmTestStatus.textContent = `❌ 连接失败: ${data.error || data.message || '未知错误'}`;
+          }
+        }
+      } catch (err) {
+        if (llmTestStatus) {
+          llmTestStatus.style.color = '#ef4444';
+          llmTestStatus.textContent = `❌ 请求异常: ${err.message || err}`;
+        }
+      } finally {
+        btnTestLlm.disabled = false;
+        btnTestLlm.textContent = '⚡ 测试服务连通性';
+      }
+    });
+  }
 
-  // ==========================================
   // ONES 一键登录并自动同步凭据逻辑
-  // ==========================================
   const btnOnesLogin = document.querySelector('#btn-ones-login');
   const onesLoginStatus = document.querySelector('#ones-login-status');
   if (btnOnesLogin) {
@@ -3307,12 +3325,6 @@ function initSystemSettings() {
       if (errorBox) errorBox.style.display = 'none';
 
       const payload = {
-        llm: {
-          api_key: (document.querySelector('#cfg-openai-api-key')?.value || '').trim(),
-          base_url: (document.querySelector('#cfg-openai-base-url')?.value || '').trim(),
-          model: (document.querySelector('#cfg-openai-model')?.value || '').trim(),
-          timeout: Number(document.querySelector('#cfg-openai-timeout')?.value) || 120,
-        },
         ones: {
           base_url: (document.querySelector('#cfg-ones-base-url')?.value || '').trim(),
           auth_token: (document.querySelector('#cfg-ones-auth-token')?.value || '').trim(),
@@ -3325,7 +3337,7 @@ function initSystemSettings() {
           transport: document.querySelector('#cfg-hw-transport')?.value || 'supercom',
           capture_provider: document.querySelector('#cfg-hw-capture')?.value || 'mtp',
         },
-              };
+      };
 
       try {
         const resp = await fetch('/api/config', {

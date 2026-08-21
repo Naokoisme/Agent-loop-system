@@ -55,33 +55,38 @@
         <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">🤖 大模型</button>
         <button type="button" class="settings-tab-btn" data-settings-tab="ones">📋 ONES 平台</button>
         <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机串口</button>
-
       </div>
 
       <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
-        <!-- Tab 1: LLM -->
-        <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 12px;">
-          <div>
-            <label for="cfg-openai-api-key" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">API Key</label>
-            <div style="display: flex; gap: 6px;">
-              <input id="cfg-openai-api-key" type="password" class="input" placeholder="sk-..." style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-              <button type="button" class="button button-secondary toggle-secret-btn" data-target="cfg-openai-api-key" style="padding: 4px 10px; font-size: 12px;">显示</button>
+        <!-- Tab 1: LLM (内置统一服务状态卡片与连通性测试) -->
+        <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #10b981;"></span>
+                大模型与视觉判定引擎
+              </span>
+              <span class="chip chip-solidified" style="font-size: 11px;">内置服务</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 84px 1fr; gap: 8px 12px; font-size: 13px; margin-bottom: 14px;">
+              <span style="color: var(--ink-soft);">服务状态:</span>
+              <span style="color: #10b981; font-weight: 600;">已就绪 (开箱即用)</span>
+              <span style="color: var(--ink-soft);">固定模型:</span>
+              <span id="llm-display-model" style="font-family: monospace; font-weight: 600;">gpt-5.6-sol</span>
+              <span style="color: var(--ink-soft);">服务网关:</span>
+              <span id="llm-display-gateway" style="font-family: monospace; font-size: 12px; color: var(--ink-soft);">https://api.onefaka.com/v1</span>
+            </div>
+            
+            <div style="border-top: 1px dashed var(--line); padding-top: 12px; display: flex; align-items: center; gap: 12px;">
+              <button id="btn-test-llm" type="button" class="button button-secondary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">⚡ 测试服务连通性</button>
+              <span id="llm-test-status" style="font-size: 12px; color: var(--ink-soft);">点击测试与大模型服务端的连通延迟</span>
             </div>
           </div>
-          <div>
-            <label for="cfg-openai-base-url" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Base URL</label>
-            <input id="cfg-openai-base-url" type="text" class="input" placeholder="https://api.openai.com/v1" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-          </div>
-          <div style="display: flex; gap: 12px;">
-            <div style="flex: 1;">
-              <label for="cfg-openai-model" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">模型名称</label>
-              <input id="cfg-openai-model" type="text" class="input" placeholder="gpt-4o" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-            </div>
-            <div style="width: 130px;">
-              <label for="cfg-openai-timeout" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">超时(秒)</label>
-              <input id="cfg-openai-timeout" type="number" class="input" placeholder="120" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-            </div>
-          </div>
+          
+          <p style="margin: 0; font-size: 12px; color: var(--ink-soft); line-height: 1.6;">
+            💡 提示：本版本已内置拓步统一的多模态视觉大模型服务，自动化测试过程中的屏幕截图对比、缺陷判定和探索推理由此服务自动驱动，测试人员无需单独申请或配置 API Key。
+          </p>
         </div>
 
         <!-- Tab 2: ONES -->
@@ -110,19 +115,16 @@
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
               <div>
                 <label for="cfg-ones-auth-token" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">访问令牌</label>
-                <div style="display: flex; gap: 6px;">
-                  <input id="cfg-ones-auth-token" type="password" class="input" placeholder="已自动获取" style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-                  <button type="button" class="button button-secondary toggle-secret-btn" data-target="cfg-ones-auth-token" style="padding: 4px 10px; font-size: 12px;">显示</button>
-                </div>
+                <input id="cfg-ones-auth-token" type="password" class="input" placeholder="从 ONES 个人设置获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
               </div>
               <div style="display: flex; gap: 12px;">
                 <div style="flex: 1;">
                   <label for="cfg-ones-team-uuid" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">团队 UUID</label>
-                  <input id="cfg-ones-team-uuid" type="text" class="input" placeholder="已自动获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                  <input id="cfg-ones-team-uuid" type="text" class="input" placeholder="团队 UUID" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
                 </div>
                 <div style="flex: 1;">
                   <label for="cfg-ones-user-id" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">用户 ID</label>
-                  <input id="cfg-ones-user-id" type="text" class="input" placeholder="已自动获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                  <input id="cfg-ones-user-id" type="text" class="input" placeholder="用户 ID" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
                 </div>
               </div>
             </div>
@@ -131,84 +133,43 @@
 
         <!-- Tab 3: Hardware -->
         <div class="settings-tab-pane" data-settings-pane="hardware" style="display: none; flex-direction: column; gap: 12px;">
-          <div>
-            <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口端口</label>
-            <input id="cfg-hw-port" type="text" class="input" placeholder="例如 COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-            <small style="color: var(--ink-soft); font-size: 11px;">插上手表后，查看 SuperCom 界面左侧新增的 COM 口</small>
-          </div>
-
-          <details style="margin-top: 4px; padding: 8px 12px; background: var(--surface-soft); border-radius: 6px; border: 1px solid var(--line);">
-            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">▼ 高级选项 (波特率 / 通信通道)</summary>
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-              <div style="display: flex; gap: 12px;">
-                <div style="flex: 1;">
-                  <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
-                  <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-                </div>
-                <div style="flex: 1;">
-                  <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">通信通道</label>
-                  <select id="cfg-hw-transport" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--line);">
-                    <option value="supercom" selected>supercom (内置管道)</option>
-                    <option value="direct">direct (直连串口)</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">截图通道</label>
-                <select id="cfg-hw-capture" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--line);">
-                  <option value="mtp" selected>mtp (USB MTP 传输)</option>
-                  <option value="ble">ble (低功耗蓝牙传输)</option>
-                </select>
-              </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口号</label>
+              <input id="cfg-hw-port" type="text" class="input" placeholder="COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
             </div>
-          </details>
+            <div style="flex: 1;">
+              <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
+              <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口管道通信</label>
+              <select id="cfg-hw-transport" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="supercom">SuperCom 命名管道 (推荐)</option>
+                <option value="direct">直接打开串口</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">真机截图抓取方式</label>
+              <select id="cfg-hw-capture" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="mtp">Windows MTP 传输 (推荐)</option>
+                <option value="serial">串口数据传输</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div id="settings-error-box" class="error-banner" style="display: none; color: #d32f2f; background: #ffebee; padding: 8px 12px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></div>
       </div>
 
-      <footer class="dialog-actions" style="margin-top: 16px;">
-        <button id="cancel-system-settings" class="button button-secondary" type="button">取消</button>
-        <button id="submit-system-settings" class="button" type="submit">保存设置</button>
+      <div id="settings-error-box" style="display: none; margin: 12px 0 0 0; padding: 8px 12px; border-radius: 4px; background: var(--red-soft); color: var(--red); font-size: 12px;"></div>
+
+      <footer class="dialog-foot" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line);">
+        <button id="cancel-system-settings" class="button button-secondary" type="button">关闭</button>
+        <button id="submit-system-settings" class="button button-primary" type="submit">保存设置</button>
       </footer>
     </form>
   </dialog>
-
-  <dialog id="update-dialog" class="import-dialog" aria-labelledby="update-dialog-title" style="max-width: 520px; width: 90vw;">
-    <header class="dialog-head">
-      <div>
-        <h2 id="update-dialog-title">系统升级提醒</h2>
-      </div>
-      <button id="close-update-dialog" class="dialog-close" type="button" aria-label="关闭">×</button>
-    </header>
-    <div class="dialog-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px 0;">
-      <div style="background: var(--surface-soft); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--line);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 13px; color: var(--ink-soft);">最新版本: <strong id="update-target-version" style="color: #4f46e5; font-size: 15px;">v0.0.0</strong></span>
-          <span style="font-size: 12px; color: var(--ink-soft);">当前版本: <span id="update-current-version">v—</span></span>
-        </div>
-      </div>
-      <div>
-        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">📋 更新日志</div>
-        <ul id="update-changelog-list" style="margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-soft); line-height: 1.6;">
-        </ul>
-      </div>
-      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 6px; font-size: 11px; color: #166534;">
-        🛡️ <strong>数据安全承诺</strong>：升级过程仅替换系统程序，您的测试用例 (<code>case_map/</code>)、测试历史记录 (<code>history/</code>) 与环境变量配置 (<code>.env</code>) 将完整保留不受影响。
-      </div>
-    </div>
-    <footer class="dialog-actions" style="margin-top: 8px;">
-      <button id="cancel-update-btn" class="button button-secondary" type="button">稍后提醒</button>
-      <button id="btn-start-upgrade" class="button button-primary" type="button" style="background: #4f46e5; color: white;">🚀 一键自动升级</button>
-    </footer>
-  </dialog>
-
-  <div id="upgrade-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.88); z-index: 99999; color: white; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 20px;">
-    <div class="spinner" style="width: 44px; height: 44px; border-width: 4px; border-top-color: #6366f1;"></div>
-    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">正在自动升级系统...</h3>
-    <div id="upgrade-overlay-status" style="margin: 0; font-size: 13px; color: #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; max-width: 420px; line-height: 1.5;">正在从 NAS 同步最新版本产物并解压暂存...</div>
-    <small style="color: #94a3b8; font-size: 11px;">升级完成后系统将自动重启并刷新页面，请勿关闭窗口</small>
-  </div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

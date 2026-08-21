@@ -2025,7 +2025,7 @@ class FrontendDataTest(unittest.TestCase):
 
     def test_case_crud_and_export_endpoints(self) -> None:
         _, base = self._server()
-
+        
         # 1. Create Case
         create_payload = {
             "project": "620C_W6830",
@@ -2043,12 +2043,12 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["case_id"], "CALC_NEW_01")
-
+            
         # Verify duplicate creation error
         with self.assertRaises(HTTPError) as err:
             self._post_json(base + "/api/cases/create", create_payload)
         self.assertEqual(err.exception.code, 400)
-
+        
         # 2. Update Case
         update_payload = {
             "project": "620C_W6830",
@@ -2067,7 +2067,7 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
-
+            
         # 3. Export Cases XLSX
         with urlopen(base + "/api/cases/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
@@ -2084,18 +2084,18 @@ class FrontendDataTest(unittest.TestCase):
         import openpyxl
         import io
         import base64
-
+        
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "自动化测试用例_v1"
         ws.append(["模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果", "不可自动化", "固化状态", "备注"])
         ws.append(["控制中心", "CTRL_001", "P0", "在主表盘下滑", "查看控制中心", "显示WiFi和蓝牙开关", "否", "", "测试导入"])
         ws.append(["计算器", "CALC_001", "P0", "原前置", "原步骤", "原预期", "否", "", "已有用例"])
-
+        
         buf = io.BytesIO()
         wb.save(buf)
         b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-
+        
         # 1. Preview
         preview_req = {
             "project": "620C_W6830",
@@ -2109,7 +2109,7 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(data["new_count"], 1)
             self.assertEqual(data["existing_count"], 1)
             self.assertIn("控制中心", data["modules"])
-
+            
         # 2. Confirm without overwrite
         confirm_req = {
             "project": "620C_W6830",
@@ -2126,13 +2126,13 @@ class FrontendDataTest(unittest.TestCase):
 
     def test_migration_and_audit_endpoints(self) -> None:
         application, base = self._server()
-
+        
         # 1. Migration Candidates
         with urlopen(base + "/api/cases/migration-candidates?source=6202_W5230_SIMULATOR&target=6202_W5230", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("candidates", data)
-
+            
         # 2. Audit and Promote
         audit_payload = {
             "case_id": "CALC_001",
@@ -2143,7 +2143,7 @@ class FrontendDataTest(unittest.TestCase):
         with self.assertRaises(HTTPError) as err:
             self._post_json(base + "/api/cases/audit-and-promote", audit_payload)
         self.assertEqual(err.exception.code, 400)
-
+        
         # Add PASS run to test history
         application.test_history._create(
             job={
@@ -2156,7 +2156,7 @@ class FrontendDataTest(unittest.TestCase):
             stdout="PASS",
             stderr="",
         )
-
+        
         with self._post_json(base + "/api/cases/audit-and-promote", audit_payload) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
@@ -2164,7 +2164,7 @@ class FrontendDataTest(unittest.TestCase):
 
     def test_runs_and_reports_endpoints(self) -> None:
         application, base = self._server()
-
+        
         # Add test run
         application.test_history._create(
             job={
@@ -2177,14 +2177,14 @@ class FrontendDataTest(unittest.TestCase):
             stdout="PASS",
             stderr="",
         )
-
+        
         # 1. Tests Jobs
         with urlopen(base + "/api/tests/jobs?project=620C_W6830&status=running", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("items", data)
             self.assertIn("summary", data)
-
+            
         # 2. Reports Summary
         with urlopen(base + "/api/reports/summary?project=620C_W6830", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
@@ -2193,13 +2193,13 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("distribution", data)
             self.assertIn("trend", data)
             self.assertIn("top_fail_modules", data)
-
+            
         # 3. Reports Runs
         with urlopen(base + "/api/reports/runs?scope=case&project=620C_W6830", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("items", data)
-
+            
         # 4. Reports Export
         with urlopen(base + "/api/reports/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
@@ -2207,20 +2207,20 @@ class FrontendDataTest(unittest.TestCase):
 
     def test_environments_and_config_endpoints(self) -> None:
         _, base = self._server()
-
+        
         # 1. Environments list
         with urlopen(base + "/api/environments", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("items", data)
             self.assertTrue(len(data["items"]) >= 3)
-
+            
         # 2. Environment check
         with self._post_json(base + "/api/environments/620C_W6830/check", {}) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("result", data)
-
+            
         # 3. Environment PUT
         put_payload = {
             "paths": {
@@ -2232,7 +2232,7 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
-
+            
         # 4. Config GET & POST
         with urlopen(base + "/api/config", timeout=3) as resp:
             cfg = json.loads(resp.read().decode("utf-8"))
@@ -2241,7 +2241,7 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("ones", cfg)
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
-
+            
         post_cfg = {
             "llm": {"model": "gpt-4o-mini", "timeout": 60},
         }
@@ -2249,13 +2249,21 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
+            
+        # 5. LLM Connectivity check
+        with patch("agent_loop_system.tools.llm_config.test_llm_connectivity", return_value={"ok": True, "latency_ms": 120, "model": "gpt-5.6-sol", "message": "连接成功"}):
+            with self._post_json(base + "/api/config/test-llm", {}) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertTrue(data["ok"])
+                self.assertEqual(data["model"], "gpt-5.6-sol")
 
-        # 5. Update check & Heartbeat
+        # 6. Update check & Heartbeat
         with urlopen(base + "/api/update-check", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("current_version", data)
-
+            
         with urlopen(base + "/api/system/heartbeat", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
