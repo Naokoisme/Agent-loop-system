@@ -42,6 +42,7 @@
       <p>正在读取本地数据…</p>
     </section>
   </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
     <form id="system-settings-form">
       <header class="dialog-head">
@@ -60,27 +61,40 @@
       <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
         <!-- Tab 1: LLM (内置统一服务状态卡片与连通性测试) -->
         <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 14px;">
-          <div style="background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; padding: 16px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-              <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #10b981;"></span>
+          <div class="llm-settings-card">
+            <div class="llm-settings-heading">
+              <span class="llm-settings-title">
+                <span id="llm-engine-dot" class="llm-status-dot" data-tone="neutral"></span>
                 大模型与视觉判定引擎
               </span>
               <span class="chip chip-solidified" style="font-size: 11px;">内置服务</span>
             </div>
-            
-            <div style="display: grid; grid-template-columns: 84px 1fr; gap: 8px 12px; font-size: 13px; margin-bottom: 14px;">
-              <span style="color: var(--ink-soft);">服务状态:</span>
-              <span style="color: #10b981; font-weight: 600;">已就绪 (开箱即用)</span>
+
+            <div class="llm-signal-list" aria-label="大模型服务状态">
+              <div class="llm-signal-row">
+                <span>服务已配置</span>
+                <strong id="llm-config-status" class="llm-signal-value" data-tone="neutral">读取中…</strong>
+              </div>
+              <div class="llm-signal-row">
+                <span>最近实际调用成功</span>
+                <strong id="llm-actual-success" class="llm-signal-value" data-tone="neutral">尚无成功记录</strong>
+              </div>
+              <div class="llm-signal-row">
+                <span>本次快速探测</span>
+                <strong id="llm-test-status" class="llm-signal-value" data-tone="neutral" role="status" aria-live="polite">尚未执行</strong>
+              </div>
+            </div>
+
+            <div class="llm-config-details">
               <span style="color: var(--ink-soft);">固定模型:</span>
               <span id="llm-display-model" style="font-family: monospace; font-weight: 600;">gpt-5.6-sol</span>
               <span style="color: var(--ink-soft);">服务网关:</span>
               <span id="llm-display-gateway" style="font-family: monospace; font-size: 12px; color: var(--ink-soft);">https://api.onefaka.com/v1</span>
             </div>
-            
-            <div style="border-top: 1px dashed var(--line); padding-top: 12px; display: flex; align-items: center; gap: 12px;">
+
+            <div class="llm-probe-actions">
               <button id="btn-test-llm" type="button" class="button button-secondary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">⚡ 测试服务连通性</button>
-              <span id="llm-test-status" style="font-size: 12px; color: var(--ink-soft);">点击测试与大模型服务端的连通延迟</span>
+              <small>快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。</small>
             </div>
           </div>
         </div>

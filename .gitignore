@@ -42,3 +42,9 @@ node_modules/
 Thumbs.db
 *.tmp
 *.bak
+.tmp_xlsx_read/
+.work/
+Data/
+nul
+
+

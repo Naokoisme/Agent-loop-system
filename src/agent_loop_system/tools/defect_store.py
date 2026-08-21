@@ -17,7 +17,7 @@ from pathlib import Path
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.ones import Defect, OnesClient, OnesConfig, extract_desc_image_uuids
 
@@ -90,7 +90,7 @@ def _llm_invoke_with_retry(llm, messages, max_retries: int = 12) -> str:
         return str(text)
 
     try:
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             _invoke,
             is_valid=lambda text: bool(text.strip()),
             max_attempts=max_retries,

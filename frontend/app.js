@@ -144,6 +144,15 @@ function showToast(message, type = '') {
   toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3600);
 }
 
+function startBrowserDownload(url, filename) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 async function api(url, options = {}) {
   const headers = { ...(options.headers || {}) };
   if (options.body) headers['Content-Type'] = 'application/json';
@@ -990,6 +999,24 @@ function testReturnUrl() {
   }
 }
 
+function testReportReturnUrl() {
+  const raw = new URLSearchParams(location.search).get('from');
+  if (!raw) return '';
+  try {
+    const target = new URL(raw, location.origin);
+    if (target.origin !== location.origin || target.pathname !== '/reports') return '';
+    const params = target.searchParams;
+    const project = String(params.get('project') || currentProject());
+    const view = ['overview', 'batches', 'cases', 'failures'].includes(params.get('view')) ? params.get('view') : 'overview';
+    const from = /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : '';
+    const to = /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : '';
+    const module = ALL_FUNCTION_MODULES.includes(params.get('module')) ? params.get('module') : '';
+    return pageUrl('/reports', testProject(project).project, {view, from, to, module});
+  } catch {
+    return '';
+  }
+}
+
 function withTestReturn(path, project = DEFAULT_TEST_PROJECT, returnTo = '/cases') {
   const params = new URLSearchParams({project: testProject(project).project, from: returnTo});
   return `${path}?${params.toString()}`;
@@ -1790,33 +1817,13 @@ async function renderTests() {
   // --- F12: Excel 导出功能 ---
   const exportExcelBtn = document.querySelector('#export-excel-btn');
   if (exportExcelBtn) {
-    exportExcelBtn.addEventListener('click', async () => {
+    exportExcelBtn.addEventListener('click', () => {
       const curProj = projectSelect ? projectSelect.value : (new URLSearchParams(window.location.search).get('project') || '620C_W6830');
       const url = `/api/cases/export?project=${encodeURIComponent(curProj)}`;
       const pLabel = testProject(curProj)?.projectLabel || curProj;
       showToast(`正在生成 ${pLabel} 的 Excel 测试用例表…`);
-      exportExcelBtn.disabled = true;
-      try {
-        const resp = await fetch(url);
-        if (!resp.ok) {
-          const errData = await resp.json().catch(() => null);
-          throw new Error(errData?.error || `HTTP ${resp.status}`);
-        }
-        const blob = await resp.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = `test_cases_${curProj}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-        showToast(`✅ ${pLabel} 测试用例表导出成功！`);
-      } catch (err) {
-        showToast(`❌ 导出失败: ${err.message}`, 'error');
-      } finally {
-        exportExcelBtn.disabled = false;
-      }
+      startBrowserDownload(url, `test_cases_${curProj}.xlsx`);
+      showToast(`✅ ${pLabel} 测试用例表下载已开始`);
     });
   }
 
@@ -2295,7 +2302,7 @@ async function renderTest(sheet, caseId) {
         <section class="panel">
           <header class="panel-head"><div><h2>${usesFixedMapping ? '固化步骤' : '动态探索'}</h2><p>${usesFixedMapping ? 'Runner 按准备、操作、采集的固定顺序运行' : '当前没有固化步骤，启动后由 Agent-loop 依据用例原文逐步探索'}</p></div></header>
           <div class="panel-body command-phases">
-            ${usesFixedMapping ? `${commandPhase('准备环境', 'setup', testCase.setup)}${commandPhase('执行操作', 'actions', testCase.actions)}${commandPhase('采集证据', 'collect', testCase.collect)}` : '<div class="notice"><strong>本条将临时探索</strong><p>探索命令和截图只写入本次运行历史，不会写入外部探索账本，也不会自动固化到 case_map。</p></div>'}
+            ${usesFixedMapping ? `${commandPhase('准备环境', 'setup', testCase.setup)}${commandPhase('执行操作', 'actions', testCase.actions)}${commandPhase('采集证据', 'collect', testCase.collect)}` : '<div class="notice"><strong>本条将临时探索</strong><p>普通运行只写本次历史，不会写入外部探索账本。完成后可由你显式发起候选复跑；只有复跑证据通过审计才会固化到 case_map。</p></div>'}
           </div>
         </section>
         ${testCase.note ? `<section class="panel"><header class="panel-head"><div><h2>补充说明</h2><p>映射字段未表达的简短说明</p></div></header><div class="panel-body prose">${escapeHtml(testCase.note)}</div></section>` : ''}
@@ -2309,7 +2316,7 @@ async function renderTest(sheet, caseId) {
             <li>保存判定理由与运行证据</li>
           </ul>
           <button id="test-run-button" class="button button-wide" type="submit">启动测试</button>
-          ${!usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">🔍 审计并晋升 PROMOTED</button>` : ''}
+          ${!usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">🔍 生成候选、复跑并晋升</button>` : ''}
           ${project === '6202_W5230' ? `<button id="test-migrate-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">🔄 从 6202 模拟器迁移</button>` : ''}
           <p class="form-note">同一时间只运行一个测试或修复任务，避免${escapeHtml(testCase.execution_target_label)}链路冲突。</p>
         </form>
@@ -2331,7 +2338,7 @@ async function renderTest(sheet, caseId) {
   if (promoteBtn) {
     promoteBtn.addEventListener('click', async () => {
       promoteBtn.disabled = true;
-      promoteBtn.textContent = '正在审计…';
+      promoteBtn.textContent = '正在生成候选…';
       try {
         const resp = await fetch('/api/cases/audit-and-promote', {
           method: 'POST',
@@ -2339,13 +2346,23 @@ async function renderTest(sheet, caseId) {
           body: JSON.stringify({case_id: caseId, sheet, project}),
         });
         const resData = await resp.json();
-        if (!resp.ok) throw new Error(resData.message || (resData.audit?.issues || []).join('; ') || '审计未通过');
-        showToast(`🎉 用例 ${caseId} 审计达标，已成功晋升为 PROMOTED！`);
+        if (!resp.ok) throw new Error(resData.error || resData.message || (resData.audit?.issues || []).join('; ') || '候选生成未通过');
+        if (resData.status === 'candidate_replay_started' && resData.job?.id) {
+          updateTestWorkflow({});
+          const chip = document.querySelector('#test-job-chip');
+          chip.className = 'chip chip-running';
+          chip.textContent = '候选复跑已创建';
+          document.querySelector('#test-job-message').textContent = `任务 ${resData.job.id} 正在用候选映射正式复跑；通过审计后才会写入 PROMOTED。`;
+          showToast(`用例 ${caseId} 的候选复跑已启动`);
+          pollTestJob(resData.job.id, project, sheet, caseId, true);
+          return;
+        }
+        showToast(`用例 ${caseId} 已是 PROMOTED`);
         window.location.reload();
       } catch (err) {
         showToast(err.message, 'error');
         promoteBtn.disabled = false;
-        promoteBtn.textContent = '🔍 审计并晋升 PROMOTED';
+        promoteBtn.textContent = '🔍 生成候选、复跑并晋升';
       }
     });
   }
@@ -2433,7 +2450,7 @@ async function restoreActiveTest(project, sheet, caseId) {
       chip.className = 'chip chip-running';
       chip.textContent = job.status === 'finalizing' ? '保存记录中' : '任务运行中';
       message.textContent = `已找回任务 ${job.id}，正在读取最新状态…`;
-      pollTestJob(job.id, project, sheet, caseId);
+      pollTestJob(job.id, project, sheet, caseId, Boolean(job.promotion_flow));
       return;
     }
     button.textContent = '其他测试运行中';
@@ -2448,36 +2465,65 @@ async function restoreActiveTest(project, sheet, caseId) {
   }
 }
 
-async function pollTestJob(jobId, project, sheet, caseId) {
+async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false) {
   const chip = document.querySelector('#test-job-chip');
   const message = document.querySelector('#test-job-message');
   const button = document.querySelector('#test-run-button');
+  const promoteButton = document.querySelector('#test-promote-button');
   if (!chip || !message || !button) return;
   try {
     const job = await api(`/api/tests/jobs/${encodeURIComponent(jobId)}`);
+    const isPromotionFlow = promotionFlow || Boolean(job.promotion_flow);
     updateTestWorkflow(job.nodes);
     if (['queued', 'running', 'finalizing'].includes(job.status)) {
       button.disabled = true;
       button.textContent = job.status === 'finalizing' ? '保存记录中…' : '正在测试…';
+      if (promoteButton && isPromotionFlow) {
+        promoteButton.disabled = true;
+        promoteButton.textContent = job.status === 'finalizing' ? '正在审计候选…' : '正在正式复跑候选…';
+      }
       chip.className = 'chip chip-running';
-      chip.textContent = job.status === 'finalizing' ? '保存记录中' : (TEST_NODE_LABELS[job.current_node] || '任务运行中');
+      chip.textContent = job.status === 'finalizing'
+        ? (isPromotionFlow ? '正在审计候选' : '保存记录中')
+        : (TEST_NODE_LABELS[job.current_node] || '任务运行中');
       message.textContent = job.status === 'finalizing'
-        ? `任务 ${job.id} 已结束，正在保存测试历史…`
+        ? `任务 ${job.id} 已结束，正在保存历史并审计候选映射…`
         : `任务 ${job.id} · ${TEST_NODE_LABELS[job.current_node] || '正在执行'}`;
-      testPollTimer = setTimeout(() => pollTestJob(jobId, project, sheet, caseId), 2000);
+      testPollTimer = setTimeout(() => pollTestJob(jobId, project, sheet, caseId, isPromotionFlow), 2000);
       return;
     }
     setResultChip(chip, job.verdict);
-    message.innerHTML = job.history_id
-      ? `任务 ${escapeHtml(job.id)} 已结束。<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, testReturnUrl()))}">查看本次测试证据 →</a>`
-      : `任务结束，但测试记录保存失败：${escapeHtml(friendlyAgentError(job.error || '未知原因'))}`;
+    const evidenceLink = job.history_id
+      ? `<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, testReturnUrl()))}">查看本次测试证据 →</a>`
+      : '';
+    if (isPromotionFlow) {
+      const promotionIssues = Array.isArray(job.promotion_issues) ? job.promotion_issues.filter(Boolean) : [];
+      if (job.promotion_status === 'promoted') {
+        message.innerHTML = `候选复跑及证据审计完成，映射已晋升为 PROMOTED。${evidenceLink}`;
+        showToast(`🎉 用例 ${caseId} 的候选复跑达标，已晋升为 PROMOTED！`);
+        window.location.reload();
+        return;
+      }
+      message.innerHTML = `候选未晋升，临时候选${job.promotion_status === 'rolled_back' ? '已自动回滚' : '需要人工检查'}：${escapeHtml(promotionIssues.join('；') || '证据门禁未通过')} ${evidenceLink}`;
+      showToast(job.promotion_status === 'rolled_back' ? '候选复跑未达晋升门禁，已自动回滚' : '候选回滚存在冲突，请查看详情', job.promotion_status === 'rolled_back' ? 'warning' : 'error');
+      if (promoteButton) {
+        promoteButton.disabled = false;
+        promoteButton.textContent = '🔍 生成候选、复跑并晋升';
+      }
+    } else {
+      message.innerHTML = job.history_id
+        ? `任务 ${escapeHtml(job.id)} 已结束。${evidenceLink}`
+        : `任务结束，但测试记录保存失败：${escapeHtml(friendlyAgentError(job.error || '未知原因'))}`;
+    }
     button.disabled = false;
     button.textContent = '再次启动测试';
     const detail = await api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}`);
     document.querySelector('#test-history-body').innerHTML = testHistoryRows(detail.history, project, sheet, caseId, testReturnUrl());
-    if (job.verdict === 'PASS') showToast('Agent 测试已通过');
-    else if (job.verdict === 'CANNOT_VERIFY') showToast('测试无法验证，请查看判定理由和证据', 'warning');
-    else showToast(job.verdict === 'ERROR' ? '测试执行出错' : 'Agent 测试未通过', 'error');
+    if (!isPromotionFlow) {
+      if (job.verdict === 'PASS') showToast('Agent 测试已通过');
+      else if (job.verdict === 'CANNOT_VERIFY') showToast('测试无法验证，请查看判定理由和证据', 'warning');
+      else showToast(job.verdict === 'ERROR' ? '测试执行出错' : 'Agent 测试未通过', 'error');
+    }
   } catch (error) {
     chip.className = 'chip chip-fail';
     chip.textContent = '状态读取失败';
@@ -3061,10 +3107,13 @@ async function renderTestHistory(sheet, caseId, runId) {
   setActiveNav('cases');
   const project = testListParams().project;
   const returnTo = testReturnUrl();
+  const reportReturnTo = testReportReturnUrl();
+  const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);
+  const backLabel = reportReturnTo ? '← 返回测试报告' : '← 返回测试详情';
   const record = await api(`/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}?project=${encodeURIComponent(project)}`);
   document.title = `测试记录 · ${caseId} · Agent 测试`;
   app.innerHTML = `
-    <a class="back-link" href="${escapeHtml(testDetailHref(project, sheet, caseId, returnTo))}">← 返回测试详情</a>
+    <a class="back-link" href="${escapeHtml(backHref)}">${backLabel}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(record.sheet)} · ${escapeHtml(record.case_id)} · ${escapeHtml(record.execution_target_label)}</p>
@@ -3156,6 +3205,12 @@ function initSystemSettings() {
 
   if (!dialog || !openBtn) return;
 
+  const setLlmSignal = (element, text, tone = 'neutral') => {
+    if (!element) return;
+    element.textContent = text;
+    element.dataset.tone = tone;
+  };
+
   // Tab switching
   dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
     tabBtn.addEventListener('click', () => {
@@ -3194,8 +3249,23 @@ function initSystemSettings() {
       // LLM
       const llmModel = document.querySelector('#llm-display-model');
       const llmGateway = document.querySelector('#llm-display-gateway');
+      const llmConfigStatus = document.querySelector('#llm-config-status');
+      const llmActualSuccess = document.querySelector('#llm-actual-success');
+      const llmEngineDot = document.querySelector('#llm-engine-dot');
+      const configured = cfg.llm?.configured === true;
       if (llmModel) llmModel.textContent = cfg.llm?.model || 'gpt-5.6-sol';
       if (llmGateway) llmGateway.textContent = cfg.llm?.base_url || 'https://api.onefaka.com/v1';
+      setLlmSignal(
+        llmConfigStatus,
+        configured ? `已配置${cfg.llm?.is_builtin ? '（内置服务）' : ''}` : '配置不完整',
+        configured ? 'success' : 'error'
+      );
+      setLlmSignal(
+        llmActualSuccess,
+        cfg.llm?.last_actual_success_at ? `成功于 ${formatTime(cfg.llm.last_actual_success_at)}` : '尚无成功记录',
+        cfg.llm?.last_actual_success_at ? 'success' : 'neutral'
+      );
+      if (llmEngineDot) llmEngineDot.dataset.tone = configured ? 'success' : 'error';
 
       // ONES
       const onesBase = document.querySelector('#cfg-ones-base-url');
@@ -3238,32 +3308,20 @@ function initSystemSettings() {
     btnTestLlm.addEventListener('click', async () => {
       btnTestLlm.disabled = true;
       btnTestLlm.textContent = '⏳ 测试中…';
-      if (llmTestStatus) {
-        llmTestStatus.style.color = 'var(--ink-soft)';
-        llmTestStatus.textContent = '正在发起握手测试…';
-      }
+      setLlmSignal(llmTestStatus, '正在发起握手测试…', 'pending');
       try {
         const resp = await fetch('/api/config/test-llm', { method: 'POST' });
         const data = await resp.json();
         if (data.ok) {
-          if (llmTestStatus) {
-            llmTestStatus.style.color = '#10b981';
-            llmTestStatus.textContent = `✅ 连通正常！响应耗时 ${data.latency_ms}ms (模型: ${data.model})`;
-          }
+          setLlmSignal(llmTestStatus, `探测成功 · ${data.latency_ms}ms · ${data.model}`, 'success');
         } else {
-          if (llmTestStatus) {
-            llmTestStatus.style.color = '#ef4444';
-            const cat = data.error_category ? `[${data.error_category}] ` : '';
-            const sug = data.suggestion ? ` · ${data.suggestion}` : '';
-            const detail = data.error || data.message || '未知错误';
-            llmTestStatus.textContent = `❌ 连接失败: ${cat}${detail}${sug}`;
-          }
+          const cat = data.error_category ? `[${data.error_category}] ` : '';
+          const sug = data.suggestion ? ` · ${data.suggestion}` : '';
+          const detail = data.error || data.message || '未知错误';
+          setLlmSignal(llmTestStatus, `本次探测失败 · ${cat}${detail}${sug}`, 'warning');
         }
       } catch (err) {
-        if (llmTestStatus) {
-          llmTestStatus.style.color = '#ef4444';
-          llmTestStatus.textContent = `❌ 请求异常: ${err.message || err}`;
-        }
+        setLlmSignal(llmTestStatus, `本次探测请求异常 · ${err.message || err}`, 'warning');
       } finally {
         btnTestLlm.disabled = false;
         btnTestLlm.textContent = '⚡ 测试服务连通性';
@@ -3664,17 +3722,19 @@ function renderFailureModules(items = []) {
   return `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>模块</th><th>FAIL</th><th>ERROR</th><th>异常合计</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-function renderRecentFailures(items = [], project = currentProject()) {
+function renderRecentFailures(items = [], project = currentProject(), returnTo = pageUrl('/reports', project, {view: 'failures'})) {
   if (!items.length) return Components.emptyState('当前范围没有失败记录');
   const rows = items.map(item => {
     const caseId = item.case_id || item.caseId || '';
     const sheet = item.module || item.sheet || item.file_sheet || '';
+    const historyId = item.history_id || item.run_id || '';
     const verdict = item.verdict || item.latest_verdict || 'FAIL';
     const time = item.at || item.timestamp || item.last_run_at;
-    const detailHref = caseId && sheet ? testDetailHref(project, sheet, caseId, pageUrl('/reports', project, {view: 'failures'})) : '';
-    return `<tr><td>${time ? formatTime(time) : '—'}</td><td>${escapeHtml(sheet)}</td><td>${detailHref ? `<a class='case-id-link' href='${escapeHtml(detailHref)}'>${escapeHtml(caseId)}</a>` : escapeHtml(caseId)}</td><td>${Components.statusChip(verdict, workspaceVerdictLabel(verdict))}</td><td>${escapeHtml(friendlyAgentError(item.message || item.reason || '未记录原因'))}</td></tr>`;
+    const historyHref = caseId && sheet && historyId ? testHistoryHref(project, sheet, caseId, historyId, returnTo) : '';
+    const detailHref = historyHref || (caseId && sheet ? testDetailHref(project, sheet, caseId, returnTo) : '');
+    return `<tr><td>${time ? formatTime(time) : '—'}</td><td>${escapeHtml(sheet)}</td><td>${detailHref ? `<a class='case-id-link' href='${escapeHtml(detailHref)}'>${escapeHtml(caseId)}</a>` : escapeHtml(caseId)}</td><td>${Components.statusChip(verdict, workspaceVerdictLabel(verdict))}</td><td>${escapeHtml(friendlyAgentError(item.message || item.reason || '未记录原因'))}</td><td class='table-actions'>${detailHref ? `<a class='text-button' href='${escapeHtml(detailHref)}'>${historyHref ? '查看本次运行' : '查看用例'} →</a>` : '—'}</td></tr>`;
   }).join('');
-  return `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>模块</th><th>用例</th><th>状态</th><th>错误信息</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>模块</th><th>用例</th><th>状态</th><th>错误信息</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function ReportsPage(project = currentProject()) {
@@ -3695,11 +3755,12 @@ function ReportsPage(project = currentProject()) {
       const {report, filters, summary, runs} = data;
       const metrics = report.metrics || {};
       const distribution = report.distribution || metrics;
+      const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});
       let content;
       if (filters.view === 'overview') {
-        content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>柱形为执行数量，折线为通过率</p></div><span class='chip chip-pending'>${escapeHtml(filters.from)} 至 ${escapeHtml(filters.to)}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>${summary.data ? '报告聚合数据' : '用例最新结果快照'}</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>高频失败模块</h2><p>按 FAIL 与 ERROR 合计排序</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>最近失败记录</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project)}</article></section>${report.insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(report.insight.title || '分析结论')}</strong><p>${escapeHtml(report.insight.description || report.insight.message || '')}</p></div></aside>` : Components.unavailableState('自动分析结论暂不可用', '报告聚合接口尚未提供分析结论，页面不根据少量快照擅自下判断。')}`;
+        content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>柱形为执行数量，折线为通过率</p></div><span class='chip chip-pending'>${escapeHtml(filters.from)} 至 ${escapeHtml(filters.to)}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>${summary.data ? '报告聚合数据' : '用例最新结果快照'}</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>高频失败模块</h2><p>按 FAIL 与 ERROR 合计排序</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>最近失败记录</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article></section>${report.insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(report.insight.title || '分析结论')}</strong><p>${escapeHtml(report.insight.description || report.insight.message || '')}</p></div></aside>` : Components.unavailableState('自动分析结论暂不可用', '报告聚合接口尚未提供分析结论，页面不根据少量快照擅自下判断。')}`;
       } else if (filters.view === 'failures') {
-        content = `<article class='workspace-panel'><header><div><h2>失败分析</h2><p>当前筛选范围内的真实失败与异常记录</p></div></header>${renderRecentFailures(report.recent_failures || [], project)}</article>`;
+        content = `<article class='workspace-panel'><header><div><h2>失败分析</h2><p>当前筛选范围内的真实失败与异常记录</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article>`;
       } else {
         content = runs.data ? `<article class='workspace-panel'><header><div><h2>${filters.view === 'batches' ? '批次报告' : '单条记录'}</h2><p>来自报告运行列表接口</p></div></header>${runs.data.items?.length ? `<pre>${escapeHtml(JSON.stringify(runs.data.items, null, 2))}</pre>` : Components.emptyState('暂无记录')}</article>` : `<article class='workspace-panel'>${Components.unavailableState(filters.view === 'batches' ? '批次报告暂不可用' : '单条记录列表暂不可用', '当前后端未提供 /api/reports/runs，已保留页面结构和筛选条件。')}</article>`;
       }
@@ -3722,27 +3783,13 @@ function ReportsPage(project = currentProject()) {
         history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module}));
         route();
       }));
-      root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', async () => {
+      root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
         const query = new URLSearchParams({project, from: data.filters.from, to: data.filters.to});
         if (data.filters.module) query.set('module', data.filters.module);
         const url = `/api/reports/export?${query.toString()}`;
         showToast('正在导出测试报告 Excel…');
-        try {
-          const resp = await fetch(url);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          const blob = await resp.blob();
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = `test_report_${project}.xlsx`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-          showToast('✅ 测试报告导出成功！');
-        } catch (err) {
-          showToast(`❌ 报告导出失败: ${err.message}`, 'error');
-        }
+        startBrowserDownload(url, `test_report_${project}.xlsx`);
+        showToast('✅ 测试报告下载已开始');
       });
     },
     destroy() {}

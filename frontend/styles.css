@@ -565,6 +565,70 @@ a { color: inherit; }
   border-bottom-color: var(--blue, #416784);
 }
 
+.llm-settings-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.llm-settings-heading,
+.llm-settings-title,
+.llm-probe-actions {
+  display: flex;
+  align-items: center;
+}
+
+.llm-settings-heading { justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.llm-settings-title { gap: 8px; font-size: 14px; font-weight: 700; }
+.llm-status-dot { width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: #a8a8a2; }
+.llm-status-dot[data-tone="success"] { background: #10b981; }
+.llm-status-dot[data-tone="error"] { background: #c14b43; }
+
+.llm-signal-list {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--line);
+}
+
+.llm-signal-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 11px;
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.llm-signal-row > span { flex: none; color: var(--ink-soft); }
+.llm-signal-value { min-width: 0; text-align: right; overflow-wrap: anywhere; }
+.llm-signal-value[data-tone="success"] { color: #17835d; }
+.llm-signal-value[data-tone="warning"] { color: #b36a00; }
+.llm-signal-value[data-tone="error"] { color: #c14b43; }
+.llm-signal-value[data-tone="pending"] { color: var(--blue); }
+.llm-signal-value[data-tone="neutral"] { color: var(--ink-soft); }
+
+.llm-config-details {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+.llm-probe-actions {
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+.llm-probe-actions small { color: var(--ink-soft); line-height: 1.45; }
+
 .dialog-body { display: grid; gap: 18px; padding: 20px 22px; }
 
 .excel-upload-zone {

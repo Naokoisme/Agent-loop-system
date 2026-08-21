@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import argparse
 import base64
+import copy
+import hashlib
 import io
 import openpyxl
 from agent_loop_system.tools.update_checker import (
@@ -18,6 +20,7 @@ import os
 import re
 import shutil
 import socket
+import struct
 import subprocess
 import sys
 import threading
@@ -32,7 +35,11 @@ from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from agent_loop_system.internal_dispatcher import build_child_command
-from agent_loop_system.tools.case_map import validated_case_entries
+from agent_loop_system.tools.case_map import (
+    OBSERVATION_ONLY_COMMANDS,
+    validated_case_entries,
+)
+from agent_loop_system.tools.command_protocol import normalize_command
 from agent_loop_system.tools.external_execution_history import (
     read_external_execution_history,
 )
@@ -51,6 +58,7 @@ HISTORY_SCHEMA_VERSION = 2
 DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 BATCH_STATE_FILE = "batch-state.json"
 BATCH_CASES_FILE = "batch-cases.json"
+PROMOTION_STATE_FILE = "promotion-state.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
 TEST_PROJECTS: dict[str, dict[str, str]] = {
     "620C_W6830": {
@@ -769,6 +777,9 @@ class TestHistoryStore:
             "verdict": result.get("verdict", "ERROR"),
             "reason": result.get("reason") or job.get("error") or "",
             "execution_mode": result.get("execution_mode", "fixed_mapping"),
+            "result_schema_version": result.get("schema_version"),
+            "provenance": result.get("provenance", {}),
+            "execution_status": result.get("execution_status"),
             "priority": case.get("priority", ""),
             "precondition_text": case.get("precondition_text", ""),
             "steps_text": case.get("steps_text", ""),
@@ -1100,7 +1111,7 @@ class TestHistoryStore:
 
 
 class CaseMapRepository:
-    """case_map 的只读查询视图。"""
+    """case_map 查询视图，以及显式候选复跑所需的最小写入事务。"""
 
     FILTERS = {
         "all", "unexplored", "externally_explored",
@@ -1108,10 +1119,604 @@ class CaseMapRepository:
     }
     RUN_CATEGORIES = {"untested", "pass", "fail", "cannot_verify", "error"}
     BATCH_CATEGORIES = RUN_CATEGORIES - {"pass"}
+    PROMOTABLE_VERDICTS = {"PASS", "FAIL"}
+    CANDIDATE_FIELDS = (
+        "setup", "actions", "collect", "verification_points", "note",
+    )
 
     def __init__(self, paths: AppPaths, history: TestHistoryStore):
         self.paths = paths
         self.history = history
+        self._write_lock = threading.RLock()
+
+    @staticmethod
+    def _command_name(command: str) -> str:
+        return normalize_command(command)[1:].partition(":")[0]
+
+    @staticmethod
+    def _unique_issues(issues: list[str]) -> list[str]:
+        return list(dict.fromkeys(issue for issue in issues if issue))
+
+    def _load_writable_case(
+        self,
+        *,
+        sheet: str,
+        case_id: str,
+        project: str,
+    ) -> tuple[Path, str, Any, list[dict[str, Any]], dict[str, Any]]:
+        """严格读取一次目标模块，并保证待修改 case_id 唯一。"""
+
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        case_id = _safe_segment(case_id, "测试用例编号")
+        path = _case_map_path(self.paths, sheet, project)
+        try:
+            source_text = path.read_text(encoding="utf-8")
+            raw = json.loads(source_text)
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"case_map JSON 无法读取: {path}") from exc
+        entries = validated_case_entries(
+            raw,
+            sheet_name=sheet,
+            expected_profile=project_meta["case_map_profile"],
+            path=path,
+        )
+        matches = [item for item in entries if item.get("case_id") == case_id]
+        if len(matches) != 1:
+            raise ValueError(
+                f"case_map 中用例 {case_id} 应唯一，实际找到 {len(matches)} 条"
+            )
+        return path, source_text, raw, entries, matches[0]
+
+    @staticmethod
+    def _write_if_unchanged(path: Path, source_text: str, payload: Any) -> None:
+        """在原子替换前拒绝覆盖同一文件的并发修改。"""
+
+        try:
+            if path.read_text(encoding="utf-8") != source_text:
+                raise RuntimeError("case_map 在写入前发生并发变化")
+        except OSError as exc:
+            raise RuntimeError(f"case_map 写入前无法复核: {exc}") from exc
+        _write_json(path, payload)
+
+    def build_agent_candidate(
+        self,
+        *,
+        sheet: str,
+        case_id: str,
+        project: str,
+        source_history: dict[str, Any],
+    ) -> dict[str, Any]:
+        """从一轮完整自主探索中提取可正式复跑的临时候选。"""
+
+        project_meta = _test_project(project)
+        issues: list[str] = []
+        if str(source_history.get("sheet") or "") != sheet:
+            issues.append("自主探索记录的模块与当前用例不一致")
+        if str(source_history.get("case_id") or "") != case_id:
+            issues.append("自主探索记录的 case_id 与当前用例不一致")
+        if str(source_history.get("project") or "") != project_meta["project"]:
+            issues.append("自主探索记录的项目与当前用例不一致")
+        if source_history.get("execution_mode") != "agent_exploration":
+            issues.append("最新运行不是 Agent-loop 自主探索结果")
+
+        verdict = str(source_history.get("verdict") or "ERROR").upper()
+        if verdict not in self.PROMOTABLE_VERDICTS:
+            issues.append(f"自主探索结果为 {verdict}，没有形成可复跑的确定结论")
+        if not str(source_history.get("reason") or "").strip():
+            issues.append("自主探索结果缺少判定理由")
+        if source_history.get("skipped") or source_history.get("aborted"):
+            issues.append("自主探索运行被跳过或中止")
+        if any(
+            source_history.get(field)
+            for field in ("setup_errors", "action_errors", "collect_errors")
+        ):
+            issues.append("自主探索运行存在命令或截图错误")
+
+        contract = source_history.get("evidence_contract")
+        if not isinstance(contract, dict):
+            contract = {}
+        if contract.get("complete") is not True or contract.get("status") != "COMPLETE":
+            issues.append("自主探索的证据合同不完整")
+        if contract.get("issues") not in ([], None):
+            issues.append("自主探索的证据合同仍有未解决问题")
+
+        planned = source_history.get("planned_commands")
+        raw_actions = planned.get("action") if isinstance(planned, dict) else None
+        if not isinstance(raw_actions, list) or not raw_actions:
+            issues.append("自主探索没有记录实际 action")
+            raw_actions = []
+        normalized_actions: list[str] = []
+        for index, command in enumerate(raw_actions, start=1):
+            try:
+                normalized = normalize_command(command)
+            except ValueError as exc:
+                issues.append(f"自主探索 action {index} 格式无效: {exc}")
+                continue
+            name = self._command_name(normalized)
+            if project_meta["execution_target"] == "hardware" and (
+                name == "TEST_SESSION" or name.startswith("SIM_")
+            ):
+                issues.append(f"自主探索 action {index} 含真机禁用命令 {name}")
+            normalized_actions.append(normalized)
+        if not any(
+            self._command_name(command) not in OBSERVATION_ONLY_COMMANDS
+            for command in normalized_actions
+        ):
+            issues.append("自主探索没有成功执行真实业务 action")
+
+        trace = source_history.get("command_trace")
+        trace = trace if isinstance(trace, list) else []
+        traced_actions: list[str] = []
+        captures: list[dict[str, Any]] = []
+        for item in trace:
+            if not isinstance(item, dict):
+                issues.append("自主探索 command_trace 含非对象条目")
+                continue
+            if item.get("source") == "agent" and item.get("phase") == "action":
+                if item.get("ok") is not True:
+                    issues.append("自主探索 action trace 存在失败动作")
+                    continue
+                try:
+                    traced_actions.append(normalize_command(str(item.get("command") or "")))
+                except ValueError as exc:
+                    issues.append(f"自主探索 action trace 格式无效: {exc}")
+            if (
+                item.get("command_name") == "HOST_SCREENSHOT"
+                and item.get("ok") is True
+                and item.get("kind") in {"capture", "screenshot"}
+            ):
+                captures.append(item)
+        if traced_actions != normalized_actions:
+            issues.append("自主探索的计划 actions 与成功 action trace 不一致")
+
+        points = source_history.get("verification_points")
+        points = (
+            [str(point).strip() for point in points]
+            if isinstance(points, list)
+            else []
+        )
+        if not points or any(not point for point in points):
+            issues.append("自主探索没有完整的视觉检查点标签")
+        capture_labels = [str(item.get("checkpoint_label") or "").strip() for item in captures]
+        if capture_labels != points:
+            issues.append("自主探索的截图 trace 与视觉检查点不一致")
+        archived_screenshots = source_history.get("screenshot_urls")
+        if not isinstance(archived_screenshots, list):
+            archived_screenshots = source_history.get("screenshots")
+        screenshot_count = len(archived_screenshots) if isinstance(archived_screenshots, list) else 0
+        if screenshot_count != len(points):
+            issues.append(
+                f"自主探索需要 {len(points)} 张历史截图，实际可读取 {screenshot_count} 张"
+            )
+        for field, actual in (
+            ("required_screenshots", len(points)),
+            ("captured_screenshots", screenshot_count),
+            ("planned_action_count", len(normalized_actions)),
+            ("attempted_action_count", len(traced_actions)),
+        ):
+            if contract.get(field) != actual:
+                issues.append(f"自主探索证据计数 {field} 与实际记录不一致")
+
+        issues = self._unique_issues(issues)
+        if issues:
+            raise ValueError("；".join(issues))
+
+        setup: list[str] = []
+        exploration = source_history.get("exploration_trace")
+        exploration_steps = exploration.get("steps") if isinstance(exploration, dict) else []
+        initial_window = ""
+        if isinstance(exploration_steps, list):
+            initial = next((item for item in exploration_steps if isinstance(item, dict)), None)
+            if initial:
+                initial_window = str(initial.get("window_name") or "").strip()
+        if (
+            re.fullmatch(r"[A-Z][A-Z0-9_]*", initial_window)
+            and not any(self._command_name(command) == "ENTER_PAGE" for command in normalized_actions)
+        ):
+            setup.append(f":ENTER_PAGE:{initial_window},0")
+
+        candidate_actions: list[str] = []
+        action_cursor = 0
+        action_started = False
+        checkpoint_cursor = 0
+        for item in trace:
+            if not isinstance(item, dict):
+                continue
+            if item.get("source") == "agent" and item.get("phase") == "action" and item.get("ok") is True:
+                command = normalized_actions[action_cursor]
+                action_cursor += 1
+                candidate_actions.append(command)
+                action_started = True
+                continue
+            if (
+                item.get("command_name") == "HOST_SCREENSHOT"
+                and item.get("ok") is True
+                and item.get("kind") in {"capture", "screenshot"}
+            ):
+                checkpoint_cursor += 1
+                screenshot_command = f":HOST_SCREENSHOT:{checkpoint_cursor}"
+                if action_started:
+                    candidate_actions.append(screenshot_command)
+                else:
+                    setup.append(screenshot_command)
+
+        return {
+            "setup": setup,
+            "actions": candidate_actions,
+            "collect": [],
+            "verification_points": points,
+            "note": (
+                "Agent-loop 自主探索候选，来源运行 "
+                f"{str(source_history.get('id') or '').strip()}"
+            ),
+        }
+
+    def stage_agent_candidate(
+        self,
+        *,
+        sheet: str,
+        case_id: str,
+        project: str,
+        source_history: dict[str, Any],
+    ) -> dict[str, Any]:
+        """显式用户操作后临时写入候选；不会写外部探索账本。"""
+
+        project_meta = _test_project(project)
+        candidate = self.build_agent_candidate(
+            sheet=sheet,
+            case_id=case_id,
+            project=project_meta["project"],
+            source_history=source_history,
+        )
+        with self._write_lock:
+            path, source_text, raw, _entries, current = self._load_writable_case(
+                sheet=sheet,
+                case_id=case_id,
+                project=project_meta["project"],
+            )
+            if current.get("mapping_status") == "PROMOTED":
+                raise ValueError("该用例已经是 PROMOTED")
+            occupied = [
+                field
+                for field in self.CANDIDATE_FIELDS
+                if current.get(field) not in (None, "", [])
+            ]
+            if occupied:
+                raise RuntimeError(
+                    "case_map 已存在未完成候选，拒绝覆盖: " + ", ".join(occupied)
+                )
+            original_fields = {
+                field: {
+                    "present": field in current,
+                    "value": copy.deepcopy(current.get(field)),
+                }
+                for field in (*self.CANDIDATE_FIELDS, "mapping_status")
+            }
+            for field in self.CANDIDATE_FIELDS:
+                current[field] = copy.deepcopy(candidate[field])
+            current.pop("mapping_status", None)
+            self._write_if_unchanged(path, source_text, raw)
+            staged_bytes = path.read_bytes()
+        return {
+            "project": project_meta["project"],
+            "sheet": sheet,
+            "case_id": case_id,
+            "source_history_id": str(source_history.get("id") or ""),
+            "candidate_fields": copy.deepcopy(candidate),
+            "original_fields": original_fields,
+            "staged_file_sha256": hashlib.sha256(staged_bytes).hexdigest().upper(),
+        }
+
+    @classmethod
+    def _candidate_matches(
+        cls,
+        current: dict[str, Any],
+        context: dict[str, Any],
+    ) -> bool:
+        expected = context.get("candidate_fields")
+        return bool(
+            isinstance(expected, dict)
+            and current.get("mapping_status") != "PROMOTED"
+            and all(current.get(field) == expected.get(field) for field in cls.CANDIDATE_FIELDS)
+        )
+
+    def rollback_agent_candidate(
+        self,
+        context: dict[str, Any],
+    ) -> dict[str, Any]:
+        """只在当前 case 仍等于本次候选时恢复写入前字段。"""
+
+        with self._write_lock:
+            path, source_text, raw, _entries, current = self._load_writable_case(
+                sheet=str(context.get("sheet") or ""),
+                case_id=str(context.get("case_id") or ""),
+                project=str(context.get("project") or ""),
+            )
+            if current.get("mapping_status") == "PROMOTED":
+                return {"status": "promoted", "issues": []}
+            if not self._candidate_matches(current, context):
+                return {
+                    "status": "rollback_conflict",
+                    "issues": ["候选复跑期间当前 case 已被其他操作修改，未自动覆盖"],
+                }
+            original = context.get("original_fields")
+            if not isinstance(original, dict):
+                return {
+                    "status": "rollback_conflict",
+                    "issues": ["缺少候选写入前快照，未自动覆盖"],
+                }
+            for field in (*self.CANDIDATE_FIELDS, "mapping_status"):
+                state = original.get(field)
+                if isinstance(state, dict) and state.get("present") is True:
+                    current[field] = copy.deepcopy(state.get("value"))
+                else:
+                    current.pop(field, None)
+            self._write_if_unchanged(path, source_text, raw)
+        return {"status": "rolled_back", "issues": []}
+
+    @staticmethod
+    def _hardware_bmp_issue(path: Path) -> str:
+        """6202 正式证据必须是可读的 410x502 top-down 24-bit BMP。"""
+
+        try:
+            data = path.read_bytes()
+        except OSError as exc:
+            return f"截图无法读取: {exc}"
+        if len(data) < 54 or data[:2] != b"BM":
+            return "截图不是完整 BMP"
+        try:
+            declared_size = struct.unpack_from("<I", data, 2)[0]
+            pixel_offset = struct.unpack_from("<I", data, 10)[0]
+            dib_size = struct.unpack_from("<I", data, 14)[0]
+            width, signed_height = struct.unpack_from("<ii", data, 18)
+            planes, bits_per_pixel = struct.unpack_from("<HH", data, 26)
+            compression = struct.unpack_from("<I", data, 30)[0]
+        except struct.error:
+            return "截图 BMP 头不完整"
+        if declared_size != len(data):
+            return "截图 BMP 声明长度与实际长度不一致"
+        if dib_size < 40 or pixel_offset < 14 + dib_size or pixel_offset >= len(data):
+            return "截图 BMP 头或像素偏移无效"
+        if (width, signed_height) != (410, -502):
+            return f"截图尺寸必须为 410x502 top-down，实际为 {width}x{abs(signed_height)}"
+        if (planes, bits_per_pixel, compression) != (1, 24, 0):
+            return "截图必须为未压缩 24-bit BGR BMP"
+        row_stride = ((410 * 3) + 3) & ~3
+        if pixel_offset + row_stride * 502 != len(data):
+            return "截图 BMP 像素布局不可读"
+        return ""
+
+    def _audit_candidate_result(
+        self,
+        *,
+        context: dict[str, Any],
+        result: dict[str, Any],
+    ) -> list[str]:
+        """核对 Runner 原始结果；verdict 与映射是否可固化保持独立。"""
+
+        issues: list[str] = []
+        project_meta = _test_project(str(context.get("project") or ""))
+        candidate = context.get("candidate_fields")
+        candidate = candidate if isinstance(candidate, dict) else {}
+        if result.get("schema_version") != 3:
+            issues.append("候选复跑结果 schema_version 不是 3")
+        if result.get("execution_mode") != "candidate_mapping":
+            issues.append("候选复跑没有使用 execution_mode=candidate_mapping")
+        if str(result.get("case_id") or "") != context.get("case_id"):
+            issues.append("候选复跑结果的 case_id 不一致")
+        if str(result.get("sheet") or "") != context.get("sheet"):
+            issues.append("候选复跑结果的模块不一致")
+        verdict = str(result.get("verdict") or "ERROR").upper()
+        if verdict not in self.PROMOTABLE_VERDICTS:
+            issues.append(f"候选复跑结果为 {verdict}，没有形成确定产品结论")
+        if not str(result.get("reason") or "").strip():
+            issues.append("候选复跑结果缺少判定理由")
+        if result.get("skipped") or result.get("aborted"):
+            issues.append("候选复跑被跳过或中止")
+        if result.get("execution_status") not in (None, "OK"):
+            issues.append("候选复跑执行状态不是 OK")
+        if any(result.get(field) for field in ("setup_errors", "action_errors", "collect_errors")):
+            issues.append("候选复跑存在命令或截图错误")
+
+        provenance = result.get("provenance")
+        expected_runtime_project = (
+            "6202_W5230"
+            if project_meta["case_map_profile"] == "6202_W5230_SIMULATOR"
+            else project_meta["project"]
+        )
+        expected_provenance = {
+            "target": project_meta["execution_target"],
+            "case_map_profile": project_meta["case_map_profile"],
+            "project": expected_runtime_project,
+        }
+        if not isinstance(provenance, dict):
+            issues.append("候选复跑缺少目标 provenance")
+        else:
+            for field, expected in expected_provenance.items():
+                if provenance.get(field) != expected:
+                    issues.append(f"候选复跑 provenance.{field} 与目标不一致")
+            if project_meta["execution_target"] == "hardware" and (
+                provenance.get("artifact_path") not in (None, "")
+                or provenance.get("artifact_sha256") not in (None, "")
+            ):
+                issues.append("真机候选复跑不应声明模拟器产物")
+
+        planned = result.get("planned_commands")
+        comparisons = (
+            ("setup", candidate.get("setup"), planned.get("setup") if isinstance(planned, dict) else None),
+            ("actions", candidate.get("actions"), planned.get("action") if isinstance(planned, dict) else None),
+            ("collect", candidate.get("collect"), planned.get("collect") if isinstance(planned, dict) else None),
+            ("verification_points", candidate.get("verification_points"), result.get("verification_points")),
+        )
+        for field, expected, actual in comparisons:
+            if expected != actual:
+                issues.append(f"候选复跑的 {field} 与暂存候选不一致")
+
+        planned_actions = candidate.get("actions")
+        planned_actions = planned_actions if isinstance(planned_actions, list) else []
+        trace = result.get("command_trace")
+        trace = trace if isinstance(trace, list) else []
+        action_traces: dict[int, dict[str, Any]] = {}
+        successful_business = False
+        for item in trace:
+            if not isinstance(item, dict):
+                issues.append("候选复跑 command_trace 含非对象条目")
+                continue
+            if item.get("source") != "case" or item.get("phase") != "action":
+                continue
+            planned_index = item.get("planned_index")
+            if type(planned_index) is not int or planned_index in action_traces:
+                issues.append("候选复跑 action trace 的 planned_index 缺失或重复")
+                continue
+            action_traces[planned_index] = item
+            if not 1 <= planned_index <= len(planned_actions):
+                issues.append("候选复跑 action trace 的 planned_index 超出范围")
+                continue
+            try:
+                expected = normalize_command(planned_actions[planned_index - 1])
+                command = normalize_command(str(item.get("command") or ""))
+                wire = normalize_command(str(item.get("wire") or ""))
+            except ValueError as exc:
+                issues.append(f"候选复跑 action trace 命令格式无效: {exc}")
+                continue
+            if command != expected or wire != expected:
+                issues.append("候选复跑 action trace 与计划命令不一致")
+                continue
+            if item.get("ok") is not True:
+                issues.append("候选复跑 action trace 存在失败命令")
+            elif self._command_name(command) not in OBSERVATION_ONLY_COMMANDS:
+                successful_business = True
+        if set(action_traces) != set(range(1, len(planned_actions) + 1)):
+            issues.append("候选复跑 action trace 未精确覆盖全部计划 actions")
+        if not successful_business:
+            issues.append("候选复跑没有成功的真实业务 action trace")
+
+        contract = result.get("evidence_contract")
+        contract = contract if isinstance(contract, dict) else {}
+        if (
+            contract.get("complete") is not True
+            or contract.get("status") != "COMPLETE"
+            or contract.get("issues") not in ([], None)
+        ):
+            issues.append("候选复跑的证据合同不完整")
+        points = result.get("verification_points")
+        points = points if isinstance(points, list) else []
+        screenshots = result.get("screenshots")
+        screenshots = screenshots if isinstance(screenshots, list) else []
+        for field, actual in (
+            ("planned_action_count", len(planned_actions)),
+            ("attempted_action_count", len(planned_actions)),
+            ("required_screenshots", len(points)),
+            ("captured_screenshots", len(screenshots)),
+        ):
+            if contract.get(field) != actual:
+                issues.append(f"候选复跑证据计数 {field} 与实际记录不一致")
+        if not isinstance(contract.get("business_action_count"), int) or contract.get("business_action_count", 0) < 1:
+            issues.append("候选复跑证据没有真实业务动作")
+        if not points or len(points) != len(screenshots):
+            issues.append("候选复跑截图没有与视觉检查点一一对应")
+
+        seen_paths: set[Path] = set()
+        seen_screenshot_trace_indexes: set[int] = set()
+        job_id = str(context.get("job_id") or "")
+        expected_evidence_root = (
+            (self.paths.runtime_jobs / job_id).resolve()
+            if SAFE_SEGMENT.fullmatch(job_id)
+            else None
+        )
+        trace_by_index = {
+            item.get("index"): item
+            for item in trace
+            if isinstance(item, dict) and type(item.get("index")) is int
+        }
+        for index, screenshot in enumerate(screenshots, start=1):
+            if not isinstance(screenshot, dict):
+                issues.append(f"候选复跑第 {index} 张截图记录无效")
+                continue
+            path_text = str(screenshot.get("path") or "")
+            path = Path(path_text).resolve() if path_text else None
+            if path is None or not path.is_file() or path.stat().st_size <= 0:
+                issues.append(f"候选复跑第 {index} 张截图不存在或为空")
+            elif path in seen_paths:
+                issues.append(f"候选复跑第 {index} 张截图复用了旧路径")
+            else:
+                seen_paths.add(path)
+                if expected_evidence_root is None:
+                    issues.append("候选复跑缺少唯一任务证据目录")
+                else:
+                    try:
+                        path.relative_to(expected_evidence_root)
+                    except ValueError:
+                        issues.append(f"候选复跑第 {index} 张截图不属于本次任务目录")
+                if project_meta["execution_target"] == "hardware":
+                    bmp_issue = self._hardware_bmp_issue(path)
+                    if bmp_issue:
+                        issues.append(f"候选复跑第 {index} 张截图无效: {bmp_issue}")
+            expected_label = str(points[index - 1]) if index <= len(points) else ""
+            if str(screenshot.get("label") or "") != expected_label:
+                issues.append(f"候选复跑第 {index} 张截图标签不匹配")
+            captured_at = str(screenshot.get("captured_at") or "").strip()
+            try:
+                captured_time = datetime.fromisoformat(captured_at)
+                if captured_time.tzinfo is None:
+                    raise ValueError("missing timezone")
+            except ValueError:
+                issues.append(f"候选复跑第 {index} 张截图缺少带时区的采集时间")
+            trace_index = screenshot.get("trace_index")
+            if type(trace_index) is not int:
+                issues.append(f"候选复跑第 {index} 张截图缺少整数 trace_index")
+            elif trace_index in seen_screenshot_trace_indexes:
+                issues.append(f"候选复跑第 {index} 张截图复用了 trace_index")
+            else:
+                seen_screenshot_trace_indexes.add(trace_index)
+            trace_item = trace_by_index.get(trace_index)
+            if not isinstance(trace_item, dict) or (
+                trace_item.get("source") != "case"
+                or trace_item.get("kind") != "screenshot"
+                or trace_item.get("ok") is not True
+                or trace_item.get("checkpoint_index") != index
+                or str(trace_item.get("checkpoint_label") or "") != expected_label
+            ):
+                issues.append(f"候选复跑第 {index} 张截图缺少对应成功 trace")
+        return self._unique_issues(issues)
+
+    def finalize_agent_candidate(
+        self,
+        *,
+        context: dict[str, Any],
+        result: dict[str, Any],
+    ) -> dict[str, Any]:
+        """审计候选复跑并晋升；任一门禁失败都尝试精确回滚。"""
+
+        issues = self._audit_candidate_result(context=context, result=result)
+        with self._write_lock:
+            path, source_text, raw, _entries, current = self._load_writable_case(
+                sheet=str(context.get("sheet") or ""),
+                case_id=str(context.get("case_id") or ""),
+                project=str(context.get("project") or ""),
+            )
+            current_hash = hashlib.sha256(path.read_bytes()).hexdigest().upper()
+            if current_hash != context.get("staged_file_sha256"):
+                issues.append("case_map 在候选复跑期间发生变化")
+            if not self._candidate_matches(current, context):
+                issues.append("case_map 当前候选与本次复跑上下文不一致")
+            issues = self._unique_issues(issues)
+            if not issues:
+                current["mapping_status"] = "PROMOTED"
+                self._write_if_unchanged(path, source_text, raw)
+                return {"status": "promoted", "issues": []}
+
+        rollback = self.rollback_agent_candidate(context)
+        rollback_issues = rollback.get("issues") if isinstance(rollback, dict) else []
+        return {
+            "status": (
+                "rolled_back"
+                if rollback.get("status") == "rolled_back"
+                else "rollback_conflict"
+            ),
+            "issues": self._unique_issues(issues + list(rollback_issues or [])),
+        }
 
     def _all(
         self,
@@ -1168,10 +1773,9 @@ class CaseMapRepository:
                 else:
                     row["latest_verdict"] = "ERROR"
                 row["external_explored"] = case_id in externally_explored_ids
-                row["is_promoted"] = (
-                    row["external_explored"]
-                    and row["mapping_status"] == "PROMOTED"
-                )
+                # 外部探索账本与映射固化是两条独立事实轴。显式的站内候选
+                # 复跑也能形成 PROMOTED，但绝不能伪造一条“外部探索”记录。
+                row["is_promoted"] = row["mapping_status"] == "PROMOTED"
                 row["maturity_state"] = (
                     "solidified"
                     if row["is_promoted"]
@@ -1203,10 +1807,10 @@ class CaseMapRepository:
         }
         summary = {
             "all": len(rows),
-            "unexplored": sum(not row["external_explored"] for row in rows),
+            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
             "externally_explored": sum(row["external_explored"] for row in rows),
             "explored_unsolidified": sum(
-                row["external_explored"] and not row["is_promoted"] for row in rows
+                row["maturity_state"] == "explored_unsolidified" for row in rows
             ),
             "solidified": sum(row["is_promoted"] for row in rows),
         }
@@ -1227,7 +1831,7 @@ class CaseMapRepository:
                 )
             ]
         if state_filter == "unexplored":
-            rows = [row for row in rows if not row["external_explored"]]
+            rows = [row for row in rows if row["maturity_state"] == "unexplored"]
         elif state_filter == "externally_explored":
             rows = [row for row in rows if row["external_explored"]]
         elif state_filter == "explored_unsolidified":
@@ -1343,6 +1947,7 @@ class CaseTestManager:
         self._jobs: dict[str, dict[str, Any]] = {}
         self._active_job_ids: dict[str, str] = {}
         self._load_batches()
+        self._recover_stale_promotions()
 
     @staticmethod
     def _execution_slot(job: dict[str, Any]) -> str:
@@ -1385,6 +1990,58 @@ class CaseTestManager:
 
     def _batch_cases_path(self, job_id: str) -> Path:
         return self.paths.runtime_jobs / job_id / BATCH_CASES_FILE
+
+    def _promotion_state_path(self, job_id: str) -> Path:
+        return self.paths.runtime_jobs / job_id / PROMOTION_STATE_FILE
+
+    def _persist_promotion_state(
+        self,
+        job: dict[str, Any],
+        *,
+        status: str,
+        issues: list[str] | None = None,
+    ) -> None:
+        context = job.get("promotion_context")
+        if not isinstance(context, dict):
+            return
+        _write_json(self._promotion_state_path(str(job["id"])), {
+            "job_id": str(job["id"]),
+            "project": str(job.get("project") or ""),
+            "sheet": str(job.get("sheet") or ""),
+            "case_id": str(job.get("case_id") or ""),
+            "status": status,
+            "updated_at": _now(),
+            "issues": list(issues or []),
+            "context": context,
+        })
+
+    def _recover_stale_promotions(self) -> None:
+        """服务重启时回滚尚未形成终态的临时候选。"""
+
+        if not self.paths.runtime_jobs.is_dir():
+            return
+        for state_path in self.paths.runtime_jobs.glob(f"*/{PROMOTION_STATE_FILE}"):
+            state = _read_json(state_path)
+            if not isinstance(state, dict) or state.get("status") not in {
+                "staged", "queued", "running", "finalizing",
+            }:
+                continue
+            context = state.get("context")
+            if not isinstance(context, dict):
+                continue
+            try:
+                rollback = self.cases.rollback_agent_candidate(context)
+                status = str(rollback.get("status") or "rollback_conflict")
+                issues = list(rollback.get("issues") or [])
+            except BaseException as exc:
+                status = "rollback_conflict"
+                issues = [f"服务重启后的候选回滚失败: {exc}"]
+            state["status"] = (
+                "rolled_back_on_restart" if status == "rolled_back" else status
+            )
+            state["issues"] = issues
+            state["updated_at"] = _now()
+            _write_json(state_path, state)
 
     def _persist_batch_locked(self, job: dict[str, Any]) -> None:
         if job.get("type") != "batch":
@@ -1500,39 +2157,93 @@ class CaseTestManager:
         sheet: str,
         case_id: str,
         project: str = DEFAULT_TEST_PROJECT,
+        candidate_replay: bool = False,
+        promotion_source: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         project_meta = _test_project(project)
         project = project_meta["project"]
         case = self.cases.get(sheet, case_id, project=project)
         if case is None:
             raise ValueError("测试用例不存在")
+        if candidate_replay and not isinstance(promotion_source, dict):
+            raise ValueError("候选复跑缺少自主探索来源记录")
+        promotion_context: dict[str, Any] | None = None
         with self._lock:
             job_id = uuid.uuid4().hex[:12]
-            job = {
+            slot_claim = {
                 "id": job_id,
-                "type": "single",
-                "sheet": sheet,
-                "case_id": case_id,
                 **{key: project_meta[key] for key in (
                     "project", "project_label", "execution_target", "execution_target_label"
                 )},
-                "case": case,
-                "status": "queued",
-                "current_node": "load",
-                "nodes": {node: "pending" for node in TEST_WORKFLOW_NODES},
-                "verdict": "PENDING",
-                "reason": "",
-                "created_at": _now(),
-                "started_at": None,
-                "finished_at": None,
-                "history_id": None,
-                "error": None,
             }
-            self._claim_execution_slot_locked(job)
-            self._jobs[job_id] = job
-            self._persist_batch_locked(job)
+            self._claim_execution_slot_locked(slot_claim)
+            try:
+                if candidate_replay:
+                    promotion_context = self.cases.stage_agent_candidate(
+                        sheet=sheet,
+                        case_id=case_id,
+                        project=project,
+                        source_history=promotion_source or {},
+                    )
+                    promotion_context["job_id"] = job_id
+                    case = self.cases.get(sheet, case_id, project=project)
+                    if case is None:
+                        raise RuntimeError("候选写入后无法重新读取测试用例")
+                job = {
+                    **slot_claim,
+                    "type": "single",
+                    "sheet": sheet,
+                    "case_id": case_id,
+                    "case": case,
+                    "status": "queued",
+                    "current_node": "load",
+                    "nodes": {node: "pending" for node in TEST_WORKFLOW_NODES},
+                    "verdict": "PENDING",
+                    "reason": "",
+                    "created_at": _now(),
+                    "started_at": None,
+                    "finished_at": None,
+                    "history_id": None,
+                    "error": None,
+                    "candidate_replay": bool(candidate_replay),
+                    "promotion_flow": bool(candidate_replay),
+                    "promotion_status": "pending" if candidate_replay else None,
+                    "promotion_issues": [],
+                    "promotion_source_history_id": (
+                        str((promotion_source or {}).get("id") or "")
+                        if candidate_replay else None
+                    ),
+                    "promotion_context": promotion_context,
+                }
+                self._jobs[job_id] = job
+                if candidate_replay:
+                    self._persist_promotion_state(job, status="queued")
+            except BaseException:
+                self._jobs.pop(job_id, None)
+                self._release_execution_slot_locked(job_id)
+                if promotion_context is not None:
+                    self.cases.rollback_agent_candidate(promotion_context)
+                raise
         thread = threading.Thread(target=self._run, args=(job_id,), daemon=True, name=f"case-test-{job_id}")
-        thread.start()
+        try:
+            thread.start()
+        except BaseException:
+            with self._lock:
+                job = self._jobs[job_id]
+                job["status"] = "failed"
+                job["error"] = "候选复跑线程启动失败" if candidate_replay else "测试线程启动失败"
+                self._release_execution_slot_locked(job_id)
+            if promotion_context is not None:
+                rollback = self.cases.rollback_agent_candidate(promotion_context)
+                with self._lock:
+                    job["promotion_status"] = rollback.get("status")
+                    job["promotion_issues"] = list(rollback.get("issues") or [])
+                    self._persist_promotion_state(
+                        job,
+                        status=str(job["promotion_status"] or "rollback_conflict"),
+                        issues=job["promotion_issues"],
+                    )
+            raise
         return self.get(job_id) or job
 
     def start_batch(
@@ -1679,7 +2390,7 @@ class CaseTestManager:
             for key, value in job.items()
             if key not in {
                 "process", "case", "cases", "current_case_data", "current_runtime_dir",
-                "current_runtime_archived",
+                "current_runtime_archived", "promotion_context",
             }
         }
 
@@ -1797,23 +2508,25 @@ class CaseTestManager:
         result_file = job_dir / "test_result.json"
         screenshot = job_dir / "screenshot.bmp"
         started_at = _now()
-        argv = build_child_command(
-            "test",
-            [
-                "--sheet",
-                str(case["file_sheet"]),
-                "--case-id",
-                str(case["case_id"]),
-                "--target",
-                project_meta["execution_target"],
-                "--case-map-profile",
-                project_meta["case_map_profile"],
-                "--result-file",
-                str(result_file),
-                "--screenshot-path",
-                str(screenshot),
-            ],
-        )
+        child_args = [
+            "--sheet",
+            str(case["file_sheet"]),
+            "--case-id",
+            str(case["case_id"]),
+            "--target",
+            project_meta["execution_target"],
+            "--case-map-profile",
+            project_meta["case_map_profile"],
+            "--result-file",
+            str(result_file),
+            "--screenshot-path",
+            str(screenshot),
+        ]
+        with self._lock:
+            candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
+        if candidate_replay:
+            child_args.append("--candidate-replay")
+        argv = build_child_command("test", child_args)
         stdout = ""
         stderr = ""
         return_code: int | None = None
@@ -1907,6 +2620,9 @@ class CaseTestManager:
             job["current_runtime_dir"] = str(job_dir)
             job["current_case_token"] = ""
             job["current_case_data"] = job["case"]
+            if job.get("promotion_flow"):
+                job["promotion_status"] = "running"
+                self._persist_promotion_state(job, status="running")
 
         execution = self._execute_case(job_id=job_id, case=job["case"], job_dir=job_dir)
         result = execution["result"]
@@ -1927,6 +2643,9 @@ class CaseTestManager:
             job["nodes"]["record"] = "running"
             job["current_node"] = "record"
             job["status"] = "finalizing"
+            if job.get("promotion_flow"):
+                job["promotion_status"] = "finalizing"
+                self._persist_promotion_state(job, status="finalizing")
 
         try:
             history_id = self.history.create(
@@ -1941,10 +2660,59 @@ class CaseTestManager:
             with self._lock:
                 job["error"] = f"测试记录保存失败: {exc}"
 
+        promotion: dict[str, Any] | None = None
+        with self._lock:
+            promotion_context = job.get("promotion_context")
+            promotion_flow = bool(job.get("promotion_flow"))
+        if promotion_flow and isinstance(promotion_context, dict):
+            if history_id:
+                try:
+                    promotion = self.cases.finalize_agent_candidate(
+                        context=promotion_context,
+                        result=result,
+                    )
+                except BaseException as exc:
+                    try:
+                        rollback = self.cases.rollback_agent_candidate(promotion_context)
+                    except BaseException as rollback_exc:
+                        rollback = {
+                            "status": "rollback_conflict",
+                            "issues": [f"候选回滚失败: {rollback_exc}"],
+                        }
+                    promotion = {
+                        "status": str(rollback.get("status") or "rollback_conflict"),
+                        "issues": [
+                            f"候选晋升审计异常: {exc}",
+                            *list(rollback.get("issues") or []),
+                        ],
+                    }
+            else:
+                try:
+                    promotion = self.cases.rollback_agent_candidate(promotion_context)
+                except BaseException as exc:
+                    promotion = {
+                        "status": "rollback_conflict",
+                        "issues": [f"历史保存失败后的候选回滚失败: {exc}"],
+                    }
+                promotion["issues"] = [
+                    "候选复跑历史未成功保存，禁止晋升",
+                    *list(promotion.get("issues") or []),
+                ]
+
         with self._lock:
             job = self._jobs[job_id]
             job["history_id"] = history_id
             job["nodes"]["record"] = "pass" if history_id else "fail"
+            if promotion is not None:
+                job["promotion_status"] = str(
+                    promotion.get("status") or "rollback_conflict"
+                )
+                job["promotion_issues"] = list(promotion.get("issues") or [])
+                self._persist_promotion_state(
+                    job,
+                    status=job["promotion_status"],
+                    issues=job["promotion_issues"],
+                )
             job["current_node"] = None
             job["status"] = "completed" if history_id else "failed"
             job.pop("process", None)
@@ -2339,6 +3107,25 @@ class WebApplication:
                 raise RuntimeError("已有缺陷修复任务正在运行")
             return self.test_jobs.start(sheet=sheet, case_id=case_id, project=project)
 
+    def start_candidate_replay(
+        self,
+        *,
+        sheet: str,
+        case_id: str,
+        project: str,
+        source_history: dict[str, Any],
+    ) -> dict[str, Any]:
+        with self._execution_lock:
+            if self.jobs.active():
+                raise RuntimeError("已有缺陷修复任务正在运行")
+            return self.test_jobs.start(
+                sheet=sheet,
+                case_id=case_id,
+                project=project,
+                candidate_replay=True,
+                promotion_source=source_history,
+            )
+
     def start_batch_test(
         self,
         *,
@@ -2498,7 +3285,13 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
 def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     """读取当前运行时系统配置。"""
     from agent_loop_system.tools.llm_config import get_llm_config
+    from agent_loop_system.tools.llm_retry import get_llm_runtime_status
+
     llm_cfg = get_llm_config()
+    llm_runtime = get_llm_runtime_status(paths.root)
+    llm_configured = bool(
+        llm_cfg["api_key"] and llm_cfg["base_url"] and llm_cfg["model"]
+    )
     return {
         "llm": {
             "provider": "builtin",
@@ -2507,7 +3300,9 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "model": llm_cfg["model"],
             "timeout": int(llm_cfg["timeout"]),
             "is_builtin": llm_cfg["is_builtin"],
-            "status": "ready",
+            "configured": llm_configured,
+            "status": "configured" if llm_configured else "unconfigured",
+            "last_actual_success_at": llm_runtime["last_actual_success_at"],
         },
         "ones": {
             "base_url": os.environ.get("ONES_BASE_URL", "https://ones.topstepht.com:8443"),
@@ -2683,7 +3478,213 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
     return items
 
 
-def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, project: str, date_from: str | None, date_to: str | None, module_filter: str | None) -> dict[str, Any]:
+REPORT_ABNORMAL_HEADERS = (
+    "运行时间", "模块", "用例编号", "优先级", "结果", "异常类别",
+    "前置条件", "测试步骤", "预期结果", "原因摘要", "原始判定/错误详情",
+    "批次编号", "运行记录编号", "执行命令", "截图证据数量",
+)
+REPORT_VERDICT_LABELS = {
+    "FAIL": "产品失败",
+    "ERROR": "执行异常",
+    "CANNOT_VERIFY": "无法验证",
+}
+EXCEL_ILLEGAL_CELL_CHARACTERS = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F]")
+
+
+def _report_cell_text(value: Any, *, limit: int = 32_000) -> str:
+    text = EXCEL_ILLEGAL_CELL_CHARACTERS.sub("", str(value or "").strip())
+    if len(text) <= limit:
+        return text
+    return text[:limit - 1] + "…"
+
+
+def _report_run_reason(run: dict[str, Any]) -> str:
+    detail = _report_cell_text(run.get("reason") or run.get("error"))
+    if detail:
+        return detail
+    errors: list[str] = []
+    for field in ("setup_errors", "action_errors", "collect_errors"):
+        values = run.get(field)
+        if isinstance(values, list):
+            errors.extend(str(value).strip() for value in values if str(value).strip())
+        elif str(values or "").strip():
+            errors.append(str(values).strip())
+    if errors:
+        return _report_cell_text("\n".join(errors))
+    return _report_cell_text(run.get("stderr")) or "未记录失败原因"
+
+
+def _report_reason_summary(detail: str) -> str:
+    lines = [line.strip() for line in detail.splitlines() if line.strip()]
+    if not lines:
+        return "未记录失败原因"
+    if detail.lstrip().startswith("Traceback"):
+        summary = lines[-1]
+    else:
+        summary = " ".join(lines)
+    return _report_cell_text(summary, limit=500)
+
+
+def _report_command_trace_text(run: dict[str, Any]) -> str:
+    trace = run.get("command_trace")
+    if not isinstance(trace, list):
+        return ""
+    lines: list[str] = []
+    for item in trace:
+        if isinstance(item, dict):
+            command = str(item.get("command") or item.get("wire") or "").strip()
+            if not command:
+                continue
+            index = item.get("index") or len(lines) + 1
+            metadata = "/".join(
+                value for value in (
+                    str(item.get("phase") or "").strip(),
+                    str(item.get("status") or "").strip(),
+                ) if value
+            )
+            suffix = f" [{metadata}]" if metadata else ""
+            lines.append(f"{index}. {command}{suffix}")
+        elif str(item or "").strip():
+            lines.append(f"{len(lines) + 1}. {str(item).strip()}")
+    return _report_cell_text("\n".join(lines))
+
+
+def _report_abnormal_run(
+    run: dict[str, Any],
+    *,
+    verdict: str,
+    sheet: str,
+    timestamp: str,
+) -> dict[str, Any]:
+    detail = _report_run_reason(run)
+    screenshots = run.get("screenshots")
+    return {
+        "timestamp": timestamp,
+        "sheet": sheet,
+        "case_id": _report_cell_text(run.get("case_id")),
+        "priority": _report_cell_text(run.get("priority")),
+        "verdict": verdict,
+        "verdict_label": REPORT_VERDICT_LABELS[verdict],
+        "precondition_text": _report_cell_text(run.get("precondition_text")),
+        "steps_text": _report_cell_text(run.get("steps_text")),
+        "expected_text": _report_cell_text(run.get("expected_text")),
+        "reason_summary": _report_reason_summary(detail),
+        "reason_detail": detail,
+        "batch_id": _report_cell_text(run.get("batch_id")),
+        "run_id": _report_cell_text(run.get("id")),
+        "commands": _report_command_trace_text(run),
+        "screenshot_count": len(screenshots) if isinstance(screenshots, list) else 0,
+    }
+
+
+def _report_excel_datetime(value: Any) -> datetime | str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return text
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone().replace(tzinfo=None)
+    return parsed
+
+
+def _style_report_overview_sheets(
+    summary_sheet: Any,
+    module_sheet: Any,
+) -> None:
+    summary_sheet.sheet_view.showGridLines = False
+    summary_sheet.column_dimensions["A"].width = 20
+    summary_sheet.column_dimensions["B"].width = 30
+    summary_fill = openpyxl.styles.PatternFill("solid", fgColor="D9EAF7")
+    for row in summary_sheet.iter_rows(min_row=1, max_col=2):
+        row[0].fill = summary_fill
+        row[0].font = openpyxl.styles.Font(bold=True)
+        for cell in row:
+            cell.alignment = openpyxl.styles.Alignment(vertical="center")
+
+    module_sheet.sheet_view.showGridLines = False
+    module_sheet.freeze_panes = "A2"
+    module_sheet.auto_filter.ref = f"A1:D{max(module_sheet.max_row, 1)}"
+    for column, width in {"A": 20, "B": 14, "C": 14, "D": 14}.items():
+        module_sheet.column_dimensions[column].width = width
+    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
+    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
+    for cell in module_sheet[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+
+
+def _add_report_abnormal_sheet(
+    workbook: openpyxl.Workbook,
+    abnormal_runs: list[dict[str, Any]],
+) -> None:
+    sheet = workbook.create_sheet(title="异常用例明细")
+    sheet.append(list(REPORT_ABNORMAL_HEADERS))
+    for item in abnormal_runs:
+        sheet.append([
+            _report_excel_datetime(item.get("timestamp")),
+            item.get("sheet", ""),
+            item.get("case_id", ""),
+            item.get("priority", ""),
+            item.get("verdict", ""),
+            item.get("verdict_label", ""),
+            item.get("precondition_text", ""),
+            item.get("steps_text", ""),
+            item.get("expected_text", ""),
+            item.get("reason_summary", ""),
+            item.get("reason_detail", ""),
+            item.get("batch_id", ""),
+            item.get("run_id", ""),
+            item.get("commands", ""),
+            item.get("screenshot_count", 0),
+        ])
+
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = f"A1:O{max(sheet.max_row, 1)}"
+    sheet.sheet_view.showGridLines = False
+    sheet.row_dimensions[1].height = 24
+    widths = {
+        "A": 20, "B": 14, "C": 16, "D": 10, "E": 14, "F": 14,
+        "G": 24, "H": 32, "I": 32, "J": 42, "K": 60, "L": 18,
+        "M": 24, "N": 60, "O": 14,
+    }
+    for column, width in widths.items():
+        sheet.column_dimensions[column].width = width
+
+    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
+    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
+    for cell in sheet[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+
+    verdict_fills = {
+        "FAIL": openpyxl.styles.PatternFill("solid", fgColor="FCE8E6"),
+        "ERROR": openpyxl.styles.PatternFill("solid", fgColor="FEF3C7"),
+        "CANNOT_VERIFY": openpyxl.styles.PatternFill("solid", fgColor="E5E7EB"),
+    }
+    for row in sheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = openpyxl.styles.Alignment(vertical="top", wrap_text=True)
+        row[0].number_format = "yyyy-mm-dd hh:mm:ss"
+        row[4].fill = verdict_fills.get(str(row[4].value or ""), verdict_fills["ERROR"])
+        row[4].font = openpyxl.styles.Font(bold=True)
+        row[14].alignment = openpyxl.styles.Alignment(horizontal="center", vertical="top")
+
+
+def _get_reports_summary_data(
+    paths: AppPaths,
+    history_store: TestHistoryStore,
+    project: str,
+    date_from: str | None,
+    date_to: str | None,
+    module_filter: str | None,
+    *,
+    include_abnormal_runs: bool = False,
+) -> dict[str, Any]:
     """聚合计算测试报告总览、分布与趋势数据。"""
     project_meta = _test_project(project)
     project_name = project_meta["project"]
@@ -2721,6 +3722,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
     by_date: dict[str, dict[str, int]] = {}
     module_fails: dict[str, dict[str, int]] = {}
     recent_fails: list[dict[str, Any]] = []
+    abnormal_runs: list[dict[str, Any]] = []
     
     for r in filtered_runs:
         v = str(r.get("verdict") or "ERROR").upper()
@@ -2745,6 +3747,13 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
             by_date[date_str]["cannot_verify"] += 1
             
         sheet = str(r.get("sheet") or "通用")
+        if include_abnormal_runs and v != "PASS":
+            abnormal_runs.append(_report_abnormal_run(
+                r,
+                verdict=v,
+                sheet=sheet,
+                timestamp=ts,
+            ))
         if v in {"FAIL", "ERROR"}:
             if sheet not in module_fails:
                 module_fails[sheet] = {"module": sheet, "fail": 0, "error": 0, "total": 0}
@@ -2758,6 +3767,7 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
                 "case_id": str(r.get("case_id") or ""),
                 "sheet": sheet,
                 "module": sheet,
+                "history_id": str(r.get("id") or ""),
                 "verdict": v,
                 "at": ts,
                 "timestamp": ts,
@@ -2780,11 +3790,12 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
         
     top_fail_modules = sorted(module_fails.values(), key=lambda m: m["total"], reverse=True)[:8]
     recent_fails.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
+    abnormal_runs.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
     
     total_count = len(filtered_runs)
     pass_rate = round(dist["PASS"] * 100.0 / total_count, 1) if total_count > 0 else 0.0
     
-    return {
+    report = {
         "metrics": {
             "total": total_count,
             "pass": dist["PASS"],
@@ -2804,6 +3815,9 @@ def _get_reports_summary_data(paths: AppPaths, history_store: TestHistoryStore, 
             "description": f"已完成 {total_count} 次测试运行，综合通过率为 {pass_rate}%。" + (f" 建议优先关注高频异常模块: {top_fail_modules[0]['module']}。" if top_fail_modules else " 当前运行状态平稳。"),
         },
     }
+    if include_abnormal_runs:
+        report["abnormal_runs"] = abnormal_runs
+    return report
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -3072,7 +4086,14 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
-            summary_data = _get_reports_summary_data(self.app.paths, self.app.test_history, project, d_from, d_to, module)
+            summary_data = _get_reports_summary_data(
+                self.app.paths,
+                self.app.test_history,
+                project,
+                d_from,
+                d_to,
+                module,
+            )
             self._json(summary_data)
             return
 
@@ -3155,7 +4176,15 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
-            summary_data = _get_reports_summary_data(self.app.paths, self.app.test_history, project, d_from, d_to, module)
+            summary_data = _get_reports_summary_data(
+                self.app.paths,
+                self.app.test_history,
+                project,
+                d_from,
+                d_to,
+                module,
+                include_abnormal_runs=True,
+            )
             
             wb = openpyxl.Workbook()
             ws_summary = wb.active
@@ -3173,7 +4202,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             ws_fail.append(["模块名称", "FAIL 数量", "ERROR 数量", "异常合计"])
             for m in summary_data.get("top_fail_modules", []):
                 ws_fail.append([m.get("module", ""), m.get("fail", 0), m.get("error", 0), m.get("total", 0)])
-                
+
+            _style_report_overview_sheets(ws_summary, ws_fail)
+            _add_report_abnormal_sheet(wb, summary_data.get("abnormal_runs", []))
+                 
             buf = io.BytesIO()
             wb.save(buf)
             data = buf.getvalue()
@@ -3541,49 +4573,62 @@ class RequestHandler(BaseHTTPRequestHandler):
             project = str(body.get("project") or DEFAULT_TEST_PROJECT).strip()
             if not case_id or not sheet:
                 raise ValueError("case_id 与 sheet 必填")
-                
-            project_meta = _test_project(project)
-            latest_history = self.app.test_history.latest(sheet, case_id, project=project)
+
+            current = self.app.cases.get(sheet, case_id, project=project)
+            if current is None:
+                raise ValueError("测试用例不存在")
+            if current.get("is_promoted"):
+                self._json({
+                    "status": "already_promoted",
+                    "audit": {"passed": True, "issues": []},
+                })
+                return
+
+            latest_summary = self.app.test_history.latest(sheet, case_id, project=project)
+            if not latest_summary:
+                self._json({
+                    "status": "failed",
+                    "audit": {
+                        "passed": False,
+                        "issues": ["未找到自主探索历史，必须先运行该用例"],
+                    },
+                }, HTTPStatus.BAD_REQUEST)
+                return
+            latest_history = self.app.test_history.get(
+                sheet,
+                case_id,
+                str(latest_summary["id"]),
+                project=project,
+            )
             if not latest_history:
-                self._json({"status": "failed", "audit": {"passed": False, "issues": ["未找到历史运行记录，必须先运行并通过测试"]}}, HTTPStatus.BAD_REQUEST)
+                self._json({
+                    "status": "failed",
+                    "audit": {"passed": False, "issues": ["最新历史运行记录无法读取"]},
+                }, HTTPStatus.BAD_REQUEST)
                 return
-                
-            verdict = str(latest_history.get("verdict") or "ERROR").upper()
-            if verdict != "PASS":
-                self._json({"status": "failed", "audit": {"passed": False, "issues": [f"最新运行结果为 {verdict}，必须为 PASS 才能晋升"]}}, HTTPStatus.BAD_REQUEST)
+
+            try:
+                job = self.app.start_candidate_replay(
+                    sheet=sheet,
+                    case_id=case_id,
+                    project=project,
+                    source_history=latest_history,
+                )
+            except ValueError as exc:
+                self._json({
+                    "status": "failed",
+                    "audit": {"passed": False, "issues": [str(exc)]},
+                }, HTTPStatus.BAD_REQUEST)
                 return
-                
-            case_root = self.app.paths.case_map / project_meta["case_map_dir"]
-            sheet_f = case_root / f"{sheet}.json"
-            raw = _read_json(sheet_f, [])
-            is_env = isinstance(raw, dict) and "cases" in raw
-            clist = raw.get("cases") if is_env else (raw if isinstance(raw, list) else [])
-            found = False
-            for c in clist:
-                if isinstance(c, dict) and c.get("case_id") == case_id:
-                    c["mapping_status"] = "PROMOTED"
-                    found = True
-                    break
-            if found:
-                if is_env:
-                    raw["cases"] = clist
-                    _write_json(sheet_f, raw)
-                else:
-                    _write_json(sheet_f, clist)
-                    
-            ledger_file = case_root / "external_execution_history.jsonl"
-            ledger_record = {
-                "case_id": case_id,
-                "sheet": sheet,
-                "target": project,
-                "last_verified": datetime.now().astimezone().strftime("%Y-%m-%d"),
-                "evidence_root": str(self.app.test_history._case_dir(sheet, case_id, project=project)),
-                "evidence_paths": [f"{latest_history.get('id')}/run.json"],
-            }
-            with ledger_file.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(ledger_record, ensure_ascii=False) + "\n")
-                
-            self._json({"status": "ok", "audit": {"passed": True, "issues": []}})
+            self._json({
+                "status": "candidate_replay_started",
+                "audit": {
+                    "passed": False,
+                    "pending": True,
+                    "issues": [],
+                },
+                "job": job,
+            }, HTTPStatus.ACCEPTED)
             return
 
         if path == "/api/excel/preview":

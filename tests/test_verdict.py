@@ -173,7 +173,7 @@ class VisionEvidenceTest(unittest.TestCase):
         with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
-            "agent_loop_system.tools.test.invoke_with_retry", side_effect=lambda fn: fn()
+            "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
         ):
             verdict = judge_with_vision(*args, **kwargs)
         return verdict, captured["content"]
@@ -252,7 +252,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
-            "agent_loop_system.tools.test.invoke_with_retry", side_effect=lambda fn: fn()
+            "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
         ):
             verdict = judge_test_with_vision("先显示按钮，点击后显示测量中", screenshots, verification_points)
         return verdict, captured.get("content", [])
@@ -311,7 +311,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
             with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
                 "langchain_openai.ChatOpenAI", return_value=FakeLLM()
             ), mock.patch(
-                "agent_loop_system.tools.test.invoke_with_retry",
+                "agent_loop_system.tools.test.invoke_llm_with_retry",
                 side_effect=LLMRetryError("APIConnectionError: Connection error."),
             ):
                 verdict = judge_test_with_vision(

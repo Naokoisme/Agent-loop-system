@@ -6,8 +6,12 @@
 """
 from __future__ import annotations
 
+import json
 import os
 import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 _RETRY_DELAYS = (1, 2, 4, 8, 16, 32, 60, 60, 60, 60, 60)
 _NON_RETRYABLE_ERROR_MARKERS = (
@@ -20,6 +24,55 @@ _NON_RETRYABLE_ERROR_MARKERS = (
 
 class LLMRetryError(RuntimeError):
     """12 次重试全部失败。"""
+
+
+def _llm_runtime_status_path(root: Path | str | None = None) -> Path:
+    from agent_loop_system.runtime_root import resolve_app_root
+
+    return resolve_app_root(root) / ".runtime" / "llm-status.json"
+
+
+def get_llm_runtime_status(root: Path | str | None = None) -> dict[str, Any]:
+    """读取跨进程 LLM 运行状态；损坏或缺失时返回空状态。"""
+    path = _llm_runtime_status_path(root)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {"last_actual_success_at": None}
+    if not isinstance(payload, dict):
+        return {"last_actual_success_at": None}
+    timestamp = str(payload.get("last_actual_success_at") or "").strip()
+    return {"last_actual_success_at": timestamp or None}
+
+
+def record_actual_llm_success(
+    *,
+    root: Path | str | None = None,
+    at: str | None = None,
+) -> None:
+    """原子记录真实业务 LLM 调用成功；不保存请求、响应或凭据。"""
+    path = _llm_runtime_status_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": 1,
+        "last_actual_success_at": at
+        or datetime.now().astimezone().isoformat(timespec="seconds"),
+        "source": "agent_runtime",
+    }
+    temporary = path.with_name(
+        f"{path.name}.{os.getpid()}.{time.time_ns()}.tmp"
+    )
+    try:
+        temporary.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
 
 
 def _is_non_retryable_error(exc: Exception) -> bool:
@@ -68,3 +121,23 @@ def invoke_with_retry(
             continue
         return value
     raise LLMRetryError(last_error)
+
+
+def invoke_llm_with_retry(
+    invoke,
+    *,
+    is_valid=lambda value: value is not None,
+    max_attempts: int = 12,
+):
+    """执行真实业务 LLM 调用，并在获得有效结果后更新成功时间。"""
+    value = invoke_with_retry(
+        invoke,
+        is_valid=is_valid,
+        max_attempts=max_attempts,
+    )
+    try:
+        record_actual_llm_success()
+    except Exception:
+        # 状态旁路写入失败不能把已经成功的业务调用改判为失败。
+        pass
+    return value

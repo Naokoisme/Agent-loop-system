@@ -80,6 +80,47 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(text, self.javascript)
         self.assertIn("chip-warning", self.javascript)
 
+    def test_llm_settings_keep_configuration_runtime_and_probe_independent(self) -> None:
+        for token in (
+            'id="llm-config-status"',
+            'id="llm-actual-success"',
+            'id="llm-test-status"',
+            "服务已配置",
+            "最近实际调用成功",
+            "本次快速探测",
+            "快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。",
+        ):
+            self.assertIn(token, self.index)
+        for token in (
+            "cfg.llm?.configured === true",
+            "cfg.llm?.last_actual_success_at",
+            "本次探测失败",
+            "setLlmSignal(llmTestStatus",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("已就绪 (开箱即用)", self.index)
+        self.assertNotIn("❌ 连接失败", self.javascript)
+        self.assertIn(".llm-signal-list", self.stylesheet)
+
+    def test_global_toast_host_exists_for_action_feedback(self) -> None:
+        self.assertIn('<div id="toast" class="toast" role="status" aria-live="polite"></div>', self.index)
+        self.assertIn("const toast = document.querySelector('#toast');", self.javascript)
+
+    def test_case_and_report_exports_use_direct_browser_downloads(self) -> None:
+        for token in (
+            "function startBrowserDownload(url, filename)",
+            "a.href = url;",
+            "a.download = filename;",
+            "exportExcelBtn.addEventListener('click', () => {",
+            "startBrowserDownload(url, `test_cases_${curProj}.xlsx`);",
+            "测试用例表下载已开始",
+            "[data-report-export]:not(:disabled)')?.addEventListener('click', () => {",
+            "startBrowserDownload(url, `test_report_${project}.xlsx`);",
+            "测试报告下载已开始",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertEqual(self.javascript.count("startBrowserDownload(url, `"), 2)
+
     def test_search_stays_inline_and_async_results_never_overwrite_input(self) -> None:
         for token in ("data-page", "page_size=${PAGE_SIZE}"):
             self.assertIn(token, self.javascript)
@@ -220,6 +261,11 @@ class FrontendAssetsTest(unittest.TestCase):
             "const usesFixedMapping = Boolean(testCase.is_promoted);",
             "本条将临时探索",
             "不会写入外部探索账本",
+            "生成候选、复跑并晋升",
+            "candidate_replay_started",
+            "Boolean(job.promotion_flow)",
+            "job.promotion_status === 'promoted'",
+            "候选复跑未达晋升门禁，已自动回滚",
             "historyCount > 0",
             "? rawVerdict : 'ERROR'",
         ):
@@ -253,6 +299,19 @@ class FrontendAssetsTest(unittest.TestCase):
             "testDetailHref(row.project, sheet, caseId, returnTo)",
             'href="${escapeHtml(returnTo)}">← 返回测试用例',
             "testHistoryHref(project, sheet, caseId, item.id, returnTo)",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_report_failure_rows_link_to_the_exact_run_and_keep_filters(self) -> None:
+        for token in (
+            "const historyId = item.history_id || item.run_id || '';",
+            "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
+            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});",
+            "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
+            "function testReportReturnUrl()",
+            "const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);",
+            "← 返回测试报告",
+            "查看本次运行",
         ):
             self.assertIn(token, self.javascript)
 

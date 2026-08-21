@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.source_context import load_runtime_navigation_sources
 from agent_loop_system.tools.designer import DesignerPlan
@@ -125,7 +125,7 @@ def _invoke_structured_with_images(
         return llm.with_structured_output(schema)
 
     if not images:
-        return invoke_with_retry(lambda: structured().invoke(prompt))
+        return invoke_llm_with_retry(lambda: structured().invoke(prompt))
 
     from langchain_core.messages import HumanMessage
 
@@ -137,7 +137,7 @@ def _invoke_structured_with_images(
         content.append(
             {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{encoded}"}}
         )
-    return invoke_with_retry(
+    return invoke_llm_with_retry(
         lambda: structured().invoke([HumanMessage(content=content)])
     )
 

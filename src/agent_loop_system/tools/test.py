@@ -36,7 +36,7 @@ from agent_loop_system.tools.case_map import (
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.simulator import SimulatorSession
 
@@ -307,7 +307,7 @@ def judge_with_vision(
 
     msg = HumanMessage(content=content)
     try:
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             lambda: llm.with_structured_output(Verdict).invoke([msg])
         )
     except LLMRetryError as exc:
@@ -388,7 +388,7 @@ def judge_test_with_vision(
 
     try:
         message = HumanMessage(content=content)
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             lambda: llm.with_structured_output(Verdict).invoke([message])
         )
     except LLMRetryError as exc:

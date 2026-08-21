@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import os
 import tempfile
@@ -295,6 +296,226 @@ class FrontendDataTest(unittest.TestCase):
         self.addCleanup(server.shutdown)
         return application, f"http://127.0.0.1:{server.server_port}"
 
+    def _clear_case_candidate(
+        self,
+        *,
+        project_dir: str,
+        sheet: str = "计算器",
+        case_id: str = "CALC_001",
+    ) -> Path:
+        path = self.paths.case_map / project_dir / f"{sheet}.json"
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        entries = raw["cases"] if isinstance(raw, dict) else raw
+        case = next(item for item in entries if item["case_id"] == case_id)
+        for field in ("setup", "actions", "collect", "verification_points"):
+            case[field] = []
+        case["note"] = ""
+        case.pop("mapping_status", None)
+        path.write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
+        return path
+
+    @staticmethod
+    def _agent_exploration_source(
+        *,
+        project: str = "6202_W5230",
+        sheet: str = "计算器",
+        case_id: str = "CALC_001",
+    ) -> dict[str, object]:
+        points = ["执行前初始画面", "点击后结果画面"]
+        return {
+            "id": "20260821T120000000000",
+            "project": project,
+            "sheet": sheet,
+            "case_id": case_id,
+            "execution_mode": "agent_exploration",
+            "verdict": "PASS",
+            "reason": "真实业务动作已执行，截图符合预期",
+            "verification_points": points,
+            "planned_commands": {
+                "setup": [],
+                "action": [":TP_CLICK:10,20,0"],
+                "collect": [],
+            },
+            "command_trace": [
+                {
+                    "index": 1,
+                    "phase": "exploration",
+                    "source": "runner",
+                    "kind": "capture",
+                    "command": ":HOST_SCREENSHOT:AGENT_EXPLORATION",
+                    "command_name": "HOST_SCREENSHOT",
+                    "ok": True,
+                    "checkpoint_index": 1,
+                    "checkpoint_label": points[0],
+                },
+                {
+                    "index": 2,
+                    "phase": "action",
+                    "source": "agent",
+                    "kind": "device",
+                    "command": ":TP_CLICK:10,20,0",
+                    "command_name": "TP_CLICK",
+                    "ok": True,
+                },
+                {
+                    "index": 3,
+                    "phase": "exploration",
+                    "source": "runner",
+                    "kind": "capture",
+                    "command": ":HOST_SCREENSHOT:AGENT_EXPLORATION",
+                    "command_name": "HOST_SCREENSHOT",
+                    "ok": True,
+                    "checkpoint_index": 2,
+                    "checkpoint_label": points[1],
+                },
+            ],
+            "evidence_contract": {
+                "status": "COMPLETE",
+                "complete": True,
+                "issues": [],
+                "required_screenshots": 2,
+                "captured_screenshots": 2,
+                "business_action_count": 1,
+                "planned_action_count": 1,
+                "attempted_action_count": 1,
+            },
+            "screenshots": [{"file": "one.bmp"}, {"file": "two.bmp"}],
+            "screenshot_urls": [{"file": "one.bmp"}, {"file": "two.bmp"}],
+            "skipped": False,
+            "aborted": False,
+            "setup_errors": [],
+            "action_errors": [],
+            "collect_errors": [],
+            "exploration_trace": {
+                "steps": [{"step": 0, "window_name": "CALCULATOR"}],
+            },
+        }
+
+    @staticmethod
+    def _write_valid_hardware_bmp(path: Path) -> None:
+        import struct
+
+        width, height = 410, 502
+        pixel_offset = 54
+        row_stride = ((width * 3) + 3) & ~3
+        file_size = pixel_offset + row_stride * height
+        data = bytearray(file_size)
+        data[:2] = b"BM"
+        struct.pack_into("<I", data, 2, file_size)
+        struct.pack_into("<I", data, 10, pixel_offset)
+        struct.pack_into("<I", data, 14, 40)
+        struct.pack_into("<ii", data, 18, width, -height)
+        struct.pack_into("<HH", data, 26, 1, 24)
+        struct.pack_into("<I", data, 30, 0)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    def _candidate_replay_result(
+        self,
+        context: dict[str, object],
+        *,
+        job_id: str,
+        verdict: str = "PASS",
+    ) -> dict[str, object]:
+        candidate = context["candidate_fields"]
+        context["job_id"] = job_id
+        evidence_dir = self.paths.runtime_jobs / job_id / "single"
+        first = evidence_dir / "screenshot-01.bmp"
+        second = evidence_dir / "screenshot-02.bmp"
+        self._write_valid_hardware_bmp(first)
+        self._write_valid_hardware_bmp(second)
+        points = candidate["verification_points"]
+        return {
+            "schema_version": 3,
+            "case_id": "CALC_001",
+            "sheet": "计算器",
+            "execution_mode": "candidate_mapping",
+            "verdict": verdict,
+            "reason": "候选复跑形成确定产品结论",
+            "execution_status": "OK",
+            "verification_points": points,
+            "planned_commands": {
+                "setup": candidate["setup"],
+                "action": candidate["actions"],
+                "collect": candidate["collect"],
+            },
+            "command_trace": [
+                {
+                    "index": 1,
+                    "phase": "setup",
+                    "source": "case",
+                    "kind": "screenshot",
+                    "wire": candidate["setup"][1],
+                    "command": candidate["setup"][1],
+                    "command_name": "HOST_SCREENSHOT",
+                    "planned_index": 2,
+                    "checkpoint_index": 1,
+                    "checkpoint_label": points[0],
+                    "ok": True,
+                },
+                {
+                    "index": 2,
+                    "phase": "action",
+                    "source": "case",
+                    "kind": "device",
+                    "wire": candidate["actions"][0],
+                    "command": candidate["actions"][0],
+                    "command_name": "TP_CLICK",
+                    "planned_index": 1,
+                    "ok": True,
+                },
+                {
+                    "index": 3,
+                    "phase": "action",
+                    "source": "case",
+                    "kind": "screenshot",
+                    "wire": candidate["actions"][1],
+                    "command": candidate["actions"][1],
+                    "command_name": "HOST_SCREENSHOT",
+                    "planned_index": 2,
+                    "checkpoint_index": 2,
+                    "checkpoint_label": points[1],
+                    "ok": True,
+                },
+            ],
+            "evidence_contract": {
+                "status": "COMPLETE",
+                "complete": True,
+                "issues": [],
+                "required_screenshots": 2,
+                "captured_screenshots": 2,
+                "planned_action_count": 2,
+                "attempted_action_count": 2,
+                "business_action_count": 1,
+            },
+            "screenshots": [
+                {
+                    "path": str(first),
+                    "label": points[0],
+                    "captured_at": "2026-08-21T12:01:00+08:00",
+                    "trace_index": 1,
+                },
+                {
+                    "path": str(second),
+                    "label": points[1],
+                    "captured_at": "2026-08-21T12:02:00+08:00",
+                    "trace_index": 3,
+                },
+            ],
+            "provenance": {
+                "target": "hardware",
+                "case_map_profile": "6202_W5230",
+                "project": "6202_W5230",
+                "artifact_path": "",
+                "artifact_sha256": "",
+            },
+            "skipped": False,
+            "aborted": False,
+            "setup_errors": [],
+            "action_errors": [],
+            "collect_errors": [],
+        }
+
 
     @staticmethod
     def _put_json(url: str, payload: dict[str, object]):
@@ -380,6 +601,93 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(len(hardware["projects"]), 3)
         with self.assertRaisesRegex(ValueError, "测试项目不存在"):
             self.cases.list(project="unknown")
+
+    def test_internal_promotion_is_solidified_without_faking_external_history(self) -> None:
+        ledger = self.paths.case_map / "6202_case_map" / "external_execution_history.jsonl"
+        ledger.write_text("", encoding="utf-8")
+        path = self.paths.case_map / "6202_case_map" / "计算器.json"
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw["cases"][0]["mapping_status"] = "PROMOTED"
+        path.write_text(json.dumps(raw, ensure_ascii=False), encoding="utf-8")
+
+        detail = self.cases.get("计算器", "CALC_001", project="6202_W5230")
+
+        self.assertTrue(detail["is_promoted"])
+        self.assertFalse(detail["external_explored"])
+        self.assertEqual(detail["maturity_state"], "solidified")
+        self.assertEqual(
+            self.cases.list(project="6202_W5230")["summary"],
+            {
+                "all": 1,
+                "unexplored": 0,
+                "externally_explored": 0,
+                "explored_unsolidified": 0,
+                "solidified": 1,
+            },
+        )
+
+    def test_agent_exploration_candidate_promotes_only_after_formal_replay(self) -> None:
+        case_map_path = self._clear_case_candidate(project_dir="6202_case_map")
+        ledger = self.paths.case_map / "6202_case_map" / "external_execution_history.jsonl"
+        ledger.write_text("", encoding="utf-8")
+        ledger_before = ledger.read_bytes()
+        source = self._agent_exploration_source()
+
+        context = self.cases.stage_agent_candidate(
+            sheet="计算器",
+            case_id="CALC_001",
+            project="6202_W5230",
+            source_history=source,
+        )
+        candidate = context["candidate_fields"]
+        self.assertEqual(
+            candidate["setup"],
+            [":ENTER_PAGE:CALCULATOR,0", ":HOST_SCREENSHOT:1"],
+        )
+        self.assertEqual(
+            candidate["actions"],
+            [":TP_CLICK:10,20,0", ":HOST_SCREENSHOT:2"],
+        )
+        staged = json.loads(case_map_path.read_text(encoding="utf-8"))["cases"][0]
+        self.assertNotIn("mapping_status", staged)
+        self.assertEqual(staged["actions"], candidate["actions"])
+
+        job_id = "promotion-job"
+        replay_result = self._candidate_replay_result(context, job_id=job_id)
+
+        promotion = self.cases.finalize_agent_candidate(
+            context=context,
+            result=replay_result,
+        )
+
+        self.assertEqual(promotion, {"status": "promoted", "issues": []})
+        promoted = json.loads(case_map_path.read_text(encoding="utf-8"))["cases"][0]
+        self.assertEqual(promoted["mapping_status"], "PROMOTED")
+        self.assertEqual(ledger.read_bytes(), ledger_before)
+
+        self._clear_case_candidate(project_dir="6202_case_map")
+        rollback_context = self.cases.stage_agent_candidate(
+            sheet="计算器",
+            case_id="CALC_001",
+            project="6202_W5230",
+            source_history=source,
+        )
+        rollback_context["job_id"] = job_id
+        invalid_result = copy.deepcopy(replay_result)
+        invalid_result["evidence_contract"]["complete"] = False
+        invalid_result["evidence_contract"]["status"] = "ERROR"
+        rolled_back = self.cases.finalize_agent_candidate(
+            context=rollback_context,
+            result=invalid_result,
+        )
+
+        self.assertEqual(rolled_back["status"], "rolled_back")
+        restored = json.loads(case_map_path.read_text(encoding="utf-8"))["cases"][0]
+        self.assertNotIn("mapping_status", restored)
+        self.assertEqual(restored["setup"], [])
+        self.assertEqual(restored["actions"], [])
+        self.assertEqual(restored["verification_points"], [])
+        self.assertEqual(ledger.read_bytes(), ledger_before)
 
     def test_frontend_rejects_case_map_profile_metadata_mismatch(self) -> None:
         path = self.paths.case_map / "6202_simulator_case_map" / "计算器.json"
@@ -1307,6 +1615,177 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(captured_env["W30_HARDWARE_PROJECT"], "6202_W5230")
         self.assertEqual(result["verdict"], "PASS")
 
+    def test_candidate_replay_job_passes_explicit_runner_flag(self) -> None:
+        self._clear_case_candidate(project_dir="6202_case_map")
+        context = self.cases.stage_agent_candidate(
+            sheet="计算器",
+            case_id="CALC_001",
+            project="6202_W5230",
+            source_history=self._agent_exploration_source(),
+        )
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
+        manager._jobs["candidate-cli"] = {
+            "process": None,
+            "candidate_replay": True,
+        }
+        captured_argv: list[str] = []
+
+        class FakeProcess:
+            returncode = 0
+
+            def __init__(self, argv: list[str]):
+                captured_argv.extend(argv)
+
+            def communicate(self) -> tuple[str, str]:
+                result_file = Path(captured_argv[captured_argv.index("--result-file") + 1])
+                result_file.write_text(
+                    json.dumps({"verdict": "PASS", "reason": "候选执行完成"}, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                return "PASS", ""
+
+        with patch(
+            "frontend.server.subprocess.Popen",
+            side_effect=lambda argv, **_: FakeProcess(argv),
+        ):
+            manager._execute_case(
+                job_id="candidate-cli",
+                case=case,
+                job_dir=self.paths.runtime_jobs / "candidate-cli" / "single",
+            )
+
+        self.assertIn("--candidate-replay", captured_argv)
+        self.cases.rollback_agent_candidate(context)
+
+    def test_candidate_replay_start_stages_candidate_and_persists_recovery_state(self) -> None:
+        case_map_path = self._clear_case_candidate(project_dir="6202_case_map")
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+
+        with patch("frontend.server.threading.Thread.start"):
+            job = manager.start(
+                sheet="计算器",
+                case_id="CALC_001",
+                project="6202_W5230",
+                candidate_replay=True,
+                promotion_source=self._agent_exploration_source(),
+            )
+
+        self.assertTrue(job["promotion_flow"])
+        self.assertTrue(job["candidate_replay"])
+        self.assertEqual(job["promotion_status"], "pending")
+        self.assertNotIn("promotion_context", job)
+        state = json.loads(
+            (self.paths.runtime_jobs / job["id"] / "promotion-state.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(state["status"], "queued")
+        staged = json.loads(case_map_path.read_text(encoding="utf-8"))["cases"][0]
+        self.assertTrue(staged["actions"])
+        rollback = self.cases.rollback_agent_candidate(
+            manager._jobs[job["id"]]["promotion_context"]
+        )
+        self.assertEqual(rollback["status"], "rolled_back")
+
+    def test_candidate_replay_job_auto_promotes_even_for_proven_product_fail(self) -> None:
+        self._clear_case_candidate(project_dir="6202_case_map")
+        ledger = self.paths.case_map / "6202_case_map" / "external_execution_history.jsonl"
+        ledger.write_text("", encoding="utf-8")
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        context = self.cases.stage_agent_candidate(
+            sheet="计算器",
+            case_id="CALC_001",
+            project="6202_W5230",
+            source_history=self._agent_exploration_source(),
+        )
+        job_id = "auto-promotion"
+        replay_result = self._candidate_replay_result(
+            context,
+            job_id=job_id,
+            verdict="FAIL",
+        )
+        case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
+        manager._jobs[job_id] = {
+            "id": job_id,
+            "type": "single",
+            "sheet": "计算器",
+            "case_id": "CALC_001",
+            "project": "6202_W5230",
+            "project_label": "6202 W5230",
+            "execution_target": "hardware",
+            "execution_target_label": "真机",
+            "case": case,
+            "status": "queued",
+            "current_node": "load",
+            "nodes": {node: "pending" for node in ("load", "execute", "judge", "record")},
+            "verdict": "PENDING",
+            "reason": "",
+            "created_at": "2026-08-21T12:00:00+08:00",
+            "started_at": None,
+            "finished_at": None,
+            "history_id": None,
+            "error": None,
+            "candidate_replay": True,
+            "promotion_flow": True,
+            "promotion_status": "pending",
+            "promotion_issues": [],
+            "promotion_context": context,
+        }
+        manager._active_job_ids["hardware"] = job_id
+        execution = {
+            "result": replay_result,
+            "stdout": "FAIL",
+            "stderr": "",
+            "return_code": 1,
+            "verdict": "FAIL",
+            "reason": replay_result["reason"],
+            "execution_reason": "",
+            "execute_failed": False,
+            "started_at": "2026-08-21T12:00:00+08:00",
+            "finished_at": "2026-08-21T12:01:00+08:00",
+            "screenshot": self.paths.runtime_jobs / job_id / "single" / "screenshot.bmp",
+        }
+
+        with patch.object(manager, "_execute_case", return_value=execution):
+            manager._run(job_id)
+
+        snapshot = manager.get(job_id)
+        self.assertEqual(snapshot["status"], "completed")
+        self.assertEqual(snapshot["verdict"], "FAIL")
+        self.assertEqual(snapshot["promotion_status"], "promoted")
+        self.assertEqual(snapshot["promotion_issues"], [])
+        promoted = self.cases.get("计算器", "CALC_001", project="6202_W5230")
+        self.assertTrue(promoted["is_promoted"])
+        self.assertFalse(promoted["external_explored"])
+        self.assertEqual(ledger.read_text(encoding="utf-8"), "")
+
+    def test_stale_candidate_is_rolled_back_when_frontend_restarts(self) -> None:
+        case_map_path = self._clear_case_candidate(project_dir="6202_case_map")
+        context = self.cases.stage_agent_candidate(
+            sheet="计算器",
+            case_id="CALC_001",
+            project="6202_W5230",
+            source_history=self._agent_exploration_source(),
+        )
+        job_id = "stale-promotion"
+        context["job_id"] = job_id
+        state_path = self.paths.runtime_jobs / job_id / "promotion-state.json"
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(json.dumps({
+            "job_id": job_id,
+            "status": "running",
+            "context": context,
+        }, ensure_ascii=False), encoding="utf-8")
+
+        CaseTestManager(self.paths, self.cases, self.test_history)
+
+        restored = json.loads(case_map_path.read_text(encoding="utf-8"))["cases"][0]
+        self.assertNotIn("mapping_status", restored)
+        self.assertEqual(restored["actions"], [])
+        recovered_state = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertEqual(recovered_state["status"], "rolled_back_on_restart")
+
     def test_case_test_manager_uses_isolated_6202_simulator_profile(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         case = self.cases.get(
@@ -2139,12 +2618,17 @@ class FrontendDataTest(unittest.TestCase):
             "sheet": "计算器",
             "project": "620C_W6830",
         }
+        case_map_path = self.paths.case_map / "620C_simulator_case_map" / "计算器.json"
+        case_map = json.loads(case_map_path.read_text(encoding="utf-8"))
+        case_map[0]["mapping_status"] = ""
+        case_map_path.write_text(json.dumps(case_map, ensure_ascii=False), encoding="utf-8")
         # Initially no history run -> returns 400 with audit issues
         with self.assertRaises(HTTPError) as err:
             self._post_json(base + "/api/cases/audit-and-promote", audit_payload)
         self.assertEqual(err.exception.code, 400)
-        
-        # Add PASS run to test history
+
+        # A complete Agent exploration starts an explicit candidate replay; the
+        # endpoint itself no longer writes PROMOTED.
         application.test_history._create(
             job={
                 "sheet": "计算器",
@@ -2152,15 +2636,59 @@ class FrontendDataTest(unittest.TestCase):
                 "project": "620C_W6830",
                 "finished_at": "2026-08-20T10:00:00+08:00",
             },
-            result={"verdict": "PASS"},
+            result={
+                "verdict": "PASS",
+                "reason": "自主探索完成",
+                "execution_mode": "agent_exploration",
+                "evidence_contract": {"status": "COMPLETE", "complete": True},
+            },
             stdout="PASS",
             stderr="",
         )
-        
+        candidate_job = {
+            "id": "candidate-job",
+            "status": "queued",
+            "promotion_flow": True,
+        }
+        with patch.object(
+            application,
+            "start_candidate_replay",
+            return_value=candidate_job,
+        ) as start_candidate:
+            with self._post_json(base + "/api/cases/audit-and-promote", audit_payload) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        self.assertEqual(resp.status, 202)
+        self.assertEqual(data["status"], "candidate_replay_started")
+        self.assertEqual(data["job"], candidate_job)
+        call = start_candidate.call_args.kwargs
+        self.assertEqual(call["sheet"], "计算器")
+        self.assertEqual(call["case_id"], "CALC_001")
+        self.assertEqual(call["project"], "620C_W6830")
+        self.assertEqual(call["source_history"]["execution_mode"], "agent_exploration")
+        case_map = json.loads(case_map_path.read_text(encoding="utf-8"))
+        self.assertEqual(case_map[0]["mapping_status"], "")
+
+        # A completed flow is idempotent and still does not append the ledger.
+        case_map[0]["mapping_status"] = "PROMOTED"
+        case_map_path.write_text(json.dumps(case_map, ensure_ascii=False), encoding="utf-8")
         with self._post_json(base + "/api/cases/audit-and-promote", audit_payload) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertTrue(data["audit"]["passed"])
+            self.assertEqual(data["status"], "already_promoted")
+
+        # Repeated requests must not duplicate the external exploration record.
+        with self._post_json(base + "/api/cases/audit-and-promote", audit_payload) as resp:
+            self.assertEqual(resp.status, 200)
+        ledger = self.paths.case_map / "620C_simulator_case_map" / "external_execution_history.jsonl"
+        ledger_case_ids = [
+            json.loads(line)["case_id"]
+            for line in ledger.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        self.assertEqual(ledger_case_ids.count("CALC_001"), 1)
+        with urlopen(base + "/api/tests?project=620C_W6830", timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
 
     def test_runs_and_reports_endpoints(self) -> None:
         application, base = self._server()
@@ -2176,6 +2704,17 @@ class FrontendDataTest(unittest.TestCase):
             result={"verdict": "PASS"},
             stdout="PASS",
             stderr="",
+        )
+        failure_history_id = application.test_history._create(
+            job={
+                "sheet": "计算器",
+                "case_id": "CALC_003",
+                "project": "620C_W6830",
+                "finished_at": "2026-08-20T11:00:00+08:00",
+            },
+            result={"verdict": "ERROR", "reason": "GUI_PING 超时"},
+            stdout="",
+            stderr="GUI_PING 超时",
         )
         
         # 1. Tests Jobs
@@ -2193,6 +2732,8 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("distribution", data)
             self.assertIn("trend", data)
             self.assertIn("top_fail_modules", data)
+            self.assertEqual(data["recent_failures"][0]["history_id"], failure_history_id)
+            self.assertEqual(data["recent_failures"][0]["case_id"], "CALC_003")
             
         # 3. Reports Runs
         with urlopen(base + "/api/reports/runs?scope=case&project=620C_W6830", timeout=3) as resp:
@@ -2204,6 +2745,142 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/reports/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
             self.assertIn("application/vnd.openxmlformats-officedocument", resp.headers.get("Content-Type"))
+
+    def test_reports_export_includes_each_non_pass_execution(self) -> None:
+        application, base = self._server()
+        screenshot = Path(self.temporary.name) / "report-failure.bmp"
+        screenshot.write_bytes(b"BM-report-failure")
+
+        def create_run(
+            *,
+            verdict: str,
+            case_id: str,
+            finished_at: str,
+            reason: str,
+            batch_id: str = "",
+            command: str = "",
+            with_screenshot: bool = False,
+        ) -> None:
+            job = {
+                "sheet": "计算器",
+                "case_id": case_id,
+                "project": "620C_W6830",
+                "started_at": finished_at,
+                "finished_at": finished_at,
+                "case": {
+                    "priority": "P0",
+                    "precondition_text": "已进入计算器",
+                    "steps_text": "点击等号并观察结果",
+                    "expected_text": "结果区域显示正确数值",
+                },
+            }
+            if batch_id:
+                job["batch_id"] = batch_id
+            result = {
+                "verdict": verdict,
+                "reason": reason,
+                "command_trace": ([{
+                    "index": 1,
+                    "phase": "action",
+                    "status": "accepted",
+                    "command": command,
+                }] if command else []),
+                "screenshots": ([{
+                    "path": str(screenshot),
+                    "label": "失败画面",
+                    "phase": "action",
+                    "command": command,
+                }] if with_screenshot else []),
+            }
+            application.test_history._create(
+                job=job,
+                result=result,
+                stdout="done",
+                stderr="",
+            )
+
+        create_run(
+            verdict="PASS",
+            case_id="CALC_009",
+            finished_at="2026-08-20T09:00:00+08:00",
+            reason="符合预期",
+        )
+        create_run(
+            verdict="FAIL",
+            case_id="CALC_001",
+            finished_at="2026-08-20T10:00:00+08:00",
+            reason="实际显示 8，与预期显示 9 不一致。",
+            batch_id="batch-fail",
+            command=":TP_CLICK:10,20,1",
+            with_screenshot=True,
+        )
+        create_run(
+            verdict="ERROR",
+            case_id="CALC_001",
+            finished_at="2026-08-20T11:00:00+08:00",
+            reason=(
+                "Traceback (most recent call last):\n"
+                "  File \"test.py\", line 1, in run\n"
+                "HardwareSerialTimeoutError: GUI_PING 超时"
+            ),
+            command=":GUI_PING:1",
+        )
+        create_run(
+            verdict="CANNOT_VERIFY",
+            case_id="CALC_002",
+            finished_at="2026-08-20T12:00:00+08:00",
+            reason="缺少独立截图证据，无法进行视觉判定。",
+            batch_id="batch-cannot-verify",
+        )
+
+        query = urlencode({
+            "project": "620C_W6830",
+            "from": "2026-08-20",
+            "to": "2026-08-20",
+        })
+        with urlopen(base + f"/api/reports/export?{query}", timeout=3) as resp:
+            import io
+            import openpyxl
+
+            workbook = openpyxl.load_workbook(io.BytesIO(resp.read()))
+
+        self.assertEqual(
+            workbook.sheetnames,
+            ["测试报告概览", "高频失败模块", "异常用例明细"],
+        )
+        summary = workbook["测试报告概览"]
+        self.assertEqual(summary["B3"].value, 4)
+        self.assertEqual(summary["B4"].value, 1)
+        self.assertEqual(summary["B5"].value, 1)
+        self.assertEqual(summary["B6"].value, 1)
+        self.assertEqual(summary["B7"].value, 1)
+
+        detail = workbook["异常用例明细"]
+        headers = [cell.value for cell in detail[1]]
+        self.assertEqual(headers, [
+            "运行时间", "模块", "用例编号", "优先级", "结果", "异常类别",
+            "前置条件", "测试步骤", "预期结果", "原因摘要", "原始判定/错误详情",
+            "批次编号", "运行记录编号", "执行命令", "截图证据数量",
+        ])
+        rows = [dict(zip(headers, values)) for values in detail.iter_rows(min_row=2, values_only=True)]
+        self.assertEqual([row["结果"] for row in rows], ["CANNOT_VERIFY", "ERROR", "FAIL"])
+        self.assertEqual(sum(row["用例编号"] == "CALC_001" for row in rows), 2)
+
+        by_verdict = {row["结果"]: row for row in rows}
+        self.assertEqual(by_verdict["FAIL"]["异常类别"], "产品失败")
+        self.assertEqual(by_verdict["FAIL"]["批次编号"], "batch-fail")
+        self.assertEqual(by_verdict["FAIL"]["截图证据数量"], 1)
+        self.assertIn(":TP_CLICK:10,20,1 [action/accepted]", by_verdict["FAIL"]["执行命令"])
+        self.assertEqual(
+            by_verdict["ERROR"]["原因摘要"],
+            "HardwareSerialTimeoutError: GUI_PING 超时",
+        )
+        self.assertIn("Traceback", by_verdict["ERROR"]["原始判定/错误详情"])
+        self.assertEqual(by_verdict["ERROR"]["异常类别"], "执行异常")
+        self.assertEqual(by_verdict["CANNOT_VERIFY"]["异常类别"], "无法验证")
+        self.assertEqual(by_verdict["CANNOT_VERIFY"]["批次编号"], "batch-cannot-verify")
+        self.assertEqual(detail.freeze_panes, "A2")
+        self.assertEqual(detail.auto_filter.ref, "A1:O4")
 
     def test_environments_and_config_endpoints(self) -> None:
         _, base = self._server()
@@ -2234,6 +2911,12 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(data["status"], "ok")
             
         # 4. Config GET & POST
+        from agent_loop_system.tools.llm_retry import record_actual_llm_success
+
+        record_actual_llm_success(
+            root=self.paths.root,
+            at="2026-08-21T14:30:00+08:00",
+        )
         with urlopen(base + "/api/config", timeout=3) as resp:
             cfg = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
@@ -2241,6 +2924,12 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("ones", cfg)
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
+            self.assertTrue(cfg["llm"]["configured"])
+            self.assertEqual(cfg["llm"]["status"], "configured")
+            self.assertEqual(
+                cfg["llm"]["last_actual_success_at"],
+                "2026-08-21T14:30:00+08:00",
+            )
             
         post_cfg = {
             "llm": {"model": "gpt-4o-mini", "timeout": 60},

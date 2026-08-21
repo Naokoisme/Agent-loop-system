@@ -1,10 +1,10 @@
 # case_map 数据合同
 
-更新时间：2026-08-18
+更新时间：2026-08-21
 
 ## 一句话规则
 
-3164 条用例全部可以从前端交给 Runner。`PROMOTED` 用例按固化步骤执行；没有固化步骤的用例由 Agent-loop 在本次运行中临时探索。临时探索只写运行历史，不得改变外部探索状态，也不得自动写回正式步骤。
+3164 条用例全部可以从前端交给 Runner。`PROMOTED` 用例按固化步骤执行；没有固化步骤的用例由 Agent-loop 在本次运行中临时探索。普通运行只写历史；只有用户显式点击“生成候选、复跑并晋升”，系统才可从完整探索结果暂存候选，并在独立候选复跑通过后写入正式步骤。任何站内流程都不得伪造外部探索账本。
 
 ## 目录与数据源
 
@@ -16,7 +16,7 @@
 
 三套目录当前都包含 40 个模块 JSON 和一份外部探索账本。实时分类数量由前端或审计程序直接读取这两个数据源计算；本规范不复制会随探索进度变化的数字。目标之间不得复制命令、坐标、页面、证据或结论，也不得在缺文件时回退到另一套目录。
 
-## 成熟度只有两个事实源
+## 外部探索与固化是两个独立事实源
 
 前端的“外部探索与固化”分类只读取下面两个地方。
 
@@ -67,13 +67,12 @@
 
 ```text
 全部用例
-├─ 尚未外部探索：case_id 不在外部探索账本
-└─ 已经外部探索：case_id 在外部探索账本
-   ├─ 已探索但未固化：没有精确的 mapping_status=PROMOTED
-   └─ 已固化、Agent-loop 可执行：mapping_status=PROMOTED
+├─ 已固化、Agent-loop 可执行：mapping_status=PROMOTED
+├─ 已探索但未固化：未 PROMOTED，且 case_id 在外部探索账本
+└─ 尚未探索：未 PROMOTED，且 case_id 不在外部探索账本
 ```
 
-数据必须满足：每个 `PROMOTED` 用例都已存在于同目标的外部探索账本。
+`PROMOTED` 的来源可以是外部 Agent 的正式候选复跑，也可以是用户显式批准的 Agent-loop 自主探索候选复跑。后一种来源不写 `external_execution_history.jsonl`，因此 `PROMOTED` 不再要求是外部账本的子集。
 
 运行结果是另一条独立轴：未运行、PASS、FAIL、CANNOT_VERIFY、ERROR。它来自 `history/tests` 的最近一次 Agent-loop 运行，不参与上面的成熟度分类。
 
@@ -86,7 +85,19 @@
 1. `mapping_status=PROMOTED`：执行固化步骤。
 2. 其余情况：由 Agent-loop 根据 `precondition_text`、`steps_text`、`expected_text` 临时探索；即使 JSON 正处于候选复跑窗口，普通运行也不把候选当成固化步骤。
 
-外部 Agent 独占用例并做正式准入复跑时，才可以显式传 `--candidate-replay`，让 Runner 执行尚未晋升的临时候选 `actions`。前端和普通批量不传这个参数。复跑失败、ERROR、CANNOT_VERIFY 或任务中断时，必须立即清空候选四组字段；不得把候选长期留在 JSON。Agent-loop 临时探索产生的命令只进入本次运行历史，不写入账本或 case_map。
+只有正式准入复跑才可以显式传 `--candidate-replay`，让 Runner 执行尚未晋升的临时候选 `actions`。入口有两种：外部 Agent 的正式流程，或用户在前端对一轮完整自主探索显式点击“生成候选、复跑并晋升”。普通单条运行和批量运行仍不传该参数。复跑未形成 PASS/FAIL、证据不完整、执行错误、任务中断或候选发生变化时，必须立即恢复写候选前的当前 case 字段；不得把候选长期留在 JSON。
+
+## Agent-loop 自主探索的显式晋升流程
+
+自主探索可以算作候选来源，但不能把同一轮探索结果直接改成 `PROMOTED`：
+
+1. 最新历史必须是 `execution_mode=agent_exploration`，结论为 PASS 或明确产品 FAIL，动作 trace、检查点和截图证据合同完整。
+2. 用户显式点击晋升后，前端服务从成功 action trace 和截图顺序生成临时候选；不修改原始人工语义，也不写外部账本。
+3. 服务启动独立任务，强制传 `--candidate-replay`，用新证据重新执行暂存的候选。
+4. 原始 Runner 结果必须是 schema 3、`execution_mode=candidate_mapping`，目标 provenance 正确，计划与 trace 精确一致，至少有一个成功业务动作，截图与检查点一一对应。
+5. 审计通过才新增精确的 `mapping_status=PROMOTED`。任一门禁失败自动回滚；服务重启会回收仍处于排队、运行或审计中的临时候选。
+
+产品 verdict 与映射资格保持独立：可重复执行并完整证明产品 FAIL 的路径可以固化；CANNOT_VERIFY、ERROR 或基础设施中断不能固化。
 
 ## 外部 Agent 统一工作流
 
@@ -124,7 +135,7 @@ Simulator 和真机仍分别遵守对应技能中的环境、会话、截图和�
 5. 能形成候选时，临时写入该 case 的 `setup/actions/collect/verification_points`，但先不要写 `PROMOTED`。
 6. 用正式 Runner、全新证据目录和显式 `--candidate-replay` 复跑候选。
 7. 准入通过才写精确的 `mapping_status: "PROMOTED"`；未通过立即清空候选，但保留外部探索账本记录。
-8. 最后核对 JSON 可解析、账本 case_id 唯一、PROMOTED 是账本子集、截图与检查点一一对应。
+8. 最后核对 JSON 可解析、账本 case_id 唯一、截图与检查点一一对应；外部流程还要确认当前 case 在目标账本中有终态记录。
 
 外部 Agent 只写自己锁定的目标和 case_id，不改另一套 case_map，不把 Agent-loop 自身运行历史反填成“外部探索”，也不修改人工预期来制造 PASS。
 
