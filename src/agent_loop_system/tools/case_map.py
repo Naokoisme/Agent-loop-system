@@ -37,6 +37,15 @@ CASE_MAP_PROFILE_TARGETS = {
     "6202_W5230": "hardware",
     "6202_W5230_SIMULATOR": "simulator",
 }
+CASE_MAP_PROFILE_PROJECTS = {
+    "620C_W6830": "620C_W6830",
+    "6202_W5230": "6202_W5230",
+    "6202_W5230_SIMULATOR": "6202_W5230",
+}
+CASE_MAP_TARGET_DEFAULT_PROFILES = {
+    "simulator": "620C_W6830",
+    "hardware": "6202_W5230",
+}
 _BARRIER_SEQ = count(1_000_000)
 _ERROR_STATUSES = {"error", "failed", "rejected", "unavailable"}
 _SCREENSHOT_SETTLE_SECONDS = 0.2
@@ -53,15 +62,16 @@ _SELF_SYNCHRONIZING_COMMANDS = {
     "HOST_WAIT",
     "HOST_SCREENSHOT",
 }
-_OBSERVATION_ONLY_COMMANDS = {
+OBSERVATION_ONLY_COMMANDS = frozenset({
     "BUSINESS_GET",
     "GET_CURRENT_WIN_ID",
     "GUI_PING",
     "GUI_STATE",
     "GUI_TREE",
     "HOST_SCREENSHOT",
+    "HOST_WAIT",
     "SCREENSHOT_PRINT",
-}
+})
 
 
 class CaseSession(Protocol):
@@ -93,7 +103,7 @@ class CaseEntry(BaseModel):
     def is_promoted(self) -> bool:
         """只有精确的 PROMOTED 才使用固化步骤。"""
 
-        return self.mapping_status.strip() == "PROMOTED"
+        return self.mapping_status == "PROMOTED"
 
     @property
     def has_candidate_mapping(self) -> bool:
@@ -126,6 +136,7 @@ class CaseRunResult:
     precomputed_verdict: str = ""
     precomputed_reason: str = ""
     exploration_trace: dict[str, object] | None = None
+    provenance: dict[str, str] = field(default_factory=dict)
 
 
 def effective_case_entries(data: object) -> list[dict]:
@@ -147,6 +158,67 @@ def case_map_dir_for_target(target: str = "simulator") -> Path:
         raise ValueError(f"未知 case_map 目标: {target!r}") from exc
 
 
+def _validated_sheet_name(sheet_name: str) -> str:
+    """只接受 case-map 目录内的单一模块名，不把输入当作路径。"""
+
+    value = str(sheet_name or "")
+    if (
+        not value
+        or value != value.strip()
+        or value in {".", ".."}
+        or any(character in value for character in ("/", "\\", ":", "\x00"))
+        or Path(value).name != value
+    ):
+        raise ValueError(f"sheet 必须是单一模块名，不能包含路径或首尾空白: {sheet_name!r}")
+    return value
+
+
+def validated_case_entries(
+    data: object,
+    *,
+    sheet_name: str,
+    expected_profile: str | None,
+    path: Path,
+) -> list[dict]:
+    """确认文件元数据和每条用例仍属于所选 profile/sheet。"""
+
+    if isinstance(data, dict):
+        if expected_profile is not None and data.get("profile") != expected_profile:
+            raise ValueError(
+                f"case_map profile 不匹配: {path} 声明 {data.get('profile')!r}，"
+                f"预期 {expected_profile!r}"
+            )
+        if data.get("sheet") != sheet_name:
+            raise ValueError(
+                f"case_map sheet 不匹配: {path} 声明 {data.get('sheet')!r}，"
+                f"预期 {sheet_name!r}"
+            )
+        raw_entries = data.get("cases")
+    elif expected_profile not in (None, "620C_W6830"):
+        raise ValueError(
+            f"case_map profile 不匹配: {path} 的 {expected_profile!r} 映射必须声明"
+            "顶层 profile、sheet 和 cases"
+        )
+    else:
+        raw_entries = data
+
+    if not isinstance(raw_entries, list) or not raw_entries:
+        raise ValueError(f"case_map cases 必须是非空数组: {path}")
+    if not all(isinstance(item, dict) for item in raw_entries):
+        raise ValueError(f"case_map cases 只能包含 JSON 对象: {path}")
+    mismatched = [
+        str(item.get("case_id") or "<unknown>")
+        for item in raw_entries
+        if item.get("sheet") != sheet_name
+    ]
+    if mismatched:
+        preview = ", ".join(mismatched[:3])
+        raise ValueError(
+            f"case_map 条目 sheet 不匹配: {path} 中 {preview} 不属于 {sheet_name!r}"
+        )
+    return raw_entries
+
+
 def load_case_map(
     sheet_name: str,
     *,
@@ -156,9 +228,11 @@ def load_case_map(
     """加载目标专用的单 sheet 映射，不跨目标回退。"""
 
     normalized_target = str(target or "").strip().lower()
+    validated_sheet = _validated_sheet_name(sheet_name)
     if profile is None:
         case_map_dir = case_map_dir_for_target(normalized_target)
         location = normalized_target
+        expected_profile = CASE_MAP_TARGET_DEFAULT_PROFILES[normalized_target]
     else:
         normalized_profile = str(profile or "").strip()
         try:
@@ -171,12 +245,22 @@ def load_case_map(
                 f"case_map profile {normalized_profile!r} 不属于执行目标 {normalized_target!r}"
             )
         location = normalized_profile
+        expected_profile = normalized_profile
 
-    path = case_map_dir / f"{sheet_name}.json"
-    if not path.is_file():
-        raise FileNotFoundError(f"{location} case_map 尚未迁移该模块: {path}")
+    resolved_directory = case_map_dir.resolve(strict=True)
+    requested_path = resolved_directory / f"{validated_sheet}.json"
+    if not requested_path.is_file():
+        raise FileNotFoundError(f"{location} case_map 尚未迁移该模块: {requested_path}")
+    path = requested_path.resolve(strict=True)
+    if path.parent != resolved_directory:
+        raise ValueError(f"case_map 文件越过目标 profile 目录: {path}")
     data = json.loads(path.read_text(encoding="utf-8"))
-    raw_entries = effective_case_entries(data)
+    raw_entries = validated_case_entries(
+        data,
+        sheet_name=validated_sheet,
+        expected_profile=expected_profile,
+        path=path,
+    )
     return {e.case_id: e for e in (CaseEntry(**e) for e in raw_entries)}
 
 
@@ -645,7 +729,7 @@ def _finish_case_run(case: CaseEntry, result: CaseRunResult) -> CaseRunResult:
         except ValueError:
             continue
     business_action_count = sum(
-        name not in _OBSERVATION_ONLY_COMMANDS for name in action_names
+        name not in OBSERVATION_ONLY_COMMANDS for name in action_names
     )
     if case.steps_text.strip() and business_action_count == 0:
         add_issue(

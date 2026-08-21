@@ -32,6 +32,7 @@ from agent_loop_system.tools.hardware_serial import (
     DEFAULT_PORT,
     SerialTransportError,
     Win32SerialTransport,
+    write_shell_wire,
 )
 
 
@@ -50,6 +51,11 @@ PROJECT_SCREEN_GEOMETRY = {
 }
 DEFAULT_USB_TIMEOUT = 30.0
 DEFAULT_MTP_TIMEOUT = 30.0
+DEFAULT_CAPTURE_ACCEPT_TIMEOUT = 2.0
+# Including CRLF, sequence 9_999_999 makes the capture shell wire exactly
+# 64 bytes.  Larger values cannot be sent atomically through the current watch
+# shell and must never be split into independent transport writes.
+MAX_SHELL_SAFE_CAPTURE_SEQUENCE = 9_999_999
 _CLIXML_PREFIX = "#< CLIXML"
 _CLIXML_ESCAPE_RE = re.compile(r"_x([0-9A-Fa-f]{4})_")
 _MAX_POWERSHELL_ERROR_LENGTH = 2_000
@@ -70,6 +76,10 @@ class MtpScreenshotTimeoutError(MtpScreenshotError, TimeoutError):
 
 class MtpScreenshotDeviceError(MtpScreenshotError):
     """固件明确拒绝或终止截图。"""
+
+
+class MtpScreenshotCommandError(MtpScreenshotError):
+    """截图命令没有被固件接收。"""
 
 
 class MtpScreenshotValidationError(MtpScreenshotError, ValueError):
@@ -451,8 +461,11 @@ class _BorrowedSessionTransport:
             line = payload[:-2].decode("utf-8")
         except UnicodeDecodeError as exc:
             raise MtpScreenshotError("shared serial command is not UTF-8") from exc
-        self.serial_session.write_shell_line(line)
+        self.write_shell_line(line)
         return len(payload)
+
+    def write_shell_line(self, line: str) -> None:
+        self.serial_session.write_shell_line(line)
 
     def read(self, _size: int) -> bytes:
         events = self.serial_session.events_since(self._event_cursor)
@@ -492,28 +505,49 @@ def capture_filename(sequence: int) -> str:
     return f"{MTP_CAPTURE_PREFIX}{sequence}{MTP_CAPTURE_SUFFIX}"
 
 
+def _default_capture_sequence() -> int:
+    return time.time_ns() % MAX_SHELL_SAFE_CAPTURE_SEQUENCE + 1
+
+
+def _validate_shell_safe_capture_sequence(sequence: int) -> int:
+    capture_filename(sequence)
+    if sequence > MAX_SHELL_SAFE_CAPTURE_SEQUENCE:
+        raise MtpScreenshotValidationError(
+            f"capture sequence {sequence} exceeds the shell-safe maximum "
+            f"{MAX_SHELL_SAFE_CAPTURE_SEQUENCE}"
+        )
+    return sequence
+
+
 def _write_line(transport: Any, line: str) -> None:
+    shared_writer = getattr(transport, "write_shell_line", None)
+    if callable(shared_writer):
+        shared_writer(line)
+        return
     payload = (line + "\r\n").encode("utf-8")
     try:
-        written = transport.write(payload)
+        write_shell_wire(transport.write, payload)
     except Exception as exc:
         if isinstance(exc, SerialTransportError):
             raise
         raise SerialTransportError(f"serial write failed: {exc}") from exc
-    if written is not None and written != len(payload):
-        raise SerialTransportError(f"short serial write: {written}/{len(payload)}")
 
 
-def _matching_terminal(text: str, sequence: int) -> dict[str, Any] | None:
+def _capture_response_state(
+    text: str, sequence: int
+) -> tuple[bool, dict[str, Any] | None, dict[str, Any] | None]:
     decoder = json.JSONDecoder()
     offset = 0
+    accepted = False
+    terminal: dict[str, Any] | None = None
+    command_failure: dict[str, Any] | None = None
     while True:
         compact_start = text.find(BRIDGE_MARKER, offset)
         generic_start = text.find("{", offset)
         starts = [value for value in (compact_start, generic_start) if value >= 0]
         start = min(starts) if starts else -1
         if start < 0:
-            return None
+            return accepted, terminal, command_failure
         try:
             event, consumed = decoder.raw_decode(text[start:])
         except json.JSONDecodeError:
@@ -524,34 +558,66 @@ def _matching_terminal(text: str, sequence: int) -> dict[str, Any] | None:
             continue
         if event.get("protocol") != "w30_test_bridge":
             continue
-        if (
-            event.get("request") == CAPTURE_REQUEST
-            and str(event.get("seq")) == str(sequence)
-            and event.get("type") == "screenshot_end"
+        if event.get("request") != CAPTURE_REQUEST:
+            continue
+        event_type = str(event.get("type", "")).lower()
+        status = str(event.get("status", "unknown")).lower()
+        if event_type == "command_result":
+            if status == "accepted":
+                accepted = True
+            else:
+                command_failure = event
+        elif event_type == "screenshot_end" and str(event.get("seq")) == str(
+            sequence
         ):
-            return event
+            terminal = event
 
 
 def _wait_for_capture_terminal(
     transport: Any, *, sequence: int, timeout: float
 ) -> dict[str, Any] | None:
-    deadline = time.monotonic() + timeout
+    started = time.monotonic()
+    deadline = started + timeout
+    acceptance_deadline = started + min(timeout, DEFAULT_CAPTURE_ACCEPT_TIMEOUT)
     received = bytearray()
+    command_accepted = False
     while time.monotonic() < deadline:
         chunk = transport.read(4096)
         if chunk:
             received.extend(chunk)
-            event = _matching_terminal(received.decode("utf-8", errors="replace"), sequence)
-            if event is not None:
-                status = str(event.get("status", "unknown")).lower()
+            accepted, terminal, command_failure = _capture_response_state(
+                received.decode("utf-8", errors="replace"), sequence
+            )
+            command_accepted = command_accepted or accepted
+            if command_failure is not None:
+                status = str(command_failure.get("status", "unknown")).lower()
+                reason = command_failure.get("reason", "unknown")
+                raise MtpScreenshotDeviceError(
+                    f"capture {sequence} command ended with {status}: {reason}"
+                )
+            if terminal is not None:
+                status = str(terminal.get("status", "unknown")).lower()
                 if status != "complete":
-                    reason = event.get("reason", "unknown")
+                    reason = terminal.get("reason", "unknown")
                     raise MtpScreenshotDeviceError(
                         f"capture {sequence} ended with {status}: {reason}"
                     )
-                return event
-        else:
-            time.sleep(0.01)
+                return terminal
+        if not command_accepted and time.monotonic() >= acceptance_deadline:
+            raise MtpScreenshotCommandError(
+                f"capture {sequence} command was not accepted within "
+                f"{min(timeout, DEFAULT_CAPTURE_ACCEPT_TIMEOUT):g}s; "
+                "UART shell input may have been truncated"
+            )
+        if not chunk:
+            remaining = deadline - time.monotonic()
+            if remaining > 0:
+                time.sleep(min(0.01, remaining))
+    if not command_accepted:
+        raise MtpScreenshotCommandError(
+            f"capture {sequence} command was not accepted within {timeout:g}s; "
+            "UART shell input may have been truncated"
+        )
     return None
 
 
@@ -673,7 +739,8 @@ def capture_mtp_screenshot(
         expected_width, expected_height
     )
     if sequence is None:
-        sequence = time.time_ns() % 2_147_483_646 + 1
+        sequence = _default_capture_sequence()
+    sequence = _validate_shell_safe_capture_sequence(sequence)
     file_name = capture_filename(sequence)
 
     output = Path(output_path).expanduser().resolve()
@@ -788,8 +855,8 @@ class MtpCaptureProvider:
         if serial_session is None:
             raise ValueError("serial_session is required")
         if sequence_start is None:
-            sequence_start = time.time_ns() % 2_147_483_646 + 1
-        capture_filename(sequence_start)
+            sequence_start = _default_capture_sequence()
+        sequence_start = _validate_shell_safe_capture_sequence(sequence_start)
         self.serial_session = serial_session
         self.usb_timeout = _positive_timeout("usb_timeout", usb_timeout)
         self.mtp_timeout = _positive_timeout("mtp_timeout", mtp_timeout)
@@ -811,16 +878,20 @@ class MtpCaptureProvider:
             if (
                 isinstance(after_sequence, bool)
                 or not isinstance(after_sequence, int)
-                or not 0 <= after_sequence <= 0xFFFFFFFF
+                or not 0 <= after_sequence <= MAX_SHELL_SAFE_CAPTURE_SEQUENCE
             ):
-                raise ValueError("after_sequence must be a uint32 or None")
+                raise ValueError(
+                    "after_sequence must be an integer in "
+                    f"0..{MAX_SHELL_SAFE_CAPTURE_SEQUENCE} or None"
+                )
         floor = -1 if self._last_sequence is None else self._last_sequence
         if after_sequence is not None:
             floor = max(floor, after_sequence)
         sequence = max(self._next_sequence, floor + 1)
-        if sequence > 0xFFFFFFFF:
+        if sequence > MAX_SHELL_SAFE_CAPTURE_SEQUENCE:
             raise MtpScreenshotValidationError(
-                "cannot allocate a capture sequence newer than after_sequence"
+                "cannot allocate a shell-safe capture sequence newer than "
+                "after_sequence"
             )
         self._next_sequence = sequence + 1
         return sequence
@@ -892,7 +963,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--port", default=DEFAULT_PORT, help="调试串口，默认 COM7")
     parser.add_argument("--baudrate", type=int, default=DEFAULT_BAUDRATE)
     parser.add_argument("--output", required=True, help="输出 BMP 路径")
-    parser.add_argument("--sequence", type=int, help="可选的 uint32 请求序号")
+    parser.add_argument(
+        "--sequence",
+        type=int,
+        help=f"可选请求序号，范围 1..{MAX_SHELL_SAFE_CAPTURE_SEQUENCE}",
+    )
     parser.add_argument("--capture-timeout", type=float, default=20.0)
     parser.add_argument("--usb-timeout", type=float, default=DEFAULT_USB_TIMEOUT)
     parser.add_argument("--mtp-timeout", type=float, default=DEFAULT_MTP_TIMEOUT)
@@ -937,9 +1012,11 @@ if __name__ == "__main__":
 
 __all__ = [
     "BmpInfo",
+    "MAX_SHELL_SAFE_CAPTURE_SEQUENCE",
     "MtpCaptureFrame",
     "MtpCaptureMetadata",
     "MtpCaptureProvider",
+    "MtpScreenshotCommandError",
     "MtpScreenshotDeviceError",
     "MtpScreenshotError",
     "MtpScreenshotResult",

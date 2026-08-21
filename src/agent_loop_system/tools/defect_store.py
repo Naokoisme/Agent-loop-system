@@ -17,7 +17,7 @@ from pathlib import Path
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.ones import Defect, OnesClient, OnesConfig, extract_desc_image_uuids
 
@@ -68,19 +68,16 @@ def _media_kind(mime: str) -> str:
 
 
 def _get_llm():
-    """创建 LLM 实例，复用 agent.py 的配置方式。"""
-    from langchain_openai import ChatOpenAI
+    """创建 LLM 实例，复用统一配置方式。"""
+    from agent_loop_system.tools.llm_config import create_chat_llm
 
-    return ChatOpenAI(
-        model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-        api_key=os.environ.get("OPENAI_API_KEY", ""),
-        base_url=os.environ.get("OPENAI_BASE_URL") or None,
-        timeout=get_llm_request_timeout(),
-    )
+    return create_chat_llm()
 
 
 def _llm_available() -> bool:
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    from agent_loop_system.tools.llm_config import get_llm_api_key
+
+    api_key = get_llm_api_key()
     return bool(api_key and not api_key.startswith("暂时"))
 
 
@@ -93,7 +90,7 @@ def _llm_invoke_with_retry(llm, messages, max_retries: int = 12) -> str:
         return str(text)
 
     try:
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             _invoke,
             is_valid=lambda text: bool(text.strip()),
             max_attempts=max_retries,

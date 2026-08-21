@@ -1388,7 +1388,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1402,7 +1401,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1416,7 +1414,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1430,7 +1427,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1444,7 +1440,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1458,7 +1453,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1472,7 +1466,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1483,12 +1476,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第1项显示Keypad",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The first application item in the Phone submenu is visible and labeled 'Keypad'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_097",
@@ -1497,12 +1499,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第2项显示Contacts",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The second application item in the Phone submenu is visible and labeled 'Contacts'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_098",
@@ -1511,12 +1522,22 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第3项显示Call History",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The third application item in the Phone submenu is visible and labeled 'Call History'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_099",
@@ -1525,12 +1546,23 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第4项显示SOS",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The fourth application item in the Phone submenu is visible and labeled 'SOS'"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_100",
@@ -1542,7 +1574,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1553,12 +1584,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Contacts子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The Contacts item is visible in the Phone submenu with a right-side '>' arrow"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_102",
@@ -1567,12 +1607,23 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Call History子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The Call History item is visible in the Phone submenu with a right-side '>' arrow"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_103",
@@ -1584,7 +1635,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1598,7 +1648,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1609,12 +1658,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone子菜单",
       "expected_text": "1.页面显示单列列表",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The Phone submenu is visibly rendered as a single-column list"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_106",
@@ -1623,12 +1681,23 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动Phone子菜单",
       "expected_text": "1.Phone标题保持在顶部",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;",
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "After scrolling the Phone submenu, the title 'Phone' remains visible at the top"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_107",
@@ -1637,12 +1706,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone页面顶部",
       "expected_text": "1.页面右上角显示当前时分",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:QDEC_SET:1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY; QDEC steps are sent as individually acknowledged single steps.",
+      "verification_points": [
+        "The upper-right corner of the Phone page visibly shows the current hour and minute"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_108",
@@ -1651,12 +1729,21 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone子菜单右滑",
       "expected_text": "1.手表显示主菜单",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_SWIPE:80,251,350,251,0;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "Current build exposes the Phone submenu as TELEPHONY with the visible title 'Call'.",
+      "verification_points": [
+        "A right swipe from the Phone submenu returns to the main menu"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_109",
@@ -1668,7 +1755,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1679,12 +1765,22 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone页点击Contacts",
       "expected_text": "1.手表显示Contacts页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1,all_phone,1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,267,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "With all_phone HFP connected, the verified Contacts-row click is repeatable; the current build remains on the Call page.",
+      "verification_points": [
+        "The Phone page Contacts click opens the Contacts page"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_111",
@@ -1693,12 +1789,22 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone页点击Call History",
       "expected_text": "1.手表显示Call History页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "unable": false,
-      "note": "",
-      "verification_points": []
+      "setup": [
+        "srv_quick_cmd send TOP5STEP:LANGUAGE_SET:3;",
+        "srv_quick_cmd send TOP5STEP:SIM_CONNECTION_SET:1,all_phone,1;",
+        "srv_quick_cmd send TOP5STEP:ENTER_PAGE:TELEPHONY,0;"
+      ],
+      "actions": [
+        "srv_quick_cmd send TOP5STEP:TP_CLICK:205,511,1;"
+      ],
+      "collect": [
+        "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
+      ],
+      "note": "With all_phone HFP connected, the verified Call history-row click is repeatable; the current build remains on the Call page.",
+      "verification_points": [
+        "The Phone page Call History click opens the Call History page"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_112",
@@ -1710,7 +1816,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1724,7 +1829,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1738,7 +1842,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1752,7 +1855,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1766,7 +1868,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1780,7 +1881,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1794,7 +1894,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1808,7 +1907,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1822,7 +1920,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1836,7 +1933,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1850,7 +1946,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1864,7 +1959,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1878,7 +1972,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1892,7 +1985,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1906,7 +1998,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1920,7 +2011,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },
@@ -1934,7 +2024,6 @@
       "setup": [],
       "actions": [],
       "collect": [],
-      "unable": false,
       "note": "",
       "verification_points": []
     },

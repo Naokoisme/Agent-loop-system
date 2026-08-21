@@ -9,12 +9,21 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘单击编码器",
       "expected_text": "1.手表显示当前风格主菜单",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "显式回表盘后执行原始编码器单击，避免额外按键切页产生高噪声串口输出。",
+      "verification_points": [
+        "单击编码器后显示当前风格主菜单"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_002",
@@ -51,12 +60,21 @@
       "precondition_text": "1.手表显示主菜单",
       "steps_text": "1.在主菜单单击按键",
       "expected_text": "1.手表显示主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:MENU_LIST,0"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202真机已注册的List主菜单入口建立前置，主编码器索引与MENU_001真机源码及实测一致。",
+      "verification_points": [
+        "在主菜单单击主编码器后显示主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_005",
@@ -107,12 +125,21 @@
       "precondition_text": "1.Menu Style已设为List，手表显示List主菜单",
       "steps_text": "1.在List主菜单上滑",
       "expected_text": "1.页面右侧显示滚动条",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:MENU_LIST,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,420,205,100,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202真机MENU_LIST入口建立List主菜单前置，执行真实上滑后采集MTP截图核对右侧滚动条。",
+      "verification_points": [
+        "在List主菜单执行一次向上滑动后，页面右侧显示滚动条"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_009",
@@ -429,12 +456,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第1项显示My Fitness",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,100,205,400,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；真机当前顶部第1项由本条独立截图判定。",
+      "verification_points": [
+        "滚动至List主菜单顶部后，第1项显示My Fitness"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_032",
@@ -443,12 +480,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第2项显示Sports",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:200,150,200,400,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；真机当前第2项实际显示Sports record，保留原始预期Sports。",
+      "verification_points": [
+        "滚动至List主菜单顶部后，第2项显示Sports"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_033",
@@ -457,12 +504,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第3项显示Health",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:200,150,200,400,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；真机当前第3项实际显示Activity record，保留原始预期Health。",
+      "verification_points": [
+        "滚动至List主菜单顶部后，第3项显示Health"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_034",
@@ -471,12 +528,22 @@
       "precondition_text": "1.Menu Style为List",
       "steps_text": "1.滚动至对应菜单位置",
       "expected_text": "1.第4项显示Sleep",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:200,150,200,400,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；第4项由本条独立真机截图判定。",
+      "verification_points": [
+        "滚动至List主菜单顶部后，第4项显示Sleep"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_035",
@@ -667,12 +734,23 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.观察Sports子菜单",
       "expected_text": "1.页面显示单列列表",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,120,205,410,0",
+        ":TP_CLICK:205,115,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后向下滑动到顶部菜单组；真机当前入口显示为Workout，点击该入口进入Sports子菜单并检查单列列表。",
+      "verification_points": [
+        "进入真机Workout（Sports）子菜单后显示单列列表"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_049",
@@ -681,12 +759,21 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.滚动Sports子菜单",
       "expected_text": "1.Sports标题保持在顶部",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_CLICK:65,115,0",
+        ":TP_SWIPE:205,400,205,150,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后点击真机当前显示的Workout入口，再向上滑动Sports子菜单；真机标题实际显示为Workout，保留原始Sports预期供正式判定。",
+      "verification_points": [
+        "滚动真机Workout（Sports）子菜单后顶部标题保持显示"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_050",
@@ -695,12 +782,21 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.观察Sports页面顶部",
       "expected_text": "1.页面右上角显示当前时分",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "actions": [
+        ":TP_CLICK:65,115,0",
+        ":TP_SWIPE:205,260,205,250,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "从表盘重新进入List主菜单后点击真机当前显示的Workout入口并执行轻微页面滚动，再检查页面右上角当前时分。",
+      "verification_points": [
+        "进入真机Workout（Sports）子菜单并滚动后右上角显示当前时分"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_051",
@@ -709,12 +805,21 @@
       "precondition_text": "1.手表显示Sports子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第1项显示Multisport",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:SPORT_LIST,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,260,205,250,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202真机SPORT_LIST入口进入Workout（Sports）子菜单，执行轻微页面手势后核对子菜单第1项。",
+      "verification_points": [
+        "真机Workout（Sports）子菜单第1项显示Multisport"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_052",
@@ -1339,12 +1444,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第1项显示Keypad",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":QDEC_SET:1"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "当前6202源码注册TELEPHONY入口；用完整页面参数进入真机Call（Phone）子菜单并单步滚动，核对第1项。",
+      "verification_points": [
+        "真机Call（Phone）子菜单第1项显示Keypad"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_097",
@@ -1353,12 +1465,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第2项显示Contacts",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,160,205,285,1"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，向下滚动Call页面使真机Contacts显示为第2项。",
+      "verification_points": [
+        "真机Call（Phone）子菜单第2项显示Contacts"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_098",
@@ -1367,12 +1486,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第3项显示Call History",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:200,400,200,200,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，向上滚动Call页面使真机Call history显示为第3项；真机文案实际为Call history，保留原始大小写预期。",
+      "verification_points": [
+        "真机Call（Phone）子菜单第3项显示Call history"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_099",
@@ -1381,12 +1507,22 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动至对应子项位置",
       "expected_text": "1.第4项显示SOS",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:200,400,200,100,0",
+        ":TP_SWIPE:200,400,200,100,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202真机TELEPHONY入口，执行真实上滑到Call（Phone）子菜单后部条目并采集MTP截图核对原始预期SOS。",
+      "verification_points": [
+        "滚动至Call（Phone）子菜单第4项/底部条目位置；预期第4项显示SOS，若截图中目标位置未显示SOS则为产品FAIL"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_100",
@@ -1409,12 +1545,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Contacts子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,150,205,400,1"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，向下滚动使真机Contacts行完整显示；当前行右侧未显示箭头，保留原始箭头预期。",
+      "verification_points": [
+        "真机Call（Phone）页面Contacts行右侧显示箭头"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_102",
@@ -1423,12 +1566,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Call History子项",
       "expected_text": "1.子项右侧显示>箭头",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,460,205,220,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，向上滚动使真机Call history行完整显示；当前行右侧未显示箭头，保留原始箭头预期。",
+      "verification_points": [
+        "真机Call（Phone）页面Call history行右侧显示箭头"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_103",
@@ -1465,12 +1615,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone子菜单",
       "expected_text": "1.页面显示单列列表",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,160,205,285,1"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口并执行真机已验证的页面滚动，再检查Call（Phone）子菜单单列列表。",
+      "verification_points": [
+        "真机Call（Phone）子菜单显示单列列表"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_106",
@@ -1479,12 +1636,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.滚动Phone子菜单",
       "expected_text": "1.Phone标题保持在顶部",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,420,205,140,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口并向上滚动Call（Phone）子菜单；真机顶部标题实际为Call，保留原始Phone预期。",
+      "verification_points": [
+        "滚动真机Call（Phone）子菜单后顶部标题保持显示"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_107",
@@ -1493,12 +1657,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.观察Phone页面顶部",
       "expected_text": "1.页面右上角显示当前时分",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,160,205,285,1"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口并执行真机已验证的页面滚动，再检查Call（Phone）页面右上角当前时分。",
+      "verification_points": [
+        "真机Call（Phone）页面右上角显示当前时分"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_108",
@@ -1507,12 +1678,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone子菜单右滑",
       "expected_text": "1.手表显示主菜单",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:50,251,360,251,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，在真机Call（Phone）子菜单从左向右滑动返回主菜单。",
+      "verification_points": [
+        "在真机Call（Phone）子菜单右滑后显示主菜单"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_109",
@@ -1535,12 +1713,19 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone页点击Contacts",
       "expected_text": "1.手表显示Contacts页面",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_CLICK:200,266,0"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202源码注册的TELEPHONY入口，点击真机实测Contacts行；当前版本点击后仍停留在Call页面，保留原始Contacts页面预期。",
+      "verification_points": [
+        "在真机Call（Phone）页面点击Contacts后显示Contacts页面"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_111",
@@ -1549,12 +1734,22 @@
       "precondition_text": "1.手表显示Phone子菜单",
       "steps_text": "1.在Phone页点击Call History",
       "expected_text": "1.手表显示Call History页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TELEPHONY,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,460,205,220,0",
+        ":TP_CLICK:200,266,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "使用当前6202真机TELEPHONY入口，先滚动使Call history行完整显示，再执行真实点击并采集MTP截图核对是否进入Call History页面。",
+      "verification_points": [
+        "在Call（Phone）页面点击Call history后应显示Call History页面；若截图仍停留Call列表则为产品FAIL"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "MENU_112",

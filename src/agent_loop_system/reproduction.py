@@ -587,7 +587,7 @@ def interactive_reproduce(
                     output_dir,
                     trace,
                     ReproductionOutcome.SYSTEM_ERROR,
-                    "复现 Agent 配置不可用",
+                    "执行 Agent 配置不可用：未能初始化执行 Agent API",
                 )
 
             if decision.action == ReproductionAction.BLOCKED:
@@ -729,11 +729,14 @@ def interactive_reproduce(
             f"达到 {max_decision_rounds} 轮决策上限",
         )
     except Exception as exc:
+        message = str(exc)
+        if not message.startswith("执行 Agent API 出错"):
+            message = f"交互式复现异常：{message}"
         return _finish_trace(
             output_dir,
             trace,
             ReproductionOutcome.SYSTEM_ERROR,
-            f"交互式复现异常: {exc}",
+            message,
         )
     finally:
         _stop_session(session)

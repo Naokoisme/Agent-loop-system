@@ -17,6 +17,83 @@ _APP_QUICK_CMD_PATHS = {
 }
 
 
+def is_forbidden_hardware_workspace(path: Path) -> bool:
+    """检查是否为禁止直接作为真机测试工作区的上游或主线仓库。"""
+    try:
+        resolved = path.resolve()
+    except Exception:
+        resolved = path
+    parts_lower = [p.lower() for p in resolved.parts]
+    return "shenju_w30" in parts_lower
+
+
+def find_hardware_workspace(
+    project: str,
+    search_roots: list[Path] | None = None,
+) -> Path | None:
+    """根据项目名称与特征指纹自动探测隔离工作区。
+
+    探测顺序：
+    1. search_roots（如调用者指定）
+    2. AGENT_LOOP_WORKSPACE_BASE / W30_WORKSPACE_BASE 环境变量目录下的项目子目录
+    3. Agent-loop-system 仓库的同级目录 ../Agent-loop-workspace/{project} 或 ../{project}
+    4. 当前工作目录下的 workspaces/{project} 或 ../Agent-loop-workspace/{project}
+    """
+    candidates: list[Path] = []
+
+    if search_roots:
+        for root in search_roots:
+            candidates.append(Path(root) / project)
+            candidates.append(Path(root))
+
+    env_base = (
+        os.environ.get("AGENT_LOOP_WORKSPACE_BASE", "").strip()
+        or os.environ.get("W30_WORKSPACE_BASE", "").strip()
+    )
+    if env_base:
+        candidates.append(Path(env_base).resolve() / project)
+
+    # 仓库同级目录
+    repo_root = Path(__file__).resolve().parents[3]
+    candidates.append(repo_root.parent / "Agent-loop-workspace" / project)
+    candidates.append(repo_root.parent / project)
+
+    # 当前执行目录相关
+    cwd = Path.cwd().resolve()
+    candidates.append(cwd.parent / "Agent-loop-workspace" / project)
+    candidates.append(cwd / "workspaces" / project)
+    candidates.append(cwd / project)
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        try:
+            resolved = candidate.resolve()
+        except Exception:
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+
+        if not resolved.is_dir():
+            continue
+        if is_forbidden_hardware_workspace(resolved):
+            continue
+
+        active_config = resolved / "app" / "ProjectConfig.cmake"
+        if not active_config.is_file():
+            continue
+
+        try:
+            content = active_config.read_text(encoding="utf-8", errors="replace")
+            match = _PROJECT_RE.search(content)
+            if match and match.group(1) == project:
+                return resolved
+        except Exception:
+            continue
+
+    return None
+
+
 @dataclass(frozen=True, slots=True)
 class HardwareTargetConfig:
     """已核对项目身份且源码根与隔离工作区一致的真机配置。"""
@@ -52,31 +129,51 @@ class HardwareTargetConfig:
 
     @classmethod
     def from_env(cls) -> "HardwareTargetConfig":
-        root_value = os.environ.get("W30_HARDWARE_SOURCE_ROOT", "").strip()
-        if not root_value:
-            raise ValueError(
-                "W30_HARDWARE_SOURCE_ROOT 未配置，无法核对真机命令表"
-            )
-        workspace_value = os.environ.get(
-            "W30_HARDWARE_WORKSPACE_ROOT", ""
-        ).strip()
-        if not workspace_value:
-            raise ValueError(
-                "W30_HARDWARE_WORKSPACE_ROOT 未配置，无法确认真机隔离工作区"
-            )
         expected_project = (
             os.environ.get("W30_HARDWARE_PROJECT", "").strip()
             or DEFAULT_HARDWARE_PROJECT
         )
         if expected_project not in _APP_QUICK_CMD_PATHS:
             raise ValueError(f"尚未登记的真机项目: {expected_project}")
-        source_root = Path(root_value).resolve()
-        workspace_root = Path(workspace_value).resolve()
-        if source_root != workspace_root:
+
+        root_value = os.environ.get("W30_HARDWARE_SOURCE_ROOT", "").strip()
+        workspace_value = (
+            os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", "").strip()
+            or os.environ.get("W30_HARDWARE_WORKSPACE", "").strip()
+        )
+
+        source_root: Path | None = None
+
+        if root_value and workspace_value:
+            src_path = Path(root_value).resolve()
+            ws_path = Path(workspace_value).resolve()
+            if src_path != ws_path:
+                raise ValueError(
+                    "HARDWARE_WORKSPACE_CONFLICT: W30_HARDWARE_SOURCE_ROOT "
+                    f"必须指向当前真机隔离工作区 {ws_path}"
+                )
+            source_root = src_path
+        elif root_value:
+            source_root = Path(root_value).resolve()
+        elif workspace_value:
+            source_root = Path(workspace_value).resolve()
+        else:
+            discovered = find_hardware_workspace(expected_project)
+            if discovered is not None:
+                source_root = discovered
+            else:
+                raise ValueError(
+                    f"HARDWARE_WORKSPACE_NOT_FOUND: 未配置真机工作区路径，且未能在标准候选目录"
+                    f"（如 ../Agent-loop-workspace/{expected_project}）自动探测到有效的隔离工作区。"
+                    f"请在 .env 中设置 W30_HARDWARE_WORKSPACE 或 W30_HARDWARE_WORKSPACE_ROOT"
+                )
+
+        if is_forbidden_hardware_workspace(source_root):
             raise ValueError(
-                "HARDWARE_WORKSPACE_CONFLICT: W30_HARDWARE_SOURCE_ROOT "
-                f"必须指向当前真机隔离工作区 {workspace_root}"
+                f"HARDWARE_WORKSPACE_FORBIDDEN: 路径 {source_root} 指向上游只读参考库 (shenju_w30)，"
+                "禁止直接作为真机工作区执行测试"
             )
+
         if not source_root.is_dir():
             raise ValueError(f"真机源码目录不存在: {source_root}")
 
@@ -158,6 +255,8 @@ __all__ = [
     "DEFAULT_HARDWARE_PROJECT",
     "HardwareTargetConfig",
     "build_hardware_agent_knowledge",
+    "find_hardware_workspace",
     "hardware_command_allowed",
+    "is_forbidden_hardware_workspace",
     "load_hardware_command_capabilities",
 ]

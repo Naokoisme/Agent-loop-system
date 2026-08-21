@@ -39,9 +39,30 @@ class FakeScanner:
         return {"target": (device, advertisement)}
 
 
+class FakeSerialSession:
+    def __init__(self) -> None:
+        self.shell_lines: list[str] = []
+
+    def write_shell_line(self, line: str) -> None:
+        self.shell_lines.append(line)
+
+
+class FakeUsbSystem:
+    def __init__(self, *, restore_failures: int = 0) -> None:
+        self.wait_calls: list[dict[str, object]] = []
+        self.restore_failures = restore_failures
+
+    def wait_for_usb(self, *, present: bool, timeout: float) -> None:
+        self.wait_calls.append({"present": present, "timeout": timeout})
+        if present and self.restore_failures > 0:
+            self.restore_failures -= 1
+            raise RuntimeError("USB did not return")
+
+
 class FakeScreenshotClient:
-    def __init__(self, bmp: bytes) -> None:
+    def __init__(self, bmp: bytes, *, capture_error: Exception | None = None) -> None:
         self.bmp = bmp
+        self.capture_error = capture_error
         self.connect_calls: list[bool] = []
         self.capture_calls: list[dict[str, object]] = []
         self.close_calls = 0
@@ -56,6 +77,8 @@ class FakeScreenshotClient:
         sequence: int | None = None,
         timeout: float = 180.0,
     ) -> WatchBleScreenshotResult:
+        if self.capture_error is not None:
+            raise self.capture_error
         assert sequence is not None
         output = Path(output_path)
         output.write_bytes(self.bmp)
@@ -79,14 +102,23 @@ class FakeScreenshotClient:
 
 
 class FakeClientBuilder:
-    def __init__(self, bmp: bytes) -> None:
+    def __init__(
+        self,
+        bmp: bytes,
+        *,
+        capture_error: Exception | None = None,
+    ) -> None:
         self.bmp = bmp
+        self.capture_error = capture_error
         self.calls: list[tuple[object, float]] = []
         self.clients: list[FakeScreenshotClient] = []
 
     def __call__(self, device, timeout: float) -> FakeScreenshotClient:
         self.calls.append((device, timeout))
-        client = FakeScreenshotClient(self.bmp)
+        client = FakeScreenshotClient(
+            self.bmp,
+            capture_error=self.capture_error,
+        )
         self.clients.append(client)
         return client
 
@@ -100,10 +132,15 @@ class BleCaptureProviderTest(unittest.TestCase):
     ) -> None:
         bmp = make_watch_bmp()
         builder = FakeClientBuilder(bmp)
+        serial = FakeSerialSession()
+        usb = FakeUsbSystem()
         provider = BleCaptureProvider(
             "42:74:DC:C8:0A:02",
+            serial_session=serial,
             sequence_start=100,
             scan_timeout=3.5,
+            usb_timeout=2.0,
+            usb_system=usb,
             scanner=FakeScanner,
             client_builder=builder,
         )
@@ -140,6 +177,24 @@ class BleCaptureProviderTest(unittest.TestCase):
             self.assertTrue(
                 all(client.close_calls == 1 for client in builder.clients)
             )
+            self.assertEqual(
+                serial.shell_lines,
+                [
+                    "dal_usb close",
+                    "dal_usb open",
+                    "dal_usb close",
+                    "dal_usb open",
+                ],
+            )
+            self.assertEqual(
+                usb.wait_calls,
+                [
+                    {"present": False, "timeout": 2.0},
+                    {"present": True, "timeout": 2.0},
+                    {"present": False, "timeout": 2.0},
+                    {"present": True, "timeout": 2.0},
+                ],
+            )
 
             with tempfile.TemporaryDirectory() as root:
                 output = Path(root) / "nested" / "watch.bmp"
@@ -153,6 +208,8 @@ class BleCaptureProviderTest(unittest.TestCase):
     def test_provider_rejects_capture_after_close(self) -> None:
         provider = BleCaptureProvider(
             "42:74:DC:C8:0A:02",
+            serial_session=FakeSerialSession(),
+            usb_system=FakeUsbSystem(),
             scanner=FakeScanner,
             client_builder=FakeClientBuilder(make_watch_bmp()),
         )
@@ -164,6 +221,8 @@ class BleCaptureProviderTest(unittest.TestCase):
     def test_provider_rejects_sequence_newer_than_uint32(self) -> None:
         provider = BleCaptureProvider(
             "42:74:DC:C8:0A:02",
+            serial_session=FakeSerialSession(),
+            usb_system=FakeUsbSystem(),
             sequence_start=1,
             scanner=FakeScanner,
             client_builder=FakeClientBuilder(make_watch_bmp()),
@@ -173,6 +232,63 @@ class BleCaptureProviderTest(unittest.TestCase):
                 provider.capture(timeout=1, after_sequence=0xFFFFFFFF)
         finally:
             provider.close()
+
+    def test_capture_failure_still_restores_usb(self) -> None:
+        serial = FakeSerialSession()
+        usb = FakeUsbSystem()
+        provider = BleCaptureProvider(
+            "42:74:DC:C8:0A:02",
+            serial_session=serial,
+            usb_timeout=2.0,
+            usb_system=usb,
+            scanner=FakeScanner,
+            client_builder=FakeClientBuilder(
+                make_watch_bmp(),
+                capture_error=RuntimeError("capture failed"),
+            ),
+        )
+        try:
+            with self.assertRaisesRegex(RuntimeError, "capture failed"):
+                provider.capture(timeout=4.0)
+        finally:
+            provider.close()
+
+        self.assertEqual(
+            serial.shell_lines,
+            ["dal_usb close", "dal_usb open"],
+        )
+        self.assertEqual(
+            usb.wait_calls,
+            [
+                {"present": False, "timeout": 2.0},
+                {"present": True, "timeout": 2.0},
+            ],
+        )
+
+    def test_restore_usb_retries_then_reports_failure(self) -> None:
+        serial = FakeSerialSession()
+        usb = FakeUsbSystem(restore_failures=2)
+        provider = BleCaptureProvider(
+            "42:74:DC:C8:0A:02",
+            serial_session=serial,
+            usb_timeout=2.0,
+            usb_system=usb,
+            scanner=FakeScanner,
+            client_builder=FakeClientBuilder(make_watch_bmp()),
+        )
+        try:
+            with self.assertRaisesRegex(
+                BleCaptureProviderError,
+                "could not restore USB after BLE screenshot",
+            ):
+                provider.capture(timeout=4.0)
+        finally:
+            provider.close()
+
+        self.assertEqual(
+            serial.shell_lines,
+            ["dal_usb close", "dal_usb open", "dal_usb open"],
+        )
 
 
 if __name__ == "__main__":

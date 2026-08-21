@@ -218,6 +218,28 @@ class WatchBleScanTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(devices[0].rssi, -66)
         self.assertEqual(FakeScanner.calls, [{"timeout": 1.5, "return_adv": True}])
 
+    async def test_scan_accepts_explicit_address_without_name_or_service(self) -> None:
+        target = SimpleNamespace(address="54:C8:D4:D9:29:06", name=None)
+        ignored = SimpleNamespace(address="AA:03", name=None)
+        FakeScanner.discovered = {
+            "target": (
+                target,
+                SimpleNamespace(local_name=None, rssi=-54, service_uuids=[]),
+            ),
+            "ignored": (
+                ignored,
+                SimpleNamespace(local_name=None, rssi=-40, service_uuids=[]),
+            ),
+        }
+
+        devices = await scan_watches(
+            timeout=1.5,
+            address="54:c8:d4:d9:29:06",
+            scanner=FakeScanner,
+        )
+
+        self.assertEqual(devices, [WatchBleDevice("54:C8:D4:D9:29:06", None, -54)])
+
     async def test_selection_requires_exactly_one_match(self) -> None:
         devices = [
             WatchBleDevice("AA:01", "same"),

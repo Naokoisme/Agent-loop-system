@@ -23,12 +23,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在设置列表单击编码器",
       "expected_text": "1.手表显示主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SETTING,0"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "PROMOTED: 6202真机从主表盘进入Settings后单击主编码器返回主表盘；正式Runner PASS，证据合同COMPLETE。探索证据 evidence/migration_watchface_nav_20260818/exploration/WFACE_002/result.json；正式证据 evidence/migration_watchface_nav_20260818/formal/WFACE_002/result.json。",
+      "verification_points": [
+        "在设置列表单击编码器后显示主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_003",

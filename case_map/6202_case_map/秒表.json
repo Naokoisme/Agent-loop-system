@@ -51,12 +51,21 @@
       "precondition_text": "1.手表显示秒表未开始页",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.主计时保持00:00.00，不新增计次",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 真机独立探索与正式复跑：在 410x502 秒表页面点击左下置灰计次按钮，MTP 新图保持 00:00.00 且无计次记录；正式证据见 evidence/migration_stopwatch_20260819/formal_candidate_SW_004_20260819-012500/result.json。",
+      "verification_points": [
+        "未开始状态点击置灰计次按钮后主计时仍为00:00.00且没有计次记录"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_005",

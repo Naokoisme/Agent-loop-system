@@ -11,8 +11,11 @@ from collections import deque
 from pathlib import Path
 from unittest import mock
 
+from agent_loop_system.tools.hardware_serial import SHELL_WRITE_BURST_LIMIT
 from agent_loop_system.tools.mtp_screenshot import (
+    MAX_SHELL_SAFE_CAPTURE_SEQUENCE,
     MtpCaptureProvider,
+    MtpScreenshotCommandError,
     MtpScreenshotError,
     MtpScreenshotDeviceError,
     MtpScreenshotTimeoutError,
@@ -82,6 +85,7 @@ class FakeMtpSystem:
         self, *, valid_bmp: bool = True, width: int = 410, height: int = 502
     ) -> None:
         self.usb_states: list[bool] = []
+        self.copy_calls: list[str] = []
         self.valid_bmp = valid_bmp
         self.width = width
         self.height = height
@@ -92,6 +96,7 @@ class FakeMtpSystem:
     def copy_capture(
         self, destination_dir: Path, *, file_name: str, timeout: float
     ) -> Path:
+        self.copy_calls.append(file_name)
         target = destination_dir / file_name
         if self.valid_bmp:
             make_bmp(target, width=self.width, height=self.height)
@@ -145,6 +150,17 @@ class FakeBorrowedSession:
 
     def write_shell_line(self, line: str) -> None:
         self.shell_lines.append(line)
+        if "TOP5STEP:SCREENSHOT_CAPTURE_FILE:" in line:
+            self.events.append(
+                {
+                    "protocol": "w30_test_bridge",
+                    "version": 1,
+                    "type": "command_result",
+                    "request": "screenshot_capture_file",
+                    "seq": None,
+                    "status": "accepted",
+                }
+            )
 
     def stop(self) -> None:
         self.stop_calls += 1
@@ -367,6 +383,84 @@ class MtpScreenshotTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             capture_filename(0)
 
+    def test_capture_accepts_largest_shell_safe_sequence_atomically(self) -> None:
+        accepted = {
+            "protocol": "w30_test_bridge",
+            "version": 1,
+            "type": "command_result",
+            "request": "screenshot_capture_file",
+            "seq": None,
+            "status": "accepted",
+        }
+        sequence = MAX_SHELL_SAFE_CAPTURE_SEQUENCE
+        with tempfile.TemporaryDirectory() as root:
+            transport = FakeTransport([(json.dumps(accepted) + "\n").encode()])
+            mtp = FakeMtpSystem()
+            result = capture_mtp_screenshot(
+                Path(root) / "capture.bmp",
+                sequence=sequence,
+                capture_timeout=0.001,
+                usb_timeout=0.1,
+                mtp_timeout=0.1,
+                mtp_system=mtp,
+                transport_factory=lambda: transport,
+            )
+
+        capture_wire = (
+            'srv_quick_cmd send "TOP5STEP:SCREENSHOT_CAPTURE_FILE:'
+            f'{sequence};"\r\n'
+        ).encode("utf-8")
+        self.assertEqual(len(capture_wire), SHELL_WRITE_BURST_LIMIT)
+        self.assertEqual(transport.writes[1:-1], [capture_wire])
+        self.assertEqual(result.sequence, sequence)
+        self.assertEqual(mtp.copy_calls, [capture_filename(sequence)])
+
+    def test_capture_rejects_shell_unsafe_sequence_before_transport_or_usb(self) -> None:
+        transport_calls: list[bool] = []
+        mtp = FakeMtpSystem()
+
+        def transport_factory():
+            transport_calls.append(True)
+            return FakeTransport()
+
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaisesRegex(
+                MtpScreenshotValidationError,
+                "exceeds the shell-safe maximum 9999999",
+            ):
+                capture_mtp_screenshot(
+                    Path(root) / "capture.bmp",
+                    sequence=MAX_SHELL_SAFE_CAPTURE_SEQUENCE + 1,
+                    capture_timeout=0.1,
+                    usb_timeout=0.1,
+                    mtp_timeout=0.1,
+                    mtp_system=mtp,
+                    transport_factory=transport_factory,
+                )
+
+        self.assertEqual(transport_calls, [])
+        self.assertEqual(mtp.usb_states, [])
+
+    def test_capture_without_acceptance_stops_before_mtp_lookup(self) -> None:
+        transport = FakeTransport()
+        mtp = FakeMtpSystem()
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaisesRegex(MtpScreenshotCommandError, "not accepted"):
+                capture_mtp_screenshot(
+                    Path(root) / "capture.bmp",
+                    sequence=MAX_SHELL_SAFE_CAPTURE_SEQUENCE,
+                    capture_timeout=0.001,
+                    usb_timeout=0.1,
+                    mtp_timeout=0.1,
+                    mtp_system=mtp,
+                    transport_factory=lambda: transport,
+                )
+
+        self.assertEqual(mtp.copy_calls, [])
+        self.assertEqual(mtp.usb_states, [False, True])
+        self.assertEqual(transport.writes[-1], b"dal_usb open\r\n")
+        self.assertTrue(transport.closed)
+
     def test_device_error_reopens_usb(self) -> None:
         receipt = {
             "protocol": "w30_test_bridge",
@@ -429,6 +523,41 @@ class MtpScreenshotTest(unittest.TestCase):
 
 
 class MtpCaptureProviderTest(unittest.TestCase):
+    def test_provider_default_sequence_stays_within_shell_safe_range(self) -> None:
+        serial = FakeBorrowedSession()
+        mtp = FakeMtpSystem()
+        with mock.patch(
+            "agent_loop_system.tools.mtp_screenshot.time.time_ns",
+            return_value=MAX_SHELL_SAFE_CAPTURE_SEQUENCE - 1,
+        ):
+            provider = MtpCaptureProvider(
+                serial,
+                usb_timeout=0.1,
+                mtp_timeout=0.1,
+                mtp_system=mtp,
+            )
+        frame = provider.capture(timeout=0.01)
+
+        self.assertEqual(
+            frame.metadata.sequence,
+            MAX_SHELL_SAFE_CAPTURE_SEQUENCE,
+        )
+        capture_line = serial.shell_lines[1]
+        self.assertEqual(
+            len((capture_line + "\r\n").encode("utf-8")),
+            SHELL_WRITE_BURST_LIMIT,
+        )
+
+    def test_provider_rejects_shell_unsafe_sequence_start(self) -> None:
+        with self.assertRaisesRegex(
+            MtpScreenshotValidationError,
+            "exceeds the shell-safe maximum 9999999",
+        ):
+            MtpCaptureProvider(
+                FakeBorrowedSession(),
+                sequence_start=MAX_SHELL_SAFE_CAPTURE_SEQUENCE + 1,
+            )
+
     def test_provider_uses_6204_project_geometry(self) -> None:
         serial = FakeBorrowedSession()
         mtp = FakeMtpSystem(width=466, height=466)

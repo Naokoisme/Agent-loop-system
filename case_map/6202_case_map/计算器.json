@@ -12,12 +12,22 @@
       "precondition_text": "1.手表处于可操作亮屏状态",
       "steps_text": "1.进入Calculator",
       "expected_text": "1.页面显示数值0和完整计算键盘（五行按键）",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":ENTER_PAGE:CALCULATOR,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "主键先清除Flashlight等顶层窗口，显式回表盘后进入Calculator。",
+      "verification_points": [
+        "页面显示数值0和完整计算键盘（五行按键）"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_002",
@@ -40,12 +50,25 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次点击1和2和3",
       "expected_text": "1.数值区显示123",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "主键先清除顶层弹窗并回表盘；坐标来自当前410×502计算器控件中心。",
+      "verification_points": [
+        "依次点击1、2、3后数值区显示123"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_004",
@@ -54,12 +77,32 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次输入123456789",
       "expected_text": "1.数值区显示123456789",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:253,293,1",
+        ":TP_CLICK:64,221,1",
+        ":TP_CLICK:159,221,1",
+        ":TP_CLICK:253,221,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "当前410×502计算器按键中心依次输入123456789。",
+      "verification_points": [
+        "依次输入123456789后，数值区完整显示123456789"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_005",
@@ -68,12 +111,28 @@
       "precondition_text": "1.数值区已有9位数字",
       "steps_text": "1.点击任一数字键",
       "expected_text": "1.数值区仍保持原9位内容，不显示提示",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:253,293,1",
+        ":TP_CLICK:64,221,1",
+        ":TP_CLICK:159,221,1",
+        ":TP_CLICK:253,221,1"
+      ],
+      "actions": [":TP_CLICK:64,365,1"],
+      "collect": [":HOST_SCREENSHOT:1"],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "真机探索已实际执行：按当前6202计算器控件中心输入123456789；真机批次前置已确认当前页为DIAL且无顶层弹窗。正式复跑 verdict=PASS，独立审计 PROMOTION_READY_PASS；证据见 evidence/migration_calc005_20260818-122720_retry2/exploration/ 与 evidence/migration_calc005_formal_20260818-124000/result.json。",
+      "verification_points": [
+        "已有9位数字时再点击数字键，数值区仍显示123456789且无提示"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_006",
@@ -82,12 +141,34 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.输入1234567.8\n2.点击数字9",
       "expected_text": "1.数值区显示1234567.8共9位\n2.第10位输入无响应",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:253,293,1",
+        ":TP_CLICK:64,221,1",
+        ":TP_CLICK:253,437,1",
+        ":TP_CLICK:159,221,1",
+        ":HOST_SCREENSHOT:1",
+        ":TP_CLICK:253,221,1",
+        ":HOST_SCREENSHOT:2"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "真机探索证据见 evidence/migration_calc006_20260818-135847/exploration/exploration.json；GUI_TREE/source 核对了本用例坐标。第2个检查点实测显示1234567.89，保留原始预期，正式判图后按证据决定 PROMOTED + FAIL 或回退。",
+      "verification_points": [
+        "数值区显示1234567.8共9位",
+        "继续点击数字9，数值区仍显示1234567.8"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_007",
@@ -96,12 +177,26 @@
       "precondition_text": "1.计算器刚清空",
       "steps_text": "1.点击小数点\n2.点击5",
       "expected_text": "1.数值区显示0.\n2.数值区显示0.5",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:253,437,1",
+        ":HOST_SCREENSHOT:1",
+        ":TP_CLICK:159,293,1",
+        ":HOST_SCREENSHOT:2"
+      ],
       "collect": [],
       "unable": false,
       "note": "",
-      "verification_points": []
+      "verification_points": [
+        "点击小数点后数值区显示0.",
+        "继续点击5后数值区显示0.5"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_008",
@@ -180,12 +275,27 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次点击2和+和3和=",
       "expected_text": "1.数值区显示5",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
       "note": "",
-      "verification_points": []
+      "verification_points": [
+        "输入2+3=后数值区显示5"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_014",
@@ -194,12 +304,27 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次点击8和-和3和=",
       "expected_text": "1.数值区显示5",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,221,1",
+        ":TP_CLICK:347,365,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "当前410×502键位依次输入8-3=。",
+      "verification_points": [
+        "输入8-3=后数值区显示5"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_015",
@@ -292,12 +417,35 @@
       "precondition_text": "1.准备结果至少10位的运算",
       "steps_text": "1.执行运算，点击等号",
       "expected_text": "1.数值区使用尾数e加减指数格式显示结果",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1"
+      ],
+      "actions": [
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "当前410×502键位：先输入999999999，再执行+1=。",
+      "verification_points": [
+        "999999999+1=后，数值区以尾数e加减指数格式显示结果"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_022",
@@ -306,12 +454,33 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.连续输入9位数字",
       "expected_text": "1.数值区字号按可用宽度缩小，数字不溢出",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:253,221,1",
+        ":HOST_SCREENSHOT:1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:253,221,1",
+        ":HOST_SCREENSHOT:2"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "先截图单个9的字号基线，再连续输入到9位并截图。",
+      "verification_points": [
+        "单个9的默认字号基线",
+        "连续输入9位后字号缩小且数字未溢出"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_023",
@@ -348,12 +517,27 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次输入5÷0=",
       "expected_text": "1.数值区显示Error",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:347,149,1",
+        ":TP_CLICK:111,437,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "当前410×502键位依次输入5÷0=。",
+      "verification_points": [
+        "依次输入5÷0=后，数值区显示Error"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_026",
@@ -362,12 +546,35 @@
       "precondition_text": "1.计算器显示Error",
       "steps_text": "1.点击数字键\n2.点击运算符\n3.点击AC",
       "expected_text": "1.数值区保持Error\n2.数值区保持Error\n3.数值区恢复0",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:347,149,1",
+        ":TP_CLICK:111,437,1",
+        ":TP_CLICK:347,437,1",
+        ":HOST_SCREENSHOT:1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":HOST_SCREENSHOT:2",
+        ":TP_CLICK:347,293,1",
+        ":HOST_SCREENSHOT:3",
+        ":TP_CLICK:111,149,1",
+        ":HOST_SCREENSHOT:4"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "先用5÷0=构造Error，并在数字、运算符、AC三个动作后分别截图。",
+      "verification_points": [
+        "操作前数值区显示Error",
+        "点击数字键后数值区保持Error",
+        "点击运算符后数值区保持Error",
+        "点击AC后数值区恢复0"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_027",
@@ -418,12 +625,25 @@
       "precondition_text": "1.手表显示Calculator且存在输入",
       "steps_text": "1.执行右滑",
       "expected_text": "1.手表返回进入Calculator前的页面",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_SCREENSHOT:1",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:64,365,1"
+      ],
+      "actions": [
+        ":SWIPE_SIM:3,0",
+        ":HOST_SCREENSHOT:2"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "先截图记录来源主表盘，再进入Calculator输入1并执行右滑。",
+      "verification_points": [
+        "进入Calculator前的来源页为主表盘",
+        "在Calculator右滑后返回同一主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_031",
@@ -432,12 +652,26 @@
       "precondition_text": "1.手表显示Calculator且存在输入",
       "steps_text": "1.单击编码器",
       "expected_text": "1.手表显示主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:64,365,1"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "先进入Calculator再用主键清除可能的顶层窗口，重建输入1后执行原始编码器单击。",
+      "verification_points": [
+        "Calculator存在输入时单击编码器后，手表显示主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_032",
@@ -446,12 +680,31 @@
       "precondition_text": "1.计算器显示非零结果",
       "steps_text": "1.执行右滑\n2.重新进入Calculator",
       "expected_text": "1.手表退出计算器\n2.数值区显示0，无历史结果",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "actions": [
+        ":SWIPE_SIM:3,0",
+        ":HOST_SCREENSHOT:1",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":HOST_SCREENSHOT:2"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "先构造2+2=的非零结果；右滑退出后重新进入并分别截图。",
+      "verification_points": [
+        "右滑后手表退出计算器并显示主表盘",
+        "重新进入后数值区显示0且无历史结果"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_033",
@@ -516,12 +769,41 @@
       "precondition_text": "1.手表处于默认亮度",
       "steps_text": "1.依次点击全部按键，观察结果区",
       "expected_text": "1.按键触发区互不重叠，结果文字无裁切",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:159,293,1",
+        ":TP_CLICK:253,293,1",
+        ":TP_CLICK:64,221,1",
+        ":TP_CLICK:159,221,1",
+        ":TP_CLICK:253,221,1",
+        ":TP_CLICK:111,437,1",
+        ":TP_CLICK:253,437,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:347,365,1",
+        ":TP_CLICK:347,221,1",
+        ":TP_CLICK:347,149,1",
+        ":TP_CLICK:347,437,1",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:253,149,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "按当前410×502布局依次覆盖18个可见按键，最后采集完整页面。",
+      "verification_points": [
+        "依次点击全部18个可见按键后，按键区域互不重叠且结果文字无裁切"
+      ],
+      "mapping_status": "PROMOTED"
     }
   ]
 }

@@ -91,6 +91,7 @@ class FakeSerial:
         self.send_result_request: str | None = None
         self.stop_error: BaseException | None = None
         self.shell_lines: list[str] = []
+        self.events: list[dict] = []
 
     def start(self) -> None:
         self.start_calls += 1
@@ -129,13 +130,24 @@ class FakeSerial:
 
     @property
     def event_count(self) -> int:
-        return 0
+        return len(self.events)
 
-    def events_since(self, _start_index: int) -> list[dict]:
-        return []
+    def events_since(self, start_index: int) -> list[dict]:
+        return [dict(event) for event in self.events[start_index:]]
 
     def write_shell_line(self, line: str) -> None:
         self.shell_lines.append(line)
+        if "TOP5STEP:SCREENSHOT_CAPTURE_FILE:" in line:
+            self.events.append(
+                {
+                    "protocol": "w30_test_bridge",
+                    "version": 1,
+                    "type": "command_result",
+                    "request": "screenshot_capture_file",
+                    "seq": None,
+                    "status": "accepted",
+                }
+            )
 
     def stop(self) -> None:
         self.stop_calls += 1
@@ -236,6 +248,7 @@ class RealDeviceSessionTest(unittest.TestCase):
 
         provider_class.assert_called_once_with(
             "42:74:DC:C8:0A:02",
+            serial_session=fake_serial,
             scan_timeout=2.5,
         )
         self.assertIs(session.capture_provider, fake_provider)

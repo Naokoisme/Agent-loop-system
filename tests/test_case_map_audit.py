@@ -77,6 +77,74 @@ def test_audit_accepts_empty_dynamic_case_without_external_history(tmp_path: Pat
     assert issues == []
 
 
+def test_audit_rejects_case_map_profile_metadata_mismatch(tmp_path: Path) -> None:
+    profile_dir = tmp_path / "6202_simulator_case_map"
+    profile_dir.mkdir()
+    (profile_dir / "demo.json").write_text(
+        json.dumps({
+            "profile": "620C_W6830",
+            "sheet": "demo",
+            "cases": [{"case_id": "DEMO_001", "sheet": "demo"}],
+        }),
+        encoding="utf-8",
+    )
+    (profile_dir / "external_execution_history.jsonl").write_text("", encoding="utf-8")
+    with patch("sim_tools.audit_case_map._live_capabilities", return_value=(set(), set())):
+        counts, issues = audit_case_maps(profile_dir)
+    assert counts["total"] == 0
+    assert [issue.code for issue in issues] == ["case_map_metadata_mismatch"]
+
+
+def test_audit_rejects_non_array_or_non_object_cases(tmp_path: Path) -> None:
+    for position, invalid_cases in enumerate(("not-an-array", [{"sheet": "demo"}, 42])):
+        profile_dir = tmp_path / str(position) / "6202_simulator_case_map"
+        profile_dir.mkdir(parents=True)
+        (profile_dir / "demo.json").write_text(
+            json.dumps({
+                "profile": "6202_W5230_SIMULATOR",
+                "sheet": "demo",
+                "cases": invalid_cases,
+            }),
+            encoding="utf-8",
+        )
+        (profile_dir / "external_execution_history.jsonl").write_text("", encoding="utf-8")
+        with patch("sim_tools.audit_case_map._live_capabilities", return_value=(set(), set())):
+            counts, issues = audit_case_maps(profile_dir)
+        assert counts["total"] == 0
+        assert [issue.code for issue in issues] == ["case_map_metadata_mismatch"]
+
+
+def test_audit_rejects_mapping_status_with_surrounding_whitespace(tmp_path: Path) -> None:
+    _write_case(
+        tmp_path / "demo.json",
+        mapping_status=" PROMOTED ",
+        setup=[],
+        actions=[],
+        collect=[],
+        verification_points=[],
+    )
+    with patch("sim_tools.audit_case_map._live_capabilities", return_value=(set(), set())):
+        counts, issues = audit_case_maps(tmp_path)
+    assert counts["explored_unsolidified"] == 1
+    assert [issue.code for issue in issues] == ["invalid_mapping_status"]
+
+
+def test_audit_reads_but_ignores_legacy_unable_flag(tmp_path: Path) -> None:
+    _write_case(
+        tmp_path / "demo.json",
+        unable=True,
+        mapping_status="",
+        setup=[],
+        actions=[],
+        collect=[],
+        verification_points=[],
+    )
+    with patch("sim_tools.audit_case_map._live_capabilities", return_value=(set(), set())):
+        counts, issues = audit_case_maps(tmp_path)
+    assert counts["explored_unsolidified"] == 1
+    assert issues == []
+
+
 def test_audit_reports_enter_page_used_instead_of_click(tmp_path: Path) -> None:
     _write_case(
         tmp_path / "demo.json",
@@ -204,8 +272,19 @@ def test_invalid_case_schema_is_reported_without_aborting_the_audit(tmp_path: Pa
 
 
 def test_duplicate_case_id_is_reported_across_files(tmp_path: Path) -> None:
-    _write_case(tmp_path / "one.json")
-    _write_case(tmp_path / "two.json")
+    _write_case(tmp_path / "one.json", sheet="one")
+    _write_case(tmp_path / "two.json", sheet="two")
+    (tmp_path / "external_execution_history.jsonl").write_text(
+        json.dumps({
+            "case_id": "DEMO_001",
+            "sheet": "one",
+            "target": "TEST_PROFILE",
+            "last_verified": "2026-08-17",
+            "evidence_root": str(tmp_path),
+            "evidence_paths": ["result.json"],
+        }) + "\n",
+        encoding="utf-8",
+    )
     with patch(
         "sim_tools.audit_case_map._live_capabilities",
         return_value=({"ENTER_PAGE", "TP_CLICK", "GUI_TREE", "SCREENSHOT_PRINT"}, {"DEMO"}),
@@ -250,6 +329,29 @@ def test_audit_accepts_host_wait_without_firmware_registration(tmp_path: Path) -
     with patch(
         "sim_tools.audit_case_map._live_capabilities",
         return_value=({"ENTER_PAGE", "TP_CLICK", "GUI_TREE", "SCREENSHOT_PRINT", "HOST_WAIT"}, {"DEMO"}),
+    ):
+        _counts, issues = audit_case_maps(tmp_path)
+    assert issues == []
+
+
+def test_host_wait_is_not_counted_as_a_business_action_for_checkpoint_warnings(
+    tmp_path: Path,
+) -> None:
+    _write_case(
+        tmp_path / "demo.json",
+        steps_text="1.等待界面稳定\n2.点击按钮",
+        expected_text="1.界面稳定\n2.进入结果页",
+        actions=[
+            "srv_quick_cmd send TOP5STEP:HOST_WAIT:500;",
+            "srv_quick_cmd send TOP5STEP:TP_CLICK:100,100,1;",
+        ],
+    )
+    with patch(
+        "sim_tools.audit_case_map._live_capabilities",
+        return_value=(
+            {"ENTER_PAGE", "HOST_WAIT", "TP_CLICK", "GUI_TREE", "SCREENSHOT_PRINT"},
+            {"DEMO"},
+        ),
     ):
         _counts, issues = audit_case_maps(tmp_path)
     assert issues == []

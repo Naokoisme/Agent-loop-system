@@ -51,12 +51,21 @@
       "precondition_text": "1.手表不存在任何闹钟",
       "steps_text": "1.进入Alarm",
       "expected_text": "1.页面显示居中闹钟图标和底部加号按钮",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":CLEAN_ALARM:"
+      ],
+      "actions": [
+        ":ENTER_PAGE:ALARM_CLOCK,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 真机独立探索与正式复跑：CLEAN_ALARM 建立空闹钟前置，进入 ALARM_CLOCK 后 MTP 新图显示居中闹钟图标、No alarm clock yet 和底部加号；正式证据见 evidence/migration_alarm_20260819/formal_candidate_ALARM_004_20260819-015200/result.json。",
+      "verification_points": [
+        "空闹钟列表页显示居中的闹钟图标、无闹钟提示和底部加号按钮"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_005",
@@ -107,12 +116,26 @@
       "precondition_text": "1.闹钟列表内容超过一屏",
       "steps_text": "1.执行上滑",
       "expected_text": "1.列表显示下方闹钟条目",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":CLEAN_ALARM:",
+        ":ADD_ALARM:",
+        ":ENTER_PAGE:ALARM_CLOCK,0"
+      ],
+      "actions": [
+        ":HOST_SCREENSHOT:1",
+        ":TP_SWIPE:205,400,205,100,0",
+        ":HOST_WAIT:800"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:2"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 真机独立探索与正式复跑：CLEAN_ALARM 和 ADD_ALARM 建立超过一屏的闹钟列表；上滑前后两张 MTP 新图分别显示顶部和下方条目；正式证据见 evidence/migration_alarm_20260819/formal_candidate_ALARM_008_20260819-020700/result.json。",
+      "verification_points": [
+        "上滑前列表位于顶部并显示08:00、08:02、08:03等前序闹钟",
+        "上滑后列表显示08:03、08:04和底部加号等下方内容"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_009",
@@ -121,12 +144,28 @@
       "precondition_text": "1.闹钟列表已离开顶部",
       "steps_text": "1.执行下滑",
       "expected_text": "1.列表显示上方闹钟条目",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":CLEAN_ALARM:",
+        ":ADD_ALARM:",
+        ":ENTER_PAGE:ALARM_CLOCK,0",
+        ":TP_SWIPE:205,400,205,100,0",
+        ":HOST_WAIT:800"
+      ],
+      "actions": [
+        ":HOST_SCREENSHOT:1",
+        ":TP_SWIPE:205,100,205,400,0",
+        ":HOST_WAIT:800"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:2"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 真机独立探索与正式复跑：CLEAN_ALARM 和 ADD_ALARM 建立超过一屏的闹钟列表，在 setup 上滑建立离开顶部前置；下滑前后两张 MTP 新图分别显示下方和上方条目；正式证据见 evidence/migration_alarm_20260819/formal_candidate_ALARM_009_20260819-021500/result.json。",
+      "verification_points": [
+        "下滑前列表已离开顶部并显示08:03、08:04等后序闹钟",
+        "下滑后列表重新显示08:00、08:02等上方闹钟"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_010",
@@ -135,12 +174,26 @@
       "precondition_text": "1.闹钟列表内容超过一屏",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.闹钟列表沿旋转方向滚动",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "verification_points": [],
+      "setup": [
+        ":CLEAN_ALARM:",
+        ":ADD_ALARM:",
+        ":ENTER_PAGE:ALARM_CLOCK,0"
+      ],
+      "actions": [
+        ":HOST_SCREENSHOT:1",
+        ":QDEC_SET:1",
+        ":HOST_WAIT:500"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:2"
+      ],
+      "verification_points": [
+        "旋转前闹钟列表顶部显示08:00、08:02、08:03",
+        "旋转一格后列表沿实际旋转方向滚动并显示下方闹钟条目"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202 真机独立探索：QDEC_SET:1 使闹钟列表从顶部 08:00/08:02/08:03 滚动到 08:02/08:03/08:04；两张 MTP 新图已验证。正式证据见 evidence/migration_alarm_20260819/formal_candidate_ALARM_010_20260819-022800/result.json。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_011",
@@ -149,12 +202,25 @@
       "precondition_text": "1.手表显示Alarm列表",
       "steps_text": "1.执行右滑",
       "expected_text": "1.手表返回进入Alarm前的页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":ENTER_PAGE:ALARM_CLOCK,0"
+      ],
+      "actions": [
+        ":HOST_SCREENSHOT:1",
+        ":TP_SWIPE:80,250,330,250,0",
+        ":HOST_WAIT:800"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:2"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 真机独立探索与正式复跑：先进入 STOPWATCH，再进入 ALARM_CLOCK；从左向右执行 TP_SWIPE:80,250,330,250,0 后返回 Stopwatch；正式证据见 evidence/migration_alarm_20260819/formal_candidate_ALARM_011_20260819-024800/result.json。",
+      "verification_points": [
+        "右滑前显示 Alarm 闹钟列表页",
+        "右滑后返回进入 Alarm 前的 Stopwatch 页面"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "ALARM_012",

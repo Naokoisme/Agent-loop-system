@@ -135,7 +135,11 @@ def _create_capture_provider(serial_session: Any) -> tuple[CaptureProvider, str]
     if not math.isfinite(scan_timeout) or scan_timeout <= 0:
         raise ValueError(f"{_BLE_SCAN_TIMEOUT_ENV} must be positive")
     return (
-        BleCaptureProvider(address, scan_timeout=scan_timeout),
+        BleCaptureProvider(
+            address,
+            serial_session=serial_session,
+            scan_timeout=scan_timeout,
+        ),
         provider_name,
     )
 

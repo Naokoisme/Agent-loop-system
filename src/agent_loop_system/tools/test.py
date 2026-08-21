@@ -11,11 +11,13 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import io
 import json
 import os
 import sys
 import time
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
@@ -24,6 +26,8 @@ from pydantic import BaseModel
 
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
+    CASE_MAP_PROFILE_PROJECTS,
+    CASE_MAP_TARGET_DEFAULT_PROFILES,
     CaseEntry,
     CaseRunResult,
     load_case_map,
@@ -32,7 +36,7 @@ from agent_loop_system.tools.case_map import (
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.simulator import SimulatorSession
 
@@ -77,6 +81,57 @@ def _screenshot_capture_note(path: str) -> str:
 def get_simulator_exe() -> str:
     """每次启动时从环境读取模拟器，避免服务进程长期持有旧工作区路径。"""
     return os.environ.get("SIMULATOR_ARTIFACT_PATH", DEFAULT_SIM_EXE)
+
+
+def _result_provenance(
+    *,
+    target: str,
+    case_map_profile: str | None,
+) -> dict[str, str]:
+    """Lock the target identity and executable used by this case run."""
+
+    normalized_target = str(target or "").strip().lower()
+    profile = (
+        str(case_map_profile or "").strip()
+        or CASE_MAP_TARGET_DEFAULT_PROFILES[normalized_target]
+    )
+    expected_project = CASE_MAP_PROFILE_PROJECTS[profile]
+    project_environment = (
+        "W30_PROJECT"
+        if normalized_target == "simulator"
+        else "W30_HARDWARE_PROJECT"
+    )
+    configured_project = os.environ.get(project_environment, "").strip()
+    if configured_project and configured_project != expected_project:
+        raise ValueError(
+            f"{project_environment} {configured_project!r} "
+            f"与 case_map profile {profile!r} 不匹配"
+        )
+    project = configured_project or expected_project
+    artifact_path = ""
+    artifact_sha256 = ""
+    if normalized_target == "simulator":
+        artifact = Path(get_simulator_exe()).resolve()
+        artifact_path = str(artifact)
+        if artifact.is_file():
+            with artifact.open("rb") as stream:
+                artifact_sha256 = hashlib.file_digest(stream, "sha256").hexdigest().upper()
+    return {
+        "target": normalized_target,
+        "case_map_profile": profile,
+        "project": project,
+        "artifact_path": artifact_path,
+        "artifact_sha256": artifact_sha256,
+    }
+
+
+def _stamp_result_provenance(
+    result: CaseRunResult,
+    *,
+    provenance: dict[str, str],
+) -> CaseRunResult:
+    result.provenance = dict(provenance)
+    return result
 
 
 class Verdict(BaseModel):
@@ -148,28 +203,27 @@ def judge_with_vision(
     defect_image_paths 为缺陷原图/规格参考图；
     reference_screenshot 非空时为修复前截图，用于对比判定修复效果。
     """
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    api_key = get_llm_api_key()
     if not api_key or api_key.startswith("暂时"):
-        return Verdict(verdict="CANNOT_VERIFY", reason="API key 不可用")
+        return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
         from langchain_core.messages import HumanMessage
         from langchain_openai import ChatOpenAI
     except ImportError:
-        return Verdict(verdict="CANNOT_VERIFY", reason="langchain 未安装")
+        return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 依赖缺失：langchain 未安装")
 
     shot_b64 = _bmp_to_png_b64(screenshot_path)
     if not shot_b64:
         return Verdict(verdict="CANNOT_VERIFY", reason=f"截图读取失败: {screenshot_path}")
 
     try:
-        llm = ChatOpenAI(
-            model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-            api_key=api_key,
-            base_url=os.environ.get("OPENAI_BASE_URL") or None,
-            timeout=get_llm_request_timeout(),
-        )
+        llm = create_chat_llm()
+        if llm is None:
+            return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
-        return Verdict(verdict="CANNOT_VERIFY", reason=f"LLM 初始化失败: {exc}")
+        return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 初始化出错：{exc}")
 
     has_ref = False
     ref_b64 = ""
@@ -253,11 +307,11 @@ def judge_with_vision(
 
     msg = HumanMessage(content=content)
     try:
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             lambda: llm.with_structured_output(Verdict).invoke([msg])
         )
     except LLMRetryError as exc:
-        return Verdict(verdict="CANNOT_VERIFY", reason=f"LLM 重试耗尽: {exc}")
+        return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 出错：{exc}")
 
 
 def judge_test_with_vision(
@@ -266,14 +320,16 @@ def judge_test_with_vision(
     verification_points: list[str] | None = None,
 ) -> Verdict:
     """只根据检查点截图判定普通测试；命令输出和 GUI_TREE 不进入 LLM。"""
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    api_key = get_llm_api_key()
     if not api_key or api_key.startswith("暂时"):
-        return Verdict(verdict="CANNOT_VERIFY", reason="API key 不可用")
+        return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
         from langchain_core.messages import HumanMessage
         from langchain_openai import ChatOpenAI
     except ImportError:
-        return Verdict(verdict="CANNOT_VERIFY", reason="langchain 未安装")
+        return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 依赖缺失：langchain 未安装")
 
     points = [str(point).strip() for point in verification_points or [] if str(point).strip()]
     if not screenshots:
@@ -294,14 +350,11 @@ def judge_test_with_vision(
         encoded_screenshots.append((index, label, path, encoded))
 
     try:
-        llm = ChatOpenAI(
-            model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-            api_key=api_key,
-            base_url=os.environ.get("OPENAI_BASE_URL") or None,
-            timeout=get_llm_request_timeout(),
-        )
+        llm = create_chat_llm()
+        if llm is None:
+            return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
-        return Verdict(verdict="CANNOT_VERIFY", reason=f"LLM 初始化失败: {exc}")
+        return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 初始化出错：{exc}")
 
     point_text = "\n".join(
         f"{index}. {point}" for index, point in enumerate(points, start=1)
@@ -335,11 +388,11 @@ def judge_test_with_vision(
 
     try:
         message = HumanMessage(content=content)
-        return invoke_with_retry(
+        return invoke_llm_with_retry(
             lambda: llm.with_structured_output(Verdict).invoke([message])
         )
     except LLMRetryError as exc:
-        return Verdict(verdict="CANNOT_VERIFY", reason=f"LLM 重试耗尽: {exc}")
+        return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 出错：{exc}")
 
 
 def judge_case_result(result: CaseRunResult) -> CaseDecision:
@@ -414,7 +467,7 @@ def save_evidence(
         result.setup_errors + result.action_errors + result.collect_errors
     )
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "case_id": result.case_id,
         "sheet": result.sheet,
         "execution_mode": result.execution_mode,
@@ -435,6 +488,7 @@ def save_evidence(
         "terminal_json": result.terminal_json,
         "screenshots": result.screenshots,
         "exploration_trace": result.exploration_trace,
+        "provenance": result.provenance,
         "verdict": result_verdict,
         "reason": reason,
     }
@@ -603,6 +657,7 @@ def run_single_case(
     target: str = "simulator",
     case_map_profile: str | None = None,
     candidate_replay: bool = False,
+    external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None,
 ) -> CaseRunResult:
     """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
@@ -620,17 +675,39 @@ def run_single_case(
 
     if target not in {"hardware", "simulator"}:
         raise ValueError(f"未知执行目标: {target!r}")
+    if candidate_replay:
+        if case.is_promoted:
+            raise ValueError("--candidate-replay 只允许复跑尚未晋升的临时候选")
+        if not case.has_candidate_mapping:
+            raise ValueError("--candidate-replay 要求当前用例存在非空候选 actions")
+    provenance = _result_provenance(
+        target=target,
+        case_map_profile=case_map_profile,
+    )
     if screenshot_path is None:
         run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         screenshot_path = str(
             EVIDENCE_DIR / target / sheet_name / case_id / run_stamp / "screenshot.bmp"
         )
-    use_candidate_mapping = candidate_replay and case.has_candidate_mapping
-    if not case.is_promoted and not use_candidate_mapping:
-        return _run_agent_exploration(
-            case,
-            screenshot_path=screenshot_path,
-            target=target,
+    if external_executor is not None:
+        if target != "hardware":
+            raise ValueError("外部真机执行器只能用于 hardware target")
+        from agent_loop_system.tools.hardware_target import HardwareTargetConfig
+
+        HardwareTargetConfig.from_env()
+        return _stamp_result_provenance(
+            external_executor(case, screenshot_path),
+            provenance=provenance,
+        )
+
+    if not case.is_promoted and not candidate_replay:
+        return _stamp_result_provenance(
+            _run_agent_exploration(
+                case,
+                screenshot_path=screenshot_path,
+                target=target,
+            ),
+            provenance=provenance,
         )
 
     if target == "hardware":
@@ -645,7 +722,10 @@ def run_single_case(
     session.start()
     try:
         result = run_case(session, case, screenshot_path=screenshot_path)
-        return result
+        return _stamp_result_provenance(
+            result,
+            provenance=provenance,
+        )
     finally:
         session.stop()
 
@@ -676,11 +756,41 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="仅供外部 Agent 准入复跑：执行尚未 PROMOTED 的临时候选 actions",
     )
+    parser.add_argument(
+        "--execution-adapter",
+        choices=("watch_ble",),
+        help="显式选择非默认真机动作适配器；普通 Runner 不使用",
+    )
+    ble_selector = parser.add_mutually_exclusive_group()
+    ble_selector.add_argument("--ble-address", help="watch_ble 的目标 BLE 地址")
+    ble_selector.add_argument("--ble-name", help="watch_ble 的目标广播名称")
     args = parser.parse_args(argv)
+
+    if args.execution_adapter and args.target != "hardware":
+        parser.error("--execution-adapter requires --target hardware")
+    if args.execution_adapter and args.candidate_replay:
+        parser.error("--execution-adapter cannot be combined with --candidate-replay")
+    if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
+        parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
+
+    external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None
+    if args.execution_adapter == "watch_ble":
+        from agent_loop_system.tools.watch_ble_probe import run_set_164_case
+
+        def execute_watch_ble(case: CaseEntry, screenshot_path: str) -> CaseRunResult:
+            return run_set_164_case(
+                case,
+                screenshot_path,
+                address=args.ble_address,
+                name=args.ble_name,
+            )
+
+        external_executor = execute_watch_ble
 
     print(
         f"[test] 加载用例: target={args.target} "
-        f"sheet={args.sheet} case_id={args.case_id}"
+        f"sheet={args.sheet} case_id={args.case_id} "
+        f"execution_adapter={args.execution_adapter or 'default'}"
     )
     result = run_single_case(
         args.sheet,
@@ -689,6 +799,7 @@ def main(argv: list[str] | None = None) -> int:
         target=args.target,
         case_map_profile=args.case_map_profile,
         candidate_replay=args.candidate_replay,
+        external_executor=external_executor,
     )
 
     print(

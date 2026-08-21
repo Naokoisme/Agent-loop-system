@@ -18,6 +18,8 @@ from agent_loop_system.tools.hardware_serial import (
     HardwareSerialCursorExpiredError,
     HardwareSerialSession,
     HardwareSerialTimeoutError,
+    SHELL_WRITE_BURST_LIMIT,
+    SerialTransportError,
     SuperComPipeTransport,
     UnsafeHardwareCommandError,
     Win32SerialTransport,
@@ -134,6 +136,35 @@ class HardwareSerialTest(unittest.TestCase):
             for invalid in ("", "bad\nline", "bad\rline", None):
                 with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                     session.write_shell_line(invalid)
+            session.stop()
+
+    def test_shell_wire_boundary_is_atomic_and_long_lines_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            transport = FakeTransport()
+            session = self._session(root, transport)
+
+            safe_line = (
+                'srv_quick_cmd send "TOP5STEP:SCREENSHOT_CAPTURE_FILE:'
+                '9999999;"'
+            )
+            safe_wire = (safe_line + "\r\n").encode("utf-8")
+            self.assertEqual(len(safe_wire), SHELL_WRITE_BURST_LIMIT)
+            session.write_shell_line(safe_line)
+            self.assertEqual(transport.writes, [safe_wire])
+
+            for sequence in (10_000_000, 999_999_999, 0xFFFFFFFF):
+                with self.subTest(sequence=sequence):
+                    transport.writes.clear()
+                    line = (
+                        'srv_quick_cmd send "TOP5STEP:SCREENSHOT_CAPTURE_FILE:'
+                        f'{sequence};"'
+                    )
+                    with self.assertRaisesRegex(
+                        SerialTransportError,
+                        "maximum safe burst is 64 bytes",
+                    ):
+                        session.write_shell_line(line)
+                    self.assertEqual(transport.writes, [])
             session.stop()
 
     def test_cache_capacities_have_screenshot_margin_and_validate_positive_ints(self) -> None:
@@ -407,6 +438,71 @@ class HardwareSerialTest(unittest.TestCase):
             self.assertIn(
                 "protocol_json_error",
                 (Path(root) / "serial" / "errors.log").read_text(encoding="utf-8"),
+            )
+
+    def test_known_voice_assistant_banner_inside_command_result_is_recovered(self) -> None:
+        def respond(transport: FakeTransport, _wire: bytes) -> None:
+            transport.feed(
+                b'{"protocol":"w30_test_bridge","version":1,'
+                b'"type":"command_resul'
+                b'============_gui_comm_voice_assistant_init==============='
+                b't","request":"button_press","seq":null,'
+                b'"status":"accepted"}\r\n'
+            )
+
+        with tempfile.TemporaryDirectory() as root:
+            session = self._session(root, FakeTransport(respond))
+            result = session.send(
+                ":BUTTON_PRESS:1,1,0",
+                expected_type="command_result",
+                expected_status="accepted",
+            )
+            self.assertEqual(result.request, "button_press")
+            self.assertEqual(result.status, "accepted")
+            session.stop()
+
+            errors = (Path(root) / "serial" / "errors.log").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn("protocol_json_recovered", errors)
+
+    def test_known_multiline_voice_assistant_noise_is_recovered(self) -> None:
+        def respond(transport: FakeTransport, _wire: bytes) -> None:
+            transport.feed(
+                b'{"protocol":"w30_test_bridge","version":1,'
+                b'"type":"command'
+                b'============_gui_comm_voice_assistant_init==============='
+                b'current_app[0]: 1\r\n',
+                b'current_app[1]: 3\r\n',
+                b'current_app[2]: 19\r\n',
+                b'gui_list_real_set_header\r\n',
+                b'_result","request":"button_press","seq":null,'
+                b'"status":"accepted"}\r\n',
+            )
+
+        with tempfile.TemporaryDirectory() as root:
+            session = self._session(root, FakeTransport(respond))
+            result = session.send(
+                ":BUTTON_PRESS:1,1,0",
+                expected_type="command_result",
+                expected_status="accepted",
+            )
+            self.assertEqual(result.request, "button_press")
+            self.assertEqual(result.status, "accepted")
+            session.stop()
+
+            events = [
+                json.loads(line)
+                for line in (Path(root) / "serial" / "events.jsonl")
+                .read_text(encoding="utf-8")
+                .splitlines()
+            ]
+            self.assertEqual(events, [result.raw])
+            self.assertIn(
+                "lines=5",
+                (Path(root) / "serial" / "errors.log").read_text(
+                    encoding="utf-8"
+                ),
             )
 
     def test_gui_ping_ignores_accepted_and_unrelated_seq_then_waits_for_processed(self) -> None:

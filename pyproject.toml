@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-loop-system"
-version = "0.1.0"
+version = "0.4.0"
 description = "Agent 自闭环修 bug + Simulator 验证系统"
 requires-python = ">=3.12,<3.13"
 dependencies = [
@@ -24,3 +24,6 @@ watch-mtp-screenshot = "agent_loop_system.tools.mtp_screenshot:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_loop_system"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

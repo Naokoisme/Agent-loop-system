@@ -260,12 +260,14 @@ async def scan_watches(
     timeout: float = 5.0,
     service_uuid: str = WATCH_SERVICE_UUID,
     name_prefix: str = DEFAULT_NAME_PREFIX,
+    address: str | None = None,
     scanner: object | None = None,
 ) -> list[WatchBleDevice]:
-    """Discover watches advertised by service UUID or product-name prefix.
+    """Discover watches by explicit address, service UUID, or product-name prefix.
 
     The name path is required because current 6202 advertisements do not always
-    include the custom service UUID.
+    include the custom service UUID.  The address path covers advertisements
+    that expose neither a local name nor the service UUID.
     """
 
     if timeout <= 0:
@@ -282,13 +284,16 @@ async def scan_watches(
         raise WatchBleDiscoveryError(f"BLE scan failed: {exc}") from exc
 
     service_uuid = _normalise_uuid(service_uuid)
+    wanted_address = _normalise_address(address) if address else None
     found: dict[str, WatchBleDevice] = {}
     for device, advertisement in _advertisement_values(discovered):
         result = _to_scan_result(device, advertisement)
+        result_address = _normalise_address(result.address)
+        address_match = bool(wanted_address and result_address == wanted_address)
         name_match = bool(result.name and result.name.startswith(name_prefix))
         service_match = service_uuid in result.service_uuids
-        if name_match or service_match:
-            found[_normalise_address(result.address)] = result
+        if address_match or name_match or service_match:
+            found[result_address] = result
     return sorted(found.values(), key=lambda item: item.address.lower())
 
 
@@ -1206,7 +1211,11 @@ async def _run_cli(
     scan_timeout = (
         args.timeout if args.command == "scan" else args.scan_timeout
     )
-    devices = await scan_watches(timeout=scan_timeout, scanner=scanner)
+    devices = await scan_watches(
+        timeout=scan_timeout,
+        address=getattr(args, "address", None),
+        scanner=scanner,
+    )
     if args.command == "scan":
         return {"ok": True, "devices": [asdict(item) for item in devices]}
     device = select_watch(devices, address=args.address, name=args.name)

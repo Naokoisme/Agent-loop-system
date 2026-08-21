@@ -11,6 +11,7 @@ from agent_loop_system.tools.agent import (
     generate_patch,
     load_simulator_knowledge,
 )
+from agent_loop_system.tools.llm_retry import LLMRetryError
 from agent_loop_system.reproduction import (
     ReproductionAction,
     ReproductionDecision,
@@ -492,6 +493,35 @@ static const gui_comm_quick_special_win_t special_win[] = {
         self.assertIn("GUI_PING、GUI_TREE、GUI_STATE、SCREENSHOT_PRINT", captured["prompt"])
         self.assertIn("不得额外读取 BUSINESS_GET", captured["prompt"])
         self.assertIn("仅供非 Windows 真机兼容", captured["prompt"])
+
+    def test_decide_reproduction_action_labels_api_failure(self) -> None:
+        class FakeChatOpenAI:
+            def __init__(self, **_kwargs):
+                pass
+
+        trace = ReproductionTrace(
+            task_id="api-error",
+            steps=[StepObservation(step=0, screenshot_ok=False)],
+        )
+        with (
+            mock.patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"}),
+            mock.patch("langchain_openai.ChatOpenAI", FakeChatOpenAI),
+            mock.patch(
+                "agent_loop_system.tools.agent.load_simulator_knowledge",
+                return_value="ENTER_PAGE | DIAL",
+            ),
+            mock.patch(
+                "agent_loop_system.tools.agent._invoke_structured_with_images",
+                side_effect=LLMRetryError("APIConnectionError: Connection error."),
+            ),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "执行 Agent API 出错"):
+                decide_reproduction_action(
+                    objective="控制中心",
+                    source_files=[],
+                    trace=trace,
+                    defect_image_paths=[],
+                )
 
     def test_decide_reproduction_action_adds_runtime_redirect_source(self) -> None:
         captured: dict[str, str] = {}

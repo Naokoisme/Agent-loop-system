@@ -1,9 +1,10 @@
 """Windows 真机串口会话。
 
 串口同时承载 Zephyr 日志和 ``w30_test_bridge`` JSON。本模块保留原始字节，
-从未清洗的逻辑行提取协议事件，再把去除 ANSI 的文本写入可读日志。只有带固定
-协议标记的完整单行 JSON 才是事件。``accepted`` 只表示命令已进入队列，不表示
-GUI 已处理完成。
+从未清洗的逻辑行提取协议事件，再把去除 ANSI 的文本写入可读日志。通常只有带固定
+协议标记的完整单行 JSON 才是事件；唯一例外是 ``command_result`` 的类型名被当前
+固件已知的 voice-assistant 诊断打印插断，宿主会在严格白名单内恢复该回执。任意其他
+损坏 JSON 都不会被拼接成事件。``accepted`` 只表示命令已进入队列，不表示 GUI 已处理完成。
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ import re
 import threading
 import time
 from collections import deque
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from ctypes import wintypes
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -33,8 +34,27 @@ DEFAULT_TX_BUFFER_SIZE = 16 * 1024
 DEFAULT_LINE_CACHE_CAPACITY = 16_384
 DEFAULT_EVENT_CACHE_CAPACITY = 8_192
 DEFAULT_BACKGROUND_ERROR_CACHE_CAPACITY = 4_096
+SHELL_WRITE_BURST_LIMIT = 64
 BRIDGE_PROTOCOL = "w30_test_bridge"
 BRIDGE_MARKER = '{"protocol":"w30_test_bridge"'
+BRIDGE_COMMAND_RESULT_PREFIX = (
+    '{"protocol":"w30_test_bridge","version":1,"type":"command'
+)
+VOICE_ASSISTANT_INIT_BANNER = (
+    "============_gui_comm_voice_assistant_init==============="
+)
+_INTERLEAVED_COMMAND_RESULT_RE = re.compile(
+    r'^\{"protocol":"w30_test_bridge","version":1,'
+    r'"type":"command(?P<middle>.*?)","request":"(?P<request>[a-z0-9_]+)",'
+    r'"seq":null,"status":"(?P<status>accepted|rejected)"'
+    r'(?P<reason>,"reason":"handler_failed")?\}',
+    re.DOTALL,
+)
+_INTERLEAVED_CURRENT_APP_RE = re.compile(
+    r"(?:uart:~\$\s*)?current_app\[\d+\]:\s*\d+"
+)
+_MAX_INTERLEAVED_COMMAND_RESULT_LINES = 16
+_MAX_INTERLEAVED_COMMAND_RESULT_TEXT = 4096
 
 # CSI、单字符 ESC 和 OSC（含 BEL/ST 结尾）。在完整逻辑行上执行，因而 ANSI
 # 序列即使被底层 read() 分块也能被移除。
@@ -60,6 +80,21 @@ _DEFAULT_COMPLETIONS: dict[str, tuple[str, str]] = {
 
 class SerialTransportError(RuntimeError):
     """打开或读写串口失败。"""
+
+
+def write_shell_wire(write: Callable[[bytes], int | None], wire: bytes) -> None:
+    """Write one complete shell wire or reject it before touching transport."""
+
+    if len(wire) > SHELL_WRITE_BURST_LIMIT:
+        raise SerialTransportError(
+            f"shell wire is {len(wire)} bytes; maximum safe burst is "
+            f"{SHELL_WRITE_BURST_LIMIT} bytes"
+        )
+    written = write(wire)
+    if written is not None and written != len(wire):
+        raise SerialTransportError(
+            f"short shell write: {written}/{len(wire)} bytes"
+        )
 
 
 class HardwareSerialTimeoutError(TimeoutError):
@@ -633,6 +668,9 @@ class HardwareSerialSession:
         self._reader_error: BaseException | None = None
         self._decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
         self._text_buffer = ""
+        self._pending_command_result = ""
+        self._pending_command_result_line_index: int | None = None
+        self._pending_command_result_line_count = 0
         self._started = False
 
         self._raw_stream = None
@@ -789,6 +827,26 @@ class HardwareSerialSession:
             self._condition.notify_all()
 
     def _extract_bridge_events_locked(self, line: str, line_index: int) -> None:
+        if self._pending_command_result:
+            if BRIDGE_MARKER in line:
+                self._abandon_pending_command_result_locked("new bridge marker")
+            else:
+                self._pending_command_result += "\n" + line
+                self._pending_command_result_line_count += 1
+                if self._try_recover_pending_command_result_locked():
+                    return
+                if (
+                    "}" in line
+                    or self._pending_command_result_line_count
+                    >= _MAX_INTERLEAVED_COMMAND_RESULT_LINES
+                    or len(self._pending_command_result)
+                    >= _MAX_INTERLEAVED_COMMAND_RESULT_TEXT
+                ):
+                    self._abandon_pending_command_result_locked(
+                        "recovery boundary reached"
+                    )
+                return
+
         offset = 0
         while True:
             start = line.find(BRIDGE_MARKER, offset)
@@ -802,8 +860,23 @@ class HardwareSerialSession:
                     "protocol_json_error",
                     f"column={start + exc.pos + 1} line={line}",
                 )
-                # 可以继续识别同一物理行上的下一条独立桥接事件，但绝不删除或
-                # 拼接损坏 JSON 中间的日志来“修复”当前事件。
+                if (
+                    candidate.startswith(BRIDGE_COMMAND_RESULT_PREFIX)
+                    and candidate.count(BRIDGE_MARKER) == 1
+                ):
+                    self._pending_command_result = candidate
+                    self._pending_command_result_line_index = line_index
+                    self._pending_command_result_line_count = 1
+                    if self._try_recover_pending_command_result_locked():
+                        return
+                    if "}" in candidate:
+                        self._abandon_pending_command_result_locked(
+                            "complete candidate did not match recovery allowlist"
+                        )
+                    else:
+                        return
+                # 同一物理行后面仍可能有另一条独立桥接事件；除上面的严格
+                # command_result 白名单外，不删除任意日志来“修复”损坏 JSON。
                 offset = start + len(BRIDGE_MARKER)
                 continue
 
@@ -811,14 +884,95 @@ class HardwareSerialSession:
             if not isinstance(value, dict) or value.get("protocol") != BRIDGE_PROTOCOL:
                 self._write_error_locked("protocol_value_error", candidate[:consumed])
                 continue
-            record = _EventRecord(dict(value), line_index)
-            self._events.append(record)
-            self._event_count += 1
-            if self._event_stream is not None:
-                self._event_stream.write(
-                    json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n"
-                )
-                self._event_stream.flush()
+            parsed_value = dict(value)
+            if self._try_recover_parsed_command_result_locked(
+                parsed_value, line_index
+            ):
+                continue
+            self._record_bridge_event_locked(parsed_value, line_index)
+
+    def _record_bridge_event_locked(self, value: dict, line_index: int) -> None:
+        record = _EventRecord(dict(value), line_index)
+        self._events.append(record)
+        self._event_count += 1
+        if self._event_stream is not None:
+            self._event_stream.write(
+                json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n"
+            )
+            self._event_stream.flush()
+
+    def _try_recover_pending_command_result_locked(self) -> bool:
+        block = self._pending_command_result
+        match = _INTERLEAVED_COMMAND_RESULT_RE.match(block)
+        if match is None:
+            return False
+
+        middle = match.group("middle")
+        middle = middle.replace(VOICE_ASSISTANT_INIT_BANNER, "")
+        middle = _INTERLEAVED_CURRENT_APP_RE.sub("", middle)
+        middle = middle.replace("gui_list_real_set_header", "")
+        middle = middle.replace("uart:~$", "")
+        if re.sub(r"\s+", "", middle) != "_result":
+            return False
+
+        value: dict[str, object] = {
+            "protocol": BRIDGE_PROTOCOL,
+            "version": 1,
+            "type": "command_result",
+            "request": match.group("request"),
+            "seq": None,
+            "status": match.group("status"),
+        }
+        if match.group("reason"):
+            value["reason"] = "handler_failed"
+        start_line_index = self._pending_command_result_line_index
+        if start_line_index is None:
+            return False
+        line_count = self._pending_command_result_line_count
+        self._record_bridge_event_locked(value, start_line_index)
+        self._write_error_locked(
+            "protocol_json_recovered",
+            f"request={value['request']} status={value['status']} lines={line_count}",
+        )
+        self._clear_pending_command_result_locked()
+        return True
+
+    def _try_recover_parsed_command_result_locked(
+        self, value: dict, line_index: int
+    ) -> bool:
+        event_type = value.get("type")
+        if (
+            not isinstance(event_type, str)
+            or VOICE_ASSISTANT_INIT_BANNER not in event_type
+            or event_type.replace(VOICE_ASSISTANT_INIT_BANNER, "")
+            != "command_result"
+            or value.get("version") != 1
+            or value.get("seq") is not None
+            or not re.fullmatch(r"[a-z0-9_]+", str(value.get("request", "")))
+            or str(value.get("status", "")) not in {"accepted", "rejected"}
+        ):
+            return False
+
+        recovered = dict(value)
+        recovered["type"] = "command_result"
+        self._record_bridge_event_locked(recovered, line_index)
+        self._write_error_locked(
+            "protocol_json_recovered",
+            f"request={recovered['request']} status={recovered['status']} lines=1",
+        )
+        return True
+
+    def _clear_pending_command_result_locked(self) -> None:
+        self._pending_command_result = ""
+        self._pending_command_result_line_index = None
+        self._pending_command_result_line_count = 0
+
+    def _abandon_pending_command_result_locked(self, reason: str) -> None:
+        self._write_error_locked(
+            "protocol_json_recovery_abandoned",
+            f"{reason}; lines={self._pending_command_result_line_count}",
+        )
+        self._clear_pending_command_result_locked()
 
     def _write_error_locked(self, kind: str, detail: str) -> None:
         if self._error_stream is None:
@@ -1032,7 +1186,7 @@ class HardwareSerialSession:
             with self._condition:
                 start_line_index = self._line_count
                 start_event_index = self._event_count
-            self._write_wire_locked(wire)
+            write_shell_wire(self._write_wire_locked, wire)
 
             deadline = time.monotonic() + timeout_value
             next_event_index = start_event_index
@@ -1115,7 +1269,7 @@ class HardwareSerialSession:
             raise ValueError("line must be one non-empty shell line")
         wire = (line + "\r\n").encode("utf-8")
         with self._send_lock:
-            self._write_wire_locked(wire)
+            write_shell_wire(self._write_wire_locked, wire)
 
     def stop(self) -> None:
         if not self._started:

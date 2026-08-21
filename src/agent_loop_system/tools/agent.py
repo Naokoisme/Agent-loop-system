@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
-    invoke_with_retry,
+    invoke_llm_with_retry,
 )
 from agent_loop_system.tools.source_context import load_runtime_navigation_sources
 from agent_loop_system.tools.designer import DesignerPlan
@@ -87,19 +87,9 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
 
 
 def _create_llm():
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key or api_key.startswith("暂时"):
-        return None
-    try:
-        from langchain_openai import ChatOpenAI
-    except ImportError:
-        return None
-    return ChatOpenAI(
-        model=os.environ.get("OPENAI_MODEL", "gpt-4"),
-        api_key=api_key,
-        base_url=os.environ.get("OPENAI_BASE_URL") or None,
-        timeout=get_llm_request_timeout(),
-    )
+    from agent_loop_system.tools.llm_config import create_chat_llm
+
+    return create_chat_llm()
 
 
 def _load_images(image_dir: str | None) -> list[tuple[str, str]]:
@@ -135,7 +125,7 @@ def _invoke_structured_with_images(
         return llm.with_structured_output(schema)
 
     if not images:
-        return invoke_with_retry(lambda: structured().invoke(prompt))
+        return invoke_llm_with_retry(lambda: structured().invoke(prompt))
 
     from langchain_core.messages import HumanMessage
 
@@ -147,7 +137,7 @@ def _invoke_structured_with_images(
         content.append(
             {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{encoded}"}}
         )
-    return invoke_with_retry(
+    return invoke_llm_with_retry(
         lambda: structured().invoke([HumanMessage(content=content)])
     )
 
@@ -322,12 +312,15 @@ def decide_reproduction_action(
                     (f"当前{target_label}截图（step {current.step}）：", encoded, "image/png")
                 )
 
-    return _invoke_structured_with_images(
-        llm,
-        ReproductionDecision,
-        prompt,
-        labeled_images,
-    )
+    try:
+        return _invoke_structured_with_images(
+            llm,
+            ReproductionDecision,
+            prompt,
+            labeled_images,
+        )
+    except LLMRetryError as exc:
+        raise RuntimeError(f"执行 Agent API 出错：{exc}") from exc
 
 
 def generate_patch(

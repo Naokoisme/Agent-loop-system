@@ -1,5 +1,9 @@
 # Agent 测试失败增量分析
 
+> 文档角色：historical run log。本文按发生时间保留旧批次事实，其中出现的 `supported`、
+> `execution_supported`、`unable` 和旧筛选名只描述当时实现，不再控制当前分类或 Runner。
+> 现行规则以 [case map 数据合同](../case_map/README.md) 为准。
+
 ## 判定规则
 
 - 产品结果只看检查点截图：截图能直接证明预期为 `PASS`，直接矛盾为 `FAIL`，截图不能表达或覆盖不足为 `CANNOT_VERIFY`。

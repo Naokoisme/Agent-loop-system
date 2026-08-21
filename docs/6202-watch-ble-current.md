@@ -1,117 +1,110 @@
-# 6202 Windows BLE 阶段性归档
+# 6202 BLE 当前能力
 
-> 归档时间：2026-08-13  
-> 状态：暂停推进，代码保留，不作为当前真机自动化主链路。
+> 文档角色：BLE 当前能力、诊断与恢复
+>
+> 最近核对：2026-08-18（Asia/Shanghai）
 
-> 2026-08-17 补充：用户明确要求实现新平台 PB 协议后，主机协议层已扩展为完整 schema、分包/重组、并发请求和主动通知接收。实现范围与规格缺口见 `docs/pb-protocol-current.md`。此变化不改变本文的真机结论，MTP 仍是默认截图链路，也没有新增真机 BLE 成功证据。
+本页只记录 6202 当前已经证明的 BLE 能力和仍然有效的处理步骤。正式真机截图仍默认使用 MTP；
+总体结论见 [6202 真机截图当前状态](6202-hardware-screenshot-current.md)。
 
-## 阶段结论
+## 当前结论
 
-Agent-loop 已具备一套实验性的 Windows BLE GATT 客户端，可以扫描 6202、编码/解码 App 协议，并尝试绑定和登录。
+| 能力 | 当前状态 |
+| --- | --- |
+| Windows 扫描并连接手表 BLE | 已验证，但受手机占用和广播状态影响 |
+| 通过 App BLE 协议发送 PB / QuickCmd | 已验证 |
+| 通过 BLE 收取完整原始 BMP | 真机闭环通过，非默认 |
+| 低功耗时通过 BLE 启动测试会话 | 真机已验证 |
+| 低功耗后直接 UART 自行恢复 | 未证明 |
+| 手机绑定、登录、HFP/经典蓝牙通话 | 不由当前 PC BLE 链路替代 |
 
-它没有完成真机绑定闭环，也不能代替真实手机提供经典蓝牙通话、手机通知权限、音乐播放、遥控相机或 Android/iOS 兼容性环境。
+Agent-loop 的 BLE 客户端复用手表现有 App 协议，不发送 579 的
+`RawCommand.packet()` 原始包，也不把任意序列化 protobuf 字节机械切片。新平台 PB 使用
+10-byte 大端 `0xAB` 信封和 CRC-16/IBM；需要分片时必须按协议语义拆分对象或列表。
 
-当前真机自动化主链路是：
+## PC 扫描不到手表
 
-- UART：命令与日志。
-- MTP：按需取得屏幕截图。
-- Agent-loop：执行用例、保存证据和判定结果。
+一次 Windows 扫描为空，不能证明手表 BLE 坏了。按下面顺序定位，找到所属层后停止：
 
-基于 KISS/YAGNI，BLE Quick Command 和“电脑扮演完整手机 App”暂停，不继续扩建。
+1. 通过 SuperCom 命名管道执行只读 `btm disp`；不得为诊断而直开 COM7。
+2. 查看蓝牙栈、LE 广播状态和当前 BLE 连接数。
+3. 如果已有 BLE 连接，先确认是否被手机官方 App 占用。需要 PC 连接时，让手机 App 断开并
+   避免自动重连，再重新扫描。
+4. 只有在 `bthost_status=1`、BLE 连接数为 0、广播状态为 0 时，才发送
+   `btm le adv_start`；随后再次执行 `btm disp` 确认广播已经开启。
+5. 广播已开启且无连接后，再运行一次有界 Windows 扫描：
 
-## 已保留的能力
+~~~powershell
+uv run python -m agent_loop_system.tools.watch_ble scan --timeout 8
+~~~
 
-### 协议层
+2026-08-18 最近一次实机发现为 `oraimo Watch Tank N_2906` /
+`54:C8:D4:D9:29:06`。该记录用于识别设备，不应把旧地址长期写死为“当前设备”；每轮仍以
+实时扫描和固件状态为准。
 
-- 6202 App 帧：`0xAB` 十字节头、CRC-16/IBM、命令号、序号和增量重组。
-- 绑定/登录 protobuf：`0x0301` / `0x0302`。
-- 请求、响应和用户资料的范围校验。
+如果固件显示正在广播、连接数为 0，但 Windows 仍扫描不到，应报告为“Windows 发现层失败”；
+不要反复重启蓝牙栈、刷机或修改协议。`btm le adv_stop` 只用于明确的诊断实验，不是常规恢复
+步骤。
 
-实现：
+扫描成功只证明 Windows 发现了 BLE 外设，不证明手机绑定、账号登录、HFP 或产品业务已经成功。
 
-- `src/agent_loop_system/tools/watch_app_protocol.py`
-- `src/agent_loop_system/protocol/watch_app_pb2.py`
+## 低功耗后的恢复入口
 
-### Windows BLE 客户端
+手表自然进入低功耗后，直接 UART 指令不可靠的问题仍未定位。2026-08-18 已证明一个最小外部
+恢复入口：
 
-- 按设备名前缀或 Service UUID 扫描。
-- 唯一设备选择和 GATT UUID 校验。
-- FF03 Notify 订阅、FF02 分片写入和响应重组。
-- 请求命令号、序号和 CRC 校验。
-- 首次绑定实验时序：连接 -> 订阅 -> 写入 `0x0301` -> Windows BLE 配对 -> 等待原请求响应。
-- 对扫描、连接、断连、配对、超时、协议和认证错误做结构化分类。
-- `close()` 可重复调用，客户端可重新连接。
+~~~text
+低功耗
+→ PC 通过 BLE PB QuickCmd 0x0406 发送一次 TOP5STEP:TEST_SESSION:START;
+→ UART 收到 command_result accepted
+→ UART 收到 test_session active / lease_seconds=86400
+→ 屏幕常亮测试策略恢复
+~~~
 
-实现：
+这次验证在发送 BLE START 前没有写入任何 UART 唤醒命令，因此能够证明恢复由 BLE 入口触发。
+证据：
 
-- `src/agent_loop_system/tools/watch_ble.py`
+- [result.json](../evidence/ble_test_session_start_20260818-102711/result.json)
+- [serial/events.jsonl](../evidence/ble_test_session_start_20260818-102711/serial/events.jsonl)
 
-依赖：
+它不证明任意 UART 指令能在低功耗后自行恢复，也不改变普通 Runner 的会话规则。该 START 是
+一次单独授权的外部动作；普通 Runner 仍只查询 `TEST_SESSION:STATUS`，不自动 START、续期或
+STOP。本次会话没有由 Runner STOP。
 
-- `bleak>=2.0,<4`
-- `protobuf>=6.31,<7`
+## BLE 截图
 
-## 验证状态
+当前可选 Provider 使用以下顺序：
 
-2026-08-13 复跑：
+~~~text
+关闭 USB → BLE 请求完整 BMP → 接收并校验所有分块 → 恢复 USB
+~~~
 
-```text
-uv run pytest -q tests/test_watch_app_protocol.py tests/test_watch_ble.py
-29 passed, 11 subtests passed
-```
+关闭 USB 是为了避免截图过程中 USB/MTP 与 BLE 传输互相干扰。成功后必须确认 ZORA 已恢复；
+失败路径也会尝试恢复 USB，并把恢复失败与原始 BLE 错误一起保留。
 
-这些测试使用模拟 BLE 后端，证明主机侧协议、时序和错误处理符合代码约定；不证明真机 BLE 通信或产品绑定成功。
+当前固件的 `dal_ble_get_pack_len()` 上限为 244 bytes，用于避开本目标 C400 控制器的 ACL
+缓冲区问题。这是 6202 当前实现的兼容值，不是通用 BLE 上限。
 
-当前没有可归档的真机成功证据：
+[2026-08-18 BLE Provider 真机结果](../evidence/ble_provider_usb_fix_20260818-095126/provider-run/result.json)
+完成 645 个分块、618,518-byte BMP，长度、CRC、410×502、24-bit top-down 格式和可读性均
+通过，结束后 ZORA 已恢复。
 
-- 未证明恢复出厂后的 6202 已通过 Windows 完成 App 协议绑定。
-- 未证明绑定后 `0x0302` 登录成功。
-- 未证明重启后绑定信息和 `bind_time` 保持一致。
-- 未证明 Windows BLE 配对会为当前固件建立所需的经典蓝牙状态。
+该次单张截图约 172 秒，并出现 644 条 `lld mem alloc buf fail type 0x2`。此项已登记为后续
+优化，当前不继续扩张调查范围；MTP 仍是默认截图链路。
 
-因此不得把“扫描到设备”“GATT 已连接”或“Windows 显示已配对”写成绑定成功。
+## 不在当前 BLE 链路内的能力
 
-## 固件侧已知门槛
+- 手机官方 App 的账号体系、绑定状态和业务编排。
+- 经典蓝牙 / HFP 通话链路。
+- 手机界面截图或 ADB 自动化。
+- 用 BLE ACK 代替手表画面验收。
 
-当前固件的绑定/登录处理还依赖经典蓝牙手机连接状态。BLE 配对与经典蓝牙产品状态不是同一件事。
+这些能力如需验证，必须单独定义目标和证据，不能从 PC BLE 扫描或 PB ACK 推断。
 
-首次 `0x0301` 可能借助“先写请求、后触发 BLE 配对”的特殊时序获得响应；即便首次绑定返回成功，也不能推出后续登录和完整手机能力已经建立。
+## 实现与协议入口
 
-`BLOCKED_BY_CLASSIC_BT_GATE` 仅表示主机根据超时和已知固件条件做出的谨慎分类，不是手表返回的明确错误码。
-
-## 与当前测试用例的关系
-
-当前 `case_map` 有 3164 条用例，其中 85 条文本明确出现 BLE/蓝牙：79 条为 `unable`，68 条集中在通话模块。大多数通话用例依赖经典蓝牙/HFP或真实手机，不会因 Windows BLE GATT 客户端而自动变得可执行。
-
-现有 BLE 能力直接适合的窄场景是：
-
-- `START_005`：扫描手表开机阶段的可绑定 BLE 广播。
-- BLE App 帧格式、认证响应和异常时序的协议测试。
-- 将来明确选中的纯 BLE 数据同步用例。
-
-通知页面等测试已有 Quick Command 数据注入方式；没有必要为了页面判定再复制一套 BLE Quick Command。
-
-## 保留命令
-
-只读扫描，不连接、不配对：
-
-```powershell
-uv run python -m agent_loop_system.tools.watch_ble scan --timeout 6
-```
-
-以下命令会改变手表或 Windows 的状态，暂停阶段不要自动执行：
-
-```powershell
-uv run python -m agent_loop_system.tools.watch_ble bind --address "<address>" --auth-code "<二维码验证码>" --user-id "agent-loop-system" --timeout 60
-uv run python -m agent_loop_system.tools.watch_ble login --address "<address>" --user-id "agent-loop-system" --timeout 60
-```
-
-## 恢复推进的条件
-
-只有满足以下任一条件时再恢复 BLE：
-
-1. 已选中的真机 P0 用例明确需要 BLE 广播或 App 协议，UART Quick Command 无法满足验收语义。
-2. 目标变为验证手机 App 协议本身，而不只是验证手表页面。
-3. 已确定要建设真实 Android/iOS 手机自动化，并需要 BLE 客户端做协议诊断或故障注入。
-
-恢复时从最小闭环开始：扫描 -> 单次绑定 -> 单次登录 -> 重启后登录。不要先增加 BLE Quick Command、天气、通知、音乐、相机或经典蓝牙模拟。
+- [watch_ble.py](../src/agent_loop_system/tools/watch_ble.py)：Windows BLE 客户端。
+- [watch_ble_provider.py](../src/agent_loop_system/tools/watch_ble_provider.py)：关闭 USB、BLE
+  取图和恢复 USB。
+- [watch_app_protocol.py](../src/agent_loop_system/tools/watch_app_protocol.py)：App PB 信封与 CRC。
+- [PB 协议当前说明](pb-protocol-current.md)：命令编码边界。

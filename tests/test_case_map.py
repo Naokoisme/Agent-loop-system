@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 from agent_loop_system.tools import case_map
-from agent_loop_system.tools.case_map import CaseEntry, load_case_map, run_case
+from agent_loop_system.tools.case_map import CaseEntry, CaseRunResult, load_case_map, run_case
 from agent_loop_system.tools.simulator import CommandResult
 
 
@@ -67,7 +68,7 @@ class CaseMapExecutionTest(unittest.TestCase):
             simulator.mkdir()
             hardware.mkdir()
             (simulator / "demo.json").write_text(
-                json.dumps([{"case_id": "SIM_001"}]),
+                json.dumps([{"case_id": "SIM_001", "sheet": "demo"}]),
                 encoding="utf-8",
             )
             with mock.patch.object(case_map, "CASE_MAP_TARGET_DIRS", {
@@ -84,7 +85,11 @@ class CaseMapExecutionTest(unittest.TestCase):
             simulator = root / "6202_simulator_case_map"
             simulator.mkdir()
             (simulator / "demo.json").write_text(
-                json.dumps([{"case_id": "SIM6202_001"}]),
+                json.dumps({
+                    "profile": "6202_W5230_SIMULATOR",
+                    "sheet": "demo",
+                    "cases": [{"case_id": "SIM6202_001", "sheet": "demo"}],
+                }),
                 encoding="utf-8",
             )
             with (
@@ -115,10 +120,13 @@ class CaseMapExecutionTest(unittest.TestCase):
             simulator = Path(temporary)
             (simulator / "removed.json").write_text(
                 json.dumps({
+                    "profile": "6202_W5230_SIMULATOR",
+                    "sheet": "removed",
                     "supported": False,
                     "unavailable_reason": "项目未启用该模块",
                     "cases": [{
                         "case_id": "REMOVED_001",
+                        "sheet": "removed",
                         "setup": [":ENTER_PAGE:REMOVED,0"],
                         "collect": [":HOST_SCREENSHOT:1"],
                     }],
@@ -138,6 +146,103 @@ class CaseMapExecutionTest(unittest.TestCase):
             self.assertFalse(loaded.unable)
             self.assertEqual(loaded.setup, [":ENTER_PAGE:REMOVED,0"])
             self.assertEqual(loaded.collect, [":HOST_SCREENSHOT:1"])
+
+    def test_loader_rejects_sheet_path_traversal_before_reading_another_profile(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            selected = root / "620C_simulator_case_map"
+            other = root / "6202_simulator_case_map"
+            selected.mkdir()
+            other.mkdir()
+            (other / "secret.json").write_text(
+                json.dumps({
+                    "profile": "6202_W5230_SIMULATOR",
+                    "sheet": "secret",
+                    "cases": [{"case_id": "OTHER_001", "sheet": "secret"}],
+                }),
+                encoding="utf-8",
+            )
+            with mock.patch.object(case_map, "CASE_MAP_PROFILE_DIRS", {
+                **case_map.CASE_MAP_PROFILE_DIRS,
+                "620C_W6830": selected,
+                "6202_W5230_SIMULATOR": other,
+            }):
+                with self.assertRaisesRegex(ValueError, "单一模块名"):
+                    load_case_map(
+                        r"..\6202_simulator_case_map\secret",
+                        target="simulator",
+                        profile="620C_W6830",
+                    )
+
+    def test_loader_rejects_profile_and_sheet_metadata_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            selected = Path(temporary)
+            map_path = selected / "demo.json"
+            with mock.patch.object(case_map, "CASE_MAP_PROFILE_DIRS", {
+                **case_map.CASE_MAP_PROFILE_DIRS,
+                "6202_W5230_SIMULATOR": selected,
+            }):
+                map_path.write_text(
+                    json.dumps({
+                        "profile": "620C_W6830",
+                        "sheet": "demo",
+                        "cases": [{"case_id": "DEMO_001", "sheet": "demo"}],
+                    }),
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(ValueError, "profile 不匹配"):
+                    load_case_map(
+                        "demo",
+                        target="simulator",
+                        profile="6202_W5230_SIMULATOR",
+                    )
+
+                for invalid_cases in (
+                    "not-an-array",
+                    [{"case_id": "DEMO_001", "sheet": "demo"}, 42],
+                    [],
+                ):
+                    with self.subTest(invalid_cases=invalid_cases):
+                        map_path.write_text(
+                            json.dumps({
+                                "profile": "6202_W5230_SIMULATOR",
+                                "sheet": "demo",
+                                "cases": invalid_cases,
+                            }),
+                            encoding="utf-8",
+                        )
+                        with self.assertRaisesRegex(ValueError, "cases"):
+                            load_case_map(
+                                "demo",
+                                target="simulator",
+                                profile="6202_W5230_SIMULATOR",
+                            )
+
+                map_path.write_text(
+                    json.dumps({
+                        "profile": "6202_W5230_SIMULATOR",
+                        "sheet": "other",
+                        "cases": [{"case_id": "DEMO_001", "sheet": "other"}],
+                    }),
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(ValueError, "sheet 不匹配"):
+                    load_case_map(
+                        "demo",
+                        target="simulator",
+                        profile="6202_W5230_SIMULATOR",
+                    )
+
+                map_path.write_text(
+                    json.dumps([{"case_id": "DEMO_001", "sheet": "demo"}]),
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(ValueError, "profile 不匹配"):
+                    load_case_map(
+                        "demo",
+                        target="simulator",
+                        profile="6202_W5230_SIMULATOR",
+                    )
 
     def test_setup_and_action_wait_for_processed_before_continuing(self) -> None:
         session = _FakeSession()
@@ -388,7 +493,7 @@ class CaseMapExecutionTest(unittest.TestCase):
         case = CaseEntry(
             case_id="DEMO_MISSING_ACTION",
             steps_text="1.连续重启20轮",
-            actions=[],
+            actions=[":HOST_WAIT:1"],
             collect=[":GUI_TREE:1"],
             verification_points=["每轮结束均显示主表盘"],
         )
@@ -494,6 +599,89 @@ class CaseMapExecutionTest(unittest.TestCase):
 
 
 class RunnerSelectionTest(unittest.TestCase):
+    def test_result_provenance_locks_simulator_artifact_hash(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = Path(temporary) / "main.exe"
+            artifact.write_bytes(b"simulator-artifact")
+            with mock.patch.object(
+                test_tool,
+                "get_simulator_exe",
+                return_value=str(artifact),
+            ):
+                provenance = test_tool._result_provenance(
+                    target="simulator",
+                    case_map_profile="6202_W5230_SIMULATOR",
+                )
+
+        self.assertEqual(provenance["target"], "simulator")
+        self.assertEqual(provenance["case_map_profile"], "6202_W5230_SIMULATOR")
+        self.assertEqual(provenance["project"], "6202_W5230")
+        self.assertEqual(provenance["artifact_path"], str(artifact.resolve()))
+        self.assertEqual(
+            provenance["artifact_sha256"],
+            hashlib.sha256(b"simulator-artifact").hexdigest().upper(),
+        )
+
+    def test_result_provenance_rejects_project_profile_mismatch(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        with mock.patch.dict(
+            test_tool.os.environ,
+            {"W30_PROJECT": "620C_W6830"},
+        ):
+            with self.assertRaisesRegex(ValueError, "与 case_map profile .* 不匹配"):
+                test_tool._result_provenance(
+                    target="simulator",
+                    case_map_profile="6202_W5230_SIMULATOR",
+                )
+
+    def test_hardware_provenance_ignores_simulator_project_environment(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        with mock.patch.dict(
+            test_tool.os.environ,
+            {
+                "W30_PROJECT": "620C_W6830",
+                "W30_HARDWARE_PROJECT": "6202_W5230",
+            },
+        ):
+            provenance = test_tool._result_provenance(
+                target="hardware",
+                case_map_profile="6202_W5230",
+            )
+
+        self.assertEqual(provenance["project"], "6202_W5230")
+        self.assertEqual(provenance["artifact_path"], "")
+        self.assertEqual(provenance["artifact_sha256"], "")
+
+    def test_project_mismatch_fails_before_agent_exploration(self) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        case = CaseEntry(case_id="DYNAMIC_000", sheet="演示")
+        with (
+            mock.patch.dict(test_tool.os.environ, {"W30_PROJECT": "620C_W6830"}),
+            mock.patch.object(
+                test_tool,
+                "load_case_map",
+                return_value={case.case_id: case},
+            ),
+            mock.patch.object(test_tool, "_run_agent_exploration") as explore,
+            mock.patch.object(test_tool, "SimulatorSession") as simulator,
+        ):
+            with self.assertRaisesRegex(ValueError, "与 case_map profile .* 不匹配"):
+                test_tool.run_single_case(
+                    "演示",
+                    case.case_id,
+                    "D:/evidence/dynamic.bmp",
+                    target="simulator",
+                    case_map_profile="6202_W5230_SIMULATOR",
+                )
+
+        explore.assert_not_called()
+        simulator.assert_not_called()
+
     def test_unsolidified_mapping_uses_agent_exploration_without_replay_flag(self) -> None:
         from agent_loop_system.tools import test as test_tool
 
@@ -503,8 +691,14 @@ class RunnerSelectionTest(unittest.TestCase):
             steps_text="完成原始操作",
             expected_text="显示结果",
             actions=[":TP_CLICK:1,1,1"],
+            mapping_status=" PROMOTED ",
         )
-        expected = mock.sentinel.dynamic_result
+        expected = CaseRunResult(
+            case_id=case.case_id,
+            sheet=case.sheet,
+            expected_text=case.expected_text,
+            execution_mode="agent_exploration",
+        )
         with (
             mock.patch.object(test_tool, "load_case_map", return_value={case.case_id: case}),
             mock.patch.object(
@@ -523,6 +717,9 @@ class RunnerSelectionTest(unittest.TestCase):
             )
 
         self.assertIs(result, expected)
+        self.assertEqual(result.provenance["target"], "simulator")
+        self.assertEqual(result.provenance["case_map_profile"], "620C_W6830")
+        self.assertEqual(result.provenance["project"], "620C_W6830")
         explore.assert_called_once_with(
             case,
             screenshot_path="D:/evidence/dynamic.bmp",
@@ -575,9 +772,51 @@ class RunnerSelectionTest(unittest.TestCase):
                     )
 
                 self.assertEqual(result.execution_mode, expected_mode)
+                self.assertEqual(result.provenance["target"], "simulator")
+                self.assertEqual(
+                    result.provenance["case_map_profile"],
+                    "6202_W5230_SIMULATOR",
+                )
+                self.assertEqual(result.provenance["project"], "6202_W5230")
                 self.assertTrue(session.started)
                 self.assertTrue(session.stopped)
                 self.assertTrue(any(raw.startswith(":TP_CLICK:") for raw, _ in session.calls))
+
+    def test_candidate_replay_fails_before_exploration_or_session_without_candidate(
+        self,
+    ) -> None:
+        from agent_loop_system.tools import test as test_tool
+
+        for case in (
+            CaseEntry(case_id="MISSING_001", sheet="演示", actions=[]),
+            CaseEntry(
+                case_id="PROMOTED_001",
+                sheet="演示",
+                actions=[":TP_CLICK:1,1,1"],
+                mapping_status="PROMOTED",
+            ),
+        ):
+            with (
+                self.subTest(case_id=case.case_id),
+                mock.patch.object(
+                    test_tool,
+                    "load_case_map",
+                    return_value={case.case_id: case},
+                ),
+                mock.patch.object(test_tool, "_run_agent_exploration") as explore,
+                mock.patch.object(test_tool, "SimulatorSession") as simulator,
+            ):
+                with self.assertRaisesRegex(ValueError, "--candidate-replay"):
+                    test_tool.run_single_case(
+                        "演示",
+                        case.case_id,
+                        "D:/evidence/candidate.bmp",
+                        target="simulator",
+                        case_map_profile="620C_W6830",
+                        candidate_replay=True,
+                    )
+                explore.assert_not_called()
+                simulator.assert_not_called()
 
 
 if __name__ == "__main__":

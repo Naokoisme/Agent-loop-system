@@ -1,69 +1,119 @@
-# 6202 MTP 独立截图工具
+# 6202 MTP 截图操作指南
 
-## 目标
+> 文档角色：MTP 当前操作与故障恢复
+>
+> 最近核对：2026-08-18（Asia/Shanghai）
 
-提供一条独立命令，从已经烧录工程截图命令的 6202 真机取得 BMP。工具不读取
-`D:\Agent-loop-workspace\6202_W5230`，也不依赖测试用例或 Agent-loop Runner。
+本页只说明 6202 当前默认的 MTP 截图链路。总体状态和问题索引见
+[6202 真机截图当前状态](6202-hardware-screenshot-current.md)。
 
-输入只有调试串口和输出路径；内部流程固定为：
+本流程不构建、不刷机，也不启动或停止测试会话。
 
-```text
-关闭 USB → 触发 SCREENSHOT_CAPTURE_FILE → 重开 USB → 精确下载带序号文件 → 校验 BMP
-```
+## 前置条件
 
-## 使用
+1. SuperCom 已独占 COM7，并提供双向命名管道
+   `\\.\pipe\SuperCom.AgentBridge.COM7`。
+2. `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT` 都指向
+   `D:\Agent-loop-workspace\6202_W5230`，项目为 `6202_W5230`。
+3. 外部所有者已经启动测试会话；Runner 只查询 `TEST_SESSION:STATUS`。
+4. 手表运行支持 `SCREENSHOT_CAPTURE_FILE` 的工程固件，屏幕处于可截图状态。
 
-```powershell
-watch-mtp-screenshot --port COM7 --output D:\evidence\watch.bmp
-```
+## 配置
 
-未安装命令行入口时也可以运行：
+在本机 `.env` 中使用等价配置；设备绑定不要提交到仓库：
 
-```powershell
-python -m agent_loop_system.tools.mtp_screenshot --port COM7 --output D:\evidence\watch.bmp
-```
+~~~dotenv
+W30_HARDWARE_SOURCE_ROOT=D:\Agent-loop-workspace\6202_W5230
+W30_HARDWARE_WORKSPACE_ROOT=D:\Agent-loop-workspace\6202_W5230
+W30_HARDWARE_PROJECT=6202_W5230
+W30_HARDWARE_TRANSPORT=supercom
+W30_HARDWARE_PORT=COM7
+W30_HARDWARE_BAUDRATE=1500000
+W30_HARDWARE_CAPTURE_PROVIDER=mtp
+~~~
 
-工具必须后台运行，不打开资源管理器，也不操作 SuperCom。若 COM7 被占用，应明确报错，
-由用户关闭占用程序后重试。
+`W30_HARDWARE_TRANSPORT=supercom` 表示 Agent-loop 通过 SuperCom 管道使用共享串口，不会并行
+打开物理 COM7。`MtpCaptureProvider` 借用同一个 `RealDeviceSession`，不会重复创建串口会话。
+
+## 通过 Runner 取图
+
+为本轮结果和截图使用唯一目录：
+
+~~~powershell
+uv run python -m agent_loop_system.tools.test --sheet <模块> --case-id <CASE_ID> --target hardware --case-map-profile 6202_W5230 --result-file <本轮唯一目录>\result.json --screenshot-path <本轮唯一目录>\screenshot.bmp
+~~~
+
+普通运行只会执行符合当前 case map 合同的路径。`--candidate-replay` 仅供独占用例的外部准入流程
+使用，不能为了绕过映射状态临时添加。
+
+旧的 `watch-mtp-screenshot --port COM7` 和
+`python -m agent_loop_system.tools.mtp_screenshot --port COM7` 会直接取得物理串口所有权，不适用于
+当前 SuperCom 持有 COM7 的配置。
+
+## Provider 的实际顺序
+
+~~~text
+关闭 USB → 触发 SCREENSHOT_CAPTURE_FILE → 恢复 USB
+→ 精确下载 agent_capture_<seq>.bmp → 校验 BMP → 保存证据
+~~~
+
+固件先写临时文件，再原子提交为带完整 uint32 请求序号的文件。主机只接受本次精确文件名；
+找不到即失败，不回退旧图。`receipt_verified=false` 只表示没有额外收到同序号 UART 终态，
+不否定已经由精确文件名确认的 MTP 帧身份。
+
+当前真机 shell 要求每条命令在一次不超过 64 bytes 的完整写入中送达。截图序号 9,999,999
+对应的完整命令（含 CRLF）刚好是 64 bytes；从 10,000,000 起会超过边界。因此宿主只分配
+1..9,999,999，越界会在关闭 USB 前失败，不拆包发送。
+
+## 常见问题
+
+### MTP 设备消失或未恢复
+
+现象分两种：
+
+- 关闭 USB 后 ZORA 暂时从资源管理器消失：这是截图步骤的一部分。
+- 截图结束后 ZORA 仍未重新出现：这是恢复失败，不能继续当作截图成功。
+
+当前 Provider 会发送 `dal_usb open` 并等待重新枚举；第一次等待超时会再发送一次。无论截图
+在哪一步失败，退出前还会做一次尽力恢复。成功必须同时看到 ZORA 以 VID `301A`、
+PID `6808` 重新出现并能访问其 WPD/MTP 存储。
+
+如果仍未恢复：
+
+1. 停止本次用例并保留串口、MTP 和结构化错误证据。
+2. 不直开 COM7，不关闭 SuperCom，不使用旧 BMP 继续判定。
+3. 把问题报告为“USB 未恢复”，不要笼统写成“截图失败”。
+
+### 本次截图文件找不到
+
+Windows 的 MTP 命名空间偶尔会在设备刚重新枚举时保留旧视图。当前 Provider 只会针对同一个
+精确序号刷新并重查一次；仍找不到就失败。它不会下载较早的
+`agent_capture_*.bmp` 作为替代。
+
+### 返回 unavailable 或 busy
+
+关屏、AOD、页面转场或并发截图都可能让固件拒绝取图。保留固件给出的结构化原因并停止该
+检查点；不要伪造帧，也不要把 ACK 当作截图。
+
+### 测试会话不是 active
+
+普通 Runner 只查询状态。若会话不是 `active`，停止并交还外部控制者处理；Runner 不自动
+START、续期或 STOP。低功耗场景的已验证外部恢复入口见
+[6202 BLE 当前能力](6202-watch-ble-current.md#低功耗后的恢复入口)。
 
 ## 成功判据
 
-- USB 重新枚举为 `ZORA`（VID `301A`、PID `6808`）。
-- 只下载本次序号对应的 `agent_capture_<seq>.bmp`，找不到即失败，不回退旧文件。
-- 下载到的文件是完整的 24-bit BMP，文件头长度等于实际长度。
-- 当前 6202 图片必须为 410×502、top-down。
-- 输出 JSON 包含命令序号、文件路径、SHA256、像素 CRC32 和是否收到同序号串口终态。
+- SuperCom 管道持续可用，没有改为直开 COM7。
+- ZORA 已恢复并可访问。
+- 只下载本次序号的 `agent_capture_<seq>.bmp`。
+- BMP 为 618,518 bytes、410×502、24-bit、top-down，文件头长度与实际长度一致。
+- 元数据包含请求序号、文件路径、SHA256、像素 CRC32 和 `receipt_verified`。
+- 每个视觉检查点都有一张独立新图，产品 verdict 只由截图决定。
 
-固件以固定临时文件写入并原子替换为 `agent_capture_<seq>.bmp`，新截图前只清理旧的 Agent
-截图文件。主机只接受本次完整 uint32 序号对应的文件名，因此 UART 没有回执时仍可校验新帧身份。
-`receipt_verified=false` 仅表示没有额外验证串口终态，不再表示 MTP 文件序号无法确认。
+## 当前真机证据
 
-## 当前验证结果
+[2026-08-18 默认 Provider 结果](../evidence/6202_hardware_solidify_20260818-004854/host-fix-default-provider-01/result.json)
+使用自动序号 2,587,899，`receipt_verified=true`，得到 618,518-byte、410×502、
+24-bit top-down BMP。本文不再保留已被该结果替代的旧包哈希、旧序号和旧失败记录。
 
-2026-08-13 使用命令序号 `831303` 完成真机验证。工具从后台控制 COM7，USB 成功重新枚举，
-并下载出当时的二维码页面：
-
-- 路径：`D:\Agent-loop-system\artifacts\usb_screenshot_tool\831303\agent_capture.bmp`
-- 618,518 bytes，410×502、24-bit、top-down
-- 像素 CRC32：`5d66cc13`
-- SHA256：`6EE20BD20A5CDCD7AE2BCFED7112308F8923FE350E8867FBD0F7081E6F7E71E6`
-- `receipt_verified=false`：当前板子没有返回文件截图的 UART 终态
-
-带序号版本已刷入并完成真机门。序号 `831304` 成功生成并下载
-`agent_capture_831304.bmp`；设备目录里只有该文件。只读查询不存在的
-`agent_capture_831305.bmp` 得到明确找不到，没有回退旧图。
-
-证据：`D:\Agent-loop-system\artifacts\usb_screenshot_sequence\831304\agent_capture.bmp`；
-618,518 bytes，像素 CRC32 `7352b6ac`，SHA256
-`B8E1D90F0CB669842FA01BAEE684B176261E98C6672E519F19E9DDCDBCDC431F`。
-
-## Agent-loop 接入
-
-`MtpCaptureProvider` 实现通用 `capture(timeout, after_sequence) -> frame` 和 `close()`。
-它复用同一套独立工具核心，并借用 `RealDeviceSession` 已启动的 `HardwareSerialSession`；
-不会二次打开或关闭 COM 口。`frame.save_bmp(path)` 直接保存已经完成格式、尺寸和 CRC 校验的
-MTP BMP。
-
-`RealDeviceSession` 默认使用该 Provider；原串口分块 `WatchCaptureProvider` 仅保留显式注入能力。
-2026-08-13 真机 Provider 序号 `831306` 已成功生成 618,518-byte BMP。完整
-`RealDeviceSession` 仍在启动 `GUI_PING` 处因 UART 无回执超时，尚未进入 MTP 基线阶段。
+实现位置：[mtp_screenshot.py](../src/agent_loop_system/tools/mtp_screenshot.py)。

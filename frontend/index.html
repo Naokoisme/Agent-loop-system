@@ -4,24 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
-  <title>固件修复工作台</title>
+  <title>Agent自动化测试平台</title>
   <link rel="stylesheet" href="/assets/styles.css">
   <script defer src="/assets/app.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/" aria-label="返回缺陷队列">
-      <span class="brand-mark" aria-hidden="true">W30</span>
-      <span>
-        <strong>固件修复工作台</strong>
-        <small>本地修复与验证</small>
-      </span>
+    <a class="brand" href="/tests?view=overview" data-route="/overview" aria-label="返回项目总览">
+      <strong>Agent-loop</strong>
+      <small id="brand-system-version">v—</small>
     </a>
-    <nav class="primary-nav" aria-label="工作台导航">
-      <a href="/" data-nav="defects">缺陷修复</a>
-      <a href="/tests" data-nav="tests">Agent 测试</a>
+    <nav class="primary-nav" aria-label="工作台一级导航">
+      <a href="/tests?view=overview" data-route="/overview" data-nav="overview"><span aria-hidden="true">⌂</span>项目总览</a>
+      <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
+      <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
+      <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
+      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>缺陷闭环</a>
+      <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
     </nav>
-    <div class="system-state"><span class="pulse-dot"></span>本地闭环已连接</div>
+    <div class="topbar-actions">
+      <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
+      <label class="global-target-picker" for="global-target-select">
+        <span class="sr-only">当前测试目标</span>
+        <select id="global-target-select" aria-label="切换全局测试目标">
+          <option value="620C_W6830">620C 模拟器</option>
+          <option value="6202_W5230_SIMULATOR">6202 模拟器</option>
+          <option value="6202_W5230">6202 真机</option>
+        </select>
+        <span id="global-target-status" class="target-health-inline"><i></i><span>尚未检查</span></span>
+      </label>
+      <button id="open-system-settings" class="icon-button settings-nav-btn" type="button" aria-label="打开系统设置" title="系统设置">⚙</button>
+    </div>
   </header>
   <main id="app" class="app-shell" aria-live="polite">
     <section class="loading-state">
@@ -30,5 +43,143 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
+    <form id="system-settings-form">
+      <header class="dialog-head">
+        <div>
+          <h2 id="settings-dialog-title">系统设置</h2>
+        </div>
+        <button id="close-system-settings" class="dialog-close" type="button" aria-label="关闭">×</button>
+      </header>
+
+      <div class="settings-tabs-nav">
+        <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">🤖 大模型</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="ones">📋 ONES 平台</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机串口</button>
+      </div>
+
+      <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+        <!-- Tab 1: LLM (内置统一服务状态卡片与连通性测试) -->
+        <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="llm-settings-card">
+            <div class="llm-settings-heading">
+              <span class="llm-settings-title">
+                <span id="llm-engine-dot" class="llm-status-dot" data-tone="neutral"></span>
+                大模型与视觉判定引擎
+              </span>
+              <span class="chip chip-solidified" style="font-size: 11px;">内置服务</span>
+            </div>
+
+            <div class="llm-signal-list" aria-label="大模型服务状态">
+              <div class="llm-signal-row">
+                <span>服务已配置</span>
+                <strong id="llm-config-status" class="llm-signal-value" data-tone="neutral">读取中…</strong>
+              </div>
+              <div class="llm-signal-row">
+                <span>最近实际调用成功</span>
+                <strong id="llm-actual-success" class="llm-signal-value" data-tone="neutral">尚无成功记录</strong>
+              </div>
+              <div class="llm-signal-row">
+                <span>本次快速探测</span>
+                <strong id="llm-test-status" class="llm-signal-value" data-tone="neutral" role="status" aria-live="polite">尚未执行</strong>
+              </div>
+            </div>
+
+            <div class="llm-config-details">
+              <span style="color: var(--ink-soft);">固定模型:</span>
+              <span id="llm-display-model" style="font-family: monospace; font-weight: 600;">gpt-5.6-sol</span>
+              <span style="color: var(--ink-soft);">服务网关:</span>
+              <span id="llm-display-gateway" style="font-family: monospace; font-size: 12px; color: var(--ink-soft);">https://api.onefaka.com/v1</span>
+            </div>
+
+            <div class="llm-probe-actions">
+              <button id="btn-test-llm" type="button" class="button button-secondary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">⚡ 测试服务连通性</button>
+              <small>快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: ONES -->
+        <div class="settings-tab-pane" data-settings-pane="ones" style="display: none; flex-direction: column; gap: 12px;">
+          <div>
+            <label for="cfg-ones-base-url" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">ONES 地址</label>
+            <input id="cfg-ones-base-url" type="text" class="input" placeholder="https://ones.topstepht.com:8443" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-ones-email" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">账号 (邮箱)</label>
+              <input id="cfg-ones-email" type="text" class="input" placeholder="例如: name@topstep-tech.com" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+            <div style="flex: 1;">
+              <label for="cfg-ones-password" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">密码</label>
+              <input id="cfg-ones-password" type="password" class="input" placeholder="ONES 密码" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="btn-ones-login" type="button" class="button button-primary" style="padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;">🔑 一键同步凭据</button>
+            <span id="ones-login-status" style="font-size: 12px; color: var(--ink-soft);"></span>
+          </div>
+
+          <details style="margin-top: 4px; padding: 8px 12px; background: var(--surface-soft); border-radius: 6px; border: 1px solid var(--line);">
+            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">▼ 高级选项 (Token / 团队 ID)</summary>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+              <div>
+                <label for="cfg-ones-auth-token" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">访问令牌</label>
+                <input id="cfg-ones-auth-token" type="password" class="input" placeholder="从 ONES 个人设置获取" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <div style="flex: 1;">
+                  <label for="cfg-ones-team-uuid" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">团队 UUID</label>
+                  <input id="cfg-ones-team-uuid" type="text" class="input" placeholder="团队 UUID" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                </div>
+                <div style="flex: 1;">
+                  <label for="cfg-ones-user-id" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">用户 ID</label>
+                  <input id="cfg-ones-user-id" type="text" class="input" placeholder="用户 ID" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Tab 3: Hardware -->
+        <div class="settings-tab-pane" data-settings-pane="hardware" style="display: none; flex-direction: column; gap: 12px;">
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口号</label>
+              <input id="cfg-hw-port" type="text" class="input" placeholder="COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+            <div style="flex: 1;">
+              <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
+              <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1;">
+              <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口管道通信</label>
+              <select id="cfg-hw-transport" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="supercom">SuperCom 命名管道 (推荐)</option>
+                <option value="direct">直接打开串口</option>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">真机截图抓取方式</label>
+              <select id="cfg-hw-capture" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="mtp">Windows MTP 传输 (推荐)</option>
+                <option value="serial">串口数据传输</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="settings-error-box" style="display: none; margin: 12px 0 0 0; padding: 8px 12px; border-radius: 4px; background: var(--red-soft); color: var(--red); font-size: 12px;"></div>
+
+      <footer class="dialog-foot" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line);">
+        <button id="cancel-system-settings" class="button button-secondary" type="button">关闭</button>
+        <button id="submit-system-settings" class="button button-primary" type="submit">保存设置</button>
+      </footer>
+    </form>
+  </dialog>
 </body>
 </html>

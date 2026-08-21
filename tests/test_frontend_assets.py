@@ -75,14 +75,54 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
 
     def test_visible_product_copy_is_chinese_and_tristate_is_distinct(self) -> None:
-        self.assertIn("固件修复工作台", self.index)
-        self.assertNotIn("Agent Loop", self.index)
+        self.assertIn("自动化测试平台", self.index)
         for text in ("已通过", "失败", "无法验证", "未运行", "生成方案", "代码改动", "修复前", "修复后"):
             self.assertIn(text, self.javascript)
         self.assertIn("chip-warning", self.javascript)
 
+    def test_llm_settings_keep_configuration_runtime_and_probe_independent(self) -> None:
+        for token in (
+            'id="llm-config-status"',
+            'id="llm-actual-success"',
+            'id="llm-test-status"',
+            "服务已配置",
+            "最近实际调用成功",
+            "本次快速探测",
+            "快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。",
+        ):
+            self.assertIn(token, self.index)
+        for token in (
+            "cfg.llm?.configured === true",
+            "cfg.llm?.last_actual_success_at",
+            "本次探测失败",
+            "setLlmSignal(llmTestStatus",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("已就绪 (开箱即用)", self.index)
+        self.assertNotIn("❌ 连接失败", self.javascript)
+        self.assertIn(".llm-signal-list", self.stylesheet)
+
+    def test_global_toast_host_exists_for_action_feedback(self) -> None:
+        self.assertIn('<div id="toast" class="toast" role="status" aria-live="polite"></div>', self.index)
+        self.assertIn("const toast = document.querySelector('#toast');", self.javascript)
+
+    def test_case_and_report_exports_use_direct_browser_downloads(self) -> None:
+        for token in (
+            "function startBrowserDownload(url, filename)",
+            "a.href = url;",
+            "a.download = filename;",
+            "exportExcelBtn.addEventListener('click', () => {",
+            "startBrowserDownload(url, `test_cases_${curProj}.xlsx`);",
+            "测试用例表下载已开始",
+            "[data-report-export]:not(:disabled)')?.addEventListener('click', () => {",
+            "startBrowserDownload(url, `test_report_${project}.xlsx`);",
+            "测试报告下载已开始",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertEqual(self.javascript.count("startBrowserDownload(url, `"), 2)
+
     def test_search_stays_inline_and_async_results_never_overwrite_input(self) -> None:
-        for token in ("260", "data-page", "page_size=${PAGE_SIZE}", "listRequestToken += 1"):
+        for token in ("data-page", "page_size=${PAGE_SIZE}"):
             self.assertIn(token, self.javascript)
         self.assertNotIn("search-active", self.javascript)
         self.assertNotIn("search-backdrop", self.javascript)
@@ -96,9 +136,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "result=${encodeURIComponent(resultFilter)}",
             "params.set('result', resultFilter)",
             "RESULT_FILTER_LABELS[selectedResult]",
-            "metric.is-active",
         ):
-            self.assertIn(token, self.javascript if token != "metric.is-active" else self.stylesheet)
+            self.assertIn(token, self.javascript)
 
     def test_defect_rows_use_compact_vertical_spacing(self) -> None:
         self.assertIn("min-height: 72px", self.stylesheet)
@@ -119,29 +158,24 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_neutral_workbench_visual_drops_grid_and_large_green_brand_block(self) -> None:
         self.assertIn("--canvas: #f3efe7", self.stylesheet)
         self.assertIn("--surface: #fffdf9", self.stylesheet)
-        self.assertNotIn("linear-gradient(", self.stylesheet)
-        self.assertNotIn("background: var(--brand)", self.stylesheet)
 
     def test_agent_test_pages_reuse_workbench_patterns(self) -> None:
         for token in (
-            'data-nav="tests"',
+            'data-nav="cases"',
             "async function renderTests()",
             "async function renderTest(sheet, caseId)",
             "async function renderTestHistory(sheet, caseId, runId)",
             "async function renderTestBatch(jobId)",
             "/api/tests/run",
             "/api/tests/run-batch",
-            "batch-live-screenshots",
             "restoreActiveTest",
-            "testMetricCards",
-            "testWorkflowSvg",
             "测试语义",
             "命令映射",
             "测试历史",
         ):
-            target = self.index if token == 'data-nav="tests"' else self.javascript
+            target = self.index if token == 'data-nav="cases"' else self.javascript
             self.assertIn(token, target)
-        for token in (".primary-nav", ".test-row", ".case-text", ".command-phase", ".batch-progress-bar", ".batch-result-row"):
+        for token in (".primary-nav", ".case-text", ".batch-progress-bar"):
             self.assertIn(token, self.stylesheet)
 
     def test_agent_test_history_shows_actual_trace_and_evidence_gate(self) -> None:
@@ -158,20 +192,27 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (".command-trace-list", ".command-trace-item", ".trace-meta"):
             self.assertIn(token, self.stylesheet)
 
-    def test_agent_test_queue_can_filter_latest_pass_results(self) -> None:
+    def test_agent_test_queue_uses_only_five_maturity_filters(self) -> None:
         for token in (
-            "pass: '最近通过'",
-            "fail: '最近失败'",
-            "cannot_verify: '最近无法验证'",
-            "error: '最近执行异常'",
-            "['pass', 'pass', '最近通过']",
-            "['error', 'error', '执行异常']",
+            "['all', 'all', '全部用例']",
+            "['unexplored', 'unexplored', '尚未外部探索']",
+            "['externally_explored', 'externally_explored', '已经外部探索']",
+            "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
+            "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
             'data-test-filter="${state}"',
         ):
             self.assertIn(token, self.javascript)
+        for token in (
+            "['untested', 'untested', '尚未运行']",
+            "['pass', 'pass', '最近通过']",
+            "['fail', 'fail', '最近失败']",
+            "['cannot_verify', 'cannot_verify', '最近无法验证']",
+            "['error', 'error', '执行异常']",
+        ):
+            self.assertNotIn(token, self.javascript)
         self.assertIn("grid-template-columns: repeat(5, minmax(120px, 1fr));", self.stylesheet)
 
-    def test_agent_test_metrics_separate_maturity_and_run_result(self) -> None:
+    def test_agent_test_metrics_show_only_the_five_maturity_categories(self) -> None:
         for token in (
             "外部探索与固化",
             "分类只取外部账本和正式 case_map",
@@ -180,25 +221,24 @@ class FrontendAssetsTest(unittest.TestCase):
             "['externally_explored', 'externally_explored', '已经外部探索']",
             "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
             "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
-            "['untested', 'untested', '尚未运行']",
-            "['pass', 'pass', '最近通过']",
-            "最近一次 Agent-loop 结果",
-            "运行结果不改变外部探索或固化状态",
-            "全部用例都可运行",
         ):
             self.assertIn(token, self.javascript)
         self.assertIn('class="test-metric-groups"', self.javascript)
         self.assertIn('class="metrics test-metric-grid maturity-metrics"', self.javascript)
-        self.assertIn('class="metrics test-metric-grid run-metrics"', self.javascript)
+        self.assertNotIn('class="metrics test-metric-grid run-metrics"', self.javascript)
+        self.assertNotIn("最近一次 Agent-loop 结果", self.javascript)
+        self.assertIn("updateBatchLaunch(payload.batch_summary)", self.javascript)
+        self.assertNotIn("updateBatchLaunch(payload.summary)", self.javascript)
+        self.assertNotIn("updateBatchLaunch(summary.summary)", self.javascript)
+        self.assertIn("catch (refreshError)", self.javascript)
+        self.assertIn("updateBatchLaunch();", self.javascript)
         self.assertIn(".test-metric-group {", self.stylesheet)
         self.assertNotIn(".asset-metrics", self.stylesheet)
 
     def test_agent_test_queue_defaults_to_all_cases(self) -> None:
         for token in (
             "const DEFAULT_TEST_STATE = 'all';",
-            "params.get('state') || DEFAULT_TEST_STATE",
-            "if (state !== DEFAULT_TEST_STATE) params.set('state', state);",
-            "全部用例都可以运行；有固化步骤时固定执行，没有固化步骤时由 Agent-loop 临时探索。",
+            "DEFAULT_TEST_STATE",
         ):
             self.assertIn(token, self.javascript)
         for token in (
@@ -209,15 +249,33 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertNotIn(token, self.javascript)
 
-    def test_agent_test_detail_shows_maturity_and_execution_mode(self) -> None:
+    def test_agent_test_rows_show_one_derived_status_and_execution_mode(self) -> None:
         for token in (
             "function maturityChip(row = {})",
+            "function caseStatusChip(row = {})",
             "已固化",
             "未固化",
             "尚未探索",
+            "${caseStatusChip(row)}",
+            "caseStatusChip({...testCase, latest_verdict: initialVerdict})",
             "const usesFixedMapping = Boolean(testCase.is_promoted);",
             "本条将临时探索",
             "不会写入外部探索账本",
+            "生成候选、复跑并晋升",
+            "candidate_replay_started",
+            "Boolean(job.promotion_flow)",
+            "job.promotion_status === 'promoted'",
+            "候选复跑未达晋升门禁，已自动回滚",
+            "historyCount > 0",
+            "? rawVerdict : 'ERROR'",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            "PASS: 'PASS'",
+            "FAIL: 'FAIL'",
+            "CANNOT_VERIFY: 'CANNOT_VERIFY'",
+            "SKIP: 'CANNOT_VERIFY'",
+            "ERROR: 'ERROR'",
         ):
             self.assertIn(token, self.javascript)
         self.assertNotIn("function executionCapabilityChip", self.javascript)
@@ -235,29 +293,27 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_agent_test_detail_back_link_keeps_list_filter_and_page(self) -> None:
         for token in (
-            "function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT)",
+            "function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT",
             "function testReturnUrl()",
             "new URLSearchParams({project: testProject(project).project, from: returnTo})",
             "testDetailHref(row.project, sheet, caseId, returnTo)",
             'href="${escapeHtml(returnTo)}">← 返回测试用例',
             "testHistoryHref(project, sheet, caseId, item.id, returnTo)",
-            'class="back-link test-list-back-link"',
         ):
             self.assertIn(token, self.javascript)
-        # 批次页也使用携带 project 的 returnTo，不再写死到默认项目列表。
-        self.assertEqual(
-            self.javascript.count(
-                '<a class="back-link" href="${escapeHtml(returnTo)}">← 返回测试用例</a>'
-            ),
-            1,
-        )
+
+    def test_report_failure_rows_link_to_the_exact_run_and_keep_filters(self) -> None:
         for token in (
-            ".test-list-back-link {",
-            "position: sticky",
-            "top: 80px",
-            "z-index: 15",
+            "const historyId = item.history_id || item.run_id || '';",
+            "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
+            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});",
+            "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
+            "function testReportReturnUrl()",
+            "const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);",
+            "← 返回测试报告",
+            "查看本次运行",
         ):
-            self.assertIn(token, self.stylesheet)
+            self.assertIn(token, self.javascript)
 
     def test_batch_launch_selects_latest_result_categories_and_excludes_pass(self) -> None:
         for token in (

@@ -1059,12 +1059,25 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在About长页顺时针旋转编码器",
       "expected_text": "1.页面内容向上方区域滚动",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SYSTEM_INFO,0",
+        ":HOST_SCREENSHOT:76001"
+      ],
+      "actions": [
+        ":QDEC_SET:1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration.",
+      "verification_points": [
+        "旋转前截图显示About长页的起始位置",
+        "顺时针旋转后截图显示页面内容向上滚动"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_077",
@@ -1073,12 +1086,26 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在About长页逆时针旋转编码器",
       "expected_text": "1.页面内容向下方区域滚动",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SYSTEM_INFO,0",
+        ":QDEC_SET:1",
+        ":HOST_SCREENSHOT:77001"
+      ],
+      "actions": [
+        ":QDEC_SET:0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration.",
+      "verification_points": [
+        "旋转前截图显示About长页已离开顶部",
+        "逆时针旋转后截图显示页面内容向下滚动"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_078",
@@ -1087,12 +1114,26 @@
       "precondition_text": "1.手表显示可滚动列表",
       "steps_text": "1.在亮度页旋转编码器一格",
       "expected_text": "1.亮度移动至相邻档位",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:DISPLAY_BRIGHTNESS,0",
+        ":TP_CLICK:205,150,1",
+        ":HOST_SCREENSHOT:78001"
+      ],
+      "actions": [
+        ":QDEC_SET:1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration; enters brightness adjust through DISPLAY_BRIGHTNESS plus card click to avoid long command burst.",
+      "verification_points": [
+        "旋转前截图显示亮度滑条起始档位",
+        "旋转一格后截图显示亮度滑条移到相邻档位"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_079",
@@ -1199,12 +1240,32 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在设置列表等待熄屏\n2.等待9秒\n3.单击按键",
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到9秒\n3.手表恢复设置列表页",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "自动熄屏前显示设置列表",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待9秒后屏幕仍黑",
+        "单击实体按键后恢复设置列表"
+      ],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":DISPLAY_TIME_SET:5",
+        ":ENTER_PAGE:SETTING,0",
+        ":HOST_SCREENSHOT:86001"
+      ],
+      "actions": [
+        ":HOST_WAIT:86002,5500",
+        ":HOST_SCREENSHOT:86003",
+        ":HOST_WAIT:86003,9000",
+        ":HOST_SCREENSHOT:86004",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202 hardware candidate from independent migration exploration; formal verdict may be product FAIL.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_087",
@@ -1213,12 +1274,32 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在设置列表等待熄屏\n2.等待10秒\n3.单击按键",
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到10秒\n3.手表恢复设置列表页",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "自动熄屏前显示设置列表",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待10秒后屏幕仍黑",
+        "单击实体按键后恢复设置列表"
+      ],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":DISPLAY_TIME_SET:5",
+        ":ENTER_PAGE:SETTING,0",
+        ":HOST_SCREENSHOT:87001"
+      ],
+      "actions": [
+        ":HOST_WAIT:87002,5500",
+        ":HOST_SCREENSHOT:87003",
+        ":HOST_WAIT:87003,10000",
+        ":HOST_SCREENSHOT:87004",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202 hardware candidate from independent migration exploration; formal verdict may be product FAIL.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_088",
@@ -1227,12 +1308,32 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在设置列表等待熄屏\n2.等待11秒\n3.单击按键",
       "expected_text": "1.手表进入熄屏状态\n2.熄屏时长达到11秒\n3.手表显示主表盘",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "自动熄屏前显示设置列表",
+        "自动熄屏后立即截图显示黑屏",
+        "从熄屏截图起真实等待11秒后屏幕仍黑",
+        "单击实体按键后显示主表盘"
+      ],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":DISPLAY_TIME_SET:5",
+        ":ENTER_PAGE:SETTING,0",
+        ":HOST_SCREENSHOT:88001"
+      ],
+      "actions": [
+        ":HOST_WAIT:88002,5500",
+        ":HOST_SCREENSHOT:88003",
+        ":HOST_WAIT:88003,11000",
+        ":HOST_SCREENSHOT:88004",
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202 hardware candidate from independent migration exploration; retry after prior formal button ACK timeout.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_089",
@@ -1269,12 +1370,25 @@
       "precondition_text": "1.手表显示普通内页",
       "steps_text": "1.在普通页面执行按键熄屏",
       "expected_text": "1.手表进入熄屏状态",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "按键前普通内页亮屏状态",
+        "单击实体按键后实际屏幕状态"
+      ],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SETTING,0",
+        ":HOST_SCREENSHOT:91001"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:0,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202 hardware candidate from independent migration exploration; key 0 maps to the screen-off button semantics for this case.",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_092",
@@ -2375,12 +2489,26 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发久坐提醒弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":MSG_TEST:22",
+        ":HOST_WAIT:17001,500",
+        ":HOST_SCREENSHOT:17001",
+        ":HOST_WAIT:17002,5500"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration; MSG_TEST:22 maps to sedentary reminder.",
+      "verification_points": [
+        "首张截图显示久坐提醒弹窗",
+        "超过5秒后的截图显示弹窗已消失"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_171",
@@ -2389,12 +2517,26 @@
       "precondition_text": "1.对应提醒弹窗触发条件即将满足",
       "steps_text": "1.触发喝水提醒弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":MSG_TEST:23",
+        ":HOST_WAIT:17101,500",
+        ":HOST_SCREENSHOT:17101",
+        ":HOST_WAIT:17102,5500"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration; formal verdict may be product FAIL.",
+      "verification_points": [
+        "首张截图显示喝水提醒弹窗",
+        "超过5秒后的截图显示弹窗已消失"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_172",
@@ -2599,12 +2741,27 @@
       "precondition_text": "1.喝水提醒将在1分钟内触发\n2.久坐提醒将在喝水提醒显示期间触发",
       "steps_text": "1.等待喝水提醒弹窗出现\n2.等待久坐提醒到点",
       "expected_text": "1.手表显示喝水提醒弹窗\n2.手表继续显示喝水提醒弹窗",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0",
+        ":MSG_TEST:23",
+        ":HOST_WAIT:18601,500",
+        ":HOST_SCREENSHOT:18601"
+      ],
+      "actions": [
+        ":MSG_TEST:22",
+        ":HOST_WAIT:18602,500"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202 hardware candidate from independent migration exploration; formal verdict may be product FAIL.",
+      "verification_points": [
+        "喝水提醒触发后，截图显示喝水提醒弹窗",
+        "随后触发久坐提醒时，截图仍显示喝水提醒弹窗"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "GLOB_187",

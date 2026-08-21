@@ -9,12 +9,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在主表盘下滑",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":LANGUAGE_SET:3",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":SWIPE_SIM:1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "真机新探索证据见 evidence/migration_ctrl001_20260818-142442/exploration/exploration.json；当前6202源码确认SWIPE_SIM:1,0为下滑，MTP新图显示控制中心第1页。",
+      "verification_points": [
+        "从主表盘下滑后显示控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_002",
@@ -51,12 +61,21 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.左滑至控制中心第2页",
       "expected_text": "1.页面显示两行三列快捷图标",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:SHORTCUT,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:350,250,60,250,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202真机探索候选：从SHORTCUT页面执行一次坐标左滑，检查控制中心左滑后的实际布局。",
+      "verification_points": [
+        "左滑后页面显示控制中心快捷图标布局"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_005",
@@ -65,12 +84,22 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.左滑至控制中心第3页",
       "expected_text": "1.页面仅显示QR Hub图标",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:SHORTCUT,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:350,250,60,250,0",
+        ":TP_SWIPE:350,250,60,250,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202真机探索候选：从SHORTCUT页面连续执行两次坐标左滑，检查是否出现仅含QR Hub图标的第3页。",
+      "verification_points": [
+        "连续左滑后页面仅显示QR Hub图标"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_006",
@@ -261,12 +290,24 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.从第1页左滑\n2.从第2页左滑",
       "expected_text": "1.手表显示控制中心第2页\n2.手表显示控制中心第3页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "verification_points": [],
+      "setup": [
+        ":ENTER_PAGE:SHORTCUT,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:350,250,60,250,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1",
+        ":TP_SWIPE:350,250,60,250,0",
+        ":HOST_SCREENSHOT:2"
+      ],
+      "verification_points": [
+        "第一次左滑后显示控制中心第2页",
+        "第二次左滑后显示控制中心第3页"
+      ],
       "unable": false,
-      "note": ""
+      "note": "6202真机探索候选：在SHORTCUT页面左滑一次后采图，再左滑一次后采第二张图，分别核对原始第2页和第3页预期。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_020",
@@ -275,12 +316,21 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.在第1页右滑",
       "expected_text": "1.页面保持控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:SHORTCUT,0"
+      ],
+      "actions": [
+        ":TP_SWIPE:60,250,350,250,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202真机探索候选：从SHORTCUT页面执行一次坐标右滑，检查页面是否保持控制中心第1页。",
+      "verification_points": [
+        "在第1页右滑后页面仍保持控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_021",
@@ -331,12 +381,25 @@
       "precondition_text": "1.手表显示控制中心第1页",
       "steps_text": "1.点击高亮勿扰图标",
       "expected_text": "1.勿扰图标变为暗色",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:SHORTCUT,0",
+        ":TP_CLICK:71,283,0",
+        ":TP_CLICK:297,428,0",
+        ":HOST_SCREENSHOT:1"
+      ],
+      "actions": [
+        ":TP_CLICK:71,283,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:2"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "6202真机探索候选：进入SHORTCUT后点击勿扰，在真机确认弹窗中点击确认按钮(297,428)建立高亮前置，再次点击勿扰并采集关闭后的状态。",
+      "verification_points": [
+        "点击前勿扰图标为高亮",
+        "点击高亮勿扰图标后图标变为暗色"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CTRL_025",

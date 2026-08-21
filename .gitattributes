@@ -1,16 +1,25 @@
-# Declare text and binary formats without forcing an end-of-line conversion.
-*.md text
-*.py text
-*.json text
-*.toml text
-*.yml text
-*.yaml text
-*.html text
-*.css text
-*.js text
-*.ps1 text
-*.cmd text
-*.bat text
+# New text is UTF-8 by project policy. Keep LF in portable sources and CRLF in
+# Windows command files. This declaration does not require a bulk renormalize.
+* text=auto
+
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.pyi text eol=lf
+*.proto text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
 
 *.bmp binary
 *.png binary

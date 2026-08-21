@@ -19,6 +19,7 @@ from agent_loop_system.tools.test import (
     save_evidence,
 )
 from agent_loop_system.tools.case_map import CaseRunResult
+from agent_loop_system.tools.llm_retry import LLMRetryError
 
 
 class AggregateVerdictsTest(unittest.TestCase):
@@ -68,9 +69,22 @@ class SaveEvidenceTest(unittest.TestCase):
     def test_custom_path_and_execution_status_are_preserved(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "job" / "result.json"
-            result = CaseRunResult(case_id="CALC_001", sheet="计算器", expected_text="显示正确")
+            result = CaseRunResult(
+                case_id="CALC_001",
+                sheet="计算器",
+                expected_text="显示正确",
+                provenance={
+                    "target": "simulator",
+                    "case_map_profile": "620C_W6830",
+                    "project": "620C_W6830",
+                    "artifact_path": "D:/sim/main.exe",
+                    "artifact_sha256": "A" * 64,
+                },
+            )
             save_evidence(result, Verdict(verdict="PASS", reason="符合预期"), output)
             payload = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(payload["schema_version"], 3)
+        self.assertEqual(payload["provenance"], result.provenance)
         self.assertEqual(payload["verdict"], "PASS")
         self.assertEqual(payload["reason"], "符合预期")
 
@@ -159,7 +173,7 @@ class VisionEvidenceTest(unittest.TestCase):
         with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
-            "agent_loop_system.tools.test.invoke_with_retry", side_effect=lambda fn: fn()
+            "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
         ):
             verdict = judge_with_vision(*args, **kwargs)
         return verdict, captured["content"]
@@ -238,7 +252,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
-            "agent_loop_system.tools.test.invoke_with_retry", side_effect=lambda fn: fn()
+            "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
         ):
             verdict = judge_test_with_vision("先显示按钮，点击后显示测量中", screenshots, verification_points)
         return verdict, captured.get("content", [])
@@ -284,6 +298,30 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
                 )
         self.assertEqual(verdict.verdict, "CANNOT_VERIFY")
         self.assertIn("需要 2 张截图", verdict.reason)
+
+    def test_vision_api_retry_error_is_labeled(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            screenshot = Path(tmp) / "screenshot.bmp"
+            Image.new("RGB", (4, 4), "white").save(screenshot)
+
+            class FakeLLM:
+                def with_structured_output(self, _schema):
+                    return object()
+
+            with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
+                "langchain_openai.ChatOpenAI", return_value=FakeLLM()
+            ), mock.patch(
+                "agent_loop_system.tools.test.invoke_llm_with_retry",
+                side_effect=LLMRetryError("APIConnectionError: Connection error."),
+            ):
+                verdict = judge_test_with_vision(
+                    "显示控制中心",
+                    [{"path": str(screenshot)}],
+                    ["显示控制中心"],
+                )
+
+        self.assertEqual(verdict.verdict, "CANNOT_VERIFY")
+        self.assertIn("识图 Agent API 出错", verdict.reason)
 
     def test_runner_gate_returns_error_before_visual_judgement(self) -> None:
         result = CaseRunResult(

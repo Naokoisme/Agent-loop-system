@@ -107,12 +107,22 @@
       "precondition_text": "1.手表显示Flashlight开启页",
       "steps_text": "1.点击屏幕",
       "expected_text": "1.页面切换为黑底浅色图标，仍停留Flashlight",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:FLASHLIGHT,0"
+      ],
+      "actions": [
+        ":TP_CLICK:205,251,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "显式回表盘后进入Flashlight；点击当前410×502页面中心切换开关态。",
+      "verification_points": [
+        "点击屏幕后页面切换为黑底浅色图标，且仍停留Flashlight"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "FLASH_009",

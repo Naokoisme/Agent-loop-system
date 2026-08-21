@@ -19,6 +19,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from agent_loop_system.tools.mtp_screenshot import (
+    DEFAULT_USB_TIMEOUT,
+    WindowsMtpSystem,
+)
 from agent_loop_system.tools.watch_ble import (
     WatchBleClient,
     WatchBleDevice,
@@ -58,6 +62,14 @@ class _ScreenshotClient(Protocol):
     ) -> WatchBleScreenshotResult: ...
 
     async def close(self) -> None: ...
+
+
+class _SharedSerialSession(Protocol):
+    def write_shell_line(self, line: str) -> None: ...
+
+
+class _UsbSystem(Protocol):
+    def wait_for_usb(self, *, present: bool, timeout: float) -> None: ...
 
 
 ClientBuilder = Callable[[WatchBleDevice, float], _ScreenshotClient]
@@ -140,8 +152,11 @@ class BleCaptureProvider:
         self,
         address: str,
         *,
+        serial_session: _SharedSerialSession,
         sequence_start: int | None = None,
         scan_timeout: float = DEFAULT_BLE_SCAN_TIMEOUT,
+        usb_timeout: float = DEFAULT_USB_TIMEOUT,
+        usb_system: _UsbSystem | None = None,
         scanner: object | None = None,
         client_builder: ClientBuilder | None = None,
     ) -> None:
@@ -156,9 +171,14 @@ class BleCaptureProvider:
             or not 0 <= sequence_start <= _UINT32_MAX
         ):
             raise ValueError("sequence_start must be a uint32")
+        if serial_session is None:
+            raise ValueError("serial_session is required")
 
         self.address = address_value
+        self.serial_session = serial_session
         self.scan_timeout = _positive_timeout("scan_timeout", scan_timeout)
+        self.usb_timeout = _positive_timeout("usb_timeout", usb_timeout)
+        self.usb_system = usb_system or WindowsMtpSystem()
         self.scanner = scanner
         self.client_builder = client_builder or _default_client_builder
         self._next_sequence = sequence_start
@@ -193,6 +213,35 @@ class BleCaptureProvider:
         self._next_sequence = sequence + 1
         return sequence
 
+    def _close_usb(self) -> None:
+        try:
+            self.serial_session.write_shell_line("dal_usb close")
+            self.usb_system.wait_for_usb(
+                present=False,
+                timeout=self.usb_timeout,
+            )
+        except Exception as exc:
+            raise BleCaptureProviderError(
+                "could not close USB before BLE screenshot"
+            ) from exc
+
+    def _restore_usb(self) -> None:
+        last_error: Exception | None = None
+        for _attempt in range(2):
+            try:
+                self.serial_session.write_shell_line("dal_usb open")
+                self.usb_system.wait_for_usb(
+                    present=True,
+                    timeout=self.usb_timeout,
+                )
+            except Exception as exc:
+                last_error = exc
+                continue
+            return
+        raise BleCaptureProviderError(
+            "could not restore USB after BLE screenshot"
+        ) from last_error
+
     async def _capture_once(
         self,
         output_path: Path,
@@ -206,6 +255,7 @@ class BleCaptureProvider:
             nonlocal client
             devices = await scan_watches(
                 timeout=min(self.scan_timeout, timeout),
+                address=self.address,
                 scanner=self.scanner,
             )
             device = select_watch(devices, address=self.address)
@@ -254,16 +304,28 @@ class BleCaptureProvider:
                         )
                     )
 
-                future = self._executor.submit(run_capture)
                 try:
-                    result, device = future.result(
-                        timeout=timeout_value + _CLOSE_TIMEOUT + 1.0
-                    )
-                except concurrent.futures.TimeoutError as exc:
-                    future.cancel()
-                    raise BleCaptureProviderTimeoutError(
-                        f"BLE screenshot sequence={sequence} did not stop after timeout"
-                    ) from exc
+                    self._close_usb()
+                    future = self._executor.submit(run_capture)
+                    try:
+                        result, device = future.result(
+                            timeout=timeout_value + _CLOSE_TIMEOUT + 1.0
+                        )
+                    except concurrent.futures.TimeoutError as exc:
+                        future.cancel()
+                        raise BleCaptureProviderTimeoutError(
+                            f"BLE screenshot sequence={sequence} did not stop after timeout"
+                        ) from exc
+                except BaseException as exc:
+                    try:
+                        self._restore_usb()
+                    except BaseException as restore_error:
+                        exc.add_note(
+                            f"restoring USB also failed: {restore_error}"
+                        )
+                    raise
+                else:
+                    self._restore_usb()
                 bmp = output.read_bytes()
 
             if result.sequence != sequence:

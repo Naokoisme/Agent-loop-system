@@ -87,6 +87,57 @@ def test_hardware_single_case_uses_6202_map_and_preserves_external_lease() -> No
     assert len(result.screenshots) == 1
 
 
+def test_hardware_single_case_can_use_an_explicit_external_executor() -> None:
+    case = CaseEntry(
+        case_id="SET_164",
+        sheet="设置",
+        steps_text="从App发起查找手表",
+        expected_text="手表显示查找设备提醒",
+    )
+    expected = CaseRunResult(
+        case_id=case.case_id,
+        sheet=case.sheet,
+        expected_text=case.expected_text,
+        execution_mode="external_ble_adapter",
+    )
+    executor = mock.Mock(return_value=expected)
+
+    with (
+        tempfile.TemporaryDirectory() as temporary,
+        mock.patch(
+            "agent_loop_system.tools.test.load_case_map",
+            return_value={case.case_id: case},
+        ),
+        mock.patch(
+            "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
+        ) as target_check,
+        mock.patch(
+            "agent_loop_system.tools.test._run_agent_exploration"
+        ) as exploration,
+    ):
+        screenshot = str(Path(temporary) / "capture.bmp")
+        result = run_single_case(
+            "设置",
+            case.case_id,
+            screenshot,
+            target="hardware",
+            case_map_profile="6202_W5230",
+            external_executor=executor,
+        )
+
+    assert result is expected
+    assert result.provenance == {
+        "target": "hardware",
+        "case_map_profile": "6202_W5230",
+        "project": "6202_W5230",
+        "artifact_path": "",
+        "artifact_sha256": "",
+    }
+    target_check.assert_called_once_with()
+    executor.assert_called_once_with(case, screenshot)
+    exploration.assert_not_called()
+
+
 def test_graph_case_mode_uses_the_same_single_case_runner() -> None:
     from agent_loop_system import graph as graph_module
 

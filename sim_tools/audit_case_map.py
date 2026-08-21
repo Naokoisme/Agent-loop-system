@@ -16,10 +16,16 @@ from pydantic import ValidationError
 
 from agent_loop_system.tools.case_map import (
     CaseEntry,
+    OBSERVATION_ONLY_COMMANDS,
     case_map_dir_for_target,
-    effective_case_entries,
+    validated_case_entries,
 )
 from agent_loop_system.tools.command_protocol import normalize_command
+from agent_loop_system.tools.external_execution_history import (
+    ExternalExecutionHistoryError,
+    ExternalExecutionRecord,
+    read_external_execution_history,
+)
 from sim_tools.extract_kb import extract_commands, extract_windows
 
 
@@ -42,9 +48,6 @@ BUTTON_TERMS = (
 TOUCH_PRESS_TERMS = ("长按",)
 ROTATE_TERMS = ("旋转编码器", "顺时针旋转", "逆时针旋转", "编码器一格")
 WAIT_TERMS = ("等待", "保持无操作", "静置", "无操作")
-LEDGER_FIELDS = {
-    "case_id", "sheet", "target", "last_verified", "evidence_root", "evidence_paths"
-}
 LEDGER_TARGETS = {
     "620C_simulator_case_map": "620C_W6830",
     "6202_case_map": "6202_W5230",
@@ -156,96 +159,50 @@ def audit_case_maps(
     seen_case_ids: dict[str, str] = {}
     seen_case_sheets: dict[str, str] = {}
     ledger_ids: set[str] = set()
-    ledger_records: dict[str, dict] = {}
+    ledger_records: dict[str, ExternalExecutionRecord] = {}
     ledger_path = case_map_dir / "external_execution_history.jsonl"
-    if ledger_path.is_file():
-        for line_number, line in enumerate(
-            ledger_path.read_text(encoding="utf-8").splitlines(),
-            1,
-        ):
-            if not line.strip():
-                continue
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError as exc:
-                issues.append(AuditIssue(
-                    "error",
-                    "invalid_external_ledger_json",
-                    ledger_path.name,
-                    f"line:{line_number}",
-                    str(exc),
-                ))
-                continue
-            case_id = str(record.get("case_id") or "").strip() if isinstance(record, dict) else ""
-            if not case_id:
-                issues.append(AuditIssue(
-                    "error",
-                    "external_ledger_case_id_missing",
-                    ledger_path.name,
-                    f"line:{line_number}",
-                    "外部探索记录缺少 case_id",
-                ))
-            elif case_id in ledger_ids:
-                issues.append(AuditIssue(
-                    "error",
-                    "duplicate_external_ledger_case_id",
-                    ledger_path.name,
-                    case_id,
-                    "外部探索账本中的 case_id 必须唯一",
-                ))
-            else:
-                ledger_ids.add(case_id)
-                ledger_records[case_id] = record
-                if set(record) != LEDGER_FIELDS:
-                    issues.append(AuditIssue(
-                        "error",
-                        "external_ledger_schema_mismatch",
-                        ledger_path.name,
-                        case_id,
-                        f"账本字段必须精确为 {sorted(LEDGER_FIELDS)}",
-                    ))
-                expected_target = LEDGER_TARGETS.get(case_map_dir.name)
-                if expected_target and str(record.get("target") or "") != expected_target:
-                    issues.append(AuditIssue(
-                        "error",
-                        "external_ledger_target_mismatch",
-                        ledger_path.name,
-                        case_id,
-                        f"target 必须是 {expected_target}",
-                    ))
-                for field in ("sheet", "target", "last_verified", "evidence_root"):
-                    if not str(record.get(field) or "").strip():
-                        issues.append(AuditIssue(
-                            "error",
-                            "external_ledger_fact_missing",
-                            ledger_path.name,
-                            case_id,
-                            f"账本字段 {field} 不能为空",
-                        ))
-                evidence_paths = record.get("evidence_paths")
-                if not isinstance(evidence_paths, list) or not evidence_paths or not all(
-                    str(path).strip() for path in evidence_paths
-                ):
-                    issues.append(AuditIssue(
-                        "error",
-                        "external_ledger_evidence_missing",
-                        ledger_path.name,
-                        case_id,
-                        "evidence_paths 必须包含本轮真实证据路径",
-                    ))
-    else:
+    ledger_valid = True
+    try:
+        records = read_external_execution_history(
+            ledger_path,
+            expected_target=LEDGER_TARGETS.get(case_map_dir.name),
+        )
+    except ExternalExecutionHistoryError as exc:
+        ledger_valid = False
+        location = (
+            exc.case_id
+            or (f"line:{exc.line_number}" if exc.line_number is not None else "<ledger>")
+        )
         issues.append(AuditIssue(
             "error",
-            "external_ledger_missing",
+            exc.code,
             ledger_path.name,
-            "<ledger>",
-            "缺少 external_execution_history.jsonl",
+            location,
+            exc.message,
         ))
+    else:
+        ledger_ids = {record.case_id for record in records}
+        ledger_records = {record.case_id: record for record in records}
 
     for path in sorted(case_map_dir.glob("*.json")):
         counts["files"] += 1
         data = json.loads(path.read_text(encoding="utf-8"))
-        raw_entries = effective_case_entries(data)
+        try:
+            raw_entries = validated_case_entries(
+                data,
+                sheet_name=path.stem,
+                expected_profile=LEDGER_TARGETS.get(case_map_dir.name),
+                path=path.resolve(),
+            )
+        except ValueError as exc:
+            issues.append(AuditIssue(
+                "error",
+                "case_map_metadata_mismatch",
+                path.name,
+                "<file>",
+                str(exc),
+            ))
+            continue
         for raw in raw_entries:
             counts["total"] += 1
             raw_case_id = str(raw.get("case_id", "<missing>"))
@@ -284,7 +241,7 @@ def audit_case_maps(
             else:
                 counts["unexplored"] += 1
 
-            if case.is_promoted and not external_explored:
+            if ledger_valid and case.is_promoted and not external_explored:
                 issues.append(AuditIssue(
                     "error",
                     "promoted_without_external_exploration",
@@ -308,13 +265,6 @@ def audit_case_maps(
                         "unsolidified_has_mapping",
                         *label,
                         "未固化用例不得长期保留固定步骤或验证点",
-                    ))
-                if case.unable:
-                    issues.append(AuditIssue(
-                        "error",
-                        "legacy_unable_gate",
-                        *label,
-                        "unable 不再参与分类或运行入口",
                     ))
                 continue
 
@@ -400,7 +350,7 @@ def audit_case_maps(
 
             expected_items = len(re.findall(r"(?m)^\s*\d+[.、）]", case.expected_text))
             business_actions = sum(
-                name not in {"GUI_TREE", "GUI_PING", "SCREENSHOT_PRINT", "HOST_SCREENSHOT"}
+                name not in OBSERVATION_ONLY_COMMANDS
                 for name in phase_names["actions"]
             )
             if (
@@ -427,7 +377,7 @@ def audit_case_maps(
     for case_id in sorted(ledger_ids.intersection(seen_case_ids)):
         record = ledger_records[case_id]
         expected_sheet = seen_case_sheets[case_id]
-        if str(record.get("sheet") or "") != expected_sheet:
+        if record.sheet != expected_sheet:
             issues.append(AuditIssue(
                 "error",
                 "external_ledger_sheet_mismatch",
