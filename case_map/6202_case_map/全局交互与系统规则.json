@@ -1060,7 +1060,6 @@
       "steps_text": "1.在About长页顺时针旋转编码器",
       "expected_text": "1.页面内容向上方区域滚动",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:SYSTEM_INFO,0",
         ":HOST_SCREENSHOT:76001"
@@ -1087,7 +1086,6 @@
       "steps_text": "1.在About长页逆时针旋转编码器",
       "expected_text": "1.页面内容向下方区域滚动",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:SYSTEM_INFO,0",
         ":QDEC_SET:1",
@@ -1115,7 +1113,6 @@
       "steps_text": "1.在亮度页旋转编码器一格",
       "expected_text": "1.亮度移动至相邻档位",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:DISPLAY_BRIGHTNESS,0",
         ":TP_CLICK:205,150,1",
@@ -1247,7 +1244,6 @@
         "单击实体按键后恢复设置列表"
       ],
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":DISPLAY_TIME_SET:5",
         ":ENTER_PAGE:SETTING,0",
@@ -1281,7 +1277,6 @@
         "单击实体按键后恢复设置列表"
       ],
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":DISPLAY_TIME_SET:5",
         ":ENTER_PAGE:SETTING,0",
@@ -1315,7 +1310,6 @@
         "单击实体按键后显示主表盘"
       ],
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":DISPLAY_TIME_SET:5",
         ":ENTER_PAGE:SETTING,0",
@@ -1375,7 +1369,6 @@
         "单击实体按键后实际屏幕状态"
       ],
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:SETTING,0",
         ":HOST_SCREENSHOT:91001"
@@ -2490,7 +2483,6 @@
       "steps_text": "1.触发久坐提醒弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0"
       ],
       "actions": [
@@ -2518,7 +2510,6 @@
       "steps_text": "1.触发喝水提醒弹窗",
       "expected_text": "1.弹窗在5秒到达时消失",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0"
       ],
       "actions": [
@@ -2742,7 +2733,6 @@
       "steps_text": "1.等待喝水提醒弹窗出现\n2.等待久坐提醒到点",
       "expected_text": "1.手表显示喝水提醒弹窗\n2.手表继续显示喝水提醒弹窗",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":MSG_TEST:23",
         ":HOST_WAIT:18601,500",

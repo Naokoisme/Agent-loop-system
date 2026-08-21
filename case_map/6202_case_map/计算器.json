@@ -112,7 +112,6 @@
       "steps_text": "1.点击任一数字键",
       "expected_text": "1.数值区仍保持原9位内容，不显示提示",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:CALCULATOR,0",
         ":TP_CLICK:64,365,1",
@@ -142,7 +141,6 @@
       "steps_text": "1.输入1234567.8\n2.点击数字9",
       "expected_text": "1.数值区显示1234567.8共9位\n2.第10位输入无响应",
       "setup": [
-        ":LANGUAGE_SET:3",
         ":ENTER_PAGE:DIAL,0",
         ":ENTER_PAGE:CALCULATOR,0",
         ":TP_CLICK:111,149,1"

@@ -202,6 +202,35 @@ class CaseMapDataContractTest(unittest.TestCase):
         ]
         self.assertFalse(any("LANGUAGE_SET" in wire for wire in commands))
 
+    def test_6202_promoted_steps_do_not_force_language_3(self) -> None:
+        affected_ids = {
+            "CALC_005",
+            "CALC_006",
+            "CTRL_001",
+            "GLOB_076",
+            "GLOB_077",
+            "GLOB_078",
+            "GLOB_086",
+            "GLOB_087",
+            "GLOB_088",
+            "GLOB_091",
+            "GLOB_170",
+            "GLOB_171",
+            "GLOB_186",
+        }
+        cases = _cases("6202_case_map")
+
+        for case_id, item in cases.items():
+            commands = [
+                wire
+                for field in ("setup", "actions", "collect")
+                for wire in item.get(field, [])
+            ]
+            self.assertNotIn(":LANGUAGE_SET:3", commands, case_id)
+
+        for case_id in affected_ids:
+            self.assertEqual(cases[case_id].get("mapping_status"), "PROMOTED", case_id)
+
     def test_620c_promotions_if_any_have_formal_steps(self) -> None:
         cases = _cases("620C_simulator_case_map")
         promoted = [
