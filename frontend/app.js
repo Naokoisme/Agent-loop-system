@@ -1790,11 +1790,33 @@ async function renderTests() {
   // --- F12: Excel 导出功能 ---
   const exportExcelBtn = document.querySelector('#export-excel-btn');
   if (exportExcelBtn) {
-    exportExcelBtn.addEventListener('click', () => {
-      const curProj = projectSelect.value;
+    exportExcelBtn.addEventListener('click', async () => {
+      const curProj = projectSelect ? projectSelect.value : (new URLSearchParams(window.location.search).get('project') || '620C_W6830');
       const url = `/api/cases/export?project=${encodeURIComponent(curProj)}`;
-      showToast(`正在生成 ${testProject(curProj).projectLabel} 的 Excel 测试用例表…`);
-      window.location.href = url;
+      const pLabel = testProject(curProj)?.projectLabel || curProj;
+      showToast(`正在生成 ${pLabel} 的 Excel 测试用例表…`);
+      exportExcelBtn.disabled = true;
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => null);
+          throw new Error(errData?.error || `HTTP ${resp.status}`);
+        }
+        const blob = await resp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `test_cases_${curProj}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+        showToast(`✅ ${pLabel} 测试用例表导出成功！`);
+      } catch (err) {
+        showToast(`❌ 导出失败: ${err.message}`, 'error');
+      } finally {
+        exportExcelBtn.disabled = false;
+      }
     });
   }
 
@@ -3231,7 +3253,10 @@ function initSystemSettings() {
         } else {
           if (llmTestStatus) {
             llmTestStatus.style.color = '#ef4444';
-            llmTestStatus.textContent = `❌ 连接失败: ${data.error || data.message || '未知错误'}`;
+            const cat = data.error_category ? `[${data.error_category}] ` : '';
+            const sug = data.suggestion ? ` · ${data.suggestion}` : '';
+            const detail = data.error || data.message || '未知错误';
+            llmTestStatus.textContent = `❌ 连接失败: ${cat}${detail}${sug}`;
           }
         }
       } catch (err) {
@@ -3697,10 +3722,27 @@ function ReportsPage(project = currentProject()) {
         history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module}));
         route();
       }));
-      root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
+      root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', async () => {
         const query = new URLSearchParams({project, from: data.filters.from, to: data.filters.to});
         if (data.filters.module) query.set('module', data.filters.module);
-        location.href = `/api/reports/export?${query.toString()}`;
+        const url = `/api/reports/export?${query.toString()}`;
+        showToast('正在导出测试报告 Excel…');
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const blob = await resp.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = `test_report_${project}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+          showToast('✅ 测试报告导出成功！');
+        } catch (err) {
+          showToast(`❌ 报告导出失败: ${err.message}`, 'error');
+        }
       });
     },
     destroy() {}
