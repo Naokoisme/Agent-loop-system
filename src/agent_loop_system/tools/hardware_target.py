@@ -204,8 +204,6 @@ def hardware_command_allowed(command_name: str) -> tuple[bool, str | None]:
     name = str(command_name or "").strip().upper()
     if not name:
         return False, "命令名为空"
-    if name == "TEST_SESSION":
-        return False, "TEST_SESSION 由用户在批次前外部管理，不交给 Agent 直接调用"
     if name.startswith("SIM_"):
         return False, "SIM_* 仅用于 PC 模拟器，不发送到真机"
     reason = dangerous_command_reason(f":{name}:")

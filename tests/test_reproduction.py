@@ -483,6 +483,64 @@ class InteractiveReproduceTest(unittest.TestCase):
             payload = json.loads((Path(tempdir) / "trace.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["outcome"], "CURRENT_CONFORMS")
 
+    def test_test_case_visual_judgement_forwards_project(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            session = FakeInteractiveSession()
+            visual_judge = mock.Mock(
+                return_value=Verdict(verdict="PASS", reason="中英文文案等价")
+            )
+            with (
+                mock.patch(
+                    "agent_loop_system.tools.build.BuildConfig.from_env",
+                    return_value=object(),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.build.run_build",
+                    return_value=BuildResult(
+                        success=True,
+                        artifact_path="D:/isolated/main.exe",
+                    ),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.agent.decide_reproduction_action",
+                    return_value=ReproductionDecision(
+                        action=ReproductionAction.READY_TO_JUDGE,
+                        reason="目标文案已经清楚可见",
+                    ),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.test.judge_test_with_vision",
+                    visual_judge,
+                ),
+                mock.patch(
+                    "agent_loop_system.reproduction.SimulatorSession",
+                    return_value=session,
+                ),
+                mock.patch(
+                    "agent_loop_system.reproduction.load_current_command_capabilities",
+                    return_value={},
+                ),
+            ):
+                trace = interactive_reproduce(
+                    task_id="6202-locale",
+                    objective="验证 Timer 入口",
+                    source_files=[],
+                    defect_image_paths=[],
+                    evidence_dir=tempdir,
+                    test_case={
+                        "expected_text": "显示 Timer 入口",
+                        "project": "6202_W5230",
+                    },
+                )
+
+            self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
+            visual_judge.assert_called_once()
+            self.assertEqual(visual_judge.call_args.args[0], "显示 Timer 入口")
+            self.assertEqual(
+                visual_judge.call_args.kwargs["project"],
+                "6202_W5230",
+            )
+
     def test_hardware_target_skips_simulator_build_and_display_time_change(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             session = FakeInteractiveSession()

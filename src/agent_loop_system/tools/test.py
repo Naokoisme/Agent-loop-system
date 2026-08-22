@@ -39,6 +39,7 @@ from agent_loop_system.tools.llm_retry import (
     invoke_llm_with_retry,
 )
 from agent_loop_system.tools.simulator import SimulatorSession
+from agent_loop_system.tools.visual_translations import visual_translation_context
 
 DEFAULT_SIM_EXE = r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe"
 EVIDENCE_DIR = Path(r"d:\Agent-loop-system\evidence")
@@ -318,6 +319,8 @@ def judge_test_with_vision(
     expected_text: str,
     screenshots: list[dict[str, object]],
     verification_points: list[str] | None = None,
+    *,
+    project: str = "",
 ) -> Verdict:
     """只根据检查点截图判定普通测试；命令输出和 GUI_TREE 不进入 LLM。"""
     from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
@@ -359,10 +362,19 @@ def judge_test_with_vision(
     point_text = "\n".join(
         f"{index}. {point}" for index, point in enumerate(points, start=1)
     ) or "未单列验证点；使用最终截图核对完整预期结果。"
+    translation_context = visual_translation_context(
+        project,
+        [expected_text, *points],
+    )
+    translation_section = (
+        f"\n\n{translation_context}\n" if translation_context else ""
+    )
     prompt = (
-        "你是嵌入式手表自动测试的视觉判定器。产品 PASS/FAIL 的唯一证据是下方模拟器截图。\n\n"
+        "你是嵌入式手表自动测试的视觉判定器。产品状态的唯一证据是下方截图；"
+        "翻译对照只用于解释截图中肉眼可见的文字。\n\n"
         f"预期结果：\n{expected_text}\n\n"
-        f"按顺序对应的验证点：\n{point_text}\n\n"
+        f"按顺序对应的验证点：\n{point_text}"
+        f"{translation_section}\n"
         "判定约束：\n"
         "- 只能依据截图中肉眼可见的界面内容判定，不得假设或索要 GUI_TREE、控件属性、页面名、终端 JSON 或命令结果。\n"
         "- 验证点与截图按序一一对应；有多个验证点时，必须逐张核对。\n"
@@ -425,6 +437,7 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
         result.expected_text,
         result.screenshots,
         result.verification_points,
+        project=str(result.provenance.get("project") or ""),
     )
     return CaseDecision(verdict=visual.verdict, reason=visual.reason)
 
@@ -519,6 +532,7 @@ def _run_agent_exploration(
     *,
     screenshot_path: str,
     target: str,
+    project: str,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
 
@@ -542,6 +556,7 @@ def _run_agent_exploration(
         "precondition_text": case.precondition_text,
         "steps_text": case.steps_text,
         "expected_text": case.expected_text,
+        "project": project,
     }
     trace = interactive_reproduce(
         task_id=f"case-{case.case_id}",
@@ -706,6 +721,7 @@ def run_single_case(
                 case,
                 screenshot_path=screenshot_path,
                 target=target,
+                project=str(provenance.get("project") or ""),
             ),
             provenance=provenance,
         )

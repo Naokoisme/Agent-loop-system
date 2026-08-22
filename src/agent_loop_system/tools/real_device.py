@@ -184,7 +184,7 @@ def query_test_session_status(
     timeout: float = 8.0,
     serial_session: Any | None = None,
 ) -> TestSessionStatus:
-    """Read the externally managed firmware test-session state without renewing it."""
+    """Read the current firmware test-session state without renewing it."""
 
     if timeout <= 0:
         raise ValueError("timeout must be positive")
@@ -219,7 +219,7 @@ def bootstrap_test_session(
     command_timeout: float = 8.0,
     serial_session: Any | None = None,
 ) -> TestSessionBootstrapResult:
-    """Establish the externally owned batch test session exactly once.
+    """Establish the runner-controlled batch test session exactly once.
 
     This is deliberately separate from :class:`RealDeviceSession`.  It first
     proves that the GUI command subscriber is alive, then sends one idempotent
@@ -352,11 +352,11 @@ def bootstrap_test_session(
 class RealDeviceSession:
     """A ``SimulatorSession``-compatible facade for a physical W30 device.
 
-    The 24-hour firmware test session is an external batch precondition.
-    ``start`` never starts, renews, or stops that lease.  It only opens the
-    transport and waits for ``GUI_PING`` to be processed.  Capture providers
-    allocate a new positive sequence for every requested evidence frame, so
-    startup does not take an unused baseline screenshot.
+    The batch controller establishes the 24-hour firmware test session before
+    creating individual case sessions. ``start`` does not renew or stop that
+    lease; it opens the transport and waits for ``GUI_PING`` to be processed.
+    Capture providers allocate a new positive sequence for every requested
+    evidence frame, so startup does not take an unused baseline screenshot.
     """
 
     def __init__(

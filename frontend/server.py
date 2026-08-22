@@ -2868,11 +2868,11 @@ class CaseTestManager:
         if execution_target == "hardware":
             try:
                 from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-                from agent_loop_system.tools.real_device import query_test_session_status
+                from agent_loop_system.tools.real_device import bootstrap_test_session
 
                 _load_test_runtime_environment()
                 HardwareTargetConfig.from_env()
-                status = query_test_session_status(
+                bootstrap = bootstrap_test_session(
                     evidence_dir=(
                         self.paths.runtime_jobs
                         / job_id
@@ -2880,15 +2880,18 @@ class CaseTestManager:
                         / "test-session"
                     ),
                 )
+                status = bootstrap.status
                 check = {
                     "checked_at": _now(),
                     "active": status.active,
                     "lease_seconds": status.lease_seconds,
+                    "start_sent": bootstrap.start_sent,
+                    "gui_ping_attempts": bootstrap.gui_ping_attempts,
+                    "bootstrap_event_seen": bootstrap.bootstrap_event_seen,
                 }
                 if not status.active:
                     raise RuntimeError(
-                        "手表 24 小时测试模式未开启或已到期；"
-                        "请先在手表端开启，再启动批次"
+                        "手表测试会话启动后仍未进入 active"
                     )
             except Exception as exc:
                 with self._lock:
@@ -2900,7 +2903,7 @@ class CaseTestManager:
                         "error": str(exc),
                     }
                     job["status"] = "failed"
-                    job["error"] = f"真机批次前置检查失败: {exc}"
+                    job["error"] = f"真机批次启动失败: {exc}"
                     job["finished_at"] = _now()
                     job["current_node"] = None
                     self._release_execution_slot_locked(job_id)
