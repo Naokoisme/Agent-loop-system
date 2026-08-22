@@ -83,8 +83,9 @@ case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_ma
 
 ## 真机安全边界
 
-- 6202 真机批次由 Runner 在启动或设备重启恢复后发送 `TEST_SESSION:START` 并等待
-  `active`；不要求外部预先持有测试会话，普通用例结束也不发送 `STOP`。
+- 6202 真机批次在每条用例启动前由 Runner 受控重启设备、恢复 GUI/USB、发送
+  `TEST_SESSION:START`，并确认 `DIAL + popup=null`；不要求外部预先持有测试会话，
+  普通用例结束也不发送 `STOP`。
 - MTP 是 6202 默认截图链路；BLE 已通过真实完整 BMP 功能验证，但当前性能不足，不切换默认值。
 - 构建、刷机和真机操作是分别授权的活动；构建许可不包含刷机许可。
 - 不自动修改 Git remote，不自动 push，不在其他 Agent 活跃写入期间操作共享 branch 或 index。

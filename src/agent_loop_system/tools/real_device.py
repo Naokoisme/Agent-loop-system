@@ -6,7 +6,7 @@ import math
 import os
 import shutil
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -20,7 +20,11 @@ from agent_loop_system.tools.hardware_serial import (
     HardwareSerialTimeoutError,
     SuperComPipeTransport,
 )
-from agent_loop_system.tools.mtp_screenshot import MtpCaptureProvider
+from agent_loop_system.tools.mtp_screenshot import (
+    MtpCaptureProvider,
+    MtpSystem,
+    WindowsMtpSystem,
+)
 from agent_loop_system.tools.watch_ble_provider import (
     DEFAULT_BLE_SCAN_TIMEOUT,
     BleCaptureProvider,
@@ -31,6 +35,9 @@ _GUI_COMMANDS = frozenset({"GUI_PING", "GUI_STATE", "GUI_TREE"})
 _MAX_HANDSHAKE_SEQ = 2_147_483_647
 _TEST_SESSION_START = ":TEST_SESSION:START"
 _TEST_SESSION_STATUS = ":TEST_SESSION:STATUS"
+_SYSTEM_REBOOT = ":SYSTEM_REBOOT:"
+_CLEAR_BOOT_POPUP = ":BUTTON_PRESS:1,1,0"
+_ENTER_DIAL = ":ENTER_PAGE:DIAL,0"
 _DEFAULT_CAPTURE_TIMEOUT = 12.0
 _DEFAULT_BLE_CAPTURE_TIMEOUT = 180.0
 _CAPTURE_PROVIDER_ENV = "W30_HARDWARE_CAPTURE_PROVIDER"
@@ -80,9 +87,12 @@ def _create_hardware_serial_session(
     *,
     evidence_dir: str | os.PathLike[str],
     cmd_timeout: float,
+    environment: Mapping[str, str] | None = None,
+    allow_dangerous_commands: bool = False,
 ) -> HardwareSerialSession:
-    port = os.environ.get("W30_HARDWARE_PORT", DEFAULT_PORT).strip() or DEFAULT_PORT
-    baudrate_text = os.environ.get(
+    settings = os.environ if environment is None else environment
+    port = settings.get("W30_HARDWARE_PORT", DEFAULT_PORT).strip() or DEFAULT_PORT
+    baudrate_text = settings.get(
         "W30_HARDWARE_BAUDRATE", str(DEFAULT_BAUDRATE)
     ).strip()
     try:
@@ -94,20 +104,25 @@ def _create_hardware_serial_session(
     if baudrate <= 0:
         raise ValueError("W30_HARDWARE_BAUDRATE must be a positive integer")
 
-    transport_name = os.environ.get(
+    transport_name = settings.get(
         "W30_HARDWARE_TRANSPORT", "serial"
     ).strip().lower()
     if transport_name not in {"serial", "supercom"}:
         raise ValueError("W30_HARDWARE_TRANSPORT must be serial or supercom")
     transport = SuperComPipeTransport(port) if transport_name == "supercom" else None
+    serial_kwargs: dict[str, object] = {
+        "port": port,
+        "baudrate": baudrate,
+        "log_dir": Path(evidence_dir) / "serial",
+        "cmd_timeout": cmd_timeout,
+        "transport": transport,
+        "dtr": False,
+        "rts": False,
+    }
+    if allow_dangerous_commands:
+        serial_kwargs["allow_dangerous_commands"] = True
     return HardwareSerialSession(
-        port=port,
-        baudrate=baudrate,
-        log_dir=Path(evidence_dir) / "serial",
-        cmd_timeout=cmd_timeout,
-        transport=transport,
-        dtr=False,
-        rts=False,
+        **serial_kwargs,
     )
 
 
@@ -157,6 +172,25 @@ class TestSessionBootstrapResult:
     start_sent: bool
     gui_ping_attempts: int
     bootstrap_event_seen: bool
+
+
+@dataclass(frozen=True, slots=True)
+class HardwareCaseResetResult:
+    """Observable gates passed before one hardware case may start."""
+
+    status: TestSessionStatus
+    reboot_status: str
+    gui_ping_attempts: int
+    bootstrap_event_seen: bool
+    current_page: str
+    popup: object | None
+    state_raw: dict[str, object]
+
+
+class HardwareCaseResetError(RuntimeError):
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        super().__init__(message)
 
 
 class TestSessionBootstrapError(RuntimeError):
@@ -212,35 +246,15 @@ def query_test_session_status(
     return _parse_test_session_status(dict(result.raw))
 
 
-def bootstrap_test_session(
+def _activate_test_session(
+    session: Any,
     *,
-    evidence_dir: str | os.PathLike[str],
-    startup_timeout: float = 180.0,
-    command_timeout: float = 8.0,
-    serial_session: Any | None = None,
+    startup_timeout: float,
+    command_timeout: float,
+    ready_event_start_index: int | None = None,
 ) -> TestSessionBootstrapResult:
-    """Establish the runner-controlled batch test session exactly once.
+    """Wait for the GUI after boot and activate the firmware test lease."""
 
-    This is deliberately separate from :class:`RealDeviceSession`.  It first
-    proves that the GUI command subscriber is alive, then sends one idempotent
-    ``TEST_SESSION:START`` and closes only its host-side transport.
-    """
-
-    if startup_timeout <= 0:
-        raise ValueError("startup_timeout must be positive")
-    if command_timeout <= 0:
-        raise ValueError("command_timeout must be positive")
-    if serial_session is None and os.environ.get(
-        "W30_HARDWARE_TRANSPORT", ""
-    ).strip().lower() != "supercom":
-        raise ValueError(
-            "hardware bootstrap requires W30_HARDWARE_TRANSPORT=supercom"
-        )
-
-    session = serial_session or _create_hardware_serial_session(
-        evidence_dir=evidence_dir,
-        cmd_timeout=command_timeout,
-    )
     deadline = time.monotonic() + startup_timeout
     gui_ping_attempts = 0
     bootstrap_event_seen = False
@@ -273,71 +287,111 @@ def bootstrap_test_session(
                 f"GUI_PING did not reach the GUI thread: {reason}",
             )
 
+    start_event_index = (
+        session.event_count
+        if ready_event_start_index is None
+        else ready_event_start_index
+    )
     try:
-        session.start()
-        start_event_index = session.event_count
+        ping_gui()
+    except HardwareSerialTimeoutError:
+        wait_timeout = deadline - time.monotonic()
+        if wait_timeout <= 0:
+            raise TestSessionBootstrapError(
+                "BLOCKED_LOW_POWER_WAKE",
+                "GUI_PING timed out before the hardware bootstrap was ready",
+            ) from None
         try:
-            ping_gui()
-        except HardwareSerialTimeoutError:
-            wait_timeout = deadline - time.monotonic()
-            if wait_timeout <= 0:
-                raise TestSessionBootstrapError(
-                    "BLOCKED_LOW_POWER_WAKE",
-                    "GUI_PING timed out before the hardware bootstrap was ready",
-                ) from None
-            try:
-                event = session.wait_for_event(
-                    request="test_bootstrap",
-                    event_type="test_bootstrap",
-                    status=("ready", "error", "expired"),
-                    timeout=wait_timeout,
-                    start_event_index=start_event_index,
-                )
-            except HardwareSerialTimeoutError as exc:
-                raise TestSessionBootstrapError(
-                    "BLOCKED_LOW_POWER_WAKE",
-                    "no test_bootstrap ready event arrived before the startup timeout",
-                ) from exc
-            bootstrap_event_seen = True
-            if str(event.get("status", "")).lower() != "ready":
-                reason = str(event.get("reason", "bootstrap_not_ready"))
-                raise TestSessionBootstrapError(
-                    "BLOCKED_LOW_POWER_WAKE",
-                    f"firmware bootstrap is unavailable: {reason}",
-                )
-            try:
-                ping_gui()
-            except HardwareSerialTimeoutError as exc:
-                raise TestSessionBootstrapError(
-                    "BLOCKED_LOW_POWER_WAKE",
-                    "GUI_PING did not complete during the hardware bootstrap grace",
-                ) from exc
-
-        try:
-            result = session.send(
-                _TEST_SESSION_START,
-                request="test_session",
-                timeout=remaining_timeout(),
-                expected_type="test_session",
-                expected_status="active",
+            event = session.wait_for_event(
+                request="test_bootstrap",
+                event_type="test_bootstrap",
+                status=("ready", "error", "expired"),
+                timeout=wait_timeout,
+                start_event_index=start_event_index,
             )
         except HardwareSerialTimeoutError as exc:
             raise TestSessionBootstrapError(
-                "BOOTSTRAP_START_TIMEOUT",
-                "TEST_SESSION:START did not return an active session",
+                "BLOCKED_LOW_POWER_WAKE",
+                "no test_bootstrap ready event arrived before the startup timeout",
             ) from exc
-        status = _parse_test_session_status(dict(result.raw))
-        if not status.active:
-            reason = str(result.raw.get("reason", result.status or "not_active"))
+        bootstrap_event_seen = True
+        if str(event.get("status", "")).lower() != "ready":
+            reason = str(event.get("reason", "bootstrap_not_ready"))
             raise TestSessionBootstrapError(
-                "BOOTSTRAP_START_FAILED",
-                f"TEST_SESSION:START did not activate the session: {reason}",
+                "BLOCKED_LOW_POWER_WAKE",
+                f"firmware bootstrap is unavailable: {reason}",
             )
-        bootstrap_result = TestSessionBootstrapResult(
-            status=status,
-            start_sent=True,
-            gui_ping_attempts=gui_ping_attempts,
-            bootstrap_event_seen=bootstrap_event_seen,
+        try:
+            ping_gui()
+        except HardwareSerialTimeoutError as exc:
+            raise TestSessionBootstrapError(
+                "BLOCKED_LOW_POWER_WAKE",
+                "GUI_PING did not complete during the hardware bootstrap grace",
+            ) from exc
+
+    try:
+        result = session.send(
+            _TEST_SESSION_START,
+            request="test_session",
+            timeout=remaining_timeout(),
+            expected_type="test_session",
+            expected_status="active",
+        )
+    except HardwareSerialTimeoutError as exc:
+        raise TestSessionBootstrapError(
+            "BOOTSTRAP_START_TIMEOUT",
+            "TEST_SESSION:START did not return an active session",
+        ) from exc
+    status = _parse_test_session_status(dict(result.raw))
+    if not status.active:
+        reason = str(result.raw.get("reason", result.status or "not_active"))
+        raise TestSessionBootstrapError(
+            "BOOTSTRAP_START_FAILED",
+            f"TEST_SESSION:START did not activate the session: {reason}",
+        )
+    return TestSessionBootstrapResult(
+        status=status,
+        start_sent=True,
+        gui_ping_attempts=gui_ping_attempts,
+        bootstrap_event_seen=bootstrap_event_seen,
+    )
+
+
+def bootstrap_test_session(
+    *,
+    evidence_dir: str | os.PathLike[str],
+    startup_timeout: float = 180.0,
+    command_timeout: float = 8.0,
+    serial_session: Any | None = None,
+) -> TestSessionBootstrapResult:
+    """Establish the runner-controlled batch test session exactly once.
+
+    This is deliberately separate from :class:`RealDeviceSession`.  It first
+    proves that the GUI command subscriber is alive, then sends one idempotent
+    ``TEST_SESSION:START`` and closes only its host-side transport.
+    """
+
+    if startup_timeout <= 0:
+        raise ValueError("startup_timeout must be positive")
+    if command_timeout <= 0:
+        raise ValueError("command_timeout must be positive")
+    if serial_session is None and os.environ.get(
+        "W30_HARDWARE_TRANSPORT", ""
+    ).strip().lower() != "supercom":
+        raise ValueError(
+            "hardware bootstrap requires W30_HARDWARE_TRANSPORT=supercom"
+        )
+
+    session = serial_session or _create_hardware_serial_session(
+        evidence_dir=evidence_dir,
+        cmd_timeout=command_timeout,
+    )
+    try:
+        session.start()
+        bootstrap_result = _activate_test_session(
+            session,
+            startup_timeout=startup_timeout,
+            command_timeout=command_timeout,
         )
     except BaseException as exc:
         try:
@@ -347,6 +401,163 @@ def bootstrap_test_session(
         raise
     session.stop()
     return bootstrap_result
+
+
+def _require_accepted(result: HardwareCommandResult, command: str) -> None:
+    if str(result.status).lower() != "accepted":
+        reason = str(result.raw.get("reason", result.status or "not_accepted"))
+        raise HardwareCaseResetError(
+            "RESET_COMMAND_REJECTED",
+            f"hardware case reset command failed: {command} -> {reason}",
+        )
+
+
+def _window_name(value: object) -> str:
+    if isinstance(value, Mapping):
+        return str(value.get("name") or "")
+    return ""
+
+
+def reset_hardware_case_state(
+    *,
+    evidence_dir: str | os.PathLike[str],
+    startup_timeout: float = 180.0,
+    command_timeout: float = 8.0,
+    usb_timeout: float = 30.0,
+    serial_session: Any | None = None,
+    mtp_system: MtpSystem | None = None,
+    environment: Mapping[str, str] | None = None,
+) -> HardwareCaseResetResult:
+    """Reboot and prove a clean DIAL state before one hardware case starts."""
+
+    if startup_timeout <= 0:
+        raise ValueError("startup_timeout must be positive")
+    if command_timeout <= 0:
+        raise ValueError("command_timeout must be positive")
+    if usb_timeout <= 0:
+        raise ValueError("usb_timeout must be positive")
+    settings = os.environ if environment is None else environment
+    if serial_session is None and settings.get(
+        "W30_HARDWARE_TRANSPORT", ""
+    ).strip().lower() != "supercom":
+        raise ValueError(
+            "hardware case reset requires W30_HARDWARE_TRANSPORT=supercom"
+        )
+
+    session = serial_session or _create_hardware_serial_session(
+        evidence_dir=evidence_dir,
+        cmd_timeout=command_timeout,
+        environment=settings,
+        allow_dangerous_commands=True,
+    )
+    system = mtp_system or WindowsMtpSystem()
+    try:
+        session.start()
+        ready_event_start_index = session.event_count
+        reboot = session.send(
+            _SYSTEM_REBOOT,
+            request="system_reboot",
+            timeout=command_timeout,
+            expected_type="command_result",
+            expected_status="accepted",
+        )
+        _require_accepted(reboot, _SYSTEM_REBOOT)
+        try:
+            system.wait_for_usb(present=False, timeout=usb_timeout)
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "REBOOT_NOT_OBSERVED",
+                "hardware reboot was accepted but USB did not disappear",
+            ) from exc
+
+        bootstrap = _activate_test_session(
+            session,
+            startup_timeout=startup_timeout,
+            command_timeout=command_timeout,
+            ready_event_start_index=ready_event_start_index,
+        )
+
+        session.write_shell_line("dal_usb open")
+        try:
+            system.wait_for_usb(present=True, timeout=usb_timeout)
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "USB_RESTORE_FAILED",
+                "dal_usb open did not restore the watch USB/MTP device",
+            ) from exc
+
+        button = session.send(
+            _CLEAR_BOOT_POPUP,
+            request="button_press",
+            timeout=command_timeout,
+            expected_type="command_result",
+            expected_status="accepted",
+        )
+        _require_accepted(button, _CLEAR_BOOT_POPUP)
+        dial = session.send(
+            _ENTER_DIAL,
+            request="enter_page",
+            timeout=command_timeout,
+            expected_type="command_result",
+            expected_status="accepted",
+        )
+        _require_accepted(dial, _ENTER_DIAL)
+
+        ping_sequence = _positive_handshake_sequence()
+        barrier = session.send(
+            f":GUI_PING:{ping_sequence}",
+            request="gui_ping",
+            seq=ping_sequence,
+            timeout=command_timeout,
+            expected_type="gui_ack",
+            expected_status="processed",
+        )
+        if str(barrier.status).lower() != "processed":
+            raise HardwareCaseResetError(
+                "RESET_GUI_BARRIER_FAILED",
+                f"GUI_PING did not complete after DIAL reset: {barrier.status}",
+            )
+
+        state_sequence = _positive_handshake_sequence()
+        state = session.send(
+            f":GUI_STATE:{state_sequence}",
+            request="gui_state",
+            seq=state_sequence,
+            timeout=command_timeout,
+            expected_type="gui_state",
+            expected_status="ok",
+        )
+        if str(state.status).lower() != "ok":
+            raise HardwareCaseResetError(
+                "RESET_STATE_UNAVAILABLE",
+                f"GUI_STATE failed after DIAL reset: {state.status}",
+            )
+        state_raw = dict(state.raw)
+        current_page = _window_name(state_raw.get("current_page"))
+        popup = state_raw.get("popup")
+        if current_page.upper() != "DIAL" or popup is not None:
+            raise HardwareCaseResetError(
+                "RESET_STATE_MISMATCH",
+                "hardware case reset did not reach DIAL with popup=null "
+                f"(current_page={current_page or 'unknown'!r}, popup={popup!r})",
+            )
+        reset_result = HardwareCaseResetResult(
+            status=bootstrap.status,
+            reboot_status=str(reboot.status),
+            gui_ping_attempts=bootstrap.gui_ping_attempts,
+            bootstrap_event_seen=bootstrap.bootstrap_event_seen,
+            current_page=current_page,
+            popup=popup,
+            state_raw=state_raw,
+        )
+    except BaseException as exc:
+        try:
+            session.stop()
+        except BaseException as cleanup_exc:
+            exc.add_note(f"hardware case reset cleanup also failed: {cleanup_exc!r}")
+        raise
+    session.stop()
+    return reset_result
 
 
 class RealDeviceSession:
@@ -598,10 +809,13 @@ class RealDeviceSession:
 __all__ = [
     "CaptureFrame",
     "CaptureProvider",
+    "HardwareCaseResetError",
+    "HardwareCaseResetResult",
     "RealDeviceSession",
     "TestSessionBootstrapError",
     "TestSessionBootstrapResult",
     "TestSessionStatus",
     "bootstrap_test_session",
     "query_test_session_status",
+    "reset_hardware_case_state",
 ]

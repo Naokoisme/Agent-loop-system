@@ -2052,7 +2052,7 @@ class FrontendDataTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             manager.screenshot_path(job_id, token, "../step_00.bmp")
 
-    def test_hardware_batch_stops_before_cases_when_session_bootstrap_fails(self) -> None:
+    def test_hardware_batch_stops_before_cases_when_case_reset_fails(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         job_id = "hardware-preflight"
         case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
@@ -2091,20 +2091,21 @@ class FrontendDataTest(unittest.TestCase):
                 "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
             ),
             patch(
-                "agent_loop_system.tools.real_device.bootstrap_test_session",
-                side_effect=RuntimeError("TEST_SESSION:START failed"),
-            ) as bootstrap,
+                "agent_loop_system.tools.real_device.reset_hardware_case_state",
+                side_effect=RuntimeError("GUI_STATE popup is CHARGING"),
+            ) as reset,
             patch("frontend.server.subprocess.Popen") as popen,
         ):
             manager._run_batch(job_id)
 
         snapshot = manager.get(job_id)
         load_env.assert_called_once_with()
-        bootstrap.assert_called_once()
+        reset.assert_called_once()
         popen.assert_not_called()
-        self.assertEqual(snapshot["status"], "failed")
+        self.assertEqual(snapshot["status"], "interrupted")
         self.assertEqual(snapshot["completed"], 0)
-        self.assertIn("TEST_SESSION:START failed", snapshot["error"])
+        self.assertIn("GUI_STATE popup is CHARGING", snapshot["error"])
+        self.assertEqual(snapshot["hardware_reset"]["status"], "failed")
         self.assertNotIn("hardware", manager._active_job_ids)
 
     def test_hardware_batch_interrupts_on_infrastructure_failure_and_retries_case(self) -> None:
@@ -2153,19 +2154,21 @@ class FrontendDataTest(unittest.TestCase):
             def communicate(self) -> tuple[str, str]:
                 return "", "HardwareSerialTimeoutError: no result for :GUI_PING:1"
 
-        preflight = SimpleNamespace(
+        case_reset = SimpleNamespace(
             status=SimpleNamespace(active=True, lease_seconds=86000),
-            start_sent=True,
+            reboot_status="accepted",
             gui_ping_attempts=1,
             bootstrap_event_seen=False,
+            current_page="DIAL",
+            popup=None,
         )
         with (
             patch("agent_loop_system.main._load_env"),
             patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
             patch(
-                "agent_loop_system.tools.real_device.bootstrap_test_session",
-                return_value=preflight,
-            ),
+                "agent_loop_system.tools.real_device.reset_hardware_case_state",
+                return_value=case_reset,
+            ) as reset,
             patch(
                 "frontend.server.subprocess.Popen",
                 side_effect=lambda argv, **_: BrokenProcess(argv),
@@ -2174,6 +2177,7 @@ class FrontendDataTest(unittest.TestCase):
             manager._run_batch(job_id)
 
         interrupted = manager.get(job_id)
+        self.assertEqual(reset.call_count, 1)
         self.assertEqual(popen.call_count, 1)
         self.assertEqual(executed_cases, ["CALC_001"])
         self.assertEqual(interrupted["status"], "interrupted")
@@ -2224,9 +2228,9 @@ class FrontendDataTest(unittest.TestCase):
             patch("agent_loop_system.main._load_env"),
             patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
             patch(
-                "agent_loop_system.tools.real_device.bootstrap_test_session",
-                return_value=preflight,
-            ),
+                "agent_loop_system.tools.real_device.reset_hardware_case_state",
+                return_value=case_reset,
+            ) as reset,
             patch(
                 "frontend.server.subprocess.Popen",
                 side_effect=lambda argv, **_: CompletedProcess(argv),
@@ -2235,6 +2239,7 @@ class FrontendDataTest(unittest.TestCase):
             manager._run_batch(job_id)
 
         completed = manager.get(job_id)
+        self.assertEqual(reset.call_count, 2)
         self.assertEqual(executed_cases, ["CALC_001", "CALC_001", "CALC_002"])
         self.assertEqual(completed["status"], "completed")
         self.assertEqual(completed["completed"], 2)

@@ -113,6 +113,7 @@ const NODE_LABELS = {
 const TEST_WORKFLOW_NODES = ['load', 'execute', 'judge', 'record'];
 const TEST_NODE_LABELS = {
   load: '加载用例',
+  reset: '清理设备',
   execute: '执行命令',
   judge: '语义判定',
   record: '保存证据'

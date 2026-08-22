@@ -2865,52 +2865,30 @@ class CaseTestManager:
             job = self._jobs[job_id]
             execution_target = str(job.get("execution_target") or "simulator")
 
+        hardware_environment: dict[str, str] | None = None
         if execution_target == "hardware":
             try:
                 from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-                from agent_loop_system.tools.real_device import bootstrap_test_session
 
-                _load_test_runtime_environment()
-                HardwareTargetConfig.from_env()
-                bootstrap = bootstrap_test_session(
-                    evidence_dir=(
-                        self.paths.runtime_jobs
-                        / job_id
-                        / "preflight"
-                        / "test-session"
-                    ),
+                hardware_environment = _test_process_environment(
+                    _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
                 )
-                status = bootstrap.status
-                check = {
-                    "checked_at": _now(),
-                    "active": status.active,
-                    "lease_seconds": status.lease_seconds,
-                    "start_sent": bootstrap.start_sent,
-                    "gui_ping_attempts": bootstrap.gui_ping_attempts,
-                    "bootstrap_event_seen": bootstrap.bootstrap_event_seen,
-                }
-                if not status.active:
-                    raise RuntimeError(
-                        "手表测试会话启动后仍未进入 active"
-                    )
+                HardwareTargetConfig.from_env()
             except Exception as exc:
                 with self._lock:
                     job = self._jobs[job_id]
-                    job["test_session_check"] = {
+                    job["hardware_reset"] = {
                         "checked_at": _now(),
-                        "active": False,
-                        "lease_seconds": 0,
+                        "status": "failed",
                         "error": str(exc),
                     }
                     job["status"] = "failed"
-                    job["error"] = f"真机批次启动失败: {exc}"
+                    job["error"] = f"真机清理环境初始化失败: {exc}"
                     job["finished_at"] = _now()
                     job["current_node"] = None
                     self._release_execution_slot_locked(job_id)
                     self._persist_batch_locked(job)
                 return
-            with self._lock:
-                self._jobs[job_id]["test_session_check"] = check
 
         with self._lock:
             job = self._jobs[job_id]
@@ -2961,8 +2939,60 @@ class CaseTestManager:
                 job["current_case_token"] = runtime_token
                 job["current_runtime_dir"] = str(case_dir)
                 job["current_runtime_archived"] = False
-                job["current_node"] = "execute"
+                job["current_node"] = (
+                    "reset" if execution_target == "hardware" else "execute"
+                )
                 self._persist_batch_locked(job)
+
+            if execution_target == "hardware":
+                try:
+                    from agent_loop_system.tools.real_device import (
+                        reset_hardware_case_state,
+                    )
+
+                    reset = reset_hardware_case_state(
+                        evidence_dir=case_dir / "hardware-reset",
+                        environment=hardware_environment,
+                    )
+                except Exception as exc:
+                    interruption_reason = (
+                        f"真机清理失败，未启动第 {index} 条 {case['case_id']}：{exc}"
+                    )
+                    with self._lock:
+                        job = self._jobs[job_id]
+                        job["hardware_reset"] = {
+                            "checked_at": _now(),
+                            "status": "failed",
+                            "case_id": case["case_id"],
+                            "error": str(exc),
+                        }
+                        job["status"] = "interrupted"
+                        job["error"] = str(exc)
+                        job["interruption_reason"] = interruption_reason
+                        job["finished_at"] = _now()
+                        job["current_node"] = None
+                        job.pop("process", None)
+                        self._release_execution_slot_locked(job_id)
+                        self._persist_batch_locked(job)
+                    return
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["hardware_reset"] = {
+                        "checked_at": _now(),
+                        "status": "ready",
+                        "case_id": case["case_id"],
+                        "reboot_status": reset.reboot_status,
+                        "lease_seconds": reset.status.lease_seconds,
+                        "gui_ping_attempts": reset.gui_ping_attempts,
+                        "bootstrap_event_seen": reset.bootstrap_event_seen,
+                        "current_page": reset.current_page,
+                        "popup": reset.popup,
+                    }
+                    job["hardware_reset_count"] = int(
+                        job.get("hardware_reset_count") or 0
+                    ) + 1
+                    job["current_node"] = "execute"
+                    self._persist_batch_locked(job)
 
             execution = self._execute_case(job_id=job_id, case=case, job_dir=case_dir)
             infrastructure_failure = (

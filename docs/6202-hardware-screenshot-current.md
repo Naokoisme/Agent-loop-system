@@ -66,12 +66,13 @@ Agent-loop → SuperCom 管道关闭 USB → PC 通过 BLE 收取完整 BMP
 
 直接 UART 唤醒仍未证明可靠。已经验证的低功耗恢复方式是：通过 BLE 发送
 `TEST_SESSION:START`，随后 UART 收到 `active / 86400`。这条记录只证明 BLE 低功耗恢复能力；
-设备重启并恢复 SuperCom 管道后，Runner 也可在批次启动流程发送 `START`。详见
+设备重启并恢复 SuperCom 管道后，Runner 也可在每条批次用例启动前发送 `START`。详见
 [BLE：低功耗后的恢复入口](6202-watch-ble-current.md#低功耗后的恢复入口)。
 
 ## 会话与证据边界
 
-- Runner 在真机批次启动或设备重启恢复后发送 `TEST_SESSION:START` 并等待 `active`；
+- Runner 在每条真机批次用例启动前执行受控重启，随后发送 `TEST_SESSION:START`
+  并等待 `active`；恢复 USB 后还必须确认 `DIAL + popup=null`，否则不启动该用例。
   不要求外部预先持有会话，普通用例结束不发送 `STOP`。
 - `command_result accepted` 只表示命令被接受，不能证明页面或业务结果正确。
 - 每个视觉检查点必须对应独立的新截图，并保留请求序号、文件哈希、尺寸和格式校验。
@@ -87,6 +88,8 @@ Agent-loop → SuperCom 管道关闭 USB → PC 通过 BLE 收取完整 BMP
 
 ## 仍保留的开放项
 
+- 新增的逐用例受控重启编排已有主机单元测试，尚需一次授权的真机双用例批次回归；
+  在此之前不要把主机测试误报为真机整链验证。
 - BLE 单张截图约 172 秒，并伴随大量底层内存分配失败日志；按当前安排暂不优化，MTP 继续作为默认。
 - 手表自然进入低功耗后，直接 UART 指令为什么不能可靠恢复仍未定位；现阶段使用已验证的 BLE
   外部恢复入口，不把它描述为 UART 根因修复。
