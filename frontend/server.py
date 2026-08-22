@@ -277,21 +277,18 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
     _load_test_runtime_environment()
     execution_env = dict(os.environ)
     if project_meta.get("execution_target") == "hardware":
-        hardware_source_root = execution_env.get(
-            "W30_HARDWARE_SOURCE_ROOT", ""
-        ).strip()
-        hardware_workspace_root = execution_env.get(
-            "W30_HARDWARE_WORKSPACE_ROOT", ""
-        ).strip()
         hardware_project = str(project_meta["project"])
         execution_env.update({
             "W30_PROJECT": hardware_project,
             "W30_HARDWARE_PROJECT": hardware_project,
         })
-        if hardware_source_root:
-            execution_env["W30_SOURCE_ROOT"] = hardware_source_root
-        if hardware_workspace_root:
-            execution_env["W30_AGENT_WORKSPACE_ROOT"] = hardware_workspace_root
+        for source_key in (
+            "W30_SOURCE_ROOT",
+            "W30_AGENT_WORKSPACE_ROOT",
+            "W30_HARDWARE_SOURCE_ROOT",
+            "W30_HARDWARE_WORKSPACE_ROOT",
+        ):
+            execution_env.pop(source_key, None)
     elif project_meta.get("simulator_source_root"):
         source_root = project_meta["simulator_source_root"]
         execution_env.update({
@@ -2926,12 +2923,19 @@ class CaseTestManager:
         hardware_environment: dict[str, str] | None = None
         if execution_target == "hardware":
             try:
-                from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-
-                hardware_environment = _test_process_environment(
-                    _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+                from agent_loop_system.tools.hardware_runtime_profile import (
+                    load_hardware_runtime_profile,
                 )
-                HardwareTargetConfig.from_env()
+
+                project_meta = _test_project(
+                    str(job.get("project") or DEFAULT_TEST_PROJECT)
+                )
+                hardware_environment = _test_process_environment(project_meta)
+                load_hardware_runtime_profile(
+                    project=project_meta["project"],
+                    profiles_root=hardware_environment.get("W30_HARDWARE_PROFILE_ROOT") or None,
+                    version=hardware_environment.get("W30_HARDWARE_PROFILE_VERSION") or None,
+                )
             except Exception as exc:
                 with self._lock:
                     job = self._jobs[job_id]
@@ -2941,7 +2945,7 @@ class CaseTestManager:
                         "error": str(exc),
                     }
                     job["status"] = "failed"
-                    job["error"] = f"真机清理环境初始化失败: {exc}"
+                    job["error"] = f"真机运行时档案初始化失败: {exc}"
                     job["finished_at"] = _now()
                     job["current_node"] = None
                     self._release_execution_slot_locked(job_id)
@@ -3721,13 +3725,16 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "baudrate": int(os.environ.get("W30_HARDWARE_BAUDRATE", 1500000)),
             "transport": os.environ.get("W30_HARDWARE_TRANSPORT", "supercom"),
             "capture_provider": os.environ.get("W30_HARDWARE_CAPTURE_PROVIDER", "mtp"),
+            "profile_root": os.environ.get(
+                "W30_HARDWARE_PROFILE_ROOT",
+                str(paths.root / "profiles"),
+            ),
+            "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
         },
         "simulator": {
             "source_root": os.environ.get("W30_SIMULATOR_SOURCE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
             "workspace_root": os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
             "simulator_path": os.environ.get("W30_SIMULATOR_PATH", r"D:\Agent-loop-workspace\620C_W6830\core\gui\simulator\bin\main.exe"),
-            "hardware_source_root": os.environ.get("W30_HARDWARE_SOURCE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
-            "hardware_workspace_root": os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
         },
     }
 
@@ -3767,6 +3774,10 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_TRANSPORT"] = str(hw["transport"])
         if "capture_provider" in hw and hw["capture_provider"] is not None:
             env_updates["W30_HARDWARE_CAPTURE_PROVIDER"] = str(hw["capture_provider"])
+        if "profile_root" in hw and hw["profile_root"] is not None:
+            env_updates["W30_HARDWARE_PROFILE_ROOT"] = str(hw["profile_root"])
+        if "profile_version" in hw and hw["profile_version"] is not None:
+            env_updates["W30_HARDWARE_PROFILE_VERSION"] = str(hw["profile_version"])
             
     if "simulator" in cfg and isinstance(cfg["simulator"], dict):
         sim = cfg["simulator"]
@@ -3776,10 +3787,6 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_SIMULATOR_WORKSPACE_ROOT"] = str(sim["workspace_root"])
         if "simulator_path" in sim and sim["simulator_path"] is not None:
             env_updates["W30_SIMULATOR_PATH"] = str(sim["simulator_path"])
-        if "hardware_source_root" in sim and sim["hardware_source_root"] is not None:
-            env_updates["W30_HARDWARE_SOURCE_ROOT"] = str(sim["hardware_source_root"])
-        if "hardware_workspace_root" in sim and sim["hardware_workspace_root"] is not None:
-            env_updates["W30_HARDWARE_WORKSPACE_ROOT"] = str(sim["hardware_workspace_root"])
             
     for k, v in env_updates.items():
         os.environ[k] = v
@@ -3817,20 +3824,43 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
         checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
         
-        # 1. 源码与工作区
-        if proj_key == "620C_W6830":
+        # 1. 普通真机运行只校验版本绑定档案；模拟器仍校验工程工作区。
+        if is_hardware:
+            try:
+                from agent_loop_system.tools.hardware_runtime_profile import (
+                    load_hardware_runtime_profile,
+                )
+
+                runtime_profile = load_hardware_runtime_profile(
+                    project=proj_key,
+                    profiles_root=cfg["hardware"]["profile_root"],
+                    version=cfg["hardware"]["profile_version"] or None,
+                )
+            except Exception as exc:
+                status = "error"
+                detail = f"运行时档案不可用: {exc}"
+            else:
+                status = "pass"
+                detail = (
+                    f"档案 {runtime_profile.version} · 固件 "
+                    f"{runtime_profile.firmware_version} · {runtime_profile.project}"
+                )
+            checks.append({
+                "key": "profile",
+                "label": "真机运行时档案",
+                "status": status,
+                "detail": detail,
+            })
+        elif proj_key == "620C_W6830":
             src_p = Path(cfg["simulator"]["source_root"])
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-        elif proj_key == "6202_W5230_SIMULATOR":
+            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
+        else:
             src_p = Path(proj_meta.get("simulator_source_root", cfg["simulator"]["source_root"]))
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-        else:
-            src_p = Path(cfg["simulator"]["hardware_source_root"])
-            status = "pass" if src_p.is_dir() else "warning"
-            detail = f"真机工作区就绪: {src_p}" if status == "pass" else f"真机源码目录不存在: {src_p}"
-        checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
+            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
         
         # 2. 项目配置
         case_map_p = paths.case_map / proj_meta["case_map_dir"]
@@ -5272,10 +5302,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             if isinstance(paths_obj, dict):
                 config_update = {"simulator": {}}
                 if project == "6202_W5230":
-                    if "source_root" in paths_obj:
-                        config_update["simulator"]["hardware_source_root"] = paths_obj["source_root"]
-                    if "workspace_root" in paths_obj:
-                        config_update["simulator"]["hardware_workspace_root"] = paths_obj["workspace_root"]
+                    hardware_update: dict[str, Any] = {}
+                    if "profile_root" in paths_obj:
+                        hardware_update["profile_root"] = paths_obj["profile_root"]
+                    if "profile_version" in paths_obj:
+                        hardware_update["profile_version"] = paths_obj["profile_version"]
+                    if hardware_update:
+                        _save_system_config(
+                            self.app.paths,
+                            {"hardware": hardware_update},
+                        )
                 elif project == "6202_W5230_SIMULATOR":
                     if "source_root" in paths_obj:
                         os.environ["W30_6202_SIMULATOR_SOURCE_ROOT"] = str(paths_obj["source_root"])

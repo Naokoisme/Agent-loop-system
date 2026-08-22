@@ -4,6 +4,8 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+import pytest
+
 from agent_loop_system.tools.case_map import CaseEntry, CaseRunResult
 from agent_loop_system.tools.simulator import CommandResult
 from agent_loop_system.tools.test import run_single_case
@@ -52,6 +54,13 @@ def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
         mapping_status="PROMOTED",
     )
     session = _FakeHardwareSession()
+    available = mock.Mock(available=True, unavailable_reason=None)
+    runtime_profile = mock.Mock(
+        command_capabilities={
+            "LANGUAGE_SET": available,
+            "ENTER_PAGE": available,
+        }
+    )
 
     with (
         tempfile.TemporaryDirectory() as temporary,
@@ -60,8 +69,9 @@ def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
             return_value={case.case_id: case},
         ) as loader,
         mock.patch(
-            "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
-        ),
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=runtime_profile,
+        ) as profile_loader,
         mock.patch(
             "agent_loop_system.tools.real_device.RealDeviceSession",
             return_value=session,
@@ -78,6 +88,7 @@ def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
         )
 
     loader.assert_called_once_with("计算器", target="hardware")
+    profile_loader.assert_called_once_with(project="6202_W5230")
     reset.assert_called_once_with(
         evidence_dir=Path(temporary).resolve() / "hardware-reset"
     )
@@ -91,6 +102,43 @@ def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
     assert ":ENTER_PAGE:CALCULATOR,0" in session.calls
     assert all(not call.startswith(":HOST_SCREENSHOT:") for call in session.calls)
     assert len(result.screenshots) == 1
+
+
+def test_hardware_fixed_case_rejects_a_command_missing_from_the_runtime_profile() -> None:
+    case = CaseEntry(
+        case_id="BAD_001",
+        sheet="不兼容",
+        actions=[":NOT_IN_FIRMWARE:1"],
+        mapping_status="PROMOTED",
+    )
+    runtime_profile = mock.Mock(command_capabilities={})
+    with (
+        tempfile.TemporaryDirectory() as temporary,
+        mock.patch(
+            "agent_loop_system.tools.test.load_case_map",
+            return_value={case.case_id: case},
+        ),
+        mock.patch(
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=runtime_profile,
+        ),
+        mock.patch(
+            "agent_loop_system.tools.real_device.RealDeviceSession"
+        ) as session_class,
+        mock.patch(
+            "agent_loop_system.tools.real_device.reset_hardware_case_state"
+        ) as reset,
+    ):
+        with pytest.raises(ValueError, match="运行时档案.*NOT_IN_FIRMWARE"):
+            run_single_case(
+                case.sheet,
+                case.case_id,
+                str(Path(temporary) / "capture.bmp"),
+                target="hardware",
+            )
+
+    reset.assert_not_called()
+    session_class.assert_not_called()
 
 
 def test_hardware_single_case_can_use_an_explicit_external_executor() -> None:
@@ -115,8 +163,9 @@ def test_hardware_single_case_can_use_an_explicit_external_executor() -> None:
             return_value={case.case_id: case},
         ),
         mock.patch(
-            "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
-        ) as target_check,
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=mock.sentinel.runtime_profile,
+        ) as profile_loader,
         mock.patch(
             "agent_loop_system.tools.test._run_agent_exploration"
         ) as exploration,
@@ -142,7 +191,7 @@ def test_hardware_single_case_can_use_an_explicit_external_executor() -> None:
         "artifact_path": "",
         "artifact_sha256": "",
     }
-    target_check.assert_called_once_with()
+    profile_loader.assert_called_once_with(project="6202_W5230")
     executor.assert_called_once_with(case, screenshot)
     exploration.assert_not_called()
     reset.assert_not_called()
@@ -172,6 +221,10 @@ def test_hardware_agent_exploration_honors_parent_reset_boundary() -> None:
             "agent_loop_system.tools.test._run_agent_exploration",
             return_value=expected,
         ) as exploration,
+        mock.patch(
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=mock.sentinel.runtime_profile,
+        ) as profile_loader,
     ):
         screenshot = str(Path(temporary) / "capture.bmp")
         result = run_single_case(
@@ -184,11 +237,13 @@ def test_hardware_agent_exploration_honors_parent_reset_boundary() -> None:
         )
 
     assert result is expected
+    profile_loader.assert_called_once_with(project="6202_W5230")
     exploration.assert_called_once_with(
         case,
         screenshot_path=screenshot,
         target="hardware",
         project="6202_W5230",
+        hardware_runtime_profile=mock.sentinel.runtime_profile,
         reset_hardware=False,
     )
 

@@ -580,24 +580,19 @@ class InteractiveReproduceTest(unittest.TestCase):
                 action=ReproductionAction.READY_TO_JUDGE,
                 reason="真机当前画面足够清楚",
             )
-            hardware_config = mock.Mock(source_root=Path(tempdir))
+            runtime_profile = mock.Mock(
+                command_capabilities={},
+                agent_knowledge="GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
+            )
             with (
                 mock.patch(
                     "agent_loop_system.tools.build.BuildConfig.from_env"
                 ) as build_config,
                 mock.patch("agent_loop_system.tools.build.run_build") as run_build,
                 mock.patch(
-                    "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env",
-                    return_value=hardware_config,
-                ),
-                mock.patch(
-                    "agent_loop_system.tools.hardware_target.load_hardware_command_capabilities",
-                    return_value={},
-                ),
-                mock.patch(
-                    "agent_loop_system.tools.hardware_target.build_hardware_agent_knowledge",
-                    return_value="GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
-                ),
+                    "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+                    return_value=runtime_profile,
+                ) as profile_loader,
                 mock.patch(
                     "agent_loop_system.tools.real_device.RealDeviceSession",
                     return_value=session,
@@ -626,6 +621,7 @@ class InteractiveReproduceTest(unittest.TestCase):
             self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
             build_config.assert_not_called()
             run_build.assert_not_called()
+            profile_loader.assert_called_once_with(project=None)
             reset.assert_called_once_with(
                 evidence_dir=Path(tempdir).resolve() / "hardware-reset"
             )
@@ -637,6 +633,9 @@ class InteractiveReproduceTest(unittest.TestCase):
             self.assertEqual(
                 decide.call_args.kwargs["capability_knowledge"],
                 "GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
+            )
+            self.assertFalse(
+                decide.call_args.kwargs["navigation_source_enabled"]
             )
 
     def test_two_unchanged_steps_stop_as_target_not_reached(self) -> None:

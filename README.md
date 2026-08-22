@@ -27,19 +27,27 @@ result.json + 新截图 + 日志
 
 ## 目标、profile 与 case map
 
-| 目标 profile | 执行方式 | 固件工作区 | case map |
+| 目标 profile | 执行方式 | 普通运行依赖 | case map |
 | --- | --- | --- | --- |
 | `620C_W6830` | Windows Simulator | `D:\Agent-loop-workspace\620C_W6830` | `case_map/620C_simulator_case_map` |
 | `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_simulator_case_map` |
-| `6202_W5230` | 真实手表 | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_case_map` |
+| `6202_W5230` | 真实手表 | `profiles/6202_W5230` 版本档案 | `case_map/6202_case_map` |
 
 三套映射相互隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。6204 真机源码位于
 `D:\Agent-loop-workspace\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
 它不是可执行 Runner 目标。`D:\TOPSTEP\shenju_w30` 只作上游参考，不在其中开发、构建或
 打补丁。
 
-部分路径和模型选择仍由环境变量及显式 Python 配置提供。在数据化 profile 迁移真正完成前，
-不要把计划中的接口当成已交付能力。
+普通 6202 真机探索和固化用例不会读取固件源码。它们从不可变发布目录读取
+`runtime/commands.json`、`runtime/pages.json` 和兼容性元数据，并校验发布清单、文件哈希、固件
+SHA256、自动化协议版本及 Agent-loop 最低版本。源码诊断、修复、构建和档案再生成仍使用独立
+固件工作区，这两种模式不能混用。
+
+工程人员先用 `uv run python scripts/generate_hardware_runtime_assets.py --output-dir <临时目录>`
+从已核对的固件工作区提取小型能力目录，再把 `--runtime-commands`、`--runtime-pages` 和
+`--runtime-metadata` 一并交给
+`scripts/publish_profile.py`。普通测试机器只需要随发布包取得 `profiles/`、匹配固件、SuperCom
+和 Windows MTP，不需要 Git、Python SDK 或固件源码。
 
 ## 快速开始
 

@@ -99,6 +99,10 @@ class RuntimePaths:
         return self.root / "templates"
 
     @property
+    def profiles(self) -> Path:
+        return self.root / "profiles"
+
+    @property
     def history(self) -> Path:
         return self.root / "history"
 

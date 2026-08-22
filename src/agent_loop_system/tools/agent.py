@@ -171,11 +171,15 @@ def decide_reproduction_action(
     execution_target: str = "simulator",
     capability_knowledge: str | None = None,
     navigation_source_root: str | None = None,
+    navigation_source_enabled: bool = True,
     test_case: dict[str, str] | None = None,
 ) -> "ReproductionDecision | None":
     """根据当前观察只决定下一步，不生成整套命令。"""
     from agent_loop_system.reproduction import ReproductionDecision
     from agent_loop_system.tools.test import VISUAL_RELEVANCE_RULES, _bmp_to_png_b64
+
+    if execution_target == "hardware" and not str(capability_knowledge or "").strip():
+        raise ValueError("真机执行缺少已验证的 HardwareRuntimeProfile 能力目录")
 
     llm = _create_llm()
     if llm is None:
@@ -221,23 +225,29 @@ def decide_reproduction_action(
     actual_window = ""
     if current:
         actual_window = current.popup_name or current.window_name or ""
-    navigation_kwargs: dict[str, Any] = {
-        "existing_paths": [item["path"] for item in source_files]
-    }
-    if navigation_source_root is not None:
-        navigation_kwargs["source_root"] = navigation_source_root
-    navigation_sources = load_runtime_navigation_sources(
-        target_window,
-        actual_window,
-        **navigation_kwargs,
-    )
+    navigation_sources: list[dict[str, str]] = []
+    if navigation_source_enabled:
+        navigation_kwargs: dict[str, Any] = {
+            "existing_paths": [item["path"] for item in source_files]
+        }
+        if navigation_source_root is not None:
+            navigation_kwargs["source_root"] = navigation_source_root
+        navigation_sources = load_runtime_navigation_sources(
+            target_window,
+            actual_window,
+            **navigation_kwargs,
+        )
     navigation_text = "\n\n".join(
         f"=== 运行时入口文件: {item['path']} ===\n{item['content']}"
         for item in navigation_sources
     )
 
     target_label = "当前真机项目" if execution_target == "hardware" else "模拟器"
-    target_knowledge = capability_knowledge or load_simulator_knowledge()
+    target_knowledge = (
+        str(capability_knowledge)
+        if execution_target == "hardware"
+        else capability_knowledge or load_simulator_knowledge()
+    )
     target_rule = (
         "7. 当前是真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"
         "关机、重启或批量删除类命令。\n"

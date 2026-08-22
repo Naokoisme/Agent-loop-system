@@ -21,8 +21,9 @@ from typing import Protocol
 
 from pydantic import BaseModel
 
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.command_protocol import collect_command_json, normalize_command
-CASE_MAP_DIR = Path(r"d:\Agent-loop-system\case_map")
+CASE_MAP_DIR = RuntimePaths.from_root().case_map
 CASE_MAP_TARGET_DIRS = {
     "simulator": CASE_MAP_DIR / "620C_simulator_case_map",
     "hardware": CASE_MAP_DIR / "6202_case_map",

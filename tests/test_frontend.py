@@ -1633,6 +1633,7 @@ class FrontendDataTest(unittest.TestCase):
                 return "PASS", ""
 
         hardware_root = r"D:\Agent-loop-workspace\6202_W5230"
+        profile_root = r"D:\Agent-loop\profiles"
         with patch.dict(os.environ, {
             "W30_SOURCE_ROOT": r"D:\Agent-loop-workspace\620C_W6830",
             "W30_AGENT_WORKSPACE_ROOT": r"D:\Agent-loop-workspace\620C_W6830",
@@ -1640,6 +1641,7 @@ class FrontendDataTest(unittest.TestCase):
             "W30_HARDWARE_SOURCE_ROOT": hardware_root,
             "W30_HARDWARE_WORKSPACE_ROOT": hardware_root,
             "W30_HARDWARE_PROJECT": "6202_W5230",
+            "W30_HARDWARE_PROFILE_ROOT": profile_root,
         }, clear=False):
             with (
                 patch("agent_loop_system.main._load_env") as load_env,
@@ -1660,10 +1662,13 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(captured_argv[captured_argv.index("--target") + 1], "hardware")
         self.assertNotIn("--preserve-test-session", captured_argv)
         self.assertNotIn("--skip-hardware-reset", captured_argv)
-        self.assertEqual(captured_env["W30_SOURCE_ROOT"], hardware_root)
-        self.assertEqual(captured_env["W30_AGENT_WORKSPACE_ROOT"], hardware_root)
+        self.assertNotIn("W30_SOURCE_ROOT", captured_env)
+        self.assertNotIn("W30_AGENT_WORKSPACE_ROOT", captured_env)
+        self.assertNotIn("W30_HARDWARE_SOURCE_ROOT", captured_env)
+        self.assertNotIn("W30_HARDWARE_WORKSPACE_ROOT", captured_env)
         self.assertEqual(captured_env["W30_PROJECT"], "6202_W5230")
         self.assertEqual(captured_env["W30_HARDWARE_PROJECT"], "6202_W5230")
+        self.assertEqual(captured_env["W30_HARDWARE_PROFILE_ROOT"], profile_root)
         self.assertEqual(result["verdict"], "PASS")
 
     def test_candidate_replay_job_passes_explicit_runner_flag(self) -> None:
@@ -2097,7 +2102,7 @@ class FrontendDataTest(unittest.TestCase):
         with (
             patch("agent_loop_system.main._load_env") as load_env,
             patch(
-                "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
+                "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"
             ),
             patch(
                 "agent_loop_system.tools.real_device.reset_hardware_case_state",
@@ -2175,7 +2180,7 @@ class FrontendDataTest(unittest.TestCase):
         )
         with (
             patch("agent_loop_system.main._load_env"),
-            patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
+            patch("agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"),
             patch(
                 "agent_loop_system.tools.real_device.reset_hardware_case_state",
                 return_value=case_reset,
@@ -2239,7 +2244,7 @@ class FrontendDataTest(unittest.TestCase):
 
         with (
             patch("agent_loop_system.main._load_env"),
-            patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
+            patch("agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"),
             patch(
                 "agent_loop_system.tools.real_device.reset_hardware_case_state",
                 return_value=case_reset,
@@ -3050,6 +3055,9 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             self.assertIn("items", data)
             self.assertTrue(len(data["items"]) >= 3)
+            hardware = next(item for item in data["items"] if item["id"] == "6202_W5230")
+            self.assertEqual(hardware["checks"][0]["key"], "profile")
+            self.assertEqual(hardware["checks"][0]["label"], "真机运行时档案")
             
         # 2. Environment check
         with self._post_json(base + "/api/environments/620C_W6830/check", {}) as resp:
@@ -3083,12 +3091,33 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("ones", cfg)
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
+            self.assertEqual(cfg["hardware"]["profile_root"], str(self.paths.root / "profiles"))
+            self.assertNotIn("hardware_source_root", cfg["simulator"])
+            self.assertNotIn("hardware_workspace_root", cfg["simulator"])
             self.assertTrue(cfg["llm"]["configured"])
             self.assertEqual(cfg["llm"]["status"], "configured")
             self.assertEqual(
                 cfg["llm"]["last_actual_success_at"],
                 "2026-08-21T14:30:00+08:00",
             )
+
+        hardware_profile_root = str(self.paths.root / "portable-profiles")
+        with self._put_json(
+            base + "/api/environments/6202_W5230",
+            {
+                "paths": {
+                    "profile_root": hardware_profile_root,
+                    "profile_version": "v30-test.1",
+                }
+            },
+        ) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(data["status"], "ok")
+        with urlopen(base + "/api/config", timeout=3) as resp:
+            cfg = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(cfg["hardware"]["profile_root"], hardware_profile_root)
+            self.assertEqual(cfg["hardware"]["profile_version"], "v30-test.1")
             
         post_cfg = {
             "llm": {"model": "gpt-4o-mini", "timeout": 60},

@@ -24,6 +24,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
     CASE_MAP_PROFILE_PROJECTS,
@@ -32,6 +33,10 @@ from agent_loop_system.tools.case_map import (
     CaseRunResult,
     load_case_map,
     run_case,
+)
+from agent_loop_system.tools.command_protocol import (
+    normalize_command,
+    validate_agent_command,
 )
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
@@ -42,7 +47,7 @@ from agent_loop_system.tools.simulator import SimulatorSession
 from agent_loop_system.tools.visual_translations import visual_translation_context
 
 DEFAULT_SIM_EXE = r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe"
-EVIDENCE_DIR = Path(r"d:\Agent-loop-system\evidence")
+EVIDENCE_DIR = RuntimePaths.from_root().evidence
 VISUAL_RELEVANCE_RULES = (
     "- 只比较缺陷标题、描述和验收条件明确涉及的界面属性，不得从参考图中扩展出新的故障点。\n"
     "- 复合需求图中，明确标注为“说明文案”“预期结果”“需求描述”等规格文字的内容定义预期；"
@@ -605,6 +610,7 @@ def _run_agent_exploration(
     screenshot_path: str,
     target: str,
     project: str,
+    hardware_runtime_profile=None,
     reset_hardware: bool = True,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
@@ -641,6 +647,7 @@ def _run_agent_exploration(
         target=target,
         test_case=test_case,
         build_simulator=False,
+        hardware_runtime_profile=hardware_runtime_profile,
         reset_hardware=reset_hardware,
     )
     result = CaseRunResult(
@@ -738,6 +745,28 @@ def _run_agent_exploration(
     return result
 
 
+def _validate_hardware_case_commands(case: CaseEntry, runtime_profile) -> None:
+    """Reject a fixed mapping that does not belong to the selected firmware profile."""
+
+    capabilities = runtime_profile.command_capabilities
+    for phase, commands in (
+        ("setup", case.setup),
+        ("actions", case.actions),
+        ("collect", case.collect),
+    ):
+        for index, raw in enumerate(commands, 1):
+            bare = normalize_command(raw)
+            name = bare[1:].partition(":")[0]
+            if name in {"HOST_SCREENSHOT", "HOST_WAIT"}:
+                continue
+            try:
+                validate_agent_command(bare, capabilities)
+            except ValueError as exc:
+                raise ValueError(
+                    f"真机运行时档案与 {case.case_id} 的 {phase}[{index}] 不兼容: {exc}"
+                ) from exc
+
+
 def run_single_case(
     sheet_name: str,
     case_id: str,
@@ -775,6 +804,15 @@ def run_single_case(
         target=target,
         case_map_profile=case_map_profile,
     )
+    hardware_runtime_profile = None
+    if target == "hardware":
+        from agent_loop_system.tools.hardware_runtime_profile import (
+            load_hardware_runtime_profile,
+        )
+
+        hardware_runtime_profile = load_hardware_runtime_profile(
+            project=str(provenance.get("project") or "") or None,
+        )
     if screenshot_path is None:
         run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         screenshot_path = str(
@@ -783,34 +821,35 @@ def run_single_case(
     if external_executor is not None:
         if target != "hardware":
             raise ValueError("外部真机执行器只能用于 hardware target")
-        from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-
-        HardwareTargetConfig.from_env()
         return _stamp_result_provenance(
             external_executor(case, screenshot_path),
             provenance=provenance,
         )
 
     if not case.is_promoted and not candidate_replay:
+        exploration_kwargs = {
+            "screenshot_path": screenshot_path,
+            "target": target,
+            "project": str(provenance.get("project") or ""),
+            "reset_hardware": reset_hardware,
+        }
+        if hardware_runtime_profile is not None:
+            exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
         return _stamp_result_provenance(
             _run_agent_exploration(
                 case,
-                screenshot_path=screenshot_path,
-                target=target,
-                project=str(provenance.get("project") or ""),
-                reset_hardware=reset_hardware,
+                **exploration_kwargs,
             ),
             provenance=provenance,
         )
 
     if target == "hardware":
-        from agent_loop_system.tools.hardware_target import HardwareTargetConfig
         from agent_loop_system.tools.real_device import (
             RealDeviceSession,
             reset_hardware_case_state,
         )
 
-        HardwareTargetConfig.from_env()
+        _validate_hardware_case_commands(case, hardware_runtime_profile)
         evidence_dir = Path(screenshot_path).resolve().parent
         if reset_hardware:
             reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")

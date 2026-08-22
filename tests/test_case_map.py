@@ -60,6 +60,11 @@ class _FakeSession:
 
 
 class CaseMapExecutionTest(unittest.TestCase):
+    def test_default_case_map_root_follows_the_runtime_root(self) -> None:
+        from agent_loop_system.runtime_root import RuntimePaths
+
+        self.assertEqual(case_map.CASE_MAP_DIR, RuntimePaths.from_root().case_map)
+
     def test_target_specific_loader_does_not_fall_back(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

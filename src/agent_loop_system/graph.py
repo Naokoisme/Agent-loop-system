@@ -27,6 +27,7 @@ from agent_loop_system.reproduction import (
     successful_reproduction_commands,
 )
 from agent_loop_system.state import LoopState
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.build import BuildConfig, run_build
 from agent_loop_system.tools.source_context import (
     SourceContextError,
@@ -35,7 +36,7 @@ from agent_loop_system.tools.source_context import (
 )
 from agent_loop_system.tools.workspace import WorkspaceConflictError, resolve_source_root
 
-EVIDENCE_ROOT = Path(r"d:\Agent-loop-system\evidence")
+EVIDENCE_ROOT = RuntimePaths.from_root().evidence
 _TASK_ID_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 

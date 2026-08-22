@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from agent_loop_system.main import _load_env
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.case_map import (
     CaseRunResult,
     case_map_dir_for_target,
@@ -22,7 +23,7 @@ from agent_loop_system.tools.test import (
 
 
 CASE_MAP_DIR = case_map_dir_for_target("simulator")
-DEFAULT_OUTPUT_ROOT = Path(r"D:\Agent-loop-system\evidence\batch")
+DEFAULT_OUTPUT_ROOT = RuntimePaths.from_root().evidence / "batch"
 
 
 def _judgement_text(result: CaseRunResult) -> str:

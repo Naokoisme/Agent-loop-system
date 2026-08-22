@@ -31,6 +31,7 @@ class RuntimeRootTests(unittest.TestCase):
             self.assertEqual(paths.frontend, self.workspace_root.resolve() / "frontend")
             self.assertEqual(paths.case_map, self.workspace_root.resolve() / "case_map")
             self.assertEqual(paths.templates, self.workspace_root.resolve() / "templates")
+            self.assertEqual(paths.profiles, self.workspace_root.resolve() / "profiles")
             self.assertEqual(paths.history, self.workspace_root.resolve() / "history")
             self.assertEqual(paths.evidence, self.workspace_root.resolve() / "evidence")
             self.assertEqual(
@@ -59,6 +60,7 @@ class RuntimeRootTests(unittest.TestCase):
             self.assertEqual(paths.frontend, fake_portable_dir / "frontend")
             self.assertEqual(paths.case_map, fake_portable_dir / "case_map")
             self.assertEqual(paths.templates, fake_portable_dir / "templates")
+            self.assertEqual(paths.profiles, fake_portable_dir / "profiles")
             self.assertEqual(paths.history, fake_portable_dir / "history")
             self.assertEqual(paths.evidence, fake_portable_dir / "evidence")
             self.assertEqual(paths.runtime_jobs, fake_portable_dir / ".runtime" / "jobs")
