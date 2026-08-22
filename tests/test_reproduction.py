@@ -483,6 +483,38 @@ class InteractiveReproduceTest(unittest.TestCase):
             payload = json.loads((Path(tempdir) / "trace.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["outcome"], "CURRENT_CONFORMS")
 
+    def test_rejected_enter_page_is_not_sent_to_session(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            session = FakeInteractiveSession()
+            trace, _, _ = self._run(
+                tempdir,
+                session,
+                [
+                    ReproductionDecision(
+                        action=ReproductionAction.EXECUTE,
+                        command=":ENTER_PAGE:CALCULATOR",
+                        reason="遗漏了必填参数",
+                    ),
+                    ReproductionDecision(
+                        action=ReproductionAction.EXECUTE,
+                        command=":ENTER_PAGE:CALCULATOR,0",
+                        reason="按完整示例重试",
+                    ),
+                    ReproductionDecision(
+                        action=ReproductionAction.READY_TO_JUDGE,
+                        reason="计算器页面已经清楚可见",
+                    ),
+                ],
+                validate_side_effect=[
+                    ValueError("ENTER_PAGE 必须包含页面名和一个 uint32 参数"),
+                    None,
+                ],
+            )
+
+            self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
+            self.assertEqual(session.business_commands, [":ENTER_PAGE:CALCULATOR,0"])
+            self.assertEqual(trace.steps[1].command_status, "error")
+
     def test_test_case_visual_judgement_forwards_project(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             session = FakeInteractiveSession()

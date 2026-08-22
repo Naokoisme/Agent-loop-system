@@ -319,6 +319,16 @@ case SRV_QUICK_CMD_MSG_TP_SWIPE:
                 "GUI_WIN_TYPE_POPUP, handler);\n",
                 encoding="utf-8",
             )
+            (windows / "gui_win_calculator.c").write_text(
+                'GUI_WIN_DEFINE(GUI_WIN_CALCULATOR, "CALCULATOR", '
+                "GUI_WIN_TYPE_NORMAL, handler);\n",
+                encoding="utf-8",
+            )
+            (windows / "gui_win_unknown.c").write_text(
+                'GUI_WIN_DEFINE(GUI_WIN_UNKNOWN, "UNKNOWN", '
+                "GUI_WIN_TYPE_NORMAL, handler);\n",
+                encoding="utf-8",
+            )
             quick_cmd = root / "gui_comm_quick_cmd.c"
             quick_cmd.write_text(
                 """
@@ -348,9 +358,19 @@ static const gui_comm_quick_special_win_t special_win[] = {
 
         self.assertIn("ACTIVE_GOAL -> ACTIVE_GOAL", result)
         self.assertIn("id=GUI_WIN_ACTIVE_GOAL", result)
-        self.assertIn("ENTER_PAGE:ACTIVE_GOAL,<param>", result)
-        self.assertIn("1=ACTIVE_GOAL_TYPE_STEPS", result)
-        self.assertIn("3=ACTIVE_GOAL_TYPE_TIME", result)
+        self.assertIn("命令=:ENTER_PAGE:ACTIVE_GOAL,1", result)
+        self.assertIn(
+            "合法值=1=ACTIVE_GOAL_TYPE_STEPS, 3=ACTIVE_GOAL_TYPE_TIME",
+            result,
+        )
+        self.assertIn("完整示例=:ENTER_PAGE:ACTIVE_GOAL,1", result)
+        self.assertIn("命令=:ENTER_PAGE:CALCULATOR,0", result)
+        self.assertIn("param含义=计算器页面不使用启动用户数据", result)
+        self.assertIn("合法值=0=规范占位值", result)
+        self.assertIn("完整示例=:ENTER_PAGE:CALCULATOR,0", result)
+        self.assertIn("语法=:ENTER_PAGE:UNKNOWN,<uint32_param>", result)
+        self.assertIn("合法值=未知，禁止猜测", result)
+        self.assertIn("完整示例=无", result)
 
     def test_load_simulator_knowledge_reads_only_shared_command_and_window_kb(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -492,6 +512,9 @@ static const gui_comm_quick_special_win_t special_win[] = {
         self.assertIn("不能一次规划整套命令", captured["prompt"])
         self.assertIn("GUI_PING、GUI_TREE、GUI_STATE、SCREENSHOT_PRINT", captured["prompt"])
         self.assertIn("不得额外读取 BUSINESS_GET", captured["prompt"])
+        self.assertIn("必须原样复制页面目录的完整示例", captured["prompt"])
+        self.assertIn("完整示例=无", captured["prompt"])
+        self.assertIn("不得猜测 param", captured["prompt"])
         self.assertIn("仅供非 Windows 真机兼容", captured["prompt"])
 
     def test_decide_reproduction_action_labels_api_failure(self) -> None:

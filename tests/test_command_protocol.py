@@ -152,8 +152,26 @@ class CommandProtocolTest(unittest.TestCase):
         )
         validate_agent_command(":SCREENSHOT_PRINT", self.capabilities)
 
-    def test_business_arguments_are_not_locally_judged(self) -> None:
-        validate_agent_command(":ENTER_PAGE:WEATHER_HOME", self.capabilities)
+    def test_enter_page_requires_complete_uint32_contract(self) -> None:
+        validate_agent_command(":ENTER_PAGE:CALCULATOR,0", self.capabilities)
+        validate_agent_command(
+            "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+            self.capabilities,
+        )
+        for bad in (
+            ":ENTER_PAGE:CALCULATOR",
+            ":ENTER_PAGE:CALCULATOR,",
+            ":ENTER_PAGE:CALCULATOR,,",
+            ":ENTER_PAGE:CALCULATOR,abc",
+            ":ENTER_PAGE:CALCULATOR,-1",
+            ":ENTER_PAGE:CALCULATOR,1",
+            ":ENTER_PAGE:CALCULATOR,4294967296",
+        ):
+            with self.subTest(command=bad):
+                with self.assertRaisesRegex(ValueError, "ENTER_PAGE"):
+                    validate_agent_command(bad, self.capabilities)
+
+    def test_other_business_arguments_are_not_locally_judged(self) -> None:
         validate_agent_command(":GUI_TREE:1,2", self.capabilities)
         validate_agent_command(
             ":SLEEP_RECORD_CREATE:1,30,30,10,5,45", self.capabilities
