@@ -801,7 +801,7 @@ a { color: inherit; }
 .test-metric-heading small { white-space: nowrap; }
 
 .test-metric-grid { margin: 0; }
-.maturity-metrics { grid-template-columns: repeat(5, minmax(120px, 1fr)); }
+.maturity-metrics { grid-template-columns: repeat(4, minmax(120px, 1fr)); }
 
 .panel {
   overflow: hidden;
@@ -1231,6 +1231,7 @@ pre, code { font-family: var(--font-ui); }
 .trace-fail { color: var(--red); }
 .single-evidence { max-width: 560px; }
 .checkpoint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; }
+.checkpoint-grid-hardware { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .checkpoint-grid .evidence-frame img { aspect-ratio: 402 / 256; }
 .checkpoint-grid .evidence-missing {
   grid-column: 1 / -1;
@@ -1304,6 +1305,7 @@ pre, code { font-family: var(--font-ui); }
   .defect-row > :nth-child(3) { display: none; }
   .kv-grid { grid-template-columns: 1fr 1fr; }
   .batch-summary-grid { grid-template-columns: 1fr 1fr; }
+  .checkpoint-grid-hardware { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .test-selection-bar { align-items: flex-start; flex-direction: column; }
 }
 
@@ -1339,6 +1341,7 @@ pre, code { font-family: var(--font-ui); }
   .pagination-actions { justify-content: space-between; }
   .pagination-actions .page-button:not(.page-text):not(.current) { display: none; }
   .evidence-grid, .patch-grid { grid-template-columns: 1fr; }
+  .checkpoint-grid-hardware { grid-template-columns: 1fr; }
   .history-row { grid-template-columns: 90px 1fr 22px; }
   .history-row > :nth-child(3) { display: none; }
   .kv-grid { grid-template-columns: 1fr; }
@@ -1619,7 +1622,7 @@ pre, code { font-family: var(--font-ui); }
 .case-main-column { min-width: 0; padding: 16px; }
 .case-main-column .test-metric-group { margin: 0; }
 .case-main-column .test-metric-heading { display: none; }
-.case-main-column .test-metric-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.case-main-column .test-metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .case-main-column .metric { min-height: 74px; padding: 11px 13px; border-radius: 9px; }
 .case-main-column .metric strong { font-size: 20px; }
 .case-batch-launch { width: 100%; min-width: 0; margin: 12px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }

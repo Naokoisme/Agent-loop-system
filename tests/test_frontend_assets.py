@@ -192,11 +192,10 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (".command-trace-list", ".command-trace-item", ".trace-meta"):
             self.assertIn(token, self.stylesheet)
 
-    def test_agent_test_queue_uses_only_five_maturity_filters(self) -> None:
+    def test_agent_test_queue_uses_only_four_maturity_filters(self) -> None:
         for token in (
             "['all', 'all', '全部用例']",
-            "['unexplored', 'unexplored', '尚未外部探索']",
-            "['externally_explored', 'externally_explored', '已经外部探索']",
+            "['unexplored', 'unexplored', '尚未探索']",
             "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
             "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
             'data-test-filter="${state}"',
@@ -210,15 +209,19 @@ class FrontendAssetsTest(unittest.TestCase):
             "['error', 'error', '执行异常']",
         ):
             self.assertNotIn(token, self.javascript)
-        self.assertIn("grid-template-columns: repeat(5, minmax(120px, 1fr));", self.stylesheet)
-
-    def test_agent_test_metrics_show_only_the_five_maturity_categories(self) -> None:
-        for token in (
-            "外部探索与固化",
-            "分类只取外部账本和正式 case_map",
-            "['all', 'all', '全部用例']",
-            "['unexplored', 'unexplored', '尚未外部探索']",
+        self.assertNotIn(
             "['externally_explored', 'externally_explored', '已经外部探索']",
+            self.javascript,
+        )
+        self.assertIn("grid-template-columns: repeat(4, minmax(120px, 1fr));", self.stylesheet)
+        self.assertIn("grid-template-columns: repeat(4, minmax(0, 1fr));", self.stylesheet)
+
+    def test_agent_test_metrics_show_only_the_four_detailed_maturity_categories(self) -> None:
+        for token in (
+            "探索与固化",
+            "分类依据探索账本和正式 case_map",
+            "['all', 'all', '全部用例']",
+            "['unexplored', 'unexplored', '尚未探索']",
             "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
             "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
         ):
@@ -234,6 +237,17 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertIn("updateBatchLaunch();", self.javascript)
         self.assertIn(".test-metric-group {", self.stylesheet)
         self.assertNotIn(".asset-metrics", self.stylesheet)
+
+    def test_interrupted_batch_notice_only_emphasizes_resume_message(self) -> None:
+        self.assertIn(
+            "job.resume_available ? `<strong>${escapeHtml(job.interruption_reason || '批次已中断')}，可从第 ${completed + 1} 条继续。</strong>`",
+            self.javascript,
+        )
+        self.assertIn(
+            "job.status === 'completed' ? '全部用例已执行完成。'",
+            self.javascript,
+        )
+        self.assertIn(": '正在准备下一条用例…'", self.javascript)
 
     def test_case_catalog_cold_start_uses_compact_server_queries(self) -> None:
         for token in (
@@ -324,14 +338,41 @@ class FrontendAssetsTest(unittest.TestCase):
             self.javascript,
         )
 
-    def test_agent_test_detail_back_link_keeps_list_filter_and_page(self) -> None:
+    def test_detail_back_links_keep_safe_direct_origin(self) -> None:
         for token in (
             "function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT",
-            "function testReturnUrl()",
-            "new URLSearchParams({project: testProject(project).project, from: returnTo})",
+            "function safeInAppReturnUrl(raw, fallback = '')",
+            "target.origin !== location.origin || !isInAppRoutePath(target.pathname)",
+            "function withReturnContext(path, returnTo = currentRouteUrl())",
+            "target.searchParams.set('from', safeReturnTo)",
+            "link.hasAttribute('data-return-link') && canUseNativeBack(destination)",
+            "const referrer = safeInAppReturnUrl(document.referrer);",
+            "history.back();",
+            "rememberReturnScroll(url);",
+            "window.history.replaceState({...state, returnScrollUrl: current, returnScrollY: window.scrollY}, '', current);",
+            "restoreRememberedScroll();",
             "testDetailHref(row.project, sheet, caseId, returnTo)",
-            'href="${escapeHtml(returnTo)}">← 返回测试用例',
-            "testHistoryHref(project, sheet, caseId, item.id, returnTo)",
+            "testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl())",
+            "const returnLabel = returnDestinationLabel(returnTo, '用例管理');",
+            'data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}',
+            "testHistoryHref(project, sheet, caseId, item.id, detailReturnTo)",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_batch_and_defect_detail_entries_keep_return_context(self) -> None:
+        for token in (
+            "function testBatchHref(jobId, returnTo = currentRouteUrl())",
+            "returnTo && returnTo !== currentRouteUrl() ? returnTo : safeFallback",
+            "window.location.href = testBatchHref(job.id);",
+            "testBatchHref(activeBatch.id)",
+            "const returnTo = currentRouteUrl();",
+            "setActiveNav('runs');",
+            "function defectDetailHref(number, returnTo = currentRouteUrl())",
+            "const detailHref = defectDetailHref(row.number);",
+            "pageReturnUrl(pageUrl('/defects', currentProject()))",
+            "defectHistoryHref(number, item.id)",
+            "const fallback = defectDetailHref(number, pageUrl('/defects', currentProject()));",
+            "window.location.href = returnTo;",
         ):
             self.assertIn(token, self.javascript)
 
@@ -339,11 +380,11 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "const historyId = item.history_id || item.run_id || '';",
             "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
-            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});",
+            "const reportReturnTo = currentRouteUrl();",
             "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
-            "function testReportReturnUrl()",
-            "const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);",
-            "← 返回测试报告",
+            "const backHref = pageReturnUrl(detailFallback);",
+            "const backLabel = returnDestinationLabel(backHref, '测试详情');",
+            "'/reports': '测试报告'",
             "查看本次运行",
         ):
             self.assertIn(token, self.javascript)
@@ -399,6 +440,22 @@ class FrontendAssetsTest(unittest.TestCase):
             "aspect-ratio: auto;",
         ):
             self.assertIn(token, self.stylesheet)
+
+    def test_hardware_checkpoint_gallery_has_at_most_three_columns(self) -> None:
+        for token in (
+            "function screenshotGridClass(value)",
+            "checkpoint-grid-hardware",
+            'class="panel-body ${screenshotGridClass(projectMeta)}"',
+            'class="panel-body ${screenshotGridClass(record)}"',
+            ".checkpoint-grid-hardware { grid-template-columns: repeat(3, minmax(0, 1fr)); }",
+            ".checkpoint-grid-hardware { grid-template-columns: repeat(2, minmax(0, 1fr)); }",
+            ".checkpoint-grid-hardware { grid-template-columns: 1fr; }",
+        ):
+            self.assertIn(token, self.javascript + self.stylesheet)
+        self.assertIn(
+            ".checkpoint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; }",
+            self.stylesheet,
+        )
 
 
 if __name__ == "__main__":

@@ -24,8 +24,8 @@ const RESULT_FILTER_LABELS = {
 };
 const TEST_FILTER_LABELS = {
   all: '全部用例',
-  unexplored: '尚未外部探索',
-  externally_explored: '已经外部探索',
+  unexplored: '尚未探索',
+  externally_explored: '已记录探索',
   explored_unsolidified: '已探索但未固化',
   solidified: '已固化、Agent-loop 可执行'
 };
@@ -220,6 +220,96 @@ function pageUrl(path, project = currentProject(), extra = {}) {
   return `${path}${params.size ? `?${params.toString()}` : ''}`;
 }
 
+function currentRouteUrl() {
+  return `${location.pathname}${location.search}${location.hash}`;
+}
+
+function isInAppRoutePath(pathname) {
+  if (pathname === '/tests' || TOP_LEVEL_ROUTE_PATHS.includes(pathname)) return true;
+  const parts = pathname.split('/').filter(Boolean);
+  return (parts[0] === 'test' && parts.length === 3)
+    || (parts[0] === 'test-batch' && parts.length === 2)
+    || (parts[0] === 'test-history' && parts.length === 4)
+    || (parts[0] === 'defect' && parts.length === 2)
+    || (parts[0] === 'history' && parts.length === 3);
+}
+
+function normalizedInAppUrl(raw) {
+  if (!raw) return '';
+  try {
+    const target = new URL(String(raw), location.origin);
+    if (target.origin !== location.origin || !isInAppRoutePath(target.pathname)) return '';
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return '';
+  }
+}
+
+function safeInAppReturnUrl(raw, fallback = '') {
+  return normalizedInAppUrl(raw) || normalizedInAppUrl(fallback);
+}
+
+function pageReturnUrl(fallback) {
+  const safeFallback = safeInAppReturnUrl(fallback);
+  const returnTo = safeInAppReturnUrl(new URLSearchParams(location.search).get('from'));
+  return returnTo && returnTo !== currentRouteUrl() ? returnTo : safeFallback;
+}
+
+function withReturnContext(path, returnTo = currentRouteUrl()) {
+  const target = new URL(path, location.origin);
+  const safeReturnTo = safeInAppReturnUrl(returnTo);
+  if (safeReturnTo) target.searchParams.set('from', safeReturnTo);
+  return `${target.pathname}${target.search}${target.hash}`;
+}
+
+function returnDestinationLabel(returnTo, fallback = '上一页') {
+  const pathname = new URL(returnTo, location.origin).pathname;
+  const labels = {
+    '/overview': '项目总览',
+    '/tests': '用例管理',
+    '/cases': '用例管理',
+    '/runs': '自动化执行',
+    '/reports': '测试报告',
+    '/defects': '缺陷队列',
+    '/environments': '环境中心',
+  };
+  if (labels[pathname]) return labels[pathname];
+  if (pathname.startsWith('/test-batch/')) return '批次运行';
+  if (pathname.startsWith('/test/')) return '测试详情';
+  if (pathname.startsWith('/defect/')) return '缺陷详情';
+  if (pathname.startsWith('/history/')) return '修复记录';
+  return fallback;
+}
+
+function canUseNativeBack(returnTo) {
+  const target = safeInAppReturnUrl(returnTo);
+  const referrer = safeInAppReturnUrl(document.referrer);
+  return Boolean(target && referrer && target === referrer && history.length > 1);
+}
+
+function rememberReturnScroll(targetUrl) {
+  const returnTo = safeInAppReturnUrl(targetUrl.searchParams.get('from'));
+  const current = currentRouteUrl();
+  if (!returnTo || returnTo !== current) return;
+  const state = window.history.state && typeof window.history.state === 'object' ? window.history.state : {};
+  window.history.replaceState({...state, returnScrollUrl: current, returnScrollY: window.scrollY}, '', current);
+}
+
+function restoreRememberedScroll() {
+  const state = window.history.state;
+  if (!state || state.returnScrollUrl !== currentRouteUrl() || !Number.isFinite(state.returnScrollY)) return;
+  const scrollY = Math.max(0, Number(state.returnScrollY));
+  const nextState = {...state};
+  delete nextState.returnScrollUrl;
+  delete nextState.returnScrollY;
+  window.history.replaceState(nextState, '', currentRouteUrl());
+  const restore = () => window.scrollTo(0, scrollY);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    restore();
+    setTimeout(restore, 120);
+  }));
+}
+
 function initGlobalTargetSwitcher() {
   const select = document.querySelector('#global-target-select');
   if (!select || select.dataset.ready === 'true') return;
@@ -243,13 +333,20 @@ function initPrimaryNavigation() {
     if (!link || link.target === '_blank' || link.hasAttribute('download') || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const url = new URL(link.getAttribute('href'), location.href);
     if (url.origin !== location.origin) return;
+    rememberReturnScroll(url);
+    const destination = `${url.pathname}${url.search}${url.hash}`;
+    if (link.hasAttribute('data-return-link') && canUseNativeBack(destination)) {
+      event.preventDefault();
+      history.back();
+      return;
+    }
     const targetPath = link.dataset.route || url.pathname;
     if (!TOP_LEVEL_ROUTE_PATHS.includes(targetPath)) return;
     event.preventDefault();
-    const destination = link.dataset.route
+    const routeDestination = link.dataset.route
       ? pageUrl(targetPath, currentProject())
-      : `${url.pathname}${url.search}${url.hash}`;
-    history.pushState({}, '', destination);
+      : destination;
+    history.pushState({}, '', routeDestination);
     route();
   });
 }
@@ -493,9 +590,17 @@ function testTargetChip(value) {
   return `<span class="chip chip-target target-${escapeHtml(target)}">${escapeHtml(projectLabel)} · ${escapeHtml(targetLabel)}</span>`;
 }
 
-function screenshotLabel(value) {
+function isHardwareTestTarget(value) {
   const meta = typeof value === 'string' ? testProject(value) : value;
-  return (meta?.execution_target || meta?.target) === 'hardware' ? '真机截图' : '模拟器截图';
+  return (meta?.execution_target || meta?.target) === 'hardware';
+}
+
+function screenshotLabel(value) {
+  return isHardwareTestTarget(value) ? '真机截图' : '模拟器截图';
+}
+
+function screenshotGridClass(value) {
+  return `checkpoint-grid${isHardwareTestTarget(value) ? ' checkpoint-grid-hardware' : ''}`;
 }
 
 function activeTestJobs(payload = {}) {
@@ -639,7 +744,10 @@ function defectRows(items, query, resultFilter = 'all') {
       ${query ? '<button class="button button-secondary" type="button" data-clear-search>清除搜索条件</button>' : ''}
     </div>`;
   }
-  const rows = items.map(row => `<tr><td><a class="case-id-link" href="/defect/${encodeURIComponent(row.number)}">#${escapeHtml(row.number)}</a></td><td><strong>${escapeHtml(row.title)}</strong><small>${escapeHtml(row.description || '')}</small></td><td><span class="chip chip-status">${escapeHtml(row.priority || row.status || '未知')}</span></td><td>${resultChip(row.repair_result)}</td><td>${row.last_run_at ? formatTime(row.last_run_at) : '—'}</td><td class="table-actions"><a class="table-icon-action" href="/defect/${encodeURIComponent(row.number)}" aria-label="查看缺陷 #${escapeHtml(row.number)}">${icon('runs', 17)}</a></td></tr>`).join('');
+  const rows = items.map(row => {
+    const detailHref = defectDetailHref(row.number);
+    return `<tr><td><a class="case-id-link" href="${escapeHtml(detailHref)}">#${escapeHtml(row.number)}</a></td><td><strong>${escapeHtml(row.title)}</strong><small>${escapeHtml(row.description || '')}</small></td><td><span class="chip chip-status">${escapeHtml(row.priority || row.status || '未知')}</span></td><td>${resultChip(row.repair_result)}</td><td>${row.last_run_at ? formatTime(row.last_run_at) : '—'}</td><td class="table-actions"><a class="table-icon-action" href="${escapeHtml(detailHref)}" aria-label="查看缺陷 #${escapeHtml(row.number)}">${icon('runs', 17)}</a></td></tr>`;
+  }).join('');
   return `<div class="workspace-table-scroll"><table class="workspace-table defect-table"><thead><tr><th>缺陷编号</th><th>标题</th><th>优先级/状态</th><th>最近结果</th><th>更新时间</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -804,7 +912,7 @@ async function refreshActiveRepairPanel() {
     return;
   }
   const defectNumber = job.defect_number || job.number || '';
-  panel.innerHTML = `<header><div><h2>当前修复任务</h2><p>${defectNumber ? `缺陷 #${escapeHtml(defectNumber)}` : escapeHtml(job.id || '')}</p></div>${Components.statusChip('RUNNING', '修复中')}</header>${renderRepairWorkflow(job)}<div class="repair-task-summary"><dl><div><dt>任务 ID</dt><dd>${escapeHtml(job.id || '—')}</dd></div><div><dt>当前阶段</dt><dd>${escapeHtml(NODE_LABELS[job.current_node] || job.current_node || '准备中')}</dd></div><div><dt>开始时间</dt><dd>${formatTime(job.started_at)}</dd></div></dl>${defectNumber ? `<a class="button button-secondary" href="/defect/${encodeURIComponent(defectNumber)}">查看任务</a>` : ''}</div>`;
+  panel.innerHTML = `<header><div><h2>当前修复任务</h2><p>${defectNumber ? `缺陷 #${escapeHtml(defectNumber)}` : escapeHtml(job.id || '')}</p></div>${Components.statusChip('RUNNING', '修复中')}</header>${renderRepairWorkflow(job)}<div class="repair-task-summary"><dl><div><dt>任务 ID</dt><dd>${escapeHtml(job.id || '—')}</dd></div><div><dt>当前阶段</dt><dd>${escapeHtml(NODE_LABELS[job.current_node] || job.current_node || '准备中')}</dd></div><div><dt>开始时间</dt><dd>${formatTime(job.started_at)}</dd></div></dl>${defectNumber ? `<a class="button button-secondary" href="${escapeHtml(defectDetailHref(defectNumber))}">查看任务</a>` : ''}</div>`;
 }
 
 async function renderList() {
@@ -966,49 +1074,13 @@ function setTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAU
 function testReturnUrl() {
   const fallbackProject = testListParams().project;
   const fallback = buildTestListUrl('', 1, DEFAULT_TEST_STATE, fallbackProject);
-  const raw = new URLSearchParams(location.search).get('from');
-  if (!raw) return fallback;
-  try {
-    const target = new URL(raw, location.origin);
-    if (target.origin !== location.origin || !['/tests', '/cases'].includes(target.pathname)) return fallback;
-    const params = new URLSearchParams(target.search);
-    const rawPage = Number.parseInt(params.get('page') || '1', 10);
-    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
-    const rawState = String(params.get('state') || DEFAULT_TEST_STATE).toLowerCase();
-    const state = Object.hasOwn(TEST_FILTER_LABELS, rawState) ? rawState : DEFAULT_TEST_STATE;
-    const project = String(params.get('project') || DEFAULT_TEST_PROJECT);
-    return buildTestListUrl(
-      (params.get('q') || '').trim(), page, state,
-      Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT,
-      params.get('category') || 'all',
-      params.get('module') || ''
-    );
-  } catch {
-    return fallback;
-  }
-}
-
-function testReportReturnUrl() {
-  const raw = new URLSearchParams(location.search).get('from');
-  if (!raw) return '';
-  try {
-    const target = new URL(raw, location.origin);
-    if (target.origin !== location.origin || target.pathname !== '/reports') return '';
-    const params = target.searchParams;
-    const project = String(params.get('project') || currentProject());
-    const view = ['overview', 'batches', 'cases', 'failures'].includes(params.get('view')) ? params.get('view') : 'overview';
-    const from = /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : '';
-    const to = /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : '';
-    const module = ALL_FUNCTION_MODULES.includes(params.get('module')) ? params.get('module') : '';
-    return pageUrl('/reports', testProject(project).project, {view, from, to, module});
-  } catch {
-    return '';
-  }
+  return pageReturnUrl(fallback);
 }
 
 function withTestReturn(path, project = DEFAULT_TEST_PROJECT, returnTo = '/cases') {
-  const params = new URLSearchParams({project: testProject(project).project, from: returnTo});
-  return `${path}?${params.toString()}`;
+  const target = new URL(path, location.origin);
+  target.searchParams.set('project', testProject(project).project);
+  return withReturnContext(`${target.pathname}${target.search}`, returnTo);
 }
 
 function testDetailHref(project, sheet, caseId, returnTo = '/cases') {
@@ -1019,11 +1091,22 @@ function testHistoryHref(project, sheet, caseId, runId, returnTo = '/cases') {
   return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
 }
 
+function testBatchHref(jobId, returnTo = currentRouteUrl()) {
+  return withReturnContext(`/test-batch/${encodeURIComponent(jobId)}`, returnTo);
+}
+
+function defectDetailHref(number, returnTo = currentRouteUrl()) {
+  return withReturnContext(pageUrl(`/defect/${encodeURIComponent(number)}`, currentProject()), returnTo);
+}
+
+function defectHistoryHref(number, runId, returnTo = currentRouteUrl()) {
+  return withReturnContext(pageUrl(`/history/${encodeURIComponent(number)}/${encodeURIComponent(runId)}`, currentProject()), returnTo);
+}
+
 function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
   const maturityCards = [
     ['all', 'all', '全部用例'],
-    ['unexplored', 'unexplored', '尚未外部探索'],
-    ['externally_explored', 'externally_explored', '已经外部探索'],
+    ['unexplored', 'unexplored', '尚未探索'],
     ['explored_unsolidified', 'explored_unsolidified', '已探索但未固化'],
     ['solidified', 'solidified', '已固化、Agent-loop 可执行']
   ];
@@ -1034,7 +1117,7 @@ function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
   return `
     <section class="test-metric-group" aria-labelledby="maturity-status-title">
       <header class="test-metric-heading">
-        <div><strong id="maturity-status-title">外部探索与固化</strong><span>分类只取外部账本和正式 case_map</span></div>
+        <div><strong id="maturity-status-title">探索与固化</strong><span>分类依据探索账本和正式 case_map</span></div>
         <small>全部 ${Number(summary.all || 0)}</small>
       </header>
       <div class="metrics test-metric-grid maturity-metrics">${renderCards(maturityCards)}</div>
@@ -1504,7 +1587,7 @@ async function renderTests() {
         method: 'POST',
         body: JSON.stringify({project: projectSelect.value, cases}),
       });
-      window.location.href = `/test-batch/${encodeURIComponent(job.id)}`;
+      window.location.href = testBatchHref(job.id);
     } catch (error) {
       showToast(error.message, error.status === 409 ? 'warning' : 'error');
       updateSelectedTestCasesUi();
@@ -1531,7 +1614,7 @@ async function renderTests() {
         method: 'POST',
         body: JSON.stringify({limit: 0, categories, project: projectSelect.value})
       });
-      window.location.href = `/test-batch/${encodeURIComponent(job.id)}`;
+      window.location.href = testBatchHref(job.id);
     } catch (error) {
       showToast(error.message, error.status === 409 ? 'warning' : 'error');
       try {
@@ -2101,7 +2184,7 @@ async function renderTests() {
           if (!resp.ok) throw new Error(resData.error || resData.message || '迁移启动失败');
           showToast(`用例 ${caseId} 迁移任务已启动！`);
           migrationDialog.close();
-          window.location.href = `/test/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=6202_W5230`;
+          window.location.href = testDetailHref('6202_W5230', sheet, caseId, currentRouteUrl());
         } catch (err) {
           showToast(err.message, 'error');
           btn.disabled = false;
@@ -2159,7 +2242,7 @@ async function restoreActiveBatchBanner() {
     panel.hidden = false;
     panel.innerHTML = jobs.map(job => {
       const projectMeta = testProject(job.project);
-      return `<article class="batch-active-row"><div><strong>${escapeHtml(projectMeta.projectLabel)} ${escapeHtml(projectMeta.targetLabel)}批次正在运行</strong><span>${Number(job.completed || 0)} / ${Number(job.total || 0)} 条已完成</span></div><a class="button button-secondary" href="/test-batch/${encodeURIComponent(job.id)}">查看实时进度</a></article>`;
+      return `<article class="batch-active-row"><div><strong>${escapeHtml(projectMeta.projectLabel)} ${escapeHtml(projectMeta.targetLabel)}批次正在运行</strong><span>${Number(job.completed || 0)} / ${Number(job.total || 0)} 条已完成</span></div><a class="button button-secondary" href="${escapeHtml(testBatchHref(job.id))}">查看实时进度</a></article>`;
     }).join('');
   } catch {
     panel.hidden = true;
@@ -2242,8 +2325,9 @@ function evidenceContractEvidence(record) {
 
 function testHistoryRows(items, project, sheet, caseId, returnTo = '/tests') {
   if (!items?.length) return '<p class="muted">还没有测试历史。完成第一次运行后，结果会出现在这里。</p>';
+  const detailReturnTo = testDetailHref(project, sheet, caseId, returnTo);
   return `<div class="history-list">${items.map(item => `
-    <a class="history-row" href="${escapeHtml(testHistoryHref(project, sheet, caseId, item.id, returnTo))}">
+    <a class="history-row" href="${escapeHtml(testHistoryHref(project, sheet, caseId, item.id, detailReturnTo))}">
       ${resultChip(item.verdict)}
       <span><strong>${escapeHtml(friendlyAgentError(item.reason || '未记录判定理由'))}</strong><small>${item.has_screenshot ? `${item.screenshot_count || 1} 张${screenshotLabel(item)}` : '无截图'} · ${escapeHtml(item.execution_target_label || testProject(project).targetLabel)}</small></span>
       <time>${formatTime(item.timestamp)}</time>
@@ -2256,13 +2340,14 @@ async function renderTest(sheet, caseId) {
   const project = testListParams().project;
   const projectMeta = testProject(project);
   const returnTo = testReturnUrl();
+  const returnLabel = returnDestinationLabel(returnTo, '用例管理');
   const testCase = await api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}`);
   document.title = `${testCase.case_id} · Agent 测试`;
   const latest = testCase.history?.[0];
   const initialVerdict = latest?.verdict || 'PENDING';
   const usesFixedMapping = Boolean(testCase.is_promoted);
   app.innerHTML = `
-    <a class="back-link test-list-back-link" href="${escapeHtml(returnTo)}">← 返回测试用例</a>
+    <a class="back-link test-list-back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(testCase.sheet)} · Agent 测试 · ${escapeHtml(testCase.execution_target_label)}</p>
@@ -2422,7 +2507,7 @@ async function restoreActiveTest(project, sheet, caseId) {
       button.textContent = '全量批次运行中';
       chip.className = 'chip chip-warning';
       chip.textContent = '批次占用中';
-      message.innerHTML = `全量批次已完成 ${Number(job.completed || 0)} / ${Number(job.total || 0)} 条。<a href="/test-batch/${encodeURIComponent(job.id)}">查看实时进度 →</a>`;
+      message.innerHTML = `全量批次已完成 ${Number(job.completed || 0)} / ${Number(job.total || 0)} 条。<a href="${escapeHtml(testBatchHref(job.id))}">查看实时进度 →</a>`;
       testPollTimer = setTimeout(() => restoreActiveTest(project, sheet, caseId), 2000);
       return;
     }
@@ -2476,7 +2561,7 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
     }
     setResultChip(chip, job.verdict);
     const evidenceLink = job.history_id
-      ? `<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, testReturnUrl()))}">查看本次测试证据 →</a>`
+      ? `<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, currentRouteUrl()))}">查看本次测试证据 →</a>`
       : '';
     if (isPromotionFlow) {
       const promotionIssues = Array.isArray(job.promotion_issues) ? job.promotion_issues.filter(Boolean) : [];
@@ -2522,7 +2607,7 @@ function stopBatchTestPolling() {
 
 function batchRecentRows(items = [], project = DEFAULT_TEST_PROJECT) {
   if (!items.length) return '<p class="muted">首条用例完成后，这里会显示最新判定。</p>';
-  const returnTo = buildTestListUrl('', 1, DEFAULT_TEST_STATE, project);
+  const returnTo = currentRouteUrl();
   return `<div class="batch-result-list">${items.map(item => {
     const content = `${resultChip(item.verdict)}<span><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.sheet)} · ${escapeHtml(friendlyAgentError(item.reason || '未记录判定理由'))}</small></span><time>${formatTime(item.finished_at)}</time>`;
     return item.history_id
@@ -2586,7 +2671,7 @@ function updateBatchView(job) {
         <div><span>命令数量</span><strong>${Number(item.setup_count || 0)} + ${Number(item.action_count || 0)} + ${Number(item.collect_count || 0)}</strong></div>
       </div>
       <p>${escapeHtml(item.expected_text || '未填写预期结果')}</p>`
-      : `<div class="notice">${job.status === 'completed' ? '全部用例已执行完成。' : job.resume_available ? `${escapeHtml(job.interruption_reason || '批次已中断')}，可从第 ${completed + 1} 条继续。` : '正在准备下一条用例…'}</div>`;
+      : `<div class="notice">${job.status === 'completed' ? '全部用例已执行完成。' : job.resume_available ? `<strong>${escapeHtml(job.interruption_reason || '批次已中断')}，可从第 ${completed + 1} 条继续。</strong>` : '正在准备下一条用例…'}</div>`;
   }
   const target = document.querySelector('#batch-target');
   if (target) target.innerHTML = testTargetChip(job);
@@ -2622,14 +2707,16 @@ async function pollBatchTest(jobId) {
 }
 
 async function renderTestBatch(jobId) {
-  setActiveNav('cases');
+  setActiveNav('runs');
   stopBatchTestPolling();
   const initialJob = await api(`/api/tests/jobs/${encodeURIComponent(jobId)}`);
   const projectMeta = testProject(initialJob.project);
-  const returnTo = buildTestListUrl('', 1, DEFAULT_TEST_STATE, projectMeta.project);
+  const fallback = buildTestListUrl('', 1, DEFAULT_TEST_STATE, projectMeta.project);
+  const returnTo = pageReturnUrl(fallback);
+  const returnLabel = returnDestinationLabel(returnTo, '用例管理');
   document.title = `批次测试 ${jobId} · Agent 测试`;
   app.innerHTML = `
-    <a class="back-link" href="${escapeHtml(returnTo)}">← 返回测试用例</a>
+    <a class="back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(projectMeta.projectLabel)} · ${escapeHtml(projectMeta.targetLabel)}批次测试</p>
@@ -2659,7 +2746,7 @@ async function renderTestBatch(jobId) {
     </section>
     <section class="panel">
       <header class="panel-head"><div><h2>当前${escapeHtml(screenshotLabel(projectMeta))}</h2><p>验证点截图生成后自动出现；LLM 只依据这些截图判定</p></div><span id="batch-screenshot-count" class="chip chip-pending">0 张</span></header>
-      <div id="batch-live-screenshots" class="panel-body checkpoint-grid"></div>
+      <div id="batch-live-screenshots" class="panel-body ${screenshotGridClass(projectMeta)}"></div>
     </section>
     <section class="panel">
       <header class="panel-head"><div><h2>最新测试结果</h2><p>保留最近 30 条；点击可查看操作信息和全部判定截图</p></div></header>
@@ -2750,7 +2837,7 @@ function testMode(record) {
 function historyRows(historyItems, number) {
   if (!historyItems?.length) return '<p class="muted">还没有修复历史。完成第一次修复后，结果会出现在这里。</p>';
   return `<div class="history-list">${historyItems.map(item => `
-    <a class="history-row" href="/history/${encodeURIComponent(number)}/${encodeURIComponent(item.id)}">
+    <a class="history-row" href="${escapeHtml(defectHistoryHref(number, item.id))}">
       ${resultChip(item.verdict)}
       <span><strong>${escapeHtml(testMode(item))}</strong><small>${escapeHtml(item.source_file || '实际修改文件未记录')}</small></span>
       <time>${formatTime(item.timestamp)}</time>
@@ -2760,12 +2847,14 @@ function historyRows(historyItems, number) {
 
 async function renderDefect(number) {
   setActiveNav('defects');
+  const returnTo = pageReturnUrl(pageUrl('/defects', currentProject()));
+  const returnLabel = returnDestinationLabel(returnTo, '缺陷队列');
   const defect = await api(`/api/defects/${encodeURIComponent(number)}`);
   document.title = `缺陷 #${defect.number} · Agent自动化测试平台`;
   const sourceMatches = defect.source_analysis?.matches || [];
   const sourcePanelOpen = sourceMatches.length < 3 ? ' open' : '';
   app.innerHTML = `
-    <a class="back-link" href="/">← 返回缺陷队列</a>
+    <a class="back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">缺陷 #${escapeHtml(defect.number)}</p>
@@ -2907,7 +2996,7 @@ async function pollJob(jobId, defectNumber) {
     }
     setResultChip(chip, job.verdict);
     message.innerHTML = job.history_id
-      ? `任务 ${escapeHtml(job.id)} 已结束。<a href="/history/${encodeURIComponent(defectNumber)}/${encodeURIComponent(job.history_id)}">查看本次修复证据 →</a>`
+      ? `任务 ${escapeHtml(job.id)} 已结束。<a href="${escapeHtml(defectHistoryHref(defectNumber, job.history_id))}">查看本次修复证据 →</a>`
       : `任务结束，但历史记录保存失败：${escapeHtml(job.error || '未知原因')}`;
     button.disabled = false;
     button.textContent = '再次启动修复';
@@ -3006,6 +3095,9 @@ function codeChangeEvidence(record, patch) {
 
 async function renderHistory(number, runId) {
   setActiveNav('defects');
+  const fallback = defectDetailHref(number, pageUrl('/defects', currentProject()));
+  const returnTo = pageReturnUrl(fallback);
+  const returnLabel = returnDestinationLabel(returnTo, '缺陷详情');
   const record = await api(`/api/history/${encodeURIComponent(number)}/${encodeURIComponent(runId)}`);
   document.title = `修复记录 · 缺陷 #${number} · Agent自动化测试平台`;
   const patch = recordedPatch(record);
@@ -3015,7 +3107,7 @@ async function renderHistory(number, runId) {
     ? '未修改代码'
     : missingRecordText(record, '实际修改文件'));
   app.innerHTML = `
-    <a class="back-link" href="/defect/${encodeURIComponent(number)}">← 返回缺陷详情</a>
+    <a class="back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">缺陷 #${escapeHtml(number)} · 修复证据</p>
@@ -3066,7 +3158,7 @@ async function renderHistory(number, runId) {
     button.disabled = true;
     try {
       await api(`/api/history/${encodeURIComponent(number)}/${encodeURIComponent(runId)}`, { method: 'DELETE' });
-      window.location.href = `/defect/${encodeURIComponent(number)}`;
+      window.location.href = returnTo;
     } catch (error) {
       button.disabled = false;
       showToast(error.message, 'error');
@@ -3088,14 +3180,14 @@ function testErrorEvidence(record) {
 async function renderTestHistory(sheet, caseId, runId) {
   setActiveNav('cases');
   const project = testListParams().project;
-  const returnTo = testReturnUrl();
-  const reportReturnTo = testReportReturnUrl();
-  const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);
-  const backLabel = reportReturnTo ? '← 返回测试报告' : '← 返回测试详情';
+  const listFallback = buildTestListUrl('', 1, DEFAULT_TEST_STATE, project);
+  const detailFallback = testDetailHref(project, sheet, caseId, listFallback);
+  const backHref = pageReturnUrl(detailFallback);
+  const backLabel = returnDestinationLabel(backHref, '测试详情');
   const record = await api(`/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}?project=${encodeURIComponent(project)}`);
   document.title = `测试记录 · ${caseId} · Agent 测试`;
   app.innerHTML = `
-    <a class="back-link" href="${escapeHtml(backHref)}">${backLabel}</a>
+    <a class="back-link" data-return-link href="${escapeHtml(backHref)}">← 返回${escapeHtml(backLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(record.sheet)} · ${escapeHtml(record.case_id)} · ${escapeHtml(record.execution_target_label)}</p>
@@ -3155,7 +3247,7 @@ async function renderTestHistory(sheet, caseId, runId) {
     </section>
     <section class="panel">
       <header class="panel-head"><div><h2>${escapeHtml(screenshotLabel(record))}</h2><p>每个验证检查点分别采集，顺序与自动验证预期一致</p></div><span class="chip chip-pending">${Array.isArray(record.screenshot_urls) ? record.screenshot_urls.length : (record.screenshot_url ? 1 : 0)} 张</span></header>
-      <div class="panel-body checkpoint-grid">${testScreenshotGallery(record)}</div>
+      <div class="panel-body ${screenshotGridClass(record)}">${testScreenshotGallery(record)}</div>
     </section>
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>终端 JSON</h2><p>仅用于诊断执行链路，不参与产品判定</p></div><span class="collapse-controls"><span class="chip chip-pending">${Array.isArray(record.terminal_json) ? record.terminal_json.length : 0} 条</span><span class="collapse-action" aria-hidden="true"></span></span></summary>
@@ -3167,7 +3259,7 @@ async function renderTestHistory(sheet, caseId, runId) {
     button.disabled = true;
     try {
       await api(`/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}?project=${encodeURIComponent(project)}`, {method: 'DELETE'});
-      window.location.href = testDetailHref(project, sheet, caseId, returnTo);
+      window.location.href = backHref;
     } catch (error) {
       button.disabled = false;
       showToast(error.message, 'error');
@@ -3562,7 +3654,7 @@ function OverviewPage(project = currentProject()) {
       const batchTotal = activeBatch ? Number(activeBatch.total || 0) : 0;
       const percent = batchTotal ? Math.round(completed * 100 / batchTotal) : 0;
       const batchCounts = activeBatch?.verdict_counts || {};
-      const activeBatchHtml = activeBatch ? `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次（进行中）</h2><span class='chip chip-running'>${escapeHtml(activeBatch.id || '运行中')}</span></div><a class='button button-secondary' href='/test-batch/${encodeURIComponent(activeBatch.id)}'>查看详情</a></header><div class='active-batch-layout'>${Components.progressRing(percent)}<div class='batch-facts'><dl><div><dt>执行环境</dt><dd>${escapeHtml(testProject(activeBatch.project || project).projectLabel)} · ${escapeHtml(testProject(activeBatch.project || project).targetLabel)}</dd></div><div><dt>执行用例</dt><dd>${completed.toLocaleString('zh-CN')} / ${batchTotal.toLocaleString('zh-CN')}</dd></div><div><dt>开始时间</dt><dd>${formatTime(activeBatch.started_at)}</dd></div></dl><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>PASS ${Number(batchCounts.PASS || 0)}</span><span class='is-fail'>FAIL ${Number(batchCounts.FAIL || 0)}</span><span class='is-error'>ERROR ${Number(batchCounts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(batchCounts.CANNOT_VERIFY || 0)}</span></div></div></div></article>` : `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次</h2><span class='chip chip-pending'>当前空闲</span></div><a class='button' href='${escapeHtml(pageUrl('/cases', project))}'>新建执行</a></header>${Components.emptyState('当前没有运行中的批次', '可从用例管理勾选用例，或按状态创建批次。')}</article>`;
+      const activeBatchHtml = activeBatch ? `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次（进行中）</h2><span class='chip chip-running'>${escapeHtml(activeBatch.id || '运行中')}</span></div><a class='button button-secondary' href='${escapeHtml(testBatchHref(activeBatch.id))}'>查看详情</a></header><div class='active-batch-layout'>${Components.progressRing(percent)}<div class='batch-facts'><dl><div><dt>执行环境</dt><dd>${escapeHtml(testProject(activeBatch.project || project).projectLabel)} · ${escapeHtml(testProject(activeBatch.project || project).targetLabel)}</dd></div><div><dt>执行用例</dt><dd>${completed.toLocaleString('zh-CN')} / ${batchTotal.toLocaleString('zh-CN')}</dd></div><div><dt>开始时间</dt><dd>${formatTime(activeBatch.started_at)}</dd></div></dl><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>PASS ${Number(batchCounts.PASS || 0)}</span><span class='is-fail'>FAIL ${Number(batchCounts.FAIL || 0)}</span><span class='is-error'>ERROR ${Number(batchCounts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(batchCounts.CANNOT_VERIFY || 0)}</span></div></div></div></article>` : `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次</h2><span class='chip chip-pending'>当前空闲</span></div><a class='button' href='${escapeHtml(pageUrl('/cases', project))}'>新建执行</a></header>${Components.emptyState('当前没有运行中的批次', '可从用例管理勾选用例，或按状态创建批次。')}</article>`;
       const reportAvailable = Boolean(reports.data);
       const reportCounts = reports.data?.distribution || verdicts;
       const defectSummary = defects.data?.summary || {};
@@ -3622,7 +3714,7 @@ function renderActiveExecution(job, project) {
   const counts = job.verdict_counts || {};
   const currentCase = job.current_case || {case_id: job.case_id, sheet: job.sheet};
   const isActive = ['queued', 'running', 'finalizing'].includes(String(job.status));
-  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='/test-batch/${encodeURIComponent(job.id)}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header><div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>PASS ${Number(counts.PASS || 0)}</span><span class='is-fail'>FAIL ${Number(counts.FAIL || 0)}</span><span class='is-error'>ERROR ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>实时证据（最新）</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
+  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='${escapeHtml(testBatchHref(job.id))}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header><div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>PASS ${Number(counts.PASS || 0)}</span><span class='is-fail'>FAIL ${Number(counts.FAIL || 0)}</span><span class='is-error'>ERROR ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>实时证据（最新）</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
 }
 
 function ExecutionPage(project = currentProject()) {
@@ -3716,7 +3808,7 @@ function ExecutionPage(project = currentProject()) {
       const activeJob = activeJobs.find(job => job.type === 'batch') || activeJobs[0] || null;
       const jobItems = data.jobs.data?.items || [];
       const recentItems = data.recent.data?.items || [];
-      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, pageUrl('/runs', project)))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
+      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
       const listArea = data.view === 'running'
         ? renderActiveExecution(activeJob, project)
         : data.jobs.data
@@ -3861,7 +3953,7 @@ function ReportsPage(project = currentProject()) {
       const {report, filters, summary, runs} = data;
       const metrics = report.metrics || {};
       const distribution = report.distribution || metrics;
-      const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});
+      const reportReturnTo = currentRouteUrl();
       let content;
       if (filters.view === 'overview') {
         content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>柱形为执行数量，折线为通过率</p></div><span class='chip chip-pending'>${escapeHtml(filters.from)} 至 ${escapeHtml(filters.to)}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>${summary.data ? '报告聚合数据' : '用例最新结果快照'}</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>高频失败模块</h2><p>按 FAIL 与 ERROR 合计排序</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>最近失败记录</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article></section>${report.insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(report.insight.title || '分析结论')}</strong><p>${escapeHtml(report.insight.description || report.insight.message || '')}</p></div></aside>` : Components.unavailableState('自动分析结论暂不可用', '报告聚合接口尚未提供分析结论，页面不根据少量快照擅自下判断。')}`;
@@ -4051,6 +4143,8 @@ async function route() {
     throw new Error('页面不存在');
   } catch (error) {
     renderError(error);
+  } finally {
+    restoreRememberedScroll();
   }
 }
 
