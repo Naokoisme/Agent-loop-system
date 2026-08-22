@@ -28,6 +28,35 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.javascript if token != "defect-description-image" else self.stylesheet)
 
+    def test_all_evidence_images_use_the_shared_in_page_preview(self) -> None:
+        for token in (
+            'id="image-preview-dialog"',
+            'id="image-preview-image"',
+            'id="close-image-preview"',
+        ):
+            self.assertIn(token, self.index)
+        for token in (
+            "function imagePreviewLinkAttributes(url, label)",
+            "function initImagePreview()",
+            "data-image-preview",
+            "dialog.showModal()",
+            "event.target === dialog",
+            "lastTrigger.focus()",
+            "initImagePreview();",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertEqual(self.javascript.count("imagePreviewLinkAttributes("), 5)
+        self.assertNotIn('target="_blank"', self.javascript)
+        self.assertNotIn("target='_blank'", self.javascript)
+        for token in (".image-preview-trigger", "cursor: zoom-in;", ".image-preview-dialog", ".image-preview-stage"):
+            self.assertIn(token, self.stylesheet)
+
+    def test_defect_navigation_is_named_ones_defect_list(self) -> None:
+        self.assertIn("ONES缺陷列表", self.index)
+        self.assertIn("ONES缺陷列表", self.javascript)
+        self.assertNotIn("缺陷闭环", self.index)
+        self.assertNotIn("缺陷闭环", self.javascript)
+
     def test_run_form_only_submits_defect(self) -> None:
         self.assertIn("JSON.stringify({ defect: String(defect.number) })", self.javascript)
         self.assertNotIn('id="sheet"', self.javascript)

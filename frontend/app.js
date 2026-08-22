@@ -125,6 +125,11 @@ function escapeHtml(value) {
     .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
+function imagePreviewLinkAttributes(url, label) {
+  const displayLabel = String(label || '图片预览');
+  return `class="image-preview-trigger" href="${escapeHtml(url)}" data-image-preview data-image-preview-label="${escapeHtml(displayLabel)}" aria-label="${escapeHtml(`放大查看：${displayLabel}`)}"`;
+}
+
 function friendlyAgentError(value) {
   const text = String(value ?? '').trim();
   if (!text) return text;
@@ -348,6 +353,50 @@ function initPrimaryNavigation() {
       : destination;
     history.pushState({}, '', routeDestination);
     route();
+  });
+}
+
+function initImagePreview() {
+  const dialog = document.querySelector('#image-preview-dialog');
+  const previewImage = document.querySelector('#image-preview-image');
+  const title = document.querySelector('#image-preview-title');
+  const closeButton = document.querySelector('#close-image-preview');
+  if (!dialog || !previewImage || !title || !closeButton || dialog.dataset.ready === 'true') return;
+  dialog.dataset.ready = 'true';
+  let lastTrigger = null;
+
+  const closePreview = () => {
+    if (dialog.open) dialog.close();
+  };
+
+  document.addEventListener('click', event => {
+    const trigger = event.target.closest?.('[data-image-preview]');
+    if (!trigger || event.defaultPrevented || event.button !== 0) return;
+    const url = trigger.getAttribute('href');
+    if (!url || url === '#') return;
+    event.preventDefault();
+    lastTrigger = trigger;
+    const label = trigger.dataset.imagePreviewLabel || '图片预览';
+    previewImage.src = url;
+    previewImage.alt = label;
+    title.textContent = label;
+    if (!dialog.open) dialog.showModal();
+    closeButton.focus();
+  });
+
+  closeButton.addEventListener('click', closePreview);
+  dialog.addEventListener('click', event => {
+    if (event.target === dialog) closePreview();
+  });
+  dialog.addEventListener('cancel', event => {
+    event.preventDefault();
+    closePreview();
+  });
+  dialog.addEventListener('close', () => {
+    previewImage.removeAttribute('src');
+    previewImage.alt = '';
+    if (lastTrigger?.isConnected) lastTrigger.focus();
+    lastTrigger = null;
   });
 }
 
@@ -917,10 +966,10 @@ async function refreshActiveRepairPanel() {
 
 async function renderList() {
   setActiveNav('defects');
-  document.title = '缺陷闭环 · Agent-loop';
+  document.title = 'ONES缺陷列表 · Agent-loop';
   const initial = listParams();
   app.innerHTML = `
-    ${Components.pageHeader({title: '缺陷闭环', intro: '从缺陷同步、自动修复到构建验证的完整闭环', actions: `<button id="open-import" class="button" type="button">${icon('refresh', 17)} 拉取缺陷</button><a class="button button-secondary" href="${escapeHtml(pageUrl('/defects', currentProject()))}" title="请先选择缺陷后创建修复任务">${icon('plus', 17)} 新建修复任务</a>`})}
+    ${Components.pageHeader({title: 'ONES缺陷列表', intro: '从缺陷同步、自动修复到构建验证的完整闭环', actions: `<button id="open-import" class="button" type="button">${icon('refresh', 17)} 拉取缺陷</button><a class="button button-secondary" href="${escapeHtml(pageUrl('/defects', currentProject()))}" title="请先选择缺陷后创建修复任务">${icon('plus', 17)} 新建修复任务</a>`})}
     ${Components.subTabs([{value: 'queue', label: '缺陷队列'}, {value: 'tasks', label: '修复任务', disabled: true}, {value: 'history', label: '修复历史', disabled: true}], 'queue')}
     <section class="defect-filter-bar" aria-label="缺陷队列工具"><div id="search-stage" class="search-box">${icon('search', 18)}<input id="defect-search" type="search" value="${escapeHtml(initial.query)}" placeholder="搜索编号、标题或描述" autocomplete="off"><button id="clear-search" class="clear-search" type="button" aria-label="清空搜索">清空</button></div><select aria-label="缺陷来源" disabled><option>ONES</option></select></section>
     <section id="import-progress" class="import-progress" aria-live="polite" hidden></section>
@@ -2628,7 +2677,7 @@ function updateBatchScreenshots(items = [], project = DEFAULT_TEST_PROJECT) {
   gallery.innerHTML = values.length ? values.map(item => `
     <figure class="evidence-frame">
       <header>检查点 ${Number(item.index || 0)} · ${escapeHtml(item.label || '')}</header>
-      <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.label || screenshotLabel(project))}"></a>
+      <a ${imagePreviewLinkAttributes(item.url, item.label || screenshotLabel(project))}><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.label || screenshotLabel(project))}"></a>
     </figure>`).join('') : '<div class="evidence-missing">当前用例尚未生成截图</div>';
 }
 
@@ -2803,7 +2852,7 @@ function attachmentCards(attachments) {
 function descriptionImage(item) {
   const alt = item.summary || item.name || '缺陷原图';
   return `<figure class="defect-description-image">
-    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+    <a ${imagePreviewLinkAttributes(item.url, item.name || '缺陷原图')}>
       <img src="${escapeHtml(item.url)}" alt="${escapeHtml(alt)}" onerror="this.closest('figure').innerHTML='<div class=\'evidence-missing\'>缺陷图片读取失败</div>'">
     </a>
     <figcaption>${escapeHtml(item.name || '缺陷原图')}</figcaption>
@@ -3015,9 +3064,10 @@ async function pollJob(jobId, defectNumber) {
 }
 
 function evidenceFrame(label, url, meta = '') {
-  const safeLabel = escapeHtml(label || '模拟器截图');
+  const displayLabel = label || '模拟器截图';
+  const safeLabel = escapeHtml(displayLabel);
   return `<article class="evidence-frame"><header><span>${safeLabel}</span>${meta ? `<small>${escapeHtml(meta)}</small>` : ''}</header>${url
-    ? `<img src="${escapeHtml(url)}" alt="${safeLabel}" onerror="this.outerHTML='<div class=\'evidence-missing\'>截图读取失败</div>'">`
+    ? `<a ${imagePreviewLinkAttributes(url, displayLabel)}><img src="${escapeHtml(url)}" alt="${safeLabel}" onerror="this.closest('a').outerHTML='<div class=\'evidence-missing\'>截图读取失败</div>'"></a>`
     : '<div class="evidence-missing">本次运行没有生成截图</div>'}</article>`;
 }
 
@@ -3695,7 +3745,7 @@ function OverviewPage(project = currentProject()) {
         <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '已固化', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最新结果 PASS', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最新结果 FAIL', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最新结果 ERROR', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
         <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
         <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '报告聚合接口' : reportPending ? '正在补充完整历史统计' : '当前用例最新结果快照'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable && !reportPending ? Components.unavailableState('趋势数据暂不可用', '当前后端未提供 /api/reports/summary，未伪造历史趋势。') : ''}</article></section>
-        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>缺陷闭环概览</h2><p>${defects.pending ? '正在读取缺陷队列' : '缺陷队列与当前自动修复任务'}</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷闭环</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${defectValue('all')}</strong></div><div><span>已通过</span><strong>${defectValue('passed')}</strong></div><div><span>失败</span><strong>${defectValue('failed')}</strong></div><div><span>待处理</span><strong>${defectValue('pending')}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
+        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>ONES缺陷列表概览</h2><p>${defects.pending ? '正在读取缺陷队列' : '缺陷队列与当前自动修复任务'}</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看ONES缺陷列表</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${defectValue('all')}</strong></div><div><span>已通过</span><strong>${defectValue('passed')}</strong></div><div><span>失败</span><strong>${defectValue('failed')}</strong></div><div><span>待处理</span><strong>${defectValue('pending')}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
         <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '来自报告聚合接口' : reportPending ? '正在读取完整运行历史' : '报告接口尚未提供，空缺项不以 0 冒充'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
     },
     mount(root, data) {
@@ -3735,7 +3785,10 @@ function renderWorkflowStepper(job = {}) {
 function renderExecutionEvidence(job = {}) {
   const screenshots = Array.isArray(job.live_screenshots) ? job.live_screenshots : [];
   if (!screenshots.length) return Components.emptyState('尚无实时截图', '截图检查点生成后会自动显示。');
-  return `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => `<figure><a href='${escapeHtml(item.url || '#')}' target='_blank' rel='noopener'><img src='${escapeHtml(item.url || '')}' alt='${escapeHtml(item.label || `检查点 ${index + 1}`)}'></a><figcaption>${escapeHtml(item.label || `检查点 ${index + 1}`)}</figcaption></figure>`).join('')}</div>`;
+  return `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => {
+    const label = item.label || `检查点 ${index + 1}`;
+    return `<figure><a ${imagePreviewLinkAttributes(item.url || '#', label)}><img src='${escapeHtml(item.url || '')}' alt='${escapeHtml(label)}'></a><figcaption>${escapeHtml(label)}</figcaption></figure>`;
+  }).join('')}</div>`;
 }
 
 function renderActiveExecution(job, project) {
@@ -4182,6 +4235,7 @@ async function route() {
 
 initSystemSettings();
 initGlobalTargetSwitcher();
+initImagePreview();
 initPrimaryNavigation();
 window.addEventListener('popstate', route);
 route();
