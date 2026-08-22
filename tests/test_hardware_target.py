@@ -225,7 +225,6 @@ class HardwareCommandPolicyTest(unittest.TestCase):
             "SIM_CHARGE",
             "FACTORY_RESET",
             "POWER_OFF",
-            "TEST_SESSION",
         ):
             with self.subTest(command=command):
                 allowed, reason = hardware_command_allowed(command)
@@ -236,6 +235,9 @@ class HardwareCommandPolicyTest(unittest.TestCase):
         for command in ("GUI_PING", "GUI_STATE", "GUI_TREE", "ENTER_PAGE"):
             with self.subTest(command=command):
                 self.assertEqual(hardware_command_allowed(command), (True, None))
+
+    def test_runner_test_session_command_is_allowed(self) -> None:
+        self.assertEqual(hardware_command_allowed("TEST_SESSION"), (True, None))
 
 
 if __name__ == "__main__":

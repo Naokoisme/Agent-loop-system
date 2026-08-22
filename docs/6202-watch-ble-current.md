@@ -67,9 +67,9 @@ uv run python -m agent_loop_system.tools.watch_ble scan --timeout 8
 - [result.json](../evidence/ble_test_session_start_20260818-102711/result.json)
 - [serial/events.jsonl](../evidence/ble_test_session_start_20260818-102711/serial/events.jsonl)
 
-它不证明任意 UART 指令能在低功耗后自行恢复，也不改变普通 Runner 的会话规则。该 START 是
-一次单独授权的外部动作；普通 Runner 仍只查询 `TEST_SESSION:STATUS`，不自动 START、续期或
-STOP。本次会话没有由 Runner STOP。
+它不证明任意 UART 指令能在低功耗后自行恢复。该证据中的 START 是一次单独授权的 BLE 动作，
+并且本次会话没有发送 STOP；当前 Runner 也可在批次启动或设备重启恢复后发送
+`TEST_SESSION:START` 并等待 `active`。
 
 ## BLE 截图
 

@@ -2052,7 +2052,7 @@ class FrontendDataTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             manager.screenshot_path(job_id, token, "../step_00.bmp")
 
-    def test_hardware_batch_stops_before_cases_when_external_session_is_inactive(self) -> None:
+    def test_hardware_batch_stops_before_cases_when_session_bootstrap_fails(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         job_id = "hardware-preflight"
         case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
@@ -2091,20 +2091,20 @@ class FrontendDataTest(unittest.TestCase):
                 "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
             ),
             patch(
-                "agent_loop_system.tools.real_device.query_test_session_status",
-                return_value=SimpleNamespace(active=False, lease_seconds=0),
-            ) as status_query,
+                "agent_loop_system.tools.real_device.bootstrap_test_session",
+                side_effect=RuntimeError("TEST_SESSION:START failed"),
+            ) as bootstrap,
             patch("frontend.server.subprocess.Popen") as popen,
         ):
             manager._run_batch(job_id)
 
         snapshot = manager.get(job_id)
         load_env.assert_called_once_with()
-        status_query.assert_called_once()
+        bootstrap.assert_called_once()
         popen.assert_not_called()
         self.assertEqual(snapshot["status"], "failed")
         self.assertEqual(snapshot["completed"], 0)
-        self.assertIn("24 小时测试模式未开启", snapshot["error"])
+        self.assertIn("TEST_SESSION:START failed", snapshot["error"])
         self.assertNotIn("hardware", manager._active_job_ids)
 
     def test_hardware_batch_interrupts_on_infrastructure_failure_and_retries_case(self) -> None:
@@ -2153,12 +2153,17 @@ class FrontendDataTest(unittest.TestCase):
             def communicate(self) -> tuple[str, str]:
                 return "", "HardwareSerialTimeoutError: no result for :GUI_PING:1"
 
-        preflight = SimpleNamespace(active=True, lease_seconds=86000)
+        preflight = SimpleNamespace(
+            status=SimpleNamespace(active=True, lease_seconds=86000),
+            start_sent=True,
+            gui_ping_attempts=1,
+            bootstrap_event_seen=False,
+        )
         with (
             patch("agent_loop_system.main._load_env"),
             patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
             patch(
-                "agent_loop_system.tools.real_device.query_test_session_status",
+                "agent_loop_system.tools.real_device.bootstrap_test_session",
                 return_value=preflight,
             ),
             patch(
@@ -2219,7 +2224,7 @@ class FrontendDataTest(unittest.TestCase):
             patch("agent_loop_system.main._load_env"),
             patch("agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"),
             patch(
-                "agent_loop_system.tools.real_device.query_test_session_status",
+                "agent_loop_system.tools.real_device.bootstrap_test_session",
                 return_value=preflight,
             ),
             patch(
