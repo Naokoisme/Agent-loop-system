@@ -875,16 +875,69 @@ class TestHistoryStore:
         }
         if not normalized_ids or not self.paths.test_history.is_dir():
             return records_by_batch
-        for path in self.paths.test_history.rglob("run.json"):
-            run = _read_json(path)
-            if not isinstance(run, dict):
-                continue
-            records = records_by_batch.get(str(run.get("batch_id") or ""))
-            if records is None:
-                continue
-            token = str(run.get("batch_token") or "")
-            if token and SAFE_SEGMENT.fullmatch(token):
-                records[token] = run
+        summary_indexes: dict[
+            str, dict[tuple[str, str], dict[str, Any]]
+        ] = {project: {} for project in TEST_PROJECTS}
+        checked_sheets: dict[tuple[str, str], bool] = {}
+        with self._summary_index_lock:
+            for path in self.paths.test_history.rglob("run.json"):
+                run = _read_json(path)
+                if isinstance(run, dict):
+                    records = records_by_batch.get(str(run.get("batch_id") or ""))
+                    if records is not None:
+                        token = str(run.get("batch_token") or "")
+                        if token and SAFE_SEGMENT.fullmatch(token):
+                            records[token] = run
+
+                relative_parts = path.relative_to(self.paths.test_history).parts
+                if (
+                    len(relative_parts) == 5
+                    and relative_parts[0] in TEST_PROJECTS
+                    and relative_parts[0] != DEFAULT_TEST_PROJECT
+                ):
+                    project, sheet, case_id, run_id, _ = relative_parts
+                elif len(relative_parts) == 4:
+                    project = DEFAULT_TEST_PROJECT
+                    sheet, case_id, run_id, _ = relative_parts
+                else:
+                    continue
+                if not SAFE_SEGMENT.fullmatch(case_id) or not SAFE_SEGMENT.fullmatch(run_id):
+                    continue
+                sheet_key = (project, sheet)
+                if sheet_key not in checked_sheets:
+                    try:
+                        _case_map_path(self.paths, sheet, project)
+                    except ValueError:
+                        checked_sheets[sheet_key] = False
+                    else:
+                        checked_sheets[sheet_key] = True
+                if not checked_sheets[sheet_key]:
+                    continue
+
+                key = (sheet, case_id)
+                summary = summary_indexes[project].setdefault(
+                    key,
+                    {"latest": None, "history_count": 0, "latest_run_id": ""},
+                )
+                summary["history_count"] += 1
+
+                if not isinstance(run, dict):
+                    continue
+                if run_id > summary["latest_run_id"]:
+                    summary["latest"] = self._compact_summary(run)
+                    summary["latest_run_id"] = run_id
+
+            self._summary_index_cache = {
+                project: {
+                    key: {
+                        "latest": summary["latest"],
+                        "history_count": summary["history_count"],
+                    }
+                    for key, summary in index.items()
+                    if summary["latest"] is not None
+                }
+                for project, index in summary_indexes.items()
+            }
         return records_by_batch
 
     def list(

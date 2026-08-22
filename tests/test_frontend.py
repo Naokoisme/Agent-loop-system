@@ -1042,6 +1042,14 @@ class FrontendDataTest(unittest.TestCase):
             self.test_history.batch_records("batch-one"),
             records["batch-one"],
         )
+        with patch.object(
+            self.test_history,
+            "_case_summary_from_dir",
+            side_effect=AssertionError("批次恢复扫描后不应再次读取历史目录"),
+        ):
+            summary_index = self.test_history.summary_index()
+        self.assertEqual(summary_index[("计算器", "CALC_001")]["history_count"], 2)
+        self.assertEqual(summary_index[("计算器", "CALC_001")]["latest"]["verdict"], "PASS")
 
     def test_agent_test_history_archives_multiple_checkpoint_screenshots(self) -> None:
         first = self.paths.evidence / "checkpoint-1.bmp"

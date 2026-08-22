@@ -265,6 +265,29 @@ class FrontendAssetsTest(unittest.TestCase):
         )
         self.assertEqual(self.javascript.count("loadCaseCatalog(project)"), 1)
 
+    def test_overview_cold_start_defers_slow_secondary_queries(self) -> None:
+        overview_start = self.javascript.index("function OverviewPage(")
+        overview_end = self.javascript.index("function renderWorkflowStepper(", overview_start)
+        overview_source = self.javascript[overview_start:overview_end]
+        controller_start = overview_source.index("const controller = {")
+        load_start = overview_source.index("async load()", controller_start)
+        render_start = overview_source.index("render(data)", load_start)
+        initial_load = overview_source[load_start:render_start]
+
+        self.assertNotIn("/api/defects?page=1&page_size=6", initial_load)
+        self.assertNotIn("/api/reports/summary?", initial_load)
+        for token in (
+            "async function loadDeferredSections(root)",
+            "optionalApi('/api/defects?page=1&page_size=6')",
+            "optionalApi(`/api/reports/summary?project=${encodeURIComponent(project)}`)",
+            "patchRenderedSections(root, controller.render(nextData), 'data-overview-deferred')",
+            "void loadDeferredSections(root);",
+            "data-overview-deferred='report'",
+            "data-overview-deferred='defects'",
+            "data-overview-deferred='daily'",
+        ):
+            self.assertIn(token, overview_source)
+
     def test_workspace_typography_scale_and_overview_shortcuts_are_clean(self) -> None:
         for token in (
             "--font-size-micro: 11px",

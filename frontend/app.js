@@ -3583,6 +3583,7 @@ function renderCaseSnapshotRows(items = [], project = currentProject(), limit = 
 function OverviewPage(project = currentProject()) {
   let refreshTimer = null;
   let refreshPromise = null;
+  let deferredPromise = null;
   let currentData = null;
   let destroyed = false;
 
@@ -3597,6 +3598,26 @@ function OverviewPage(project = currentProject()) {
       optionalApi(`/api/reports/summary?project=${encodeURIComponent(project)}`)
     ]);
     return {...currentData, catalog, active, reports, refreshedAt: new Date()};
+  }
+
+  async function loadDeferredSections(root) {
+    if (destroyed) return;
+    if (deferredPromise) return deferredPromise;
+    deferredPromise = (async () => {
+      const [defects, reports] = await Promise.all([
+        optionalApi('/api/defects?page=1&page_size=6'),
+        optionalApi(`/api/reports/summary?project=${encodeURIComponent(project)}`)
+      ]);
+      if (destroyed) return;
+      const nextData = {...currentData, defects, reports};
+      patchRenderedSections(root, controller.render(nextData), 'data-overview-deferred');
+      currentData = nextData;
+    })();
+    try {
+      await deferredPromise;
+    } finally {
+      deferredPromise = null;
+    }
   }
 
   function scheduleRefresh(root) {
@@ -3630,15 +3651,22 @@ function OverviewPage(project = currentProject()) {
 
   const controller = {
     async load() {
-      const [catalog, active, defects, repair, reports, environments] = await Promise.all([
+      const [catalog, active, repair, environments] = await Promise.all([
         api(`/api/tests/overview?project=${encodeURIComponent(project)}&recent_limit=7&exception_limit=6`),
         optionalApi('/api/tests/active'),
-        optionalApi('/api/defects?page=1&page_size=6'),
         optionalApi('/api/run/active'),
-        optionalApi(`/api/reports/summary?project=${encodeURIComponent(project)}`),
         optionalApi('/api/environments')
       ]);
-      return {catalog, active, defects, repair, reports, environments, refreshedAt: new Date()};
+      const pending = {available: true, data: null, error: null, pending: true};
+      return {
+        catalog,
+        active,
+        defects: {...pending},
+        repair,
+        reports: {...pending},
+        environments,
+        refreshedAt: new Date()
+      };
     },
     render(data) {
       const {catalog, active, defects, repair, reports, environments, refreshedAt} = data;
@@ -3656,16 +3684,19 @@ function OverviewPage(project = currentProject()) {
       const batchCounts = activeBatch?.verdict_counts || {};
       const activeBatchHtml = activeBatch ? `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次（进行中）</h2><span class='chip chip-running'>${escapeHtml(activeBatch.id || '运行中')}</span></div><a class='button button-secondary' href='${escapeHtml(testBatchHref(activeBatch.id))}'>查看详情</a></header><div class='active-batch-layout'>${Components.progressRing(percent)}<div class='batch-facts'><dl><div><dt>执行环境</dt><dd>${escapeHtml(testProject(activeBatch.project || project).projectLabel)} · ${escapeHtml(testProject(activeBatch.project || project).targetLabel)}</dd></div><div><dt>执行用例</dt><dd>${completed.toLocaleString('zh-CN')} / ${batchTotal.toLocaleString('zh-CN')}</dd></div><div><dt>开始时间</dt><dd>${formatTime(activeBatch.started_at)}</dd></div></dl><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>PASS ${Number(batchCounts.PASS || 0)}</span><span class='is-fail'>FAIL ${Number(batchCounts.FAIL || 0)}</span><span class='is-error'>ERROR ${Number(batchCounts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(batchCounts.CANNOT_VERIFY || 0)}</span></div></div></div></article>` : `<article class='workspace-panel active-batch-card'><header><div><h2>执行批次</h2><span class='chip chip-pending'>当前空闲</span></div><a class='button' href='${escapeHtml(pageUrl('/cases', project))}'>新建执行</a></header>${Components.emptyState('当前没有运行中的批次', '可从用例管理勾选用例，或按状态创建批次。')}</article>`;
       const reportAvailable = Boolean(reports.data);
+      const reportPending = Boolean(reports.pending);
       const reportCounts = reports.data?.distribution || verdicts;
+      const defectAvailable = Boolean(defects.data);
       const defectSummary = defects.data?.summary || {};
+      const defectValue = key => defectAvailable ? Number(defectSummary[key] || 0) : '—';
       const repairJob = repair.data?.job || null;
       return `${Components.pageHeader({title: '项目总览', intro: '实时掌握测试执行状态、用例质量与环境健康度', updatedAt: formatTime(refreshedAt), actions: `<button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
         <section class='workspace-panel environment-overview-panel'><header><div><h2>环境就绪状态</h2><p>协议来自项目配置；就绪状态只采用真实环境检查结果</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project))}'>环境中心 ›</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.id === profile.project || item.project === profile.project), project)).join('')}</div></section>
         <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '已固化', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最新结果 PASS', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最新结果 FAIL', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最新结果 ERROR', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
         <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
-        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel'><header><div><h2>报告概览</h2><p>${reportAvailable ? '报告聚合接口' : '当前用例最新结果快照'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable ? Components.unavailableState('趋势数据暂不可用', '当前后端未提供 /api/reports/summary，未伪造历史趋势。') : ''}</article></section>
-        <section class='workspace-panel defect-overview-strip'><header><div><h2>缺陷闭环概览</h2><p>缺陷队列与当前自动修复任务</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷闭环</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${Number(defectSummary.all || 0)}</strong></div><div><span>已通过</span><strong>${Number(defectSummary.passed || 0)}</strong></div><div><span>失败</span><strong>${Number(defectSummary.failed || 0)}</strong></div><div><span>待处理</span><strong>${Number(defectSummary.pending || 0)}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
-        <section class='workspace-panel daily-digest'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '来自报告聚合接口' : '报告接口尚未提供，空缺项不以 0 冒充'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
+        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '报告聚合接口' : reportPending ? '正在补充完整历史统计' : '当前用例最新结果快照'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable && !reportPending ? Components.unavailableState('趋势数据暂不可用', '当前后端未提供 /api/reports/summary，未伪造历史趋势。') : ''}</article></section>
+        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>缺陷闭环概览</h2><p>${defects.pending ? '正在读取缺陷队列' : '缺陷队列与当前自动修复任务'}</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷闭环</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${defectValue('all')}</strong></div><div><span>已通过</span><strong>${defectValue('passed')}</strong></div><div><span>失败</span><strong>${defectValue('failed')}</strong></div><div><span>待处理</span><strong>${defectValue('pending')}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
+        <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '来自报告聚合接口' : reportPending ? '正在读取完整运行历史' : '报告接口尚未提供，空缺项不以 0 冒充'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -3677,6 +3708,7 @@ function OverviewPage(project = currentProject()) {
         invalidateCaseCatalog(project);
         route();
       });
+      void loadDeferredSections(root);
       scheduleRefresh(root);
     },
     destroy() {
