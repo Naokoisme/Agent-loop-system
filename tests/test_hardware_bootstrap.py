@@ -292,7 +292,7 @@ class HardwareCaseResetTest(unittest.TestCase):
         serial = self._serial()
         mtp = FakeMtpGate()
         capture = FakeCaptureProvider()
-        judge = mock.Mock(return_value=("PASS", "截图显示单列列表"))
+        judge = mock.Mock(return_value=("LIST_RADIUS", "截图显示单列列表"))
         environment = {"W30_HARDWARE_TRANSPORT": "supercom"}
         with tempfile.TemporaryDirectory() as root, mock.patch.object(
             real_device,
@@ -346,20 +346,17 @@ class HardwareCaseResetTest(unittest.TestCase):
         self.assertEqual(capture.close_calls, 1)
         judge.assert_called_once()
 
-    def test_default_menu_style_judge_uses_one_visual_checkpoint(self) -> None:
+    def test_default_menu_style_classifier_returns_structured_style(self) -> None:
         screenshot = Path("menu-style.bmp")
-        visual = SimpleNamespace(verdict="PASS", reason="截图显示列表风格")
+        visual = SimpleNamespace(style="HONEYCOMB", reason="截图显示蜂窝风格")
         with mock.patch(
-            "agent_loop_system.tools.test.judge_test_with_vision",
+            "agent_loop_system.tools.test.classify_menu_style_with_vision",
             return_value=visual,
-        ) as judge:
-            verdict, reason = real_device._judge_list_menu_style(screenshot)
+        ) as classify:
+            style, reason = real_device._classify_menu_style(screenshot)
 
-        self.assertEqual((verdict, reason), ("PASS", "截图显示列表风格"))
-        expected_text, screenshots, verification_points = judge.call_args.args
-        self.assertIn("单列纵向列表", expected_text)
-        self.assertEqual(screenshots, [{"path": str(screenshot), "label": "主菜单风格检查"}])
-        self.assertEqual(len(verification_points), 1)
+        self.assertEqual((style, reason), ("HONEYCOMB", "截图显示蜂窝风格"))
+        classify.assert_called_once_with(str(screenshot))
 
     def test_popup_state_mismatch_blocks_the_case(self) -> None:
         serial = self._serial(popup={"id": 901, "name": "CHARGING"})
@@ -380,67 +377,99 @@ class HardwareCaseResetTest(unittest.TestCase):
         self.assertIn("popup", str(raised.exception))
         self.assertEqual(serial.stop_calls, 1)
 
-    def test_cycles_at_most_three_times_until_the_fourth_screenshot_is_list(self) -> None:
-        serial = self._serial(menu_switches=3)
-        mtp = FakeMtpGate()
-        capture = FakeCaptureProvider()
-        judge = mock.Mock(side_effect=[
-            ("FAIL", "蜂窝风格"),
-            ("FAIL", "瀑布风格"),
-            ("FAIL", "星环风格"),
-            ("PASS", "列表风格"),
-        ])
-        with tempfile.TemporaryDirectory() as root, mock.patch.object(
-            real_device,
-            "_positive_handshake_sequence",
-            side_effect=range(101, 130),
-        ):
-            result = real_device.reset_hardware_case_state(
-                evidence_dir=root,
-                serial_session=serial,
-                mtp_system=mtp,
-                capture_provider=capture,
-                menu_style_judge=judge,
-            )
-            screenshots = sorted(Path(root).glob("menu-style-check-*.bmp"))
+    def test_exact_style_uses_minimum_switches_and_one_final_confirmation(self) -> None:
+        expected_switches = {
+            "LIST_RADIUS": 0,
+            "HONEYCOMB": 3,
+            "WATERFALL": 2,
+            "GALACTIC_RING": 1,
+        }
+        for initial_style, switch_count in expected_switches.items():
+            with self.subTest(initial_style=initial_style):
+                serial = self._serial(menu_switches=switch_count)
+                capture = FakeCaptureProvider()
+                classifications = [(initial_style, "初始风格")]
+                if switch_count:
+                    classifications.append(("LIST_RADIUS", "已切换到列表风格"))
+                judge = mock.Mock(side_effect=classifications)
+                with tempfile.TemporaryDirectory() as root, mock.patch.object(
+                    real_device,
+                    "_positive_handshake_sequence",
+                    side_effect=range(101, 140),
+                ):
+                    result = real_device.reset_hardware_case_state(
+                        evidence_dir=root,
+                        serial_session=serial,
+                        mtp_system=FakeMtpGate(),
+                        capture_provider=capture,
+                        menu_style_judge=judge,
+                    )
+                    screenshots = sorted(Path(root).glob("menu-style-*.bmp"))
+                    screenshot_contents = [
+                        screenshot.read_bytes() for screenshot in screenshots
+                    ]
 
-        commands = [command for command, _kwargs in serial.send_calls]
-        self.assertEqual(commands.count(":BUTTON_PRESS:1,3,0"), 3)
-        self.assertEqual(commands.count(":ENTER_PAGE:DIAL,0"), 2)
-        self.assertEqual(len(capture.capture_calls), 4)
-        self.assertEqual(len(screenshots), 4)
-        self.assertEqual(judge.call_count, 4)
-        self.assertEqual(capture.close_calls, 1)
-        self.assertEqual(serial.stop_calls, 1)
-        self.assertEqual(result.current_page, "DIAL")
-
-    def test_four_non_list_screenshots_block_before_returning_to_dial(self) -> None:
-        serial = self._serial(menu_switches=3)
-        capture = FakeCaptureProvider()
-        judge = mock.Mock(return_value=("FAIL", "仍是非列表风格"))
-        with tempfile.TemporaryDirectory() as root, mock.patch.object(
-            real_device,
-            "_positive_handshake_sequence",
-            side_effect=range(101, 130),
-        ):
-            with self.assertRaises(real_device.HardwareCaseResetError) as raised:
-                real_device.reset_hardware_case_state(
-                    evidence_dir=root,
-                    serial_session=serial,
-                    mtp_system=FakeMtpGate(),
-                    capture_provider=capture,
-                    menu_style_judge=judge,
+                commands = [command for command, _kwargs in serial.send_calls]
+                expected_captures = 1 if switch_count == 0 else 2
+                self.assertEqual(
+                    commands.count(":BUTTON_PRESS:1,3,0"),
+                    switch_count,
                 )
+                self.assertEqual(commands.count(":ENTER_PAGE:DIAL,0"), 2)
+                self.assertEqual(len(capture.capture_calls), expected_captures)
+                self.assertEqual(len(screenshots), expected_captures)
+                self.assertEqual(judge.call_count, expected_captures)
+                self.assertEqual(capture.close_calls, 1)
+                self.assertEqual(serial.stop_calls, 1)
+                self.assertEqual(result.current_page, "DIAL")
+                if switch_count:
+                    self.assertEqual(
+                        [path.name for path in screenshots],
+                        ["menu-style-final.bmp", "menu-style-initial.bmp"],
+                    )
+                    self.assertNotEqual(
+                        screenshot_contents[0],
+                        screenshot_contents[1],
+                    )
 
-        commands = [command for command, _kwargs in serial.send_calls]
-        self.assertEqual(raised.exception.code, "MENU_STYLE_NOT_LIST")
-        self.assertEqual(commands.count(":BUTTON_PRESS:1,3,0"), 3)
-        self.assertEqual(commands.count(":ENTER_PAGE:DIAL,0"), 1)
-        self.assertEqual(len(capture.capture_calls), 4)
-        self.assertEqual(capture.close_calls, 1)
-        self.assertEqual(serial.stop_calls, 1)
+    def test_final_non_list_or_unknown_blocks_before_returning_to_dial(self) -> None:
+        for final_style, expected_code in (
+            ("HONEYCOMB", "MENU_STYLE_NOT_LIST"),
+            ("UNKNOWN", "MENU_STYLE_UNVERIFIED"),
+        ):
+            with self.subTest(final_style=final_style):
+                serial = self._serial(menu_switches=1)
+                capture = FakeCaptureProvider()
+                judge = mock.Mock(side_effect=[
+                    ("GALACTIC_RING", "初始为星环风格"),
+                    (final_style, "最终截图未确认列表风格"),
+                ])
+                with tempfile.TemporaryDirectory() as root, mock.patch.object(
+                    real_device,
+                    "_positive_handshake_sequence",
+                    side_effect=range(101, 130),
+                ):
+                    with self.assertRaises(
+                        real_device.HardwareCaseResetError
+                    ) as raised:
+                        real_device.reset_hardware_case_state(
+                            evidence_dir=root,
+                            serial_session=serial,
+                            mtp_system=FakeMtpGate(),
+                            capture_provider=capture,
+                            menu_style_judge=judge,
+                        )
 
-    def test_unverifiable_menu_screenshot_blocks_without_cycling(self) -> None:
+                commands = [command for command, _kwargs in serial.send_calls]
+                self.assertEqual(raised.exception.code, expected_code)
+                self.assertEqual(commands.count(":BUTTON_PRESS:1,3,0"), 1)
+                self.assertEqual(commands.count(":ENTER_PAGE:DIAL,0"), 1)
+                self.assertEqual(len(capture.capture_calls), 2)
+                self.assertEqual(judge.call_count, 2)
+                self.assertEqual(capture.close_calls, 1)
+                self.assertEqual(serial.stop_calls, 1)
+
+    def test_unknown_initial_style_blocks_without_cycling(self) -> None:
         serial = self._serial()
         capture = FakeCaptureProvider()
         with tempfile.TemporaryDirectory() as root, mock.patch.object(
@@ -455,7 +484,7 @@ class HardwareCaseResetTest(unittest.TestCase):
                     mtp_system=FakeMtpGate(),
                     capture_provider=capture,
                     menu_style_judge=lambda _path: (
-                        "CANNOT_VERIFY",
+                        "UNKNOWN",
                         "截图被遮挡",
                     ),
                 )

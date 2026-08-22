@@ -40,11 +40,15 @@ _CLEAR_BOOT_POPUP = ":BUTTON_PRESS:1,1,0"
 _ENTER_DIAL = ":ENTER_PAGE:DIAL,0"
 _OPEN_MAIN_MENU = _CLEAR_BOOT_POPUP
 _CYCLE_MENU_STYLE = ":BUTTON_PRESS:1,3,0"
-_MENU_STYLE_CHECK_LIMIT = 4
-_LIST_MENU_EXPECTATION = (
-    "当前截图显示手表主菜单的列表风格：应用以单列纵向列表排列，"
-    "每行一个应用图标并带对应的应用名称；不得是蜂窝、瀑布或星环图标布局。"
-)
+_LIST_MENU_STYLE = "LIST_RADIUS"
+_UNKNOWN_MENU_STYLE = "UNKNOWN"
+# 6202_W5230 Version 30 advances through MENU_STYLE_CONFIG in this order.
+_MENU_STYLE_SWITCH_COUNTS = {
+    "LIST_RADIUS": 0,
+    "HONEYCOMB": 3,
+    "WATERFALL": 2,
+    "GALACTIC_RING": 1,
+}
 _DEFAULT_CAPTURE_TIMEOUT = 12.0
 _DEFAULT_BLE_CAPTURE_TIMEOUT = 180.0
 _CAPTURE_PROVIDER_ENV = "W30_HARDWARE_CAPTURE_PROVIDER"
@@ -447,15 +451,11 @@ def _wait_for_reset_gui(
         )
 
 
-def _judge_list_menu_style(screenshot_path: Path) -> tuple[str, str]:
-    from agent_loop_system.tools.test import judge_test_with_vision
+def _classify_menu_style(screenshot_path: Path) -> tuple[str, str]:
+    from agent_loop_system.tools.test import classify_menu_style_with_vision
 
-    verdict = judge_test_with_vision(
-        _LIST_MENU_EXPECTATION,
-        [{"path": str(screenshot_path), "label": "主菜单风格检查"}],
-        ["确认当前主菜单为单列、图标加应用名称的列表风格"],
-    )
-    return str(verdict.verdict).upper(), str(verdict.reason)
+    classification = classify_menu_style_with_vision(str(screenshot_path))
+    return str(classification.style).upper(), str(classification.reason)
 
 
 def _restore_list_menu_style(
@@ -488,43 +488,49 @@ def _restore_list_menu_style(
         usb_timeout=usb_timeout,
         mtp_system=mtp_system,
     )
+
+    def capture_and_classify(label: str) -> tuple[str, str]:
+        screenshot_path = evidence_dir / f"menu-style-{label}.bmp"
+        try:
+            frame = provider.capture(timeout=capture_timeout)
+            frame.save_bmp(screenshot_path)
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "MENU_STYLE_CAPTURE_FAILED",
+                f"failed to capture {label} menu-style check: {exc}",
+            ) from exc
+
+        try:
+            style, reason = menu_style_judge(screenshot_path)
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "MENU_STYLE_JUDGMENT_FAILED",
+                f"menu-style screenshot judgment failed at {label} check: {exc}",
+            ) from exc
+        normalized_style = str(style or "").strip().upper()
+        normalized_reason = str(reason or "")
+        if (
+            normalized_style not in _MENU_STYLE_SWITCH_COUNTS
+            and normalized_style != _UNKNOWN_MENU_STYLE
+        ):
+            normalized_reason = (
+                f"classifier returned unsupported style {normalized_style or 'empty'!r}; "
+                f"{normalized_reason or 'no reason'}"
+            )
+            normalized_style = _UNKNOWN_MENU_STYLE
+        return normalized_style, normalized_reason
+
     try:
-        for check_index in range(1, _MENU_STYLE_CHECK_LIMIT + 1):
-            screenshot_path = evidence_dir / f"menu-style-check-{check_index:02d}.bmp"
-            try:
-                frame = provider.capture(timeout=capture_timeout)
-                frame.save_bmp(screenshot_path)
-            except Exception as exc:
-                raise HardwareCaseResetError(
-                    "MENU_STYLE_CAPTURE_FAILED",
-                    f"failed to capture menu-style check {check_index}: {exc}",
-                ) from exc
+        initial_style, initial_reason = capture_and_classify("initial")
+        if initial_style == _UNKNOWN_MENU_STYLE:
+            raise HardwareCaseResetError(
+                "MENU_STYLE_UNVERIFIED",
+                "initial menu-style screenshot could not identify the configured style "
+                f"(reason={initial_reason or 'none'})",
+            )
 
-            try:
-                verdict, reason = menu_style_judge(screenshot_path)
-            except Exception as exc:
-                raise HardwareCaseResetError(
-                    "MENU_STYLE_JUDGMENT_FAILED",
-                    f"menu-style screenshot judgment failed at check {check_index}: {exc}",
-                ) from exc
-            verdict = str(verdict or "").strip().upper()
-            reason = str(reason or "")
-            if verdict == "PASS":
-                break
-            if verdict != "FAIL":
-                raise HardwareCaseResetError(
-                    "MENU_STYLE_UNVERIFIED",
-                    "menu-style screenshot could not prove List style "
-                    f"at check {check_index} (verdict={verdict or 'unknown'}, "
-                    f"reason={reason or 'none'})",
-                )
-            if check_index == _MENU_STYLE_CHECK_LIMIT:
-                raise HardwareCaseResetError(
-                    "MENU_STYLE_NOT_LIST",
-                    "main menu did not reach List style after checking all four "
-                    f"configured styles (last_reason={reason or 'none'})",
-                )
-
+        switch_count = _MENU_STYLE_SWITCH_COUNTS[initial_style]
+        for switch_index in range(1, switch_count + 1):
             switched = session.send(
                 _CYCLE_MENU_STYLE,
                 request="button_press",
@@ -536,8 +542,23 @@ def _restore_list_menu_style(
             _wait_for_reset_gui(
                 session,
                 command_timeout=command_timeout,
-                context=f"after menu-style switch {check_index}",
+                context=f"after menu-style switch {switch_index}/{switch_count}",
             )
+
+        if switch_count:
+            final_style, final_reason = capture_and_classify("final")
+            if final_style != _LIST_MENU_STYLE:
+                error_code = (
+                    "MENU_STYLE_UNVERIFIED"
+                    if final_style == _UNKNOWN_MENU_STYLE
+                    else "MENU_STYLE_NOT_LIST"
+                )
+                raise HardwareCaseResetError(
+                    error_code,
+                    "menu-style reset did not visually confirm LIST_RADIUS "
+                    f"after {switch_count} switch(es) from {initial_style} "
+                    f"(final_style={final_style}, reason={final_reason or 'none'})",
+                )
     finally:
         provider.close()
 
@@ -686,7 +707,7 @@ def reset_hardware_case_state(
             usb_timeout=usb_timeout,
             mtp_system=system,
             capture_provider=capture_provider,
-            menu_style_judge=menu_style_judge or _judge_list_menu_style,
+            menu_style_judge=menu_style_judge or _classify_menu_style,
         )
 
         state_sequence = _positive_handshake_sequence()

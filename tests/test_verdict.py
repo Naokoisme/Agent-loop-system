@@ -7,11 +7,14 @@ from pathlib import Path
 from unittest import mock
 
 from PIL import Image
+from pydantic import ValidationError
 
 from agent_loop_system.tools.test import (
+    MenuStyleClassification,
     Verdict,
     _configure_console_output,
     aggregate_verdicts,
+    classify_menu_style_with_vision,
     judge_case_result,
     judge_test_with_vision,
     judge_with_llm,
@@ -46,6 +49,75 @@ class AggregateVerdictsTest(unittest.TestCase):
     def test_skip_never_yields_pass(self) -> None:
         self.assertEqual(aggregate_verdicts(["SKIP"]), "CANNOT_VERIFY")
         self.assertEqual(aggregate_verdicts(["PASS", "SKIP"]), "CANNOT_VERIFY")
+
+
+class MenuStyleClassificationTest(unittest.TestCase):
+    def test_schema_accepts_only_the_four_configured_styles_or_unknown(self) -> None:
+        style_schema = MenuStyleClassification.model_json_schema()["properties"][
+            "style"
+        ]
+        self.assertEqual(
+            style_schema["enum"],
+            [
+                "LIST_RADIUS",
+                "HONEYCOMB",
+                "WATERFALL",
+                "GALACTIC_RING",
+                "UNKNOWN",
+            ],
+        )
+        with self.assertRaises(ValidationError):
+            MenuStyleClassification(style="LIST", reason="非6202配置枚举")
+
+    def test_unavailable_visual_agent_returns_unknown(self) -> None:
+        with mock.patch(
+            "agent_loop_system.tools.llm_config.get_llm_api_key",
+            return_value="",
+        ):
+            result = classify_menu_style_with_vision("missing.bmp")
+
+        self.assertEqual(result.style, "UNKNOWN")
+        self.assertIn("API key", result.reason)
+
+    def test_classifier_sends_one_image_with_the_structured_schema(self) -> None:
+        captured: dict[str, object] = {}
+
+        class Structured:
+            def invoke(self, messages):
+                captured["content"] = messages[0].content
+                return MenuStyleClassification(
+                    style="WATERFALL",
+                    reason="图标沿纵向弧线排列",
+                )
+
+        class LLM:
+            def with_structured_output(self, schema):
+                captured["schema"] = schema
+                return Structured()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            screenshot = Path(tmp) / "menu.bmp"
+            Image.new("RGB", (4, 4), "black").save(screenshot)
+            with mock.patch(
+                "agent_loop_system.tools.llm_config.get_llm_api_key",
+                return_value="sk-test",
+            ), mock.patch(
+                "agent_loop_system.tools.llm_config.create_chat_llm",
+                return_value=LLM(),
+            ), mock.patch(
+                "agent_loop_system.tools.test.invoke_llm_with_retry",
+                side_effect=lambda fn: fn(),
+            ):
+                result = classify_menu_style_with_vision(str(screenshot))
+
+        self.assertEqual(result.style, "WATERFALL")
+        self.assertIs(captured["schema"], MenuStyleClassification)
+        content = captured["content"]
+        self.assertEqual(sum(item["type"] == "image_url" for item in content), 1)
+        prompt = content[0]["text"]
+        self.assertIn("LIST_RADIUS", prompt)
+        self.assertIn("UNKNOWN", prompt)
+        self.assertIn("不得猜测", prompt)
 
 
 class ConsoleOutputTest(unittest.TestCase):

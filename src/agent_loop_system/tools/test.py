@@ -142,6 +142,19 @@ class Verdict(BaseModel):
     reason: str
 
 
+class MenuStyleClassification(BaseModel):
+    """6202 主菜单截图的结构化风格分类。"""
+
+    style: Literal[
+        "LIST_RADIUS",
+        "HONEYCOMB",
+        "WATERFALL",
+        "GALACTIC_RING",
+        "UNKNOWN",
+    ]
+    reason: str
+
+
 class CaseDecision(BaseModel):
     """Runner 最终判定；执行异常由证据门禁产生，不交给视觉模型猜。"""
 
@@ -405,6 +418,65 @@ def judge_test_with_vision(
         )
     except LLMRetryError as exc:
         return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 出错：{exc}")
+
+
+def classify_menu_style_with_vision(
+    screenshot_path: str,
+) -> MenuStyleClassification:
+    """只根据一张主菜单截图返回6202配置中的精确菜单风格。"""
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    def unknown(reason: str) -> MenuStyleClassification:
+        return MenuStyleClassification(style="UNKNOWN", reason=reason)
+
+    api_key = get_llm_api_key()
+    if not api_key or api_key.startswith("暂时"):
+        return unknown("识图 Agent API 配置出错：API key 不可用")
+    try:
+        from langchain_core.messages import HumanMessage
+        from langchain_openai import ChatOpenAI
+    except ImportError:
+        return unknown("识图 Agent 依赖缺失：langchain 未安装")
+
+    encoded = _bmp_to_png_b64(screenshot_path)
+    if not encoded:
+        return unknown(f"菜单风格截图读取失败: {screenshot_path}")
+
+    try:
+        llm = create_chat_llm()
+        if llm is None:
+            return unknown("识图 Agent 初始化失败")
+    except Exception as exc:
+        return unknown(f"识图 Agent API 初始化出错：{exc}")
+
+    prompt = (
+        "你是嵌入式手表主菜单风格分类器。只观察下方这一张当前截图，"
+        "必须从以下五个枚举中选择一个 style：\n"
+        "- LIST_RADIUS：单列纵向列表，每行一个应用图标并带应用名称。\n"
+        "- HONEYCOMB：多个圆形应用图标按蜂窝状密集排列，通常不显示名称。\n"
+        "- WATERFALL：应用图标沿纵向弧线或瀑布状排列，图标大小随位置变化。\n"
+        "- GALACTIC_RING：应用图标按圆环或轨道状排列。\n"
+        "- UNKNOWN：截图不是清楚可见的主菜单、被遮挡，或无法可靠区分。\n\n"
+        "只做当前可见布局分类，不依据命令结果、页面名、先前截图或自由联想。"
+        "无法确认时必须返回 UNKNOWN，不得猜测。reason 简要说明肉眼证据。"
+    )
+    content: list[dict[str, object]] = [
+        {"type": "text", "text": prompt},
+        {"type": "text", "text": _screenshot_capture_note(screenshot_path)},
+        {
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{encoded}"},
+        },
+    ]
+    try:
+        message = HumanMessage(content=content)
+        return invoke_llm_with_retry(
+            lambda: llm.with_structured_output(MenuStyleClassification).invoke(
+                [message]
+            )
+        )
+    except LLMRetryError as exc:
+        return unknown(f"识图 Agent API 出错：{exc}")
 
 
 def judge_case_result(result: CaseRunResult) -> CaseDecision:
