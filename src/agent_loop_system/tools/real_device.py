@@ -6,7 +6,7 @@ import math
 import os
 import shutil
 import time
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -38,6 +38,13 @@ _TEST_SESSION_STATUS = ":TEST_SESSION:STATUS"
 _SYSTEM_REBOOT = ":SYSTEM_REBOOT:"
 _CLEAR_BOOT_POPUP = ":BUTTON_PRESS:1,1,0"
 _ENTER_DIAL = ":ENTER_PAGE:DIAL,0"
+_OPEN_MAIN_MENU = _CLEAR_BOOT_POPUP
+_CYCLE_MENU_STYLE = ":BUTTON_PRESS:1,3,0"
+_MENU_STYLE_CHECK_LIMIT = 4
+_LIST_MENU_EXPECTATION = (
+    "当前截图显示手表主菜单的列表风格：应用以单列纵向列表排列，"
+    "每行一个应用图标并带对应的应用名称；不得是蜂窝、瀑布或星环图标布局。"
+)
 _DEFAULT_CAPTURE_TIMEOUT = 12.0
 _DEFAULT_BLE_CAPTURE_TIMEOUT = 180.0
 _CAPTURE_PROVIDER_ENV = "W30_HARDWARE_CAPTURE_PROVIDER"
@@ -418,17 +425,151 @@ def _window_name(value: object) -> str:
     return ""
 
 
+def _wait_for_reset_gui(
+    session: Any,
+    *,
+    command_timeout: float,
+    context: str,
+) -> None:
+    sequence = _positive_handshake_sequence()
+    barrier = session.send(
+        f":GUI_PING:{sequence}",
+        request="gui_ping",
+        seq=sequence,
+        timeout=command_timeout,
+        expected_type="gui_ack",
+        expected_status="processed",
+    )
+    if str(barrier.status).lower() != "processed":
+        raise HardwareCaseResetError(
+            "RESET_GUI_BARRIER_FAILED",
+            f"GUI_PING did not complete {context}: {barrier.status}",
+        )
+
+
+def _judge_list_menu_style(screenshot_path: Path) -> tuple[str, str]:
+    from agent_loop_system.tools.test import judge_test_with_vision
+
+    verdict = judge_test_with_vision(
+        _LIST_MENU_EXPECTATION,
+        [{"path": str(screenshot_path), "label": "主菜单风格检查"}],
+        ["确认当前主菜单为单列、图标加应用名称的列表风格"],
+    )
+    return str(verdict.verdict).upper(), str(verdict.reason)
+
+
+def _restore_list_menu_style(
+    session: Any,
+    *,
+    evidence_dir: Path,
+    command_timeout: float,
+    capture_timeout: float,
+    usb_timeout: float,
+    mtp_system: MtpSystem,
+    capture_provider: CaptureProvider | None,
+    menu_style_judge: Callable[[Path], tuple[str, str]],
+) -> None:
+    opened = session.send(
+        _OPEN_MAIN_MENU,
+        request="button_press",
+        timeout=command_timeout,
+        expected_type="command_result",
+        expected_status="accepted",
+    )
+    _require_accepted(opened, _OPEN_MAIN_MENU)
+    _wait_for_reset_gui(
+        session,
+        command_timeout=command_timeout,
+        context="after opening the main menu",
+    )
+
+    provider = capture_provider or MtpCaptureProvider(
+        session,
+        usb_timeout=usb_timeout,
+        mtp_system=mtp_system,
+    )
+    try:
+        for check_index in range(1, _MENU_STYLE_CHECK_LIMIT + 1):
+            screenshot_path = evidence_dir / f"menu-style-check-{check_index:02d}.bmp"
+            try:
+                frame = provider.capture(timeout=capture_timeout)
+                frame.save_bmp(screenshot_path)
+            except Exception as exc:
+                raise HardwareCaseResetError(
+                    "MENU_STYLE_CAPTURE_FAILED",
+                    f"failed to capture menu-style check {check_index}: {exc}",
+                ) from exc
+
+            try:
+                verdict, reason = menu_style_judge(screenshot_path)
+            except Exception as exc:
+                raise HardwareCaseResetError(
+                    "MENU_STYLE_JUDGMENT_FAILED",
+                    f"menu-style screenshot judgment failed at check {check_index}: {exc}",
+                ) from exc
+            verdict = str(verdict or "").strip().upper()
+            reason = str(reason or "")
+            if verdict == "PASS":
+                break
+            if verdict != "FAIL":
+                raise HardwareCaseResetError(
+                    "MENU_STYLE_UNVERIFIED",
+                    "menu-style screenshot could not prove List style "
+                    f"at check {check_index} (verdict={verdict or 'unknown'}, "
+                    f"reason={reason or 'none'})",
+                )
+            if check_index == _MENU_STYLE_CHECK_LIMIT:
+                raise HardwareCaseResetError(
+                    "MENU_STYLE_NOT_LIST",
+                    "main menu did not reach List style after checking all four "
+                    f"configured styles (last_reason={reason or 'none'})",
+                )
+
+            switched = session.send(
+                _CYCLE_MENU_STYLE,
+                request="button_press",
+                timeout=command_timeout,
+                expected_type="command_result",
+                expected_status="accepted",
+            )
+            _require_accepted(switched, _CYCLE_MENU_STYLE)
+            _wait_for_reset_gui(
+                session,
+                command_timeout=command_timeout,
+                context=f"after menu-style switch {check_index}",
+            )
+    finally:
+        provider.close()
+
+    dial = session.send(
+        _ENTER_DIAL,
+        request="enter_page",
+        timeout=command_timeout,
+        expected_type="command_result",
+        expected_status="accepted",
+    )
+    _require_accepted(dial, _ENTER_DIAL)
+    _wait_for_reset_gui(
+        session,
+        command_timeout=command_timeout,
+        context="after restoring DIAL from the main menu",
+    )
+
+
 def reset_hardware_case_state(
     *,
     evidence_dir: str | os.PathLike[str],
     startup_timeout: float = 180.0,
     command_timeout: float = 8.0,
     usb_timeout: float = 30.0,
+    capture_timeout: float = _DEFAULT_CAPTURE_TIMEOUT,
     serial_session: Any | None = None,
     mtp_system: MtpSystem | None = None,
+    capture_provider: CaptureProvider | None = None,
+    menu_style_judge: Callable[[Path], tuple[str, str]] | None = None,
     environment: Mapping[str, str] | None = None,
 ) -> HardwareCaseResetResult:
-    """Reboot and prove a clean DIAL state before one hardware case starts."""
+    """Reboot, restore List menu style, and prove DIAL before one hardware case."""
 
     if startup_timeout <= 0:
         raise ValueError("startup_timeout must be positive")
@@ -436,6 +577,8 @@ def reset_hardware_case_state(
         raise ValueError("command_timeout must be positive")
     if usb_timeout <= 0:
         raise ValueError("usb_timeout must be positive")
+    if capture_timeout <= 0:
+        raise ValueError("capture_timeout must be positive")
     settings = os.environ if environment is None else environment
     if serial_session is None and settings.get(
         "W30_HARDWARE_TRANSPORT", ""
@@ -503,20 +646,11 @@ def reset_hardware_case_state(
         )
         _require_accepted(dial, _ENTER_DIAL)
 
-        ping_sequence = _positive_handshake_sequence()
-        barrier = session.send(
-            f":GUI_PING:{ping_sequence}",
-            request="gui_ping",
-            seq=ping_sequence,
-            timeout=command_timeout,
-            expected_type="gui_ack",
-            expected_status="processed",
+        _wait_for_reset_gui(
+            session,
+            command_timeout=command_timeout,
+            context="after DIAL reset",
         )
-        if str(barrier.status).lower() != "processed":
-            raise HardwareCaseResetError(
-                "RESET_GUI_BARRIER_FAILED",
-                f"GUI_PING did not complete after DIAL reset: {barrier.status}",
-            )
 
         state_sequence = _positive_handshake_sequence()
         state = session.send(
@@ -540,6 +674,44 @@ def reset_hardware_case_state(
                 "RESET_STATE_MISMATCH",
                 "hardware case reset did not reach DIAL with popup=null "
                 f"(current_page={current_page or 'unknown'!r}, popup={popup!r})",
+            )
+
+        reset_evidence_dir = Path(evidence_dir).resolve()
+        reset_evidence_dir.mkdir(parents=True, exist_ok=True)
+        _restore_list_menu_style(
+            session,
+            evidence_dir=reset_evidence_dir,
+            command_timeout=command_timeout,
+            capture_timeout=capture_timeout,
+            usb_timeout=usb_timeout,
+            mtp_system=system,
+            capture_provider=capture_provider,
+            menu_style_judge=menu_style_judge or _judge_list_menu_style,
+        )
+
+        state_sequence = _positive_handshake_sequence()
+        state = session.send(
+            f":GUI_STATE:{state_sequence}",
+            request="gui_state",
+            seq=state_sequence,
+            timeout=command_timeout,
+            expected_type="gui_state",
+            expected_status="ok",
+        )
+        if str(state.status).lower() != "ok":
+            raise HardwareCaseResetError(
+                "RESET_STATE_UNAVAILABLE",
+                f"GUI_STATE failed after menu-style reset: {state.status}",
+            )
+        state_raw = dict(state.raw)
+        current_page = _window_name(state_raw.get("current_page"))
+        popup = state_raw.get("popup")
+        if current_page.upper() != "DIAL" or popup is not None:
+            raise HardwareCaseResetError(
+                "RESET_STATE_MISMATCH",
+                "hardware case reset did not return to DIAL with popup=null "
+                f"after menu-style reset (current_page={current_page or 'unknown'!r}, "
+                f"popup={popup!r})",
             )
         reset_result = HardwareCaseResetResult(
             status=bootstrap.status,
