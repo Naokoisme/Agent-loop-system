@@ -279,7 +279,7 @@ class RealDeviceSessionTest(unittest.TestCase):
             ):
                 RealDeviceSession(serial_session=FakeSerial())
 
-    def test_start_uses_external_test_session_without_mutating_it(self) -> None:
+    def test_start_uses_batch_test_session_without_mutating_it(self) -> None:
         serial = FakeSerial()
         camera = FakeCaptureProvider()
         with tempfile.TemporaryDirectory() as root:

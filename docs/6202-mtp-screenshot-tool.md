@@ -7,7 +7,7 @@
 本页只说明 6202 当前默认的 MTP 截图链路。总体状态和问题索引见
 [6202 真机截图当前状态](6202-hardware-screenshot-current.md)。
 
-本流程不构建、不刷机，也不启动或停止测试会话。
+本流程不构建、不刷机；测试会话由 Runner 的批次启动流程建立，MTP 截图步骤不自行停止会话。
 
 ## 前置条件
 
@@ -15,7 +15,7 @@
    `\\.\pipe\SuperCom.AgentBridge.COM7`。
 2. `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT` 都指向
    `D:\Agent-loop-workspace\6202_W5230`，项目为 `6202_W5230`。
-3. 外部所有者已经启动测试会话；Runner 只查询 `TEST_SESSION:STATUS`。
+3. Runner 已发送 `TEST_SESSION:START` 并确认会话为 `active`。
 4. 手表运行支持 `SCREENSHOT_CAPTURE_FILE` 的工程固件，屏幕处于可截图状态。
 
 ## 配置
@@ -97,8 +97,8 @@ Windows 的 MTP 命名空间偶尔会在设备刚重新枚举时保留旧视图�
 
 ### 测试会话不是 active
 
-普通 Runner 只查询状态。若会话不是 `active`，停止并交还外部控制者处理；Runner 不自动
-START、续期或 STOP。低功耗场景的已验证外部恢复入口见
+Runner 在批次启动或设备重启恢复后发送 `TEST_SESSION:START` 并等待 `active`。若启动失败，
+保留结构化错误并停止批次。低功耗场景的已验证 BLE 恢复入口见
 [6202 BLE 当前能力](6202-watch-ble-current.md#低功耗后的恢复入口)。
 
 ## 成功判据

@@ -52,7 +52,7 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agent_loop_system.tools.hardware_bootstrap",
         description=(
-            "Establish the externally owned hardware TEST_SESSION, then release "
+            "Establish the runner-controlled hardware TEST_SESSION, then release "
             "the SuperCom pipe without stopping the watch session."
         ),
     )

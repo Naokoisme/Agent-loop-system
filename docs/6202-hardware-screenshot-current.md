@@ -64,15 +64,15 @@ Agent-loop → SuperCom 管道关闭 USB → PC 通过 BLE 收取完整 BMP
 
 ### 低功耗后 UART 指令无效
 
-直接 UART 唤醒仍未证明可靠。已经验证的恢复方式是：由外部控制者通过 BLE 发送
-`TEST_SESSION:START`，随后 UART 收到 `active / 86400`。它是显式恢复入口，不是普通 Runner
-自动执行的前置动作。详见
+直接 UART 唤醒仍未证明可靠。已经验证的低功耗恢复方式是：通过 BLE 发送
+`TEST_SESSION:START`，随后 UART 收到 `active / 86400`。这条记录只证明 BLE 低功耗恢复能力；
+设备重启并恢复 SuperCom 管道后，Runner 也可在批次启动流程发送 `START`。详见
 [BLE：低功耗后的恢复入口](6202-watch-ble-current.md#低功耗后的恢复入口)。
 
 ## 会话与证据边界
 
-- 测试会话由外部批次或人工控制者启动和停止；普通 Runner 只查询
-  `TEST_SESSION:STATUS`，不自动 START、续期或 STOP。
+- Runner 在真机批次启动或设备重启恢复后发送 `TEST_SESSION:START` 并等待 `active`；
+  不要求外部预先持有会话，普通用例结束不发送 `STOP`。
 - `command_result accepted` 只表示命令被接受，不能证明页面或业务结果正确。
 - 每个视觉检查点必须对应独立的新截图，并保留请求序号、文件哈希、尺寸和格式校验。
 - 6202 的命令、坐标、截图和结论不能复制到 Simulator、6204、W30 或其他目标。
