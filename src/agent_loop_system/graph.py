@@ -747,16 +747,23 @@ def test(state: LoopState) -> dict:
 
     if target == "hardware":
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-        from agent_loop_system.tools.real_device import RealDeviceSession
+        from agent_loop_system.tools.real_device import (
+            RealDeviceSession,
+            reset_hardware_case_state,
+        )
 
         try:
             HardwareTargetConfig.from_env()
+            reset_hardware_case_state(evidence_dir=shot_dir / "hardware-reset")
             session = RealDeviceSession(evidence_dir=shot_dir)
         except Exception as exc:
             return {
                 "verdict": "CANNOT_VERIFY",
-                "error": f"真机环境配置失败: {exc}",
-                "test_output": {"results": [], "evidence_issue": "真机环境配置失败"},
+                "error": f"真机环境配置或状态清理失败: {exc}",
+                "test_output": {
+                    "results": [],
+                    "evidence_issue": "真机环境配置或状态清理失败",
+                },
             }
     else:
         session = SimulatorSession(get_simulator_exe())

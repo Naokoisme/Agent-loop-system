@@ -571,6 +571,9 @@ class InteractiveReproduceTest(unittest.TestCase):
                     return_value=session,
                 ) as real_session,
                 mock.patch(
+                    "agent_loop_system.tools.real_device.reset_hardware_case_state"
+                ) as reset,
+                mock.patch(
                     "agent_loop_system.tools.agent.decide_reproduction_action",
                     return_value=decision,
                 ) as decide,
@@ -591,6 +594,9 @@ class InteractiveReproduceTest(unittest.TestCase):
             self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
             build_config.assert_not_called()
             run_build.assert_not_called()
+            reset.assert_called_once_with(
+                evidence_dir=Path(tempdir).resolve() / "hardware-reset"
+            )
             real_session.assert_called_once_with(evidence_dir=Path(tempdir).resolve())
             self.assertEqual(session.system_commands, [])
             self.assertEqual(session.start_calls, 1)

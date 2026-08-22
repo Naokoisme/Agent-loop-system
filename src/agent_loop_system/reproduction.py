@@ -456,11 +456,13 @@ def interactive_reproduce(
     target: str = "simulator",
     test_case: dict[str, str] | None = None,
     build_simulator: bool = True,
+    reset_hardware: bool = True,
 ) -> ReproductionTrace:
     """在选定目标上按“观察→一个动作→再观察”完成缺陷复现或普通测试。
 
     simulator 保持原有的一次构建、一次会话；hardware 跳过构建，直接使用
-    当前已烧录的 6202 Debug 固件，并从核对后的 6202 源码即时加载命令表。
+    当前已烧录的 6202 Debug 固件，并从核对后的 6202 源码即时加载命令表；
+    默认在首次观察前调用统一真机状态清理入口。
     """
     from agent_loop_system.tools.agent import decide_reproduction_action
     from agent_loop_system.tools.build import BuildConfig, run_build
@@ -498,12 +500,17 @@ def interactive_reproduce(
                 build_hardware_agent_knowledge,
                 load_hardware_command_capabilities,
             )
-            from agent_loop_system.tools.real_device import RealDeviceSession
+            from agent_loop_system.tools.real_device import (
+                RealDeviceSession,
+                reset_hardware_case_state,
+            )
 
             hardware_config = HardwareTargetConfig.from_env()
             capabilities = load_hardware_command_capabilities(hardware_config)
             capability_knowledge = build_hardware_agent_knowledge(hardware_config)
             navigation_source_root = str(hardware_config.source_root)
+            if reset_hardware:
+                reset_hardware_case_state(evidence_dir=output_dir / "hardware-reset")
             session: DeviceSession = RealDeviceSession(evidence_dir=output_dir)
         else:
             capabilities = load_current_command_capabilities()

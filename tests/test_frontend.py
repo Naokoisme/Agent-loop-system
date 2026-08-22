@@ -1651,6 +1651,7 @@ class FrontendDataTest(unittest.TestCase):
         load_env.assert_called_once_with()
         self.assertEqual(captured_argv[captured_argv.index("--target") + 1], "hardware")
         self.assertNotIn("--preserve-test-session", captured_argv)
+        self.assertNotIn("--skip-hardware-reset", captured_argv)
         self.assertEqual(captured_env["W30_SOURCE_ROOT"], hardware_root)
         self.assertEqual(captured_env["W30_AGENT_WORKSPACE_ROOT"], hardware_root)
         self.assertEqual(captured_env["W30_PROJECT"], "6202_W5230")
@@ -2144,12 +2145,14 @@ class FrontendDataTest(unittest.TestCase):
         }
         manager._active_job_ids["hardware"] = job_id
         executed_cases: list[str] = []
+        parent_reset_flags: list[bool] = []
 
         class BrokenProcess:
             returncode = 1
 
             def __init__(self, argv: list[str]):
                 executed_cases.append(argv[argv.index("--case-id") + 1])
+                parent_reset_flags.append("--skip-hardware-reset" in argv)
 
             def communicate(self) -> tuple[str, str]:
                 return "", "HardwareSerialTimeoutError: no result for :GUI_PING:1"
@@ -2180,6 +2183,7 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(reset.call_count, 1)
         self.assertEqual(popen.call_count, 1)
         self.assertEqual(executed_cases, ["CALC_001"])
+        self.assertEqual(parent_reset_flags, [True])
         self.assertEqual(interrupted["status"], "interrupted")
         self.assertEqual(interrupted["completed"], 0)
         self.assertEqual(interrupted["current_index"], 1)
@@ -2207,6 +2211,7 @@ class FrontendDataTest(unittest.TestCase):
                 self.case_id = argv[argv.index("--case-id") + 1]
                 self.returncode = 1 if self.case_id == "CALC_001" else 0
                 executed_cases.append(self.case_id)
+                parent_reset_flags.append("--skip-hardware-reset" in argv)
 
             def communicate(self) -> tuple[str, str]:
                 result_file = Path(self.argv[self.argv.index("--result-file") + 1])
@@ -2241,6 +2246,7 @@ class FrontendDataTest(unittest.TestCase):
         completed = manager.get(job_id)
         self.assertEqual(reset.call_count, 2)
         self.assertEqual(executed_cases, ["CALC_001", "CALC_001", "CALC_002"])
+        self.assertEqual(parent_reset_flags, [True, True, True])
         self.assertEqual(completed["status"], "completed")
         self.assertEqual(completed["completed"], 2)
         self.assertEqual(completed["verdict_counts"]["FAIL"], 1)

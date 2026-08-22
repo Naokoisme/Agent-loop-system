@@ -2644,6 +2644,7 @@ class CaseTestManager:
         job_id: str,
         case: dict[str, Any],
         job_dir: Path,
+        hardware_reset_completed: bool = False,
     ) -> dict[str, Any]:
         project_meta = _test_project(str(case.get("project") or DEFAULT_TEST_PROJECT))
         job_dir.mkdir(parents=True, exist_ok=True)
@@ -2668,6 +2669,10 @@ class CaseTestManager:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
         if candidate_replay:
             child_args.append("--candidate-replay")
+        if hardware_reset_completed:
+            if project_meta["execution_target"] != "hardware":
+                raise ValueError("hardware_reset_completed 只适用于真机用例")
+            child_args.append("--skip-hardware-reset")
         argv = build_child_command("test", child_args)
         stdout = ""
         stderr = ""
@@ -2994,7 +2999,12 @@ class CaseTestManager:
                     job["current_node"] = "execute"
                     self._persist_batch_locked(job)
 
-            execution = self._execute_case(job_id=job_id, case=case, job_dir=case_dir)
+            execution = self._execute_case(
+                job_id=job_id,
+                case=case,
+                job_dir=case_dir,
+                hardware_reset_completed=execution_target == "hardware",
+            )
             infrastructure_failure = (
                 self._hardware_infrastructure_failure(execution)
                 if execution_target == "hardware"

@@ -533,6 +533,7 @@ def _run_agent_exploration(
     screenshot_path: str,
     target: str,
     project: str,
+    reset_hardware: bool = True,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
 
@@ -568,6 +569,7 @@ def _run_agent_exploration(
         target=target,
         test_case=test_case,
         build_simulator=False,
+        reset_hardware=reset_hardware,
     )
     result = CaseRunResult(
         case_id=case.case_id,
@@ -673,11 +675,13 @@ def run_single_case(
     case_map_profile: str | None = None,
     candidate_replay: bool = False,
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None,
+    reset_hardware: bool = True,
 ) -> CaseRunResult:
     """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
     screenshot_path 不为 None 时，在每个 GUI_TREE 检查点保存一张截图；
     没有 GUI_TREE 时保存最终画面。
+    真机默认先清理到可验证的表盘状态；只有已完成同一清理入口的父流程才可关闭。
     """
     load_kwargs = {"target": target}
     if case_map_profile:
@@ -722,16 +726,22 @@ def run_single_case(
                 screenshot_path=screenshot_path,
                 target=target,
                 project=str(provenance.get("project") or ""),
+                reset_hardware=reset_hardware,
             ),
             provenance=provenance,
         )
 
     if target == "hardware":
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-        from agent_loop_system.tools.real_device import RealDeviceSession
+        from agent_loop_system.tools.real_device import (
+            RealDeviceSession,
+            reset_hardware_case_state,
+        )
 
         HardwareTargetConfig.from_env()
         evidence_dir = Path(screenshot_path).resolve().parent
+        if reset_hardware:
+            reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")
         session = RealDeviceSession(evidence_dir=evidence_dir)
     elif target == "simulator":
         session = SimulatorSession(get_simulator_exe())
@@ -777,6 +787,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=("watch_ble",),
         help="显式选择非默认真机动作适配器；普通 Runner 不使用",
     )
+    parser.add_argument(
+        "--skip-hardware-reset",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     ble_selector = parser.add_mutually_exclusive_group()
     ble_selector.add_argument("--ble-address", help="watch_ble 的目标 BLE 地址")
     ble_selector.add_argument("--ble-name", help="watch_ble 的目标广播名称")
@@ -786,6 +801,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--execution-adapter requires --target hardware")
     if args.execution_adapter and args.candidate_replay:
         parser.error("--execution-adapter cannot be combined with --candidate-replay")
+    if args.skip_hardware_reset and args.target != "hardware":
+        parser.error("--skip-hardware-reset requires --target hardware")
     if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
         parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
 
@@ -816,6 +833,7 @@ def main(argv: list[str] | None = None) -> int:
         case_map_profile=args.case_map_profile,
         candidate_replay=args.candidate_replay,
         external_executor=external_executor,
+        reset_hardware=not args.skip_hardware_reset,
     )
 
     print(
