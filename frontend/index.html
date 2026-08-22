@@ -19,7 +19,7 @@
       <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
       <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
       <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
-      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>缺陷闭环</a>
+      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>ONES缺陷列表</a>
       <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
     </nav>
     <div class="topbar-actions">
@@ -43,6 +43,18 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="image-preview-dialog" class="image-preview-dialog" aria-labelledby="image-preview-title">
+    <header class="dialog-head image-preview-head">
+      <div>
+        <p class="eyebrow">图片预览</p>
+        <h2 id="image-preview-title">图片预览</h2>
+      </div>
+      <button id="close-image-preview" class="dialog-close" type="button" aria-label="关闭图片预览">×</button>
+    </header>
+    <div class="image-preview-stage">
+      <img id="image-preview-image" alt="">
+    </div>
+  </dialog>
   <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
     <form id="system-settings-form">
       <header class="dialog-head">
