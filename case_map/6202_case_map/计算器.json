@@ -3,7 +3,7 @@
   "source_profile": "620C_W6830",
   "sheet": "计算器",
   "window_version": "5803_SBYH_FP410X502",
-  "coordinate_source": "D:\\Agent-loop-workspace\\6202_W5230\\app\\windows\\5803_SBYH_FP410X502\\gui_win_calculator.json",
+  "coordinate_source": "D:\\Agent-loop\\workspaces\\firmware\\6202_W5230\\app\\windows\\5803_SBYH_FP410X502\\gui_win_calculator.json",
   "cases": [
     {
       "case_id": "CALC_001",

@@ -58,7 +58,7 @@
         "上滑后的后续画面显示15、60分钟预设和加号按钮"
       ],
       "unable": false,
-      "note": "6202当前410x502 Timer预设页真实双上滑路径已验证；首屏与双上滑后各采集一张独立截图。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_003\\20260814-233102-047c38a8819e49a4a7920040e5b61b2e-formal-r2。",
+      "note": "6202当前410x502 Timer预设页真实双上滑路径已验证；首屏与双上滑后各采集一张独立截图。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_003\\20260814-233102-047c38a8819e49a4a7920040e5b61b2e-formal-r2。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -175,7 +175,7 @@
         "点击加号后页面显示小时、分钟、秒钟滚轮以及确认按钮"
       ],
       "unable": false,
-      "note": "6202当前410x502 Timer列表双上滑、底部加号坐标及重复点击重试均已实测；若首次点击已进入自定义页，第二次坐标落在取消与确认按钮之间的空隙，不改变产品状态。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_010\\20260814-233154-7d603752b56a46cfb00704f7f4336219-formal-r2。",
+      "note": "6202当前410x502 Timer列表双上滑、底部加号坐标及重复点击重试均已实测；若首次点击已进入自定义页，第二次坐标落在取消与确认按钮之间的空隙，不改变产品状态。首轮单上滑CANNOT_VERIFY后已回退修正；2026-08-14第二轮正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_010\\20260814-233154-7d603752b56a46cfb00704f7f4336219-formal-r2。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -220,7 +220,7 @@
         "点击加号后自定义计时页默认显示00小时01分钟00秒"
       ],
       "unable": false,
-      "note": "6202当前410x502 Timer列表底部加号和自定义页默认值已实测；重复点击为经验证的惯性滚动重试，第二次在已进入自定义页时落在两个按钮之间的空隙。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_012\\20260814-231438-e06782ea3f924ff2a26734ae4f3fa8fb-formal。",
+      "note": "6202当前410x502 Timer列表底部加号和自定义页默认值已实测；重复点击为经验证的惯性滚动重试，第二次在已进入自定义页时落在两个按钮之间的空隙。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_012\\20260814-231438-e06782ea3f924ff2a26734ae4f3fa8fb-formal。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -307,7 +307,7 @@
         "点击置灰确认按钮后仍停留在00:00:00自定义页且未开始倒计时"
       ],
       "unable": false,
-      "note": "6202当前自定义Timer滚轮、置灰确认按钮和无倒计时结果均已实测；点击置灰确认后再点击分钟滚轮用于确认仍停留在同一可交互页面，并等待完整重绘后截图。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_016\\20260814-231528-144dd41aeb044428a5693a75b58dfe9c-formal。",
+      "note": "6202当前自定义Timer滚轮、置灰确认按钮和无倒计时结果均已实测；点击置灰确认后再点击分钟滚轮用于确认仍停留在同一可交互页面，并等待完整重绘后截图。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_016\\20260814-231528-144dd41aeb044428a5693a75b58dfe9c-formal。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -373,7 +373,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1903;"
       ],
       "unable": false,
-      "note": "6202当前分钟滚轮坐标和双向手势已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，3/3截图，实际01→05→01，与原始期望的每次变化1不符，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_019\\20260814-231642-23cefdaedd3348698b71551aef908b6c-formal。",
+      "note": "6202当前分钟滚轮坐标和双向手势已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，3/3截图，实际01→05→01，与原始期望的每次变化1不符，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_019\\20260814-231642-23cefdaedd3348698b71551aef908b6c-formal。",
       "verification_points": [
         "操作前分钟列基线值",
         "分钟列上滑后数值增加1",
@@ -413,7 +413,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:2002;"
       ],
       "unable": false,
-      "note": "6202当前秒钟滚轮坐标和编码器方向已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，旋转前后为00→01，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_020\\20260814-231742-684f417820cb4d87ad43cd18f541a06c-formal。",
+      "note": "6202当前秒钟滚轮坐标和编码器方向已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，2/2截图，旋转前后为00→01，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_020\\20260814-231742-684f417820cb4d87ad43cd18f541a06c-formal。",
       "verification_points": [
         "旋转前秒钟列基线值",
         "旋转一格后秒钟值变化1秒"
@@ -452,7 +452,7 @@
         "自定义计时页右滑后返回Timer预设列表且未创建计时任务"
       ],
       "unable": false,
-      "note": "6202当前自定义计时页和右滑手势已实测；未点击确认。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后显示Timer预设列表且无倒计时任务，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_021\\20260814-231839-8b69293f6bad42b1b3ad9cf54583291c-formal。",
+      "note": "6202当前自定义计时页和右滑手势已实测；未点击确认。2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后显示Timer预设列表且无倒计时任务，产品PASS，audit=PROMOTABLE_PASS。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_021\\20260814-231839-8b69293f6bad42b1b3ad9cf54583291c-formal。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -487,7 +487,7 @@
         "自定义计时页单击编码器退出键后返回Timer预设列表且未创建计时任务"
       ],
       "unable": false,
-      "note": "6202当前自定义计时页和编码器退出键已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后实际回到表盘而非Timer预设列表，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop-evidence\\6202_SIM_01\\计时器\\TIMER_022\\20260814-231935-d8351337e89a451691cec9735a17f776-formal。",
+      "note": "6202当前自定义计时页和编码器退出键已实测；2026-08-14正式Runner复跑，evidence_contract=COMPLETE，1/1截图，动作后实际回到表盘而非Timer预设列表，产品FAIL但路径有效，audit=PROMOTABLE_FAIL。证据：D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_01\\计时器\\TIMER_022\\20260814-231935-d8351337e89a451691cec9735a17f776-formal。",
       "mapping_status": "PROMOTED"
     },
     {

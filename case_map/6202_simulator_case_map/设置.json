@@ -91,7 +91,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_006\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_006\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前的设置列表位置",
         "逆时针旋转后的设置列表向下位置"
@@ -551,7 +551,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_038\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_038\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前的Display列表位置",
         "逆时针旋转后的Display列表向下位置"
@@ -680,7 +680,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=11张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_045\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=11张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_045\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "旋转前亮度滑条位于0档",
         "第1次旋转后的亮度档位",
@@ -1444,7 +1444,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_098\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_098\\result.json。",
       "verification_points": [
         "旋转前Lift to View页面内容和开关状态",
         "旋转后页面内容和开关状态均不变"
@@ -1513,7 +1513,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_102\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_102\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位于Sounds & Vibration顶部",
         "逆时针旋转后页面向下滚动"
@@ -1596,7 +1596,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_107\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_107\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位置",
         "逆时针旋转后页面向下滚动并显示后续设置项"
@@ -1877,7 +1877,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_126\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_126\\result.json。",
       "verification_points": [
         "第一次旋转后音量变化一格",
         "第二次旋转后音量再变化一格",
@@ -2003,7 +2003,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_134\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_134\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "编码器旋转前页面位置和当前档位",
         "编码器旋转后页面位置和当前档位"
@@ -2716,7 +2716,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\设置\\SET_184\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\设置\\SET_184\\result.json。",
       "verification_points": [
         "旋转前Start Time小时滚轮数值",
         "旋转后小时滚轮按旋转方向切换数值"

@@ -1076,7 +1076,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_076\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_076\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1104,7 +1104,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_077\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_077\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1131,7 +1131,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_078\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_078\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1263,7 +1263,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_086\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal-retry\\GLOB_086\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1297,7 +1297,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_087\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=4张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal-retry\\GLOB_087\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1331,7 +1331,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=4张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal-retry\\GLOB_088\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=4张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal-retry\\GLOB_088\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -1386,7 +1386,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_091\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_091\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -2502,7 +2502,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_170\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_170\\result.json。",
       "verification_points": [
         "首张截图显示久坐提醒弹窗",
         "超过5秒后的截图显示弹窗已消失"
@@ -2530,7 +2530,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_171\\result.json。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_171\\result.json。",
       "verification_points": [
         "首张截图显示喝水提醒弹窗",
         "超过5秒后的截图显示弹窗已消失"
@@ -2755,7 +2755,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_186\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
+      "note": "2026-08-15外部探索已实际执行；正式Runner复跑完成，verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-settings-global\\formal\\全局交互与系统规则\\GLOB_186\\result.json。 截图证明业务路径已执行但产品显示与原始预期冲突，保留为产品真实 FAIL。",
       "verification_points": [
         "喝水提醒触发后，截图显示喝水提醒弹窗",
         "随后触发久坐提醒时，截图仍显示喝水提醒弹窗"

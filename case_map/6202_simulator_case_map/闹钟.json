@@ -66,7 +66,7 @@
         "空闹钟列表页显示居中的闹钟图标、无闹钟提示和底部加号按钮"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：命令无错，1个检查点对应1张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_004\\20260814-224352-602e5eb96b384e97b607f179ae3d3894。",
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：命令无错，1个检查点对应1张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_004\\20260814-224352-602e5eb96b384e97b607f179ae3d3894。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -96,7 +96,7 @@
         "上滑后显示 Once 闹钟的时间、重复周期和开关，且不显示备注"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：当前 ADD_ALARM 一次固定建立 Custom、Every day、Once 共4条测试闹钟；2个检查点对应2张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_005\\20260814-224454-37caddbfc8ad40f295729e28ca84d194。",
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：当前 ADD_ALARM 一次固定建立 Custom、Every day、Once 共4条测试闹钟；2个检查点对应2张独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_005\\20260814-224454-37caddbfc8ad40f295729e28ca84d194。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -155,7 +155,7 @@
         "上滑后列表显示08:03、08:04和底部加号等下方内容"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：命令无错、双检查点各有独立新截图、evidence_contract完整，审计为PROMOTABLE_FAIL。稳定截图显示TP_SWIPE后列表仍回到顶部、未显示底部加号，这是当前产品真实FAIL而非执行路径失败，故保留可执行映射。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_008\\20260814-231110-53cce1b62d334abda7e306fefd604346。",
+      "note": "正式Runner已复跑：命令无错、双检查点各有独立新截图、evidence_contract完整，审计为PROMOTABLE_FAIL。稳定截图显示TP_SWIPE后列表仍回到顶部、未显示底部加号，这是当前产品真实FAIL而非执行路径失败，故保留可执行映射。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_008\\20260814-231110-53cce1b62d334abda7e306fefd604346。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -188,7 +188,7 @@
         "下滑后列表重新显示08:00、08:02等上方闹钟"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：QDEC_SET:1 精确建立列表离开顶部的前置，真实下滑命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示下滑后仍停在08:02、08:03、08:04，未恢复08:00，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_009\\20260814-225630-7b5ff4a77f6a441297ac89da0a57eecc。",
+      "note": "正式Runner已复跑：QDEC_SET:1 精确建立列表离开顶部的前置，真实下滑命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示下滑后仍停在08:02、08:03、08:04，未恢复08:00，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_009\\20260814-225630-7b5ff4a77f6a441297ac89da0a57eecc。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -219,7 +219,7 @@
         "顺时针旋转一格后列表沿旋转方向向下滚动并显示08:02、08:03、08:04"
       ],
       "unable": false,
-      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：QDEC_SET:1 后列表从08:00、08:02、08:03移动为08:02、08:03、08:04；双检查点各有独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_010\\20260814-225746-500eba62e97e490281df73974e7684cb。",
+      "note": "已在6202 Windows Simulator第二实例完成独立探索并由正式Runner复跑：QDEC_SET:1 后列表从08:00、08:02、08:03移动为08:02、08:03、08:04；双检查点各有独立新截图，evidence_contract完整，产品判定PASS，审计PROMOTABLE_PASS。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_010\\20260814-225746-500eba62e97e490281df73974e7684cb。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -249,7 +249,7 @@
         "右滑后返回进入Alarm前的主表盘"
       ],
       "unable": false,
-      "note": "正式Runner已复跑：当前5803 Alarm页头部执行真实右滑(20,50)到(370,50)，命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示右滑后仍停留Alarm列表，未返回DIAL，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop-evidence\\6202_SIM_02\\闹钟\\ALARM_011\\20260814-225859-bd3efc45bbc44aa281aa187c85ad1788。",
+      "note": "正式Runner已复跑：当前5803 Alarm页头部执行真实右滑(20,50)到(370,50)，命令无错，双检查点各有独立新截图，evidence_contract完整，审计PROMOTABLE_FAIL。稳定截图显示右滑后仍停留Alarm列表，未返回DIAL，这是当前产品真实FAIL而非执行路径失败。正式证据见 D:\\Agent-loop\\data\\legacy-evidence\\6202_SIM_02\\闹钟\\ALARM_011\\20260814-225859-bd3efc45bbc44aa281aa187c85ad1788。",
       "mapping_status": "PROMOTED"
     },
     {

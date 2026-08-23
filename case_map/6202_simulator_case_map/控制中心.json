@@ -20,7 +20,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前6202模拟器实测从DIAL下滑(205,50)->(205,220)进入控制中心；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_001/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_001/result.json。",
+      "note": "2026-08-16当前6202模拟器实测从DIAL下滑(205,50)->(205,220)进入控制中心；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_001/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_001/result.json。",
       "verification_points": [
         "从主表盘下滑后显示控制中心第1页"
       ],
@@ -72,7 +72,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前5803控制中心为纵向可滚动快捷列表，左滑后画面保持该列表；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_004/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_004/result.json。",
+      "note": "2026-08-16当前5803控制中心为纵向可滚动快捷列表，左滑后画面保持该列表；按原预期判定真实产品结果；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_004/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_004/result.json。",
       "verification_points": [
         "左滑后页面显示两行三列快捷图标"
       ],
@@ -97,7 +97,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前5803控制中心连续左滑后仍保持纵向快捷列表，未出现QR Hub页；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_005/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_005/result.json。",
+      "note": "2026-08-16当前5803控制中心连续左滑后仍保持纵向快捷列表，未出现QR Hub页；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_005/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_005/result.json。",
       "verification_points": [
         "连续左滑后页面仅显示QR Hub图标"
       ],
@@ -121,7 +121,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前6202模拟器实测控制中心上滑返回DIAL；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_006/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_006/result.json。",
+      "note": "2026-08-16当前6202模拟器实测控制中心上滑返回DIAL；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_006/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_006/result.json。",
       "verification_points": [
         "在控制中心上滑后返回主表盘"
       ],
@@ -145,7 +145,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前6202模拟器实测控制中心单击编码器返回DIAL；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_007/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_007/result.json。",
+      "note": "2026-08-16当前6202模拟器实测控制中心单击编码器返回DIAL；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_007/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_007/result.json。",
       "verification_points": [
         "在控制中心单击编码器后返回主表盘"
       ],
@@ -329,7 +329,7 @@
         "第二次左滑后显示控制中心第3页"
       ],
       "unable": false,
-      "note": "2026-08-16当前5803控制中心两次左滑后的独立截图均保持同一纵向列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_019/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_019/result.json。",
+      "note": "2026-08-16当前5803控制中心两次左滑后的独立截图均保持同一纵向列表；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_019/exploration.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_019/result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -350,7 +350,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16当前6202模拟器实测控制中心右滑后保持原列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_020/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_020/result.json。",
+      "note": "2026-08-16当前6202模拟器实测控制中心右滑后保持原列表；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/6202_SIM_01/CTRL_020/exploration.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_01/CTRL_020/result.json。",
       "verification_points": [
         "在第1页右滑后页面仍保持控制中心第1页"
       ],
@@ -403,7 +403,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测暗色勿扰图标中心(71,283)，点击后当前产品先显示Enable确认弹窗；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_023/result.json。",
+      "note": "2026-08-16实测暗色勿扰图标中心(71,283)，点击后当前产品先显示Enable确认弹窗；按原预期判定真实产品结果；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=FAIL；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_023/result.json。",
       "verification_points": [
         "点击前勿扰图标为暗色",
         "点击暗色勿扰图标后图标变为高亮"
@@ -431,7 +431,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测点击暗色勿扰并确认可建立紫色高亮前置，再次点击(71,283)恢复暗色；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_024/result.json。",
+      "note": "2026-08-16实测点击暗色勿扰并确认可建立紫色高亮前置，再次点击(71,283)恢复暗色；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/dnd-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_024/result.json。",
       "verification_points": [
         "点击前勿扰图标为高亮",
         "点击高亮勿扰图标后图标变为暗色"
@@ -639,7 +639,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测Raise to wake中心(205,113)，当前模拟器点击后显示硬件报错/心率未校验页；按原预期判定真实产品结果；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_038/result.json。",
+      "note": "2026-08-16实测Raise to wake中心(205,113)，当前模拟器点击后显示硬件报错/心率未校验页；按原预期判定真实产品结果；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_038/result.json。",
       "verification_points": [
         "点击前抬腕亮屏图标为高亮",
         "点击高亮抬腕图标后图标变为暗色"
@@ -708,7 +708,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4202;"
       ],
       "unable": false,
-      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1返回applied，当前SHORTCUT中Call BT中心(71,113)，点击前后各有独立新截图；探索证据：D:/Agent-loop-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_042/exploration.json。 正式Runner verdict=PASS；evidence_contract=COMPLETE；独立审计=PROMOTABLE_PASS；正式截图证明Call BT由绿色高亮变为暗灰色；审计PROMOTABLE_PASS。 正式结果：D:/Agent-loop-evidence/control-center-batch20-third-20260816/formal/6202_SIM_01/CTRL_042/result.json。",
+      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1返回applied，当前SHORTCUT中Call BT中心(71,113)，点击前后各有独立新截图；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_042/exploration.json。 正式Runner verdict=PASS；evidence_contract=COMPLETE；独立审计=PROMOTABLE_PASS；正式截图证明Call BT由绿色高亮变为暗灰色；审计PROMOTABLE_PASS。 正式结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-third-20260816/formal/6202_SIM_01/CTRL_042/result.json。",
       "verification_points": [
         "点击前Call BT图标为高亮",
         "点击高亮Call BT图标后变为暗色"
@@ -749,7 +749,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4402;"
       ],
       "unable": false,
-      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1和hfp,0均返回applied，断开前后各有独立新截图；探索证据：D:/Agent-loop-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_044/exploration.json。 正式Runner verdict=FAIL；evidence_contract=COMPLETE；独立审计=PROMOTABLE_FAIL；正式截图证明模拟手机侧断开HFP后Call BT仍保持绿色高亮，属于产品真实FAIL；审计PROMOTABLE_FAIL。 正式结果：D:/Agent-loop-evidence/control-center-batch20-third-20260816/formal/6202_SIM_02/CTRL_044/result.json。",
+      "note": "2026-08-16本批独立会话探索：SIM_CONNECTION_SET:hfp,1和hfp,0均返回applied，断开前后各有独立新截图；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-third-20260816/clean/6202_SIM_01/CTRL_044/exploration.json。 正式Runner verdict=FAIL；evidence_contract=COMPLETE；独立审计=PROMOTABLE_FAIL；正式截图证明模拟手机侧断开HFP后Call BT仍保持绿色高亮，属于产品真实FAIL；审计PROMOTABLE_FAIL。 正式结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-third-20260816/formal/6202_SIM_02/CTRL_044/result.json。",
       "verification_points": [
         "断开前Call BT图标为高亮",
         "模拟手机侧断开HFP后Call BT图标变为暗色"
@@ -804,7 +804,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测纵向列表下拉到顶部后Settings中心约(71,90)，点击进入SETTING列表；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_047/result.json。",
+      "note": "2026-08-16实测纵向列表下拉到顶部后Settings中心约(71,90)，点击进入SETTING列表；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_047/result.json。",
       "verification_points": [
         "控制中心Settings Action图标显示常亮",
         "点击Settings后显示设置列表页"
@@ -886,7 +886,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测Silent中心(339,113)，默认橙色高亮点击后变为灰色扬声器图标；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_052/result.json。",
+      "note": "2026-08-16实测Silent中心(339,113)，默认橙色高亮点击后变为灰色扬声器图标；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_052/result.json。",
       "verification_points": [
         "点击前静音图标为高亮",
         "点击高亮静音图标后图标变为暗色"
@@ -913,7 +913,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测Silent中心(339,113)，先点击建立灰色暗态，再次点击恢复橙色高亮；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_053/result.json。",
+      "note": "2026-08-16实测Silent中心(339,113)，先点击建立灰色暗态，再次点击恢复橙色高亮；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_053/result.json。",
       "verification_points": [
         "点击前静音图标为暗色",
         "点击暗色静音图标后图标变为高亮"
@@ -953,7 +953,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-16实测Flashlight中心(339,283)，点击进入白色全屏手电筒页；探索证据：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_055/result.json。",
+      "note": "2026-08-16实测Flashlight中心(339,283)，点击进入白色全屏手电筒页；探索证据：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/control-probe/probe.json。 正式Runner：verdict=PASS；evidence_contract=COMPLETE；结果：D:/Agent-loop/data/legacy-evidence/control-center-batch20-20260816-092550/formal/6202_SIM_02/CTRL_055/result.json。",
       "verification_points": [
         "控制中心Flashlight Action图标显示常亮",
         "点击Flashlight后显示手电筒页面"
