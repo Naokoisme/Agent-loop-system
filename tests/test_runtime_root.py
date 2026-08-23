@@ -78,6 +78,7 @@ class RuntimeRootTests(unittest.TestCase):
             os.environ.pop("AGENT_LOOP_ROOT", None)
             res1 = resolve_app_root(custom_root)
             self.assertEqual(res1, custom_root)
+            self.assertNotIn("AGENT_LOOP_ROOT", os.environ)
 
         # Environment variable override
         with patch.dict(os.environ, {"AGENT_LOOP_ROOT": str(custom_root)}):

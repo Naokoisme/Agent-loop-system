@@ -27,7 +27,8 @@ def resolve_app_root(explicit_root: Path | str | None = None) -> Path:
     3. Frozen 模式：sys.executable 所在目录（便携发布包根目录）
     4. 源码模式：向上寻找包含 case_map 或 pyproject.toml 的工作区根目录
     """
-    if explicit_root is not None and str(explicit_root).strip():
+    has_explicit_root = explicit_root is not None and bool(str(explicit_root).strip())
+    if has_explicit_root:
         root = Path(explicit_root).resolve()
     elif os.environ.get("AGENT_LOOP_ROOT", "").strip():
         root = Path(os.environ["AGENT_LOOP_ROOT"]).resolve()
@@ -44,7 +45,12 @@ def resolve_app_root(explicit_root: Path | str | None = None) -> Path:
             else:
                 root = candidate
 
-    os.environ["AGENT_LOOP_ROOT"] = str(root)
+    # An explicit root is a local resolution request (for example, a test or a
+    # second application instance), not permission to retarget the process.
+    # Auto-detected/environment roots are pinned so later implicit lookups and
+    # child processes continue to share one authoritative runtime root.
+    if not has_explicit_root:
+        os.environ["AGENT_LOOP_ROOT"] = str(root)
     return root
 
 
