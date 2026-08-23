@@ -23,14 +23,14 @@ from pathlib import Path
 from typing import Any
 
 from agent_loop_system.tools.update_checker import (
+    DEFAULT_MANIFEST_PATH,
+    DEFAULT_NAS_ROOT,
     DATA_SAFETY_NOTICE,
     _parse_version_tuple,
     check_for_updates,
     get_current_system_version,
+    get_manifest_source,
 )
-
-DEFAULT_NAS_ROOT = r"\\nas.topstepht.com\TOPSTEP\公用文件夹\软件工具\拓步自研工具\Agent-loop自动化测试平台"
-DEFAULT_MANIFEST_PATH = os.path.join(DEFAULT_NAS_ROOT, "update-manifest.json")
 
 
 class AutoUpdaterError(Exception):
@@ -40,21 +40,12 @@ class AutoUpdaterError(Exception):
         self.error_code = error_code
 
 
-def get_manifest_source() -> str:
-    """获取更新清单来源（优先环境变量，默认指向 NAS 公共目录）。"""
-    return (
-        os.environ.get("W30_UPDATE_MANIFEST_URL")
-        or os.environ.get("W30_NAS_MANIFEST_PATH")
-        or DEFAULT_MANIFEST_PATH
-    ).strip()
-
-
 def prepare_upgrade(
     app_root: Path,
     manifest_source: str | None = None,
 ) -> dict[str, Any]:
     """准备升级：极速拉取新版文件并解压到本地暂存区，返回升级包信息。"""
-    source = manifest_source or get_manifest_source()
+    source = get_manifest_source(manifest_source)
     cur_ver = get_current_system_version()
     update_info = check_for_updates(manifest_source=source, current_version=cur_ver)
 

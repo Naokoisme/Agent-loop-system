@@ -3724,7 +3724,7 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     simulator_root = runtime_paths.firmware_workspaces / "620C_W6830"
     return {
         "llm": {
-            "provider": "builtin",
+            "provider": "environment",
             "api_key": (llm_cfg["api_key"][:3] + "..." + llm_cfg["api_key"][-4:]) if llm_cfg["api_key"] else "",
             "base_url": llm_cfg["base_url"],
             "model": llm_cfg["model"],

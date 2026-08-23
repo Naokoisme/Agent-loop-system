@@ -1,6 +1,6 @@
 """统一大模型服务配置与连通性测试模块。
 
-为发布包提供统一内置的大模型服务凭据（开箱即用，无需测试人员手动配置）。
+发布包只提供非敏感默认参数；API Key 必须由用户环境显式配置。
 """
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ import ssl
 import time
 from typing import Any
 
-# 统一内置默认服务凭据
-DEFAULT_OPENAI_API_KEY = "sk-Q7ltq1BNR1ouXNdKCDAPj1hWm3lYEvVsK7ok48g74AyBGN9Q"
+# 非敏感默认参数；正式发布物严禁内置 API 凭据。
+DEFAULT_OPENAI_API_KEY = ""
 DEFAULT_OPENAI_BASE_URL = "https://api.onefaka.com/v1"
 DEFAULT_OPENAI_MODEL = "gpt-5.6-sol"
 DEFAULT_OPENAI_TIMEOUT = 120.0
@@ -89,9 +89,7 @@ def get_llm_api_key(scope: str | None = None) -> str:
             return scoped_key
 
     key = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not key or key.startswith("暂时"):
-        return DEFAULT_OPENAI_API_KEY
-    return key
+    return "" if key.startswith("暂时") else key
 
 
 def get_llm_base_url() -> str:
@@ -136,7 +134,8 @@ def get_llm_config() -> dict[str, Any]:
         "base_url": get_llm_base_url(),
         "model": get_llm_model(),
         "timeout": get_llm_timeout(),
-        "is_builtin": (get_llm_api_key() == DEFAULT_OPENAI_API_KEY),
+        "is_builtin": bool(DEFAULT_OPENAI_API_KEY)
+        and get_llm_api_key() == DEFAULT_OPENAI_API_KEY,
     }
 
 
@@ -220,7 +219,7 @@ def test_llm_connectivity(timeout: float = 20.0) -> dict[str, Any]:
             suggestion = f"在 {timeout}s 内未收到服务端响应，请检查外网连通性或当前网关负载"
         elif "401" in exc_str or "Unauthorized" in exc_str or "auth" in exc_str.lower():
             error_category = "API Key 鉴权失败"
-            suggestion = "内置 Token 凭据失效或未授权访问该模型"
+            suggestion = "API Key 凭据失效或未授权访问该模型"
         elif "404" in exc_str or "NotFound" in exc_str or ("model" in exc_str.lower() and "exist" in exc_str.lower()):
             error_category = "模型不存在"
             suggestion = f"网关 {base_url} 未部署或未提供模型 {model_name}"

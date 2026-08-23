@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -70,6 +71,9 @@ RELEASE_ENV_LOCAL_STATE_KEYS = {
 
 RELEASE_ENV_CLEAR_KEYS = RELEASE_ENV_SECRET_KEYS | RELEASE_ENV_LOCAL_STATE_KEYS
 
+OPENAI_STYLE_API_KEY_PATTERN = re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")
+WINDOWS_JSON_PATH_LITERAL_PATTERN = re.compile(r'"[A-Za-z]:(?:/|\\\\)')
+
 
 def read_dotenv_assignments(path: Path) -> dict[str, str]:
     """Read raw dotenv assignment values without evaluating or logging them."""
@@ -120,6 +124,94 @@ def write_release_env_example(
         rendered.extend(["", "# Release-specific settings"])
         rendered.extend(f"{key}={replacements[key]}" for key in missing)
     destination.write_text("\n".join(rendered) + "\n", encoding="utf-8")
+
+
+def find_embedded_release_secrets(root: Path) -> list[str]:
+    """Return source locations containing credential-shaped literals.
+
+    PyInstaller compiles Python modules into the distribution, so checking only
+    the rendered ``.env.example`` is insufficient.  Never include the matched
+    value in diagnostics.
+    """
+
+    findings: list[str] = []
+    for source_root in (root / "src", root / "frontend"):
+        if not source_root.is_dir():
+            continue
+        for path in sorted(source_root.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in {".py", ".js", ".html"}:
+                continue
+            try:
+                lines = path.read_text(encoding="utf-8-sig").splitlines()
+            except (OSError, UnicodeError):
+                continue
+            for line_number, line in enumerate(lines, start=1):
+                if OPENAI_STYLE_API_KEY_PATTERN.search(line):
+                    findings.append(
+                        f"{path.relative_to(root).as_posix()}:{line_number}"
+                    )
+    return findings
+
+
+def _portable_case_map_value(value: object) -> object:
+    """Remove local-only provenance from a release copy of a case map."""
+
+    if isinstance(value, dict):
+        portable: dict[str, object] = {}
+        for key, item in value.items():
+            if key == "coordinate_source":
+                continue
+            portable[key] = (
+                "." if key == "evidence_root" else _portable_case_map_value(item)
+            )
+        return portable
+    if isinstance(value, list):
+        return [_portable_case_map_value(item) for item in value]
+    return value
+
+
+def copy_release_case_map(source: Path, destination: Path) -> None:
+    """Copy runtime case-map data without developer-machine path metadata."""
+
+    for path in sorted(source.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in {".json", ".jsonl"}:
+            continue
+        target = destination / path.relative_to(source)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if path.suffix.lower() == ".jsonl":
+            rendered: list[str] = []
+            for line in path.read_text(encoding="utf-8-sig").splitlines():
+                if not line.strip():
+                    continue
+                value = _portable_case_map_value(json.loads(line))
+                rendered.append(
+                    json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+                )
+            target.write_text("\n".join(rendered) + "\n", encoding="utf-8")
+        else:
+            value = _portable_case_map_value(
+                json.loads(path.read_text(encoding="utf-8-sig"))
+            )
+            target.write_text(
+                json.dumps(value, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+
+def find_release_case_map_local_paths(case_map_root: Path) -> list[str]:
+    """Return release case-map files that still contain Windows drive paths."""
+
+    findings: list[str] = []
+    if not case_map_root.is_dir():
+        return findings
+    for path in sorted(case_map_root.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in {".json", ".jsonl"}:
+            continue
+        if WINDOWS_JSON_PATH_LITERAL_PATTERN.search(
+            path.read_text(encoding="utf-8-sig")
+        ):
+            findings.append(path.relative_to(case_map_root).as_posix())
+    return findings
 
 
 def calc_sha256(path: Path) -> str:
@@ -173,6 +265,12 @@ def build_exe(
     clean: bool = True,
 ) -> dict[str, object]:
     root = (workspace_root or Path(__file__).resolve().parents[1]).resolve()
+    embedded_secrets = find_embedded_release_secrets(root)
+    if embedded_secrets:
+        raise RuntimeError(
+            "Release source contains credential-shaped literals at: "
+            f"{embedded_secrets}"
+        )
     load_app_env(app_root=root)
     runtime_paths = RuntimePaths.from_root(root)
     target_dir = (output_dir or (root / "dist" / "agent-loop-windows-x64")).resolve()
@@ -289,13 +387,7 @@ def build_exe(
     # 1. case_map
     case_map_src = root / "case_map"
     if case_map_src.exists():
-        for root_dir, _, filenames in os.walk(case_map_src):
-            rel_sub = Path(root_dir).relative_to(root)
-            dst_sub = target_dir / rel_sub
-            dst_sub.mkdir(parents=True, exist_ok=True)
-            for fname in filenames:
-                if fname.endswith(".json") or fname.endswith(".jsonl") or fname.endswith(".md"):
-                    shutil.copy2(Path(root_dir) / fname, dst_sub / fname)
+        copy_release_case_map(case_map_src, target_dir / "case_map")
 
     # 2. templates
     templates_src = root / "templates"
@@ -419,6 +511,12 @@ def build_exe(
             sensitive_leaks.append(
                 f".env.example contains machine-local settings: {leaked_local_state}"
             )
+
+    case_map_local_paths = find_release_case_map_local_paths(target_dir / "case_map")
+    if case_map_local_paths:
+        sensitive_leaks.append(
+            f"case_map contains machine-local paths: {case_map_local_paths}"
+        )
 
     for r_dir, _, fnames in os.walk(target_dir):
         for fname in fnames:

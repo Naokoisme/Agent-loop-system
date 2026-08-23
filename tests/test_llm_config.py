@@ -14,6 +14,7 @@ from agent_loop_system.tools.llm_config import (
     LLM_API_KEY_SCOPE_FIXED,
     create_chat_llm,
     get_llm_api_key,
+    get_llm_config,
     get_llm_model,
     llm_api_key_scope,
 )
@@ -64,6 +65,14 @@ def test_missing_scoped_key_falls_back_to_shared_key(scope: str, scoped_name: st
     environment.pop(scoped_name)
     with mock.patch.dict(os.environ, environment, clear=True):
         assert get_llm_api_key(scope) == "shared-key"
+
+
+def test_missing_keys_do_not_fall_back_to_an_embedded_credential() -> None:
+    with mock.patch.dict(os.environ, {}, clear=True):
+        assert get_llm_api_key() == ""
+        config = get_llm_config()
+        assert config["api_key"] == ""
+        assert config["is_builtin"] is False
 
 
 @pytest.mark.parametrize(

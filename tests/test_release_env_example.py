@@ -1,6 +1,15 @@
 from pathlib import Path
 
-from scripts.build_exe import write_release_env_example
+import json
+import re
+import tomllib
+
+from scripts.build_exe import (
+    copy_release_case_map,
+    find_embedded_release_secrets,
+    find_release_case_map_local_paths,
+    write_release_env_example,
+)
 
 
 def _assignments(path: Path) -> dict[str, str]:
@@ -10,6 +19,30 @@ def _assignments(path: Path) -> dict[str, str]:
         if line and not line.startswith("#") and "=" in line
         for key, value in [line.split("=", 1)]
     }
+
+
+def test_release_version_sources_are_synchronized() -> None:
+    repository_root = Path(__file__).resolve().parents[1]
+    pyproject = tomllib.loads(
+        (repository_root / "pyproject.toml").read_text(encoding="utf-8")
+    )
+    lockfile = tomllib.loads(
+        (repository_root / "uv.lock").read_text(encoding="utf-8")
+    )
+    version_source = (
+        repository_root / "src" / "agent_loop_system" / "version.py"
+    ).read_text(encoding="utf-8")
+    match = re.search(r'^__version__\s*=\s*"([^"]+)"', version_source, re.MULTILINE)
+    assert match is not None
+
+    project_version = pyproject["project"]["version"]
+    locked_project = next(
+        package
+        for package in lockfile["package"]
+        if package["name"] == "agent-loop-system"
+    )
+    assert match.group(1) == project_version
+    assert locked_project["version"] == project_version
 
 
 def test_release_env_clears_credentials_local_paths_and_device_identity(tmp_path: Path) -> None:
@@ -116,3 +149,59 @@ def test_release_env_without_source_is_still_portable(tmp_path: Path) -> None:
     assert values["W30_HARDWARE_SOURCE_ROOT"] == ""
     assert values["W30_HARDWARE_WORKSPACE_ROOT"] == ""
     assert values["W30_HARDWARE_PROFILE_ROOT"] == "profiles"
+
+
+def test_release_source_rejects_embedded_api_key_literals(tmp_path: Path) -> None:
+    source = tmp_path / "src" / "demo.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        'TOKEN = "sk-example-release-secret-123456789"\n',
+        encoding="utf-8",
+    )
+
+    assert find_embedded_release_secrets(tmp_path) == ["src/demo.py:1"]
+
+
+def test_release_case_map_removes_machine_local_provenance(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    destination = tmp_path / "destination"
+    source.mkdir()
+    (source / "demo.json").write_text(
+        json.dumps(
+            {
+                "profile": "demo",
+                "cases": [
+                    {
+                        "case_id": "DEMO_001",
+                        "coordinate_source": (
+                            r"D:\\Agent-loop\\workspaces\\firmware\\demo.json"
+                        ),
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (source / "external_execution_history.jsonl").write_text(
+        json.dumps(
+            {
+                "case_id": "DEMO_001",
+                "evidence_root": "D:/Agent-loop/data/legacy-evidence",
+                "evidence_paths": ["demo/result.json"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    copy_release_case_map(source, destination)
+
+    case_data = json.loads((destination / "demo.json").read_text(encoding="utf-8"))
+    ledger = json.loads(
+        (destination / "external_execution_history.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+    )
+    assert "coordinate_source" not in case_data["cases"][0]
+    assert ledger["evidence_root"] == "."
+    assert find_release_case_map_local_paths(destination) == []

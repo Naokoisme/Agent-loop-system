@@ -3236,8 +3236,8 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(cfg["hardware"]["ble_scan_timeout"], 15.0)
             self.assertNotIn("hardware_source_root", cfg["simulator"])
             self.assertNotIn("hardware_workspace_root", cfg["simulator"])
-            self.assertTrue(cfg["llm"]["configured"])
-            self.assertEqual(cfg["llm"]["status"], "configured")
+            self.assertFalse(cfg["llm"]["configured"])
+            self.assertEqual(cfg["llm"]["status"], "unconfigured")
             self.assertEqual(
                 cfg["llm"]["last_actual_success_at"],
                 "2026-08-21T14:30:00+08:00",
@@ -3288,10 +3288,19 @@ class FrontendDataTest(unittest.TestCase):
                 self.assertEqual(data["model"], "gpt-5.6-sol")
 
         # 6. Update check & Heartbeat
-        with urlopen(base + "/api/update-check", timeout=3) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(resp.status, 200)
-            self.assertIn("current_version", data)
+        with patch(
+            "frontend.server.check_for_updates",
+            return_value={
+                "has_update": False,
+                "status": "up_to_date",
+                "current_version": "0.4.2",
+                "latest_version": "0.4.2",
+            },
+        ):
+            with urlopen(base + "/api/update-check", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertIn("current_version", data)
             
         with urlopen(base + "/api/system/heartbeat", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
