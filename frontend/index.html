@@ -156,11 +156,17 @@
         <!-- Tab 3: Hardware -->
         <div class="settings-tab-pane" data-settings-pane="hardware" style="display: none; flex-direction: column; gap: 12px;">
           <div style="display: flex; gap: 12px;">
-            <div style="flex: 1;">
-              <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口号</label>
-              <input id="cfg-hw-port" type="text" class="input" placeholder="COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            <div style="flex: 1.2;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label for="cfg-hw-port" style="font-size: 12px; font-weight: bold;">SuperCom 端口设备</label>
+                <button id="btn-refresh-serial-ports" type="button" class="button button-secondary" style="padding: 2px 8px; font-size: 11px; cursor: pointer;" title="刷新串口列表与 SuperCom 管道状态">🔄 刷新</button>
+              </div>
+              <select id="cfg-hw-port" class="select" required style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="">正在读取串口…</option>
+              </select>
+              <div id="cfg-hw-port-status" class="serial-port-status-banner" style="margin-top: 6px; font-size: 11px; line-height: 1.4;"></div>
             </div>
-            <div style="flex: 1;">
+            <div style="flex: 0.8;">
               <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
               <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
             </div>

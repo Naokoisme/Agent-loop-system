@@ -4943,6 +4943,26 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json(_get_system_config(self.app.paths))
             return
 
+        if path == "/api/hardware/serial-ports":
+            configured_port = os.environ.get("W30_HARDWARE_PORT", "COM7")
+            try:
+                from agent_loop_system.tools.hardware_serial_ports import (
+                    get_serial_ports_status,
+                )
+                payload = get_serial_ports_status(configured_port)
+            except Exception as exc:
+                payload = {
+                    "configured_port": configured_port,
+                    "selected_port": configured_port,
+                    "default_port": None,
+                    "active_count": 0,
+                    "items": [],
+                    "available": False,
+                    "error": str(exc),
+                }
+            self._json(payload)
+            return
+
         if path == "/api/hardware/ble/devices":
             query_text = query.get("q", [""])[0]
             timeout = query.get(

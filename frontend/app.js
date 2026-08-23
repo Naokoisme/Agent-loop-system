@@ -3330,6 +3330,9 @@ function initSystemSettings() {
   if (!dialog || !openBtn) return;
 
   const hwCaptureSelect = dialog.querySelector('#cfg-hw-capture');
+  const hwPortSelect = dialog.querySelector('#cfg-hw-port');
+  const btnRefreshSerialPorts = dialog.querySelector('#btn-refresh-serial-ports');
+  const hwPortStatus = dialog.querySelector('#cfg-hw-port-status');
   const hwBleOptions = dialog.querySelector('#cfg-hw-ble-options');
   const hwBleAddress = dialog.querySelector('#cfg-hw-ble-address');
   const hwBleScanTimeout = dialog.querySelector('#cfg-hw-ble-scan-timeout');
@@ -3340,6 +3343,8 @@ function initSystemSettings() {
   const bleRememberedList = dialog.querySelector('#ble-remembered-list');
   const bleDiscoveredCount = dialog.querySelector('#ble-discovered-count');
   const bleRememberedCount = dialog.querySelector('#ble-remembered-count');
+  let serialPortsData = null;
+  let serialPortsLoading = false;
   let bleDiscoveredDevices = [];
   let bleRememberedDevices = [];
   let bleRememberedLoaded = false;
@@ -3464,6 +3469,134 @@ function initSystemSettings() {
     refreshSelectedBleStatus();
   });
 
+  const updateSerialPortStatus = selectedPort => {
+    if (!hwPortStatus) return;
+    const cleanPort = String(selectedPort || hwPortSelect?.value || '').trim().toUpperCase();
+    const activeCount = Number(serialPortsData?.active_count || 0);
+
+    if (!cleanPort) {
+      hwPortStatus.dataset.tone = 'warning';
+      if (activeCount > 1) {
+        hwPortStatus.textContent = '⚠️ 检测到多个活动 SuperCom 端口，请显式选择要绑定的端口设备';
+      } else if (activeCount === 0) {
+        hwPortStatus.textContent = '⚪ 未检测到开启 AgentBridge 的 SuperCom 串口，请先在 SuperCom 中打开端口';
+      } else {
+        hwPortStatus.textContent = '⚠️ 请选择 SuperCom 端口设备';
+      }
+      return;
+    }
+
+    const item = serialPortsData?.items?.find(i => String(i.port || '').toUpperCase() === cleanPort);
+    if (!item) {
+      hwPortStatus.dataset.tone = 'warning';
+      hwPortStatus.textContent = `⚠️ 当前选择 ${cleanPort}（未在设备列表中发现）`;
+      return;
+    }
+    if (item.missing || item.present === false) {
+      hwPortStatus.dataset.tone = 'error';
+      hwPortStatus.textContent = `❌ ${item.port} 未检测到设备，当前不可用`;
+      return;
+    }
+    if (item.supercom_open) {
+      hwPortStatus.dataset.tone = 'success';
+      hwPortStatus.textContent = `🟢 SuperCom 桥接管道已就绪 (${item.pipe_path || item.pipe_name})`;
+    } else {
+      hwPortStatus.dataset.tone = 'warning';
+      if (item.kind === 'system') {
+        hwPortStatus.textContent = `⚪ ${item.port} 为系统/板载串口，SuperCom 桥接未开启`;
+      } else {
+        hwPortStatus.textContent = `⚪ ${item.port} SuperCom 桥接未开启（请在 SuperCom 打开该端口）`;
+      }
+    }
+  };
+
+  const renderSerialPortOptions = (data, explicitSelection = null) => {
+    if (!hwPortSelect) return;
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const activeCount = Number(data?.active_count || 0);
+    const chosenPort = explicitSelection !== null
+      ? String(explicitSelection || '').trim().toUpperCase()
+      : String(data?.selected_port || '').trim().toUpperCase();
+
+    if (!items.length) {
+      hwPortSelect.innerHTML = `<option value="" disabled selected>未能检测到可用串口设备</option>`;
+      updateSerialPortStatus('');
+      return;
+    }
+
+    const hasMatchingChosen = chosenPort && items.some(item => String(item.port || '').toUpperCase() === chosenPort);
+    let placeholderHtml = '';
+
+    if (!hasMatchingChosen) {
+      let placeholderText = '请选择 SuperCom 端口设备';
+      if (activeCount > 1) {
+        placeholderText = '请选择 SuperCom 端口（检测到多个活动端口）';
+      } else if (activeCount === 0) {
+        placeholderText = '未检测到 SuperCom 开启的串口（请在 SuperCom 中打开端口）';
+      }
+      placeholderHtml = `<option value="" disabled selected>${escapeHtml(placeholderText)}</option>`;
+    }
+
+    const optionsHtml = items.map(item => {
+      const port = item.port || '';
+      const isSelected = hasMatchingChosen && String(port).toUpperCase() === chosenPort;
+      let statusIndicator = 'SuperCom 未开启';
+      let toneIcon = '⚪';
+      if (item.missing || item.present === false) {
+        statusIndicator = '未检测到 / 不可用';
+        toneIcon = '⚠️';
+      } else if (item.supercom_open) {
+        statusIndicator = 'SuperCom 桥接已开启';
+        toneIcon = '🟢';
+      }
+      const label = `${toneIcon} ${port} · ${item.friendly_name || port} · ${statusIndicator}`;
+      return `<option value="${escapeHtml(port)}" ${isSelected ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+    }).join('');
+
+    hwPortSelect.innerHTML = placeholderHtml + optionsHtml;
+
+    if (hasMatchingChosen) {
+      hwPortSelect.value = chosenPort;
+    } else {
+      hwPortSelect.value = '';
+    }
+    updateSerialPortStatus(hwPortSelect.value);
+  };
+
+  async function loadSerialPorts(explicitSelection = null) {
+    if (serialPortsLoading) return;
+    serialPortsLoading = true;
+    if (btnRefreshSerialPorts) btnRefreshSerialPorts.disabled = true;
+    try {
+      const resp = await fetch('/api/hardware/serial-ports');
+      if (!resp.ok) throw new Error('读取串口列表失败');
+      const data = await resp.json();
+      serialPortsData = data;
+      renderSerialPortOptions(data, explicitSelection);
+      if (data?.available === false && hwPortStatus) {
+        hwPortStatus.dataset.tone = 'error';
+        hwPortStatus.textContent = `❌ Agent-loop 无法读取串口设备${data.error ? `：${data.error}` : ''}`;
+      }
+    } catch (err) {
+      if (hwPortStatus) {
+        hwPortStatus.dataset.tone = 'error';
+        hwPortStatus.textContent = `❌ 探测串口失败: ${err.message}`;
+      }
+    } finally {
+      serialPortsLoading = false;
+      if (btnRefreshSerialPorts) btnRefreshSerialPorts.disabled = false;
+    }
+  }
+
+  hwPortSelect?.addEventListener('change', () => {
+    updateSerialPortStatus(hwPortSelect.value);
+  });
+
+  btnRefreshSerialPorts?.addEventListener('click', async () => {
+    await loadSerialPorts(hwPortSelect?.value);
+    showToast('串口列表与 SuperCom 管道状态已刷新');
+  });
+
   bleScanButton?.addEventListener('click', async () => {
     const originalText = bleScanButton.textContent;
     try {
@@ -3553,6 +3686,9 @@ function initSystemSettings() {
       dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
         pane.style.display = (pane.dataset.settingsPane === tabName) ? 'flex' : 'none';
       });
+      if (tabName === 'hardware') {
+        void loadSerialPorts(hwPortSelect?.value);
+      }
     });
   });
 
@@ -3618,16 +3754,15 @@ function initSystemSettings() {
       if (onesUser) onesUser.value = cfg.ones?.user_id || '';
 
       // Hardware
-      const hwPort = document.querySelector('#cfg-hw-port');
       const hwBaud = document.querySelector('#cfg-hw-baudrate');
       const hwTrans = document.querySelector('#cfg-hw-transport');
       const hwCap = document.querySelector('#cfg-hw-capture');
-      if (hwPort) hwPort.value = cfg.hardware?.port || 'COM7';
       if (hwBaud) hwBaud.value = cfg.hardware?.baudrate || 1500000;
       if (hwTrans) hwTrans.value = cfg.hardware?.transport || 'supercom';
       if (hwCap) hwCap.value = cfg.hardware?.capture_provider || 'mtp';
       if (hwBleAddress) hwBleAddress.value = cfg.hardware?.ble_address || '';
       if (hwBleScanTimeout) hwBleScanTimeout.value = cfg.hardware?.ble_scan_timeout || 15;
+      await loadSerialPorts();
       syncBleOptions();
       await loadRememberedBleDevices();
     } catch (err) {
