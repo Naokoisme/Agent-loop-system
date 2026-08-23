@@ -6,7 +6,10 @@ import zlib
 from pathlib import Path
 from types import SimpleNamespace
 
-from agent_loop_system.tools.watch_ble import WatchBleScreenshotResult
+from agent_loop_system.tools.watch_ble import (
+    WatchBleAmbiguousDeviceError,
+    WatchBleScreenshotResult,
+)
 from agent_loop_system.tools.watch_ble_provider import (
     BleCaptureProvider,
     BleCaptureProviderError,
@@ -37,6 +40,29 @@ class FakeScanner:
             service_uuids=[],
         )
         return {"target": (device, advertisement)}
+
+
+class FakeAmbiguousScanner:
+    @classmethod
+    async def discover(cls, **kwargs):
+        return {
+            "first": (
+                SimpleNamespace(address="42:74:DC:C8:0A:02", name=None),
+                SimpleNamespace(
+                    local_name="oraimo Watch Tank N_0A02",
+                    rssi=-45,
+                    service_uuids=[],
+                ),
+            ),
+            "second": (
+                SimpleNamespace(address="54:C8:D4:D9:29:06", name=None),
+                SimpleNamespace(
+                    local_name="oraimo Watch Tank N_2906",
+                    rssi=-50,
+                    service_uuids=[],
+                ),
+            ),
+        }
 
 
 class FakeSerialSession:
@@ -204,6 +230,46 @@ class BleCaptureProviderTest(unittest.TestCase):
             provider.close()
         self.assertTrue(provider.closed)
         provider.close()
+
+    def test_provider_discovers_the_only_matching_watch_without_address(self) -> None:
+        bmp = make_watch_bmp()
+        builder = FakeClientBuilder(bmp)
+        provider = BleCaptureProvider(
+            None,
+            serial_session=FakeSerialSession(),
+            sequence_start=100,
+            usb_system=FakeUsbSystem(),
+            scanner=FakeScanner,
+            client_builder=builder,
+        )
+        try:
+            frame = provider.capture(timeout=4.0)
+        finally:
+            provider.close()
+
+        self.assertEqual(frame.metadata.ble_address, "42:74:DC:C8:0A:02")
+        self.assertEqual(builder.calls[0][0].address, "42:74:DC:C8:0A:02")
+
+    def test_provider_fails_closed_when_dynamic_discovery_is_ambiguous(self) -> None:
+        serial = FakeSerialSession()
+        usb = FakeUsbSystem()
+        provider = BleCaptureProvider(
+            None,
+            serial_session=serial,
+            usb_system=usb,
+            scanner=FakeAmbiguousScanner,
+            client_builder=FakeClientBuilder(make_watch_bmp()),
+        )
+        try:
+            with self.assertRaisesRegex(
+                WatchBleAmbiguousDeviceError,
+                "matched multiple BLE devices",
+            ):
+                provider.capture(timeout=4.0)
+        finally:
+            provider.close()
+
+        self.assertEqual(serial.shell_lines, ["dal_usb close", "dal_usb open"])
 
     def test_provider_rejects_capture_after_close(self) -> None:
         provider = BleCaptureProvider(

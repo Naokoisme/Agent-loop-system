@@ -225,7 +225,7 @@ class RealDeviceSessionTest(unittest.TestCase):
         transport_class.assert_called_once_with("COM7")
         self.assertIs(serial_class.call_args.kwargs["transport"], fake_transport)
 
-    def test_ble_capture_provider_requires_explicit_environment_and_address(
+    def test_ble_capture_provider_accepts_explicit_address_override(
         self,
     ) -> None:
         fake_serial = FakeSerial()
@@ -255,17 +255,28 @@ class RealDeviceSessionTest(unittest.TestCase):
         self.assertEqual(session.capture_provider_name, "ble")
         self.assertEqual(session.capture_timeout, 180.0)
 
-    def test_ble_capture_provider_fails_closed_without_address(self) -> None:
-        with mock.patch.dict(
+    def test_ble_capture_provider_discovers_when_address_is_unset(self) -> None:
+        fake_serial = FakeSerial()
+        fake_provider = FakeCaptureProvider()
+        with tempfile.TemporaryDirectory() as root, mock.patch.dict(
             "os.environ",
             {"W30_HARDWARE_CAPTURE_PROVIDER": "ble"},
             clear=True,
-        ):
-            with self.assertRaisesRegex(
-                ValueError,
-                "W30_HARDWARE_BLE_ADDRESS is required",
-            ):
-                RealDeviceSession(serial_session=FakeSerial())
+        ), mock.patch.object(
+            real_device, "BleCaptureProvider", return_value=fake_provider
+        ) as provider_class:
+            session = RealDeviceSession(
+                evidence_dir=root,
+                serial_session=fake_serial,
+            )
+
+        provider_class.assert_called_once_with(
+            None,
+            serial_session=fake_serial,
+            scan_timeout=15.0,
+        )
+        self.assertIs(session.capture_provider, fake_provider)
+        self.assertEqual(session.capture_provider_name, "ble")
 
     def test_unknown_capture_provider_is_rejected(self) -> None:
         with mock.patch.dict(

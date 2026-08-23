@@ -146,11 +146,7 @@ def _create_capture_provider(serial_session: Any) -> tuple[CaptureProvider, str]
             f"{_CAPTURE_PROVIDER_ENV} must be mtp or ble"
         )
 
-    address = os.environ.get(_BLE_ADDRESS_ENV, "").strip()
-    if not address:
-        raise ValueError(
-            f"{_BLE_ADDRESS_ENV} is required when {_CAPTURE_PROVIDER_ENV}=ble"
-        )
+    address = os.environ.get(_BLE_ADDRESS_ENV, "").strip() or None
     scan_timeout_text = os.environ.get(
         _BLE_SCAN_TIMEOUT_ENV, str(DEFAULT_BLE_SCAN_TIMEOUT)
     ).strip()
