@@ -6,6 +6,7 @@ import os
 import tempfile
 import threading
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
@@ -15,6 +16,7 @@ from urllib.request import Request, urlopen
 
 from frontend.server import (
     AppPaths,
+    BATCH_STATE_FILE,
     CaseMapRepository,
     CaseTestManager,
     DefectRepository,
@@ -2899,6 +2901,65 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/reports/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
             self.assertIn("application/vnd.openxmlformats-officedocument", resp.headers.get("Content-Type"))
+
+    def test_report_24h_period_filters_runs_batches_and_export_by_timestamp(self) -> None:
+        application, base = self._server()
+        now = datetime.now().astimezone()
+        within = (now - timedelta(hours=23, minutes=30)).isoformat(timespec="seconds")
+        outside = (now - timedelta(hours=24, minutes=30)).isoformat(timespec="seconds")
+
+        for case_id, finished_at in (("CALC_001", within), ("CALC_003", outside)):
+            application.test_history._create(
+                job={
+                    "sheet": "计算器",
+                    "case_id": case_id,
+                    "project": "620C_W6830",
+                    "started_at": finished_at,
+                    "finished_at": finished_at,
+                },
+                result={"verdict": "PASS"},
+                stdout="PASS",
+                stderr="",
+            )
+
+        for batch_id, started_at in (("batch-within-24h", within), ("batch-outside-24h", outside)):
+            batch_dir = application.paths.runtime_jobs / batch_id
+            batch_dir.mkdir(parents=True)
+            (batch_dir / BATCH_STATE_FILE).write_text(
+                json.dumps({
+                    "project": "620C_W6830",
+                    "status": "completed",
+                    "started_at": started_at,
+                    "finished_at": started_at,
+                    "completed": 1,
+                    "total": 1,
+                }),
+                encoding="utf-8",
+            )
+
+        query = urlencode({"project": "620C_W6830", "period": "24h"})
+        with urlopen(base + f"/api/reports/summary?{query}", timeout=3) as resp:
+            summary = json.loads(resp.read().decode("utf-8"))
+        self.assertEqual(summary["metrics"]["total"], 1)
+
+        with urlopen(base + f"/api/reports/runs?scope=case&{query}", timeout=3) as resp:
+            case_runs = json.loads(resp.read().decode("utf-8"))
+        self.assertEqual(case_runs["total"], 1)
+        self.assertEqual(case_runs["items"][0]["case_id"], "CALC_001")
+
+        with urlopen(base + f"/api/reports/runs?scope=batch&{query}", timeout=3) as resp:
+            batch_runs = json.loads(resp.read().decode("utf-8"))
+        self.assertEqual(batch_runs["total"], 1)
+        self.assertEqual(batch_runs["items"][0]["batch_id"], "batch-within-24h")
+
+        with urlopen(base + f"/api/reports/export?{query}", timeout=3) as resp:
+            import io
+            import openpyxl
+
+            workbook = openpyxl.load_workbook(io.BytesIO(resp.read()))
+        summary_sheet = workbook["测试报告概览"]
+        self.assertEqual(summary_sheet["B2"].value, "最近24小时")
+        self.assertEqual(summary_sheet["B3"].value, 1)
 
     def test_reports_export_includes_each_non_pass_execution(self) -> None:
         application, base = self._server()

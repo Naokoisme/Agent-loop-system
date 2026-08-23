@@ -29,7 +29,7 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -4286,6 +4286,37 @@ def _report_excel_datetime(value: Any) -> datetime | str:
     return parsed
 
 
+def _report_timestamp_in_range(
+    value: Any,
+    date_from: str | None,
+    date_to: str | None,
+    period: str | None = None,
+    *,
+    now: datetime | None = None,
+) -> bool:
+    text = str(value or "").strip()
+    if period == "24h":
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        local_now = now or datetime.now().astimezone()
+        if local_now.tzinfo is None:
+            local_now = local_now.astimezone()
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=local_now.tzinfo)
+        else:
+            parsed = parsed.astimezone(local_now.tzinfo)
+        return local_now - timedelta(hours=24) <= parsed <= local_now
+
+    date_str = text[:10] if len(text) >= 10 else ""
+    if date_from and date_str and date_str < date_from:
+        return False
+    if date_to and date_str and date_str > date_to:
+        return False
+    return True
+
+
 def _style_report_overview_sheets(
     summary_sheet: Any,
     module_sheet: Any,
@@ -4372,6 +4403,7 @@ def _get_reports_summary_data(
     date_from: str | None,
     date_to: str | None,
     module_filter: str | None,
+    period: str | None = None,
     *,
     include_abnormal_runs: bool = False,
 ) -> dict[str, Any]:
@@ -4397,14 +4429,11 @@ def _get_reports_summary_data(
                     if isinstance(run_data, dict):
                         all_runs.append(run_data)
                         
-    # Filter by date
+    # Filter by date or an explicit rolling period.
     filtered_runs = []
     for r in all_runs:
         ts = str(r.get("timestamp") or r.get("started_at") or "")
-        date_str = ts[:10] if len(ts) >= 10 else ""
-        if date_from and date_str and date_str < date_from:
-            continue
-        if date_to and date_str and date_str > date_to:
+        if not _report_timestamp_in_range(ts, date_from, date_to, period):
             continue
         filtered_runs.append(r)
         
@@ -4802,6 +4831,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
+            period = query.get("period", [None])[0]
             summary_data = _get_reports_summary_data(
                 self.app.paths,
                 self.app.test_history,
@@ -4809,6 +4839,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 d_from,
                 d_to,
                 module,
+                period,
             )
             self._json(summary_data)
             return
@@ -4818,6 +4849,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             scope = query.get("scope", ["batch"])[0]
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
+            period = query.get("period", [None])[0]
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
             
@@ -4830,10 +4862,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         st = _read_json(j_dir / BATCH_STATE_FILE)
                         if isinstance(st, dict):
                             ts = str(st.get("started_at") or st.get("created_at") or "")
-                            d_str = ts[:10] if len(ts) >= 10 else ""
-                            if d_from and d_str and d_str < d_from:
-                                continue
-                            if d_to and d_str and d_str > d_to:
+                            if not _report_timestamp_in_range(ts, d_from, d_to, period):
                                 continue
                             meta = _test_project(str(st.get("project") or DEFAULT_TEST_PROJECT))
                             items.append({
@@ -4865,10 +4894,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                                 r_json = _read_json(r_dir / "run.json")
                                 if isinstance(r_json, dict):
                                     ts = str(r_json.get("timestamp") or r_json.get("started_at") or "")
-                                    d_str = ts[:10] if len(ts) >= 10 else ""
-                                    if d_from and d_str and d_str < d_from:
-                                        continue
-                                    if d_to and d_str and d_str > d_to:
+                                    if not _report_timestamp_in_range(ts, d_from, d_to, period):
                                         continue
                                     items.append({
                                         "id": r_json.get("id", r_dir.name),
@@ -4892,6 +4918,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
+            period = query.get("period", [None])[0]
             summary_data = _get_reports_summary_data(
                 self.app.paths,
                 self.app.test_history,
@@ -4899,6 +4926,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 d_from,
                 d_to,
                 module,
+                period,
                 include_abnormal_runs=True,
             )
             
@@ -4906,7 +4934,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             ws_summary = wb.active
             ws_summary.title = "测试报告概览"
             ws_summary.append(["测试项目", summary_data.get("project", project)])
-            ws_summary.append(["统计周期", f"{d_from or '全部'} 至 {d_to or '全部'}"])
+            ws_summary.append(["统计周期", "最近24小时" if period == "24h" else f"{d_from or '全部'} 至 {d_to or '全部'}"])
             ws_summary.append(["总执行数", summary_data["metrics"]["total"]])
             ws_summary.append(["通过 (PASS)", summary_data["metrics"]["pass"]])
             ws_summary.append(["失败 (FAIL)", summary_data["metrics"]["fail"]])

@@ -4145,21 +4145,59 @@ function ExecutionPage(project = currentProject()) {
 function isoDateOffset(days = 0) {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+const REPORT_DATE_PRESETS = [
+  {value: '24h', label: '24小时', days: 2},
+  {value: 'today', label: '今天', days: 1},
+  {value: '7d', label: '7天', days: 7},
+  {value: '30d', label: '30天', days: 30}
+];
+
+function reportDatePresetRange(value) {
+  const preset = REPORT_DATE_PRESETS.find(item => item.value === value) || REPORT_DATE_PRESETS[2];
+  return {from: isoDateOffset(1 - preset.days), to: isoDateOffset(0)};
 }
 
 function reportParams() {
   const params = new URLSearchParams(location.search);
   const view = ['overview', 'batches', 'cases', 'failures'].includes(params.get('view')) ? params.get('view') : 'overview';
   const module = ALL_FUNCTION_MODULES.includes(params.get('module')) ? params.get('module') : '';
-  const from = /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : isoDateOffset(-6);
-  const to = /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : isoDateOffset(0);
-  return {view, module, from, to};
+  const period = params.get('period') === '24h' ? '24h' : '';
+  const defaults = reportDatePresetRange(period || '7d');
+  const from = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : defaults.from;
+  const to = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : defaults.to;
+  return {view, module, from, to, period};
+}
+
+function activeReportDatePreset(filters = {}) {
+  if (filters.period === '24h') return '24h';
+  const match = REPORT_DATE_PRESETS.filter(item => item.value !== '24h').find(item => {
+    const range = reportDatePresetRange(item.value);
+    return filters.from === range.from && filters.to === range.to;
+  });
+  return match?.value || '';
+}
+
+function reportQuery(project, filters = {}) {
+  const query = new URLSearchParams({project, from: filters.from, to: filters.to});
+  if (filters.period === '24h') query.set('period', '24h');
+  if (filters.module) query.set('module', filters.module);
+  return query;
+}
+
+function reportRangeLabel(filters = {}) {
+  return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;
 }
 
 function buildSnapshotReport(items = [], filters = {}) {
-  const fromTime = filters.from ? new Date(`${filters.from}T00:00:00`).getTime() : 0;
-  const toTime = filters.to ? new Date(`${filters.to}T23:59:59`).getTime() : Number.MAX_SAFE_INTEGER;
+  const now = Date.now();
+  const fromTime = filters.period === '24h' ? now - 24 * 60 * 60 * 1000 : filters.from ? new Date(`${filters.from}T00:00:00`).getTime() : 0;
+  const toTime = filters.period === '24h' ? now : filters.to ? new Date(`${filters.to}T23:59:59.999`).getTime() : Number.MAX_SAFE_INTEGER;
   const executed = items.filter(item => {
     if (!item.last_run_at) return false;
     if (filters.module && String(item.file_sheet || item.sheet) !== filters.module) return false;
@@ -4242,8 +4280,7 @@ function ReportsPage(project = currentProject()) {
   return {
     async load() {
       const filters = reportParams();
-      const query = new URLSearchParams({project, from: filters.from, to: filters.to});
-      if (filters.module) query.set('module', filters.module);
+      const query = reportQuery(project, filters);
       const [summary, runs] = await Promise.all([
         optionalApi(`/api/reports/summary?${query.toString()}`),
         optionalApi(`/api/reports/runs?scope=${filters.view === 'batches' ? 'batch' : 'case'}&${query.toString()}&page=1&page_size=20`)
@@ -4263,34 +4300,40 @@ function ReportsPage(project = currentProject()) {
       const reportReturnTo = currentRouteUrl();
       let content;
       if (filters.view === 'overview') {
-        content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>柱形为执行数量，折线为通过率</p></div><span class='chip chip-pending'>${escapeHtml(filters.from)} 至 ${escapeHtml(filters.to)}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>${summary.data ? '报告聚合数据' : '用例最新结果快照'}</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>高频失败模块</h2><p>按 FAIL 与 ERROR 合计排序</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>最近失败记录</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article></section>${report.insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(report.insight.title || '分析结论')}</strong><p>${escapeHtml(report.insight.description || report.insight.message || '')}</p></div></aside>` : Components.unavailableState('自动分析结论暂不可用', '报告聚合接口尚未提供分析结论，页面不根据少量快照擅自下判断。')}`;
+        content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>柱形为执行数量，折线为通过率</p></div><span class='chip chip-pending'>${escapeHtml(reportRangeLabel(filters))}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>${summary.data ? '报告聚合数据' : '用例最新结果快照'}</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>高频失败模块</h2><p>按 FAIL 与 ERROR 合计排序</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>最近失败记录</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article></section>${report.insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(report.insight.title || '分析结论')}</strong><p>${escapeHtml(report.insight.description || report.insight.message || '')}</p></div></aside>` : Components.unavailableState('自动分析结论暂不可用', '报告聚合接口尚未提供分析结论，页面不根据少量快照擅自下判断。')}`;
       } else if (filters.view === 'failures') {
         content = `<article class='workspace-panel'><header><div><h2>失败分析</h2><p>当前筛选范围内的真实失败与异常记录</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article>`;
       } else {
         content = runs.data ? `<article class='workspace-panel'><header><div><h2>${filters.view === 'batches' ? '批次报告' : '单条记录'}</h2><p>来自报告运行列表接口</p></div></header>${runs.data.items?.length ? `<pre>${escapeHtml(JSON.stringify(runs.data.items, null, 2))}</pre>` : Components.emptyState('暂无记录')}</article>` : `<article class='workspace-panel'>${Components.unavailableState(filters.view === 'batches' ? '批次报告暂不可用' : '单条记录列表暂不可用', '当前后端未提供 /api/reports/runs，已保留页面结构和筛选条件。')}</article>`;
       }
-      const exportHref = `/api/reports/export?${new URLSearchParams({project, from: filters.from, to: filters.to, ...(filters.module ? {module: filters.module} : {})}).toString()}`;
-      return `${Components.pageHeader({title: '测试报告', intro: '查看结果趋势、批次结论和完整证据', actions: `<button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前后端未提供报告导出接口"'}>${icon('reports', 17)} 导出报告</button>`})}<section class='report-filter-bar'><label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label><label>目标<strong>${escapeHtml(testProject(project).targetLabel)}</strong></label><label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label><label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label><label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label></section>${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>当前版本缺少报告聚合接口。可计算区域使用真实“用例最新结果快照”，历史趋势保持空白。</span></aside>` : ''}<section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: 'PASS', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: 'FAIL', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: 'ERROR', value: Number(metrics.error || distribution.ERROR || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
+      const activePreset = activeReportDatePreset(filters);
+      const presetButtons = REPORT_DATE_PRESETS.map(item => `<button class='report-period-option ${activePreset === item.value ? 'is-active' : ''}' type='button' data-report-period='${escapeHtml(item.value)}' aria-pressed='${activePreset === item.value}'>${escapeHtml(item.label)}</button>`).join('');
+      return `${Components.pageHeader({title: '测试报告', intro: '查看结果趋势、批次结论和完整证据', actions: `<button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前后端未提供报告导出接口"'}>${icon('reports', 17)} 导出报告</button>`})}<section class='report-filter-bar'><label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label><label>目标<strong>${escapeHtml(testProject(project).targetLabel)}</strong></label><label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label><label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label><div class='report-period-field'><span>快捷筛选</span><div class='report-period-options' role='group' aria-label='快捷时间段'>${presetButtons}</div></div><label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label></section>${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>当前版本缺少报告聚合接口。可计算区域使用真实“用例最新结果快照”，历史趋势保持空白。</span></aside>` : ''}<section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: 'PASS', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: 'FAIL', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: 'ERROR', value: Number(metrics.error || distribution.ERROR || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
     },
     mount(root, data) {
       rememberProject(project);
-      const applyFilters = () => {
+      const applyFilters = ({preservePeriod = false} = {}) => {
         const from = root.querySelector('#report-from')?.value || data.filters.from;
         const to = root.querySelector('#report-to')?.value || data.filters.to;
         const module = root.querySelector('#report-module')?.value || '';
-        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module}));
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module, ...(preservePeriod && data.filters.period ? {period: data.filters.period} : {})}));
         route();
       };
-      root.querySelector('#report-from')?.addEventListener('change', applyFilters);
-      root.querySelector('#report-to')?.addEventListener('change', applyFilters);
-      root.querySelector('#report-module')?.addEventListener('change', applyFilters);
+      root.querySelector('#report-from')?.addEventListener('change', () => applyFilters());
+      root.querySelector('#report-to')?.addEventListener('change', () => applyFilters());
+      root.querySelector('#report-module')?.addEventListener('change', () => applyFilters({preservePeriod: true}));
+      root.querySelectorAll('[data-report-period]').forEach(button => button.addEventListener('click', () => {
+        const period = button.dataset.reportPeriod || '7d';
+        const range = reportDatePresetRange(period);
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from: range.from, to: range.to, module: data.filters.module, ...(period === '24h' ? {period} : {})}));
+        route();
+      }));
       root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module}));
+        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module, ...(data.filters.period ? {period: data.filters.period} : {})}));
         route();
       }));
       root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
-        const query = new URLSearchParams({project, from: data.filters.from, to: data.filters.to});
-        if (data.filters.module) query.set('module', data.filters.module);
+        const query = reportQuery(project, data.filters);
         const url = `/api/reports/export?${query.toString()}`;
         showToast('正在导出测试报告 Excel…');
         startBrowserDownload(url, `test_report_${project}.xlsx`);

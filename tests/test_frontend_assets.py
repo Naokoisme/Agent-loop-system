@@ -196,6 +196,31 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
         self.assertEqual(self.javascript.count("startBrowserDownload(url, `"), 2)
 
+    def test_report_quick_date_filters_keep_custom_dates_and_exact_24h_period(self) -> None:
+        for token in (
+            "const REPORT_DATE_PRESETS = [",
+            "{value: '24h', label: '24小时', days: 2}",
+            "{value: 'today', label: '今天', days: 1}",
+            "{value: '7d', label: '7天', days: 7}",
+            "{value: '30d', label: '30天', days: 30}",
+            "function reportDatePresetRange(value)",
+            "function activeReportDatePreset(filters = {})",
+            "function reportQuery(project, filters = {})",
+            "query.set('period', '24h')",
+            "data-report-period=",
+            "aria-label='快捷时间段'",
+            "applyFilters({preservePeriod: true})",
+            "root.querySelector('#report-from')?.addEventListener('change', () => applyFilters())",
+            "root.querySelector('#report-to')?.addEventListener('change', () => applyFilters())",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            ".report-period-options",
+            ".report-period-option.is-active",
+            ".report-period-field { grid-column: 1 / -1; }",
+        ):
+            self.assertIn(token, self.stylesheet)
+
     def test_search_stays_inline_and_async_results_never_overwrite_input(self) -> None:
         for token in ("data-page", "page_size=${PAGE_SIZE}"):
             self.assertIn(token, self.javascript)
