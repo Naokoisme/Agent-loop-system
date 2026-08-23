@@ -37,6 +37,7 @@ from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from agent_loop_system.internal_dispatcher import build_child_command
+from agent_loop_system.runtime_root import resolve_app_root
 from agent_loop_system.tools.case_map import (
     OBSERVATION_ONLY_COMMANDS,
     validated_case_entries,
@@ -5867,7 +5868,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--port", type=int, default=8765, help="监听端口")
     args = parser.parse_args(argv)
 
-    root = Path(__file__).resolve().parent.parent
+    root = resolve_app_root()
     app = WebApplication(AppPaths.from_root(root))
     server = FrontendHTTPServer((args.host, args.port), make_handler(app))
     print(f"W30 Agent UI: http://{args.host}:{args.port}")

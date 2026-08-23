@@ -25,6 +25,7 @@ from frontend.server import (
     TestHistoryStore as CaseRunHistoryStore,
     ThreadingHTTPServer,
     WebApplication,
+    main as frontend_main,
     make_handler,
 )
 
@@ -197,6 +198,24 @@ class FrontendDataTest(unittest.TestCase):
                 ("127.0.0.1", first.server_address[1]),
                 make_handler(application),
             )
+
+    def test_frontend_main_uses_the_runtime_app_root(self) -> None:
+        runtime_root = Path(self.temporary.name) / "portable-app"
+        fake_server = SimpleNamespace(
+            serve_forever=lambda: None,
+            server_close=lambda: None,
+        )
+
+        with (
+            patch("frontend.server.resolve_app_root", return_value=runtime_root),
+            patch("frontend.server.WebApplication") as application_class,
+            patch("frontend.server.FrontendHTTPServer", return_value=fake_server),
+        ):
+            self.assertEqual(frontend_main(["--host", "127.0.0.1", "--port", "0"]), 0)
+
+        paths = application_class.call_args.args[0]
+        self.assertEqual(paths.root, runtime_root.resolve())
+        self.assertEqual(paths.frontend, runtime_root.resolve() / "frontend")
 
     def _write_defect(
         self,
