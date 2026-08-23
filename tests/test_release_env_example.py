@@ -22,6 +22,8 @@ def test_release_env_uses_credentials_and_relative_runtime_profile(tmp_path: Pat
                 "OPENAI_EXPLORATION_MODEL=",
                 "OPENAI_FIXED_MODEL=",
                 "ONES_AUTH_TOKEN=",
+                r"AGENT_LOOP_LAYOUT_ROOT=..",
+                r"AGENT_LOOP_WORKSPACE_BASE=../workspaces/firmware",
                 r"W30_SOURCE_ROOT=D:\\source",
                 r"W30_HARDWARE_SOURCE_ROOT=D:\\firmware",
                 r"W30_HARDWARE_WORKSPACE_ROOT=D:\\workspace",
@@ -41,6 +43,8 @@ def test_release_env_uses_credentials_and_relative_runtime_profile(tmp_path: Pat
                 "OPENAI_EXPLORATION_MODEL=exploration-model",
                 "OPENAI_FIXED_MODEL=fixed-model",
                 "ONES_AUTH_TOKEN=ones-secret",
+                r"AGENT_LOOP_LAYOUT_ROOT=..",
+                r"AGENT_LOOP_WORKSPACE_BASE=../workspaces/firmware",
                 r"W30_HARDWARE_SOURCE_ROOT=D:\\local-firmware",
                 r"W30_HARDWARE_WORKSPACE_ROOT=D:\\local-workspace",
                 "W30_HARDWARE_PROFILE_VERSION=v1.2.0-dev.3",
@@ -59,6 +63,8 @@ def test_release_env_uses_credentials_and_relative_runtime_profile(tmp_path: Pat
     assert values["OPENAI_EXPLORATION_MODEL"] == "exploration-model"
     assert values["OPENAI_FIXED_MODEL"] == "fixed-model"
     assert values["ONES_AUTH_TOKEN"] == "ones-secret"
+    assert values["AGENT_LOOP_LAYOUT_ROOT"] == ""
+    assert values["AGENT_LOOP_WORKSPACE_BASE"] == ""
     assert values["W30_SOURCE_ROOT"] == ""
     assert values["W30_HARDWARE_SOURCE_ROOT"] == ""
     assert values["W30_HARDWARE_WORKSPACE_ROOT"] == ""

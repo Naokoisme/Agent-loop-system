@@ -15,7 +15,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from agent_loop_system.runtime_root import RuntimePaths
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.hardware_serial import (
     BRIDGE_PROTOCOL,
     BRIDGE_PROTOCOL_VERSION,
@@ -255,7 +255,11 @@ def load_hardware_runtime_profile(
         "真机项目",
     )
     root_value = profiles_root or os.environ.get("W30_HARDWARE_PROFILE_ROOT")
-    root = Path(root_value).resolve() if root_value else RuntimePaths.from_root().profiles.resolve()
+    root = (
+        resolve_config_path(root_value)
+        if root_value
+        else RuntimePaths.from_root().profiles.resolve()
+    )
     profile_root = (root / selected_project).resolve(strict=False)
     try:
         profile_root.relative_to(root)

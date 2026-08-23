@@ -16,6 +16,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from agent_loop_system.runtime_root import resolve_config_path
 from agent_loop_system.tools.enter_page_contract import (
     ENTER_PAGE_COMMAND,
     parse_enter_page_args,
@@ -78,7 +79,7 @@ def _current_command_source() -> Path:
     if not source_root:
         raise ValueError("W30_SOURCE_ROOT 未配置，无法校验当前真实源码命令")
     source = (
-        Path(source_root)
+        resolve_config_path(source_root)
         / "core"
         / "comm"
         / "srv"

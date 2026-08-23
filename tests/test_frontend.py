@@ -27,6 +27,7 @@ from frontend.server import (
     TestHistoryStore as CaseRunHistoryStore,
     ThreadingHTTPServer,
     WebApplication,
+    _save_system_config,
     main as frontend_main,
     make_handler,
 )
@@ -51,6 +52,43 @@ class FrontendDataTest(unittest.TestCase):
     def _restore_env(self) -> None:
         os.environ.clear()
         os.environ.update(self._env_backup)
+
+    def test_system_config_persists_layout_paths_relatively(self) -> None:
+        layout_root = self.paths.root.parent
+        simulator_root = layout_root / "workspaces" / "firmware" / "6202_W5230"
+        with patch.dict(
+            os.environ,
+            {
+                "AGENT_LOOP_ROOT": str(self.paths.root),
+                "AGENT_LOOP_LAYOUT_ROOT": "..",
+            },
+            clear=False,
+        ):
+            _save_system_config(
+                self.paths,
+                {
+                    "simulator_6202": {
+                        "source_root": str(simulator_root),
+                        "build_directory": str(simulator_root / "build"),
+                        "artifact_path": str(simulator_root / "bin" / "main.exe"),
+                    }
+                },
+            )
+
+        values = {
+            key: value
+            for line in (self.paths.root / ".env").read_text(encoding="utf-8").splitlines()
+            if line and "=" in line
+            for key, value in [line.split("=", 1)]
+        }
+        self.assertEqual(
+            values["W30_6202_SIMULATOR_SOURCE_ROOT"],
+            os.path.relpath(simulator_root.resolve(), self.paths.root),
+        )
+        self.assertEqual(
+            values["W30_6202_SIMULATOR_BUILD_DIRECTORY"],
+            os.path.relpath((simulator_root / "build").resolve(), self.paths.root),
+        )
 
     def setUp(self) -> None:
         self._env_backup = dict(os.environ)
@@ -1891,9 +1929,27 @@ class FrontendDataTest(unittest.TestCase):
                 )
                 return "PASS", ""
 
-        with patch(
-            "frontend.server.subprocess.Popen",
-            side_effect=lambda argv, **kwargs: FakeProcess(argv, kwargs["env"]),
+        simulator_root = (
+            self.paths.root.parent
+            / "workspaces"
+            / "firmware"
+            / "6202_W5230"
+        ).resolve()
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "AGENT_LOOP_ROOT": str(self.paths.root),
+                    "W30_6202_SIMULATOR_SOURCE_ROOT": "../workspaces/firmware/6202_W5230",
+                    "W30_6202_SIMULATOR_BUILD_DIRECTORY": "../workspaces/firmware/6202_W5230/core/gui/simulator/out/build/6202_W5230",
+                    "W30_6202_SIMULATOR_ARTIFACT_PATH": "../workspaces/firmware/6202_W5230/core/gui/simulator/bin/main.exe",
+                },
+                clear=False,
+            ),
+            patch(
+                "frontend.server.subprocess.Popen",
+                side_effect=lambda argv, **kwargs: FakeProcess(argv, kwargs["env"]),
+            ),
         ):
             result = manager._execute_case(
                 job_id="simulator-6202-job",
@@ -1910,7 +1966,7 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(captured_env["W30_PROJECT"], "6202_W5230")
         self.assertEqual(
             captured_env["W30_SOURCE_ROOT"],
-            r"D:\Agent-loop-workspace\6202_W5230",
+            str(simulator_root),
         )
         self.assertEqual(result["verdict"], "PASS")
 

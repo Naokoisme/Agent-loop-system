@@ -29,12 +29,12 @@ result.json + 新截图 + 日志
 
 | 目标 profile | 执行方式 | 普通运行依赖 | case map |
 | --- | --- | --- | --- |
-| `620C_W6830` | Windows Simulator | `D:\Agent-loop-workspace\620C_W6830` | `case_map/620C_simulator_case_map` |
-| `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_simulator_case_map` |
+| `620C_W6830` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\620C_W6830` | `case_map/620C_simulator_case_map` |
+| `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\6202_W5230` | `case_map/6202_simulator_case_map` |
 | `6202_W5230` | 真实手表 | `profiles/6202_W5230` 版本档案 | `case_map/6202_case_map` |
 
 三套映射相互隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。6204 真机源码位于
-`D:\Agent-loop-workspace\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
+`D:\Agent-loop\workspaces\firmware\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
 它不是可执行 Runner 目标。`D:\TOPSTEP\shenju_w30` 只作上游参考，不在其中开发、构建或
 打补丁。
 
@@ -54,7 +54,7 @@ SHA256、自动化协议版本及 Agent-loop 最低版本。源码诊断、修�
 要求：Windows、Python 3.12 和 `uv`。
 
 ```powershell
-Set-Location C:\path\to\Agent-loop-system
+Set-Location D:\Agent-loop\system
 Copy-Item .env.example .env
 uv sync
 uv run pytest -q
@@ -80,7 +80,8 @@ case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_ma
 
 ## 仓库与基线边界
 
-- `D:\Agent-loop-system` 保存编排器、Runner、前端、测试、case map 和文档。
+- `D:\Agent-loop\system` 保存编排器、Runner、前端、测试、case map 和文档。
+- `D:\Agent-loop\workspaces` 只保存固件、配套工具和待人工审查的独立工作区；路径配置可相对 `system` 书写。
 - 固件工作区是独立 Git 仓库，可能包含 `app`、`core/comm`、`core/gui`、`core/lvgl` 等嵌套仓库。
 - `artifacts/`、`evidence/`、`history/`、`logs/` 等目录是本机运行输出，不进入源码基线。
 - 可复现固件清单必须记录根仓库和嵌套仓库的提交、dirty 状态、项目配置及关键产物哈希。

@@ -24,7 +24,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from agent_loop_system.runtime_root import RuntimePaths
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
     CASE_MAP_PROFILE_PROJECTS,
@@ -46,8 +46,17 @@ from agent_loop_system.tools.llm_retry import (
 from agent_loop_system.tools.simulator import SimulatorSession
 from agent_loop_system.tools.visual_translations import visual_translation_context
 
-DEFAULT_SIM_EXE = r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe"
-EVIDENCE_DIR = RuntimePaths.from_root().evidence
+_RUNTIME_PATHS = RuntimePaths.from_root()
+DEFAULT_SIM_EXE = str(
+    _RUNTIME_PATHS.firmware_workspaces
+    / "620C_W6830"
+    / "core"
+    / "gui"
+    / "simulator"
+    / "bin"
+    / "main.exe"
+)
+EVIDENCE_DIR = _RUNTIME_PATHS.evidence
 VISUAL_RELEVANCE_RULES = (
     "- 只比较缺陷标题、描述和验收条件明确涉及的界面属性，不得从参考图中扩展出新的故障点。\n"
     "- 复合需求图中，明确标注为“说明文案”“预期结果”“需求描述”等规格文字的内容定义预期；"
@@ -86,7 +95,9 @@ def _screenshot_capture_note(path: str) -> str:
 
 def get_simulator_exe() -> str:
     """每次启动时从环境读取模拟器，避免服务进程长期持有旧工作区路径。"""
-    return os.environ.get("SIMULATOR_ARTIFACT_PATH", DEFAULT_SIM_EXE)
+    return str(resolve_config_path(
+        os.environ.get("SIMULATOR_ARTIFACT_PATH", DEFAULT_SIM_EXE)
+    ))
 
 
 def _result_provenance(

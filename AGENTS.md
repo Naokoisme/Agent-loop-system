@@ -4,9 +4,10 @@
 
 ## 三套源码必须隔离
 
-- 620C 模拟器：`D:\Agent-loop-workspace\620C_W6830`
-- 6202 真机：`D:\Agent-loop-workspace\6202_W5230`
-- 6204 真机：`D:\Agent-loop-workspace\6204_W5230`
+- Agent-loop 系统：`D:\Agent-loop\system`
+- 620C 模拟器：`D:\Agent-loop\workspaces\firmware\620C_W6830`
+- 6202 真机：`D:\Agent-loop\workspaces\firmware\6202_W5230`
+- 6204 真机：`D:\Agent-loop\workspaces\firmware\6204_W5230`
 - `D:\TOPSTEP\shenju_w30` 只作上游参考。不要在那里开发、构建或打补丁。
 - 涉及固件源码诊断、修改、构建或重新生成 Runtime Profile 的真机工程任务，必须同时使用
   `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT`；两者必须指向同一个、

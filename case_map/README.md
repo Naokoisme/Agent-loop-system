@@ -27,7 +27,7 @@
 一条用例一行、`case_id` 唯一，最小格式如下：
 
 ```json
-{"case_id":"CALC_003","sheet":"计算器","target":"6202_W5230","last_verified":"2026-08-17","evidence_root":"D:/Agent-loop-system","evidence_paths":["evidence/batch/CALC_003/result.json"]}
+{"case_id":"CALC_003","sheet":"计算器","target":"6202_W5230","last_verified":"2026-08-17","evidence_root":".","evidence_paths":["evidence/batch/CALC_003/result.json"]}
 ```
 
 只写事实字段：

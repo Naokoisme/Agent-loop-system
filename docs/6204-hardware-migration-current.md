@@ -7,7 +7,7 @@
 
 ## 结论
 
-6204 v1.6.2 已迁移到独立开发目录 `D:\Agent-loop-workspace\6204_W5230`，并在这套
+6204 v1.6.2 已迁移到独立开发目录 `D:\Agent-loop\workspaces\firmware\6204_W5230`，并在这套
 6204 自己的源码上完成 Agent-loop 通用真机协议移植：HLQ 唯一命令入口、
 `TEST_SESSION`、`GUI_PING`、`GUI_TREE` 和 `SCREENSHOT_CAPTURE_FILE` 均已接入。
 
@@ -24,7 +24,7 @@ case map、坐标、业务命令和历史证据没有复制到 6204。
 | 项目 | 当前值 |
 | --- | --- |
 | 上游参考目录 | `D:\TOPSTEP\shenju_w30`（只读使用） |
-| 独立工作区 | `D:\Agent-loop-workspace\6204_W5230` |
+| 独立工作区 | `D:\Agent-loop\workspaces\firmware\6204_W5230` |
 | 选定发布标签 | `6204_W5230_v1.6.2` |
 | 标签对象 | `6960fb0245ccb0c734833b45563d11a9ced58d46` |
 | 根仓提交 | `14b6116a55897be9ff8afb293002bb3dbeecb4ca` |
@@ -110,7 +110,7 @@ case map、坐标、业务命令和历史证据没有复制到 6204。
 
 ## 下一道验收门槛
 
-1. 用户单独授权后，在 `D:\Agent-loop-workspace\6204_W5230` 构建 6204，并记录工具链、
+1. 用户单独授权后，在 `D:\Agent-loop\workspaces\firmware\6204_W5230` 构建 6204，并记录工具链、
    根仓/子仓状态、配置、新 UP3 路径与 SHA-256。
 2. 构建成功后仍需用户再次明确授权才能刷机；构建许可不包含刷机许可。
 3. 刷入新产物后，通过 SuperCom 命名管道验证 HLQ、会话和 GUI 栅栏，再用 MTP 取得一张

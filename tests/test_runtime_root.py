@@ -12,6 +12,8 @@ from agent_loop_system.runtime_root import (
     is_frozen,
     load_app_env,
     resolve_app_root,
+    resolve_config_path,
+    resolve_layout_root,
 )
 
 
@@ -92,6 +94,63 @@ class RuntimeRootTests(unittest.TestCase):
                 self.assertEqual(root, self.workspace_root.resolve())
             finally:
                 os.chdir(orig_cwd)
+
+    def test_relative_config_paths_are_anchored_at_app_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            app_root = Path(tmpdir) / "system"
+            app_root.mkdir()
+            expected = (app_root / ".." / "workspaces" / "firmware").resolve()
+            with patch.dict(
+                os.environ,
+                {"AGENT_LOOP_ROOT": str(app_root)},
+                clear=True,
+            ):
+                orig_cwd = os.getcwd()
+                try:
+                    os.chdir("C:\\")
+                    self.assertEqual(
+                        resolve_config_path("../workspaces/firmware"),
+                        expected,
+                    )
+                finally:
+                    os.chdir(orig_cwd)
+
+    def test_layout_root_and_shared_workspace_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            layout_root = Path(tmpdir)
+            app_root = layout_root / "system"
+            app_root.mkdir()
+            with patch.dict(
+                os.environ,
+                {
+                    "AGENT_LOOP_ROOT": str(app_root),
+                    "AGENT_LOOP_LAYOUT_ROOT": "..",
+                },
+                clear=True,
+            ):
+                self.assertEqual(resolve_layout_root(), layout_root.resolve())
+                paths = RuntimePaths.from_root()
+                self.assertEqual(
+                    paths.firmware_workspaces,
+                    layout_root.resolve() / "workspaces" / "firmware",
+                )
+                self.assertEqual(
+                    paths.tool_workspaces,
+                    layout_root.resolve() / "workspaces" / "tools",
+                )
+                self.assertEqual(
+                    paths.legacy_evidence,
+                    layout_root.resolve() / "data" / "legacy-evidence",
+                )
+
+    def test_frozen_layout_remains_self_contained_without_override(self) -> None:
+        fake_portable_dir = Path("C:/portable_test_dist/agent-loop-windows-x64").resolve()
+        with patch.object(sys, "frozen", True, create=True), patch.dict(
+            os.environ,
+            {"AGENT_LOOP_ROOT": str(fake_portable_dir)},
+            clear=True,
+        ):
+            self.assertEqual(resolve_layout_root(), fake_portable_dir)
 
     def test_load_app_env(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

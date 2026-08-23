@@ -177,6 +177,27 @@ class HardwareTargetConfigTest(unittest.TestCase):
                 config = HardwareTargetConfig.from_env()
             self.assertEqual(config.source_root, proj_dir.resolve())
 
+    def test_relative_paths_and_layout_discovery_use_app_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            layout = Path(directory)
+            app_root = layout / "system"
+            project_root = layout / "workspaces" / "firmware" / "6202_W5230"
+            app_root.mkdir()
+            project_root.mkdir(parents=True)
+            self._tree(project_root)
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "AGENT_LOOP_ROOT": str(app_root),
+                    "AGENT_LOOP_LAYOUT_ROOT": "..",
+                    "W30_HARDWARE_SOURCE_ROOT": "../workspaces/firmware/6202_W5230",
+                    "W30_HARDWARE_WORKSPACE_ROOT": "../workspaces/firmware/6202_W5230",
+                },
+                clear=True,
+            ):
+                config = HardwareTargetConfig.from_env()
+            self.assertEqual(config.source_root, project_root.resolve())
+
     def test_auto_discovery_fails_when_workspace_not_found(self) -> None:
         with mock.patch(
             "agent_loop_system.tools.hardware_target.find_hardware_workspace",

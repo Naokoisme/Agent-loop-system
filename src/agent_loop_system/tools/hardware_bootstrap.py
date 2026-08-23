@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.hardware_serial import SerialTransportError
 from agent_loop_system.tools.hardware_target import HardwareTargetConfig
 from agent_loop_system.tools.real_device import (
@@ -16,7 +17,7 @@ from agent_loop_system.tools.real_device import (
 )
 
 
-DEFAULT_EVIDENCE_ROOT = Path("artifacts/hardware_bootstrap")
+DEFAULT_EVIDENCE_ROOT = RuntimePaths.from_root().evidence / "hardware_bootstrap"
 
 
 def _default_evidence_dir() -> Path:
@@ -31,7 +32,7 @@ def _validate_environment() -> tuple[HardwareTargetConfig, str]:
         value = os.environ.get(name, "").strip()
         if not value:
             raise ValueError(f"{name} must explicitly point to the 6202 workspace")
-        if Path(value).resolve() != config.source_root:
+        if resolve_config_path(value) != config.source_root:
             raise ValueError(f"{name} must match W30_HARDWARE_SOURCE_ROOT")
 
     for name in ("W30_PROJECT", "W30_HARDWARE_PROJECT"):

@@ -11,6 +11,11 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from agent_loop_system.runtime_root import (
+    RuntimePaths,
+    load_app_env,
+    resolve_config_path,
+)
 from agent_loop_system.tools.enter_page_contract import (
     EnterPageParamValue,
     render_enter_page_knowledge,
@@ -18,7 +23,13 @@ from agent_loop_system.tools.enter_page_contract import (
 
 SIM_TOOLS = Path(__file__).parent
 KB_DIR = SIM_TOOLS / "kb"
-W30_ROOT = Path(os.environ.get("W30_SOURCE_ROOT", r"D:\TOPSTEP\shenju_w30"))
+load_app_env()
+W30_ROOT = resolve_config_path(
+    os.environ.get(
+        "W30_SOURCE_ROOT",
+        RuntimePaths.from_root().firmware_workspaces / "620C_W6830",
+    )
+)
 PROJECT_NAME = os.environ.get("W30_PROJECT", "620C_W6830")
 C_FILE = W30_ROOT / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
 PROJECT_CMAKE = W30_ROOT / "app" / "projects" / PROJECT_NAME / "Project.cmake"

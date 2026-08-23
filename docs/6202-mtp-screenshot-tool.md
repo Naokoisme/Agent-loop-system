@@ -15,7 +15,7 @@ MTP 截图步骤不自行停止会话。
 1. SuperCom 已独占 COM7，并提供双向命名管道
    `\\.\pipe\SuperCom.AgentBridge.COM7`。
 2. `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT` 都指向
-   `D:\Agent-loop-workspace\6202_W5230`，项目为 `6202_W5230`。
+   `D:\Agent-loop\workspaces\firmware\6202_W5230`，项目为 `6202_W5230`。
 3. Runner 已完成逐用例重启恢复，发送 `TEST_SESSION:START` 并确认会话为 `active`。
 4. 手表运行支持 `SCREENSHOT_CAPTURE_FILE` 的工程固件，屏幕处于可截图状态。
 
@@ -24,8 +24,8 @@ MTP 截图步骤不自行停止会话。
 在本机 `.env` 中使用等价配置；设备绑定不要提交到仓库：
 
 ~~~dotenv
-W30_HARDWARE_SOURCE_ROOT=D:\Agent-loop-workspace\6202_W5230
-W30_HARDWARE_WORKSPACE_ROOT=D:\Agent-loop-workspace\6202_W5230
+W30_HARDWARE_SOURCE_ROOT=../workspaces/firmware/6202_W5230
+W30_HARDWARE_WORKSPACE_ROOT=../workspaces/firmware/6202_W5230
 W30_HARDWARE_PROJECT=6202_W5230
 W30_HARDWARE_TRANSPORT=supercom
 W30_HARDWARE_PORT=COM7

@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
+from agent_loop_system.runtime_root import resolve_config_path
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
@@ -55,7 +56,7 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
     if kb_dir == SIMULATOR_KB_DIR and source_root_value:
         from sim_tools.extract_kb import extract_commands, extract_windows
 
-        source_root = Path(source_root_value).resolve()
+        source_root = resolve_config_path(source_root_value)
         project = os.environ.get("W30_PROJECT", "").strip()
         if not project:
             raise ValueError("W30_PROJECT 未配置，不能从真实源码生成模拟器能力目录")

@@ -48,6 +48,46 @@ def resolve_app_root(explicit_root: Path | str | None = None) -> Path:
     return root
 
 
+def resolve_config_path(
+    value: Path | str,
+    *,
+    app_root: Path | str | None = None,
+) -> Path:
+    """Resolve one configured path independently from the process cwd.
+
+    Absolute values remain supported for external tools. Relative values are
+    always anchored at the Agent-loop application root, so launching the same
+    source tree from another terminal directory does not change their meaning.
+    """
+
+    raw = os.path.expandvars(os.path.expanduser(str(value).strip()))
+    if not raw:
+        raise ValueError("configured path is empty")
+    path = Path(raw)
+    if not path.is_absolute():
+        path = resolve_app_root(app_root) / path
+    return path.resolve()
+
+
+def resolve_layout_root(app_root: Path | str | None = None) -> Path:
+    """Return the optional multi-workspace layout root.
+
+    A portable frozen distribution remains self-contained by default. Source
+    installations may opt into a shared layout with ``AGENT_LOOP_LAYOUT_ROOT``;
+    after migration, ``D:/Agent-loop/system`` also auto-discovers its parent
+    when that parent contains ``workspaces``.
+    """
+
+    root = resolve_app_root(app_root)
+    configured = os.environ.get("AGENT_LOOP_LAYOUT_ROOT", "").strip()
+    if configured:
+        return resolve_config_path(configured, app_root=root)
+    parent = root.parent
+    if not is_frozen() and (parent / "workspaces").is_dir():
+        return parent.resolve()
+    return root
+
+
 def load_app_env(
     env_path: Path | None = None,
     *,
@@ -85,6 +125,50 @@ class RuntimePaths:
     """应用程序运行期全部资源与数据路径集合。"""
 
     root: Path
+
+    @property
+    def layout_root(self) -> Path:
+        return resolve_layout_root(self.root)
+
+    @property
+    def firmware_workspaces(self) -> Path:
+        return self.layout_root / "workspaces" / "firmware"
+
+    @property
+    def tool_workspaces(self) -> Path:
+        return self.layout_root / "workspaces" / "tools"
+
+    @property
+    def review_workspaces(self) -> Path:
+        return self.layout_root / "workspaces" / "review"
+
+    @property
+    def data(self) -> Path:
+        return self.layout_root / "data"
+
+    @property
+    def legacy_evidence(self) -> Path:
+        return self.data / "legacy-evidence"
+
+    @property
+    def validation(self) -> Path:
+        return self.data / "validation"
+
+    @property
+    def supercom_data(self) -> Path:
+        return self.data / "supercom"
+
+    @property
+    def releases(self) -> Path:
+        return self.layout_root / "releases"
+
+    @property
+    def release_archive(self) -> Path:
+        return self.releases / "archive"
+
+    @property
+    def draft_archive(self) -> Path:
+        return self.layout_root / "archive" / "drafts"
 
     @property
     def frontend(self) -> Path:

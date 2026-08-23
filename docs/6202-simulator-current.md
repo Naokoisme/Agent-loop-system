@@ -6,10 +6,10 @@
 
 ## 隔离范围
 
-- 源码：`D:\Agent-loop-workspace\6202_W5230`
-- 构建目录：`D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\out\build\6202_W5230`
-- 运行产物：`D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\bin\main.exe`
-- 用例映射：`D:\Agent-loop-system\case_map\6202_simulator_case_map`
+- 源码：`D:\Agent-loop\workspaces\firmware\6202_W5230`
+- 构建目录：`D:\Agent-loop\workspaces\firmware\6202_W5230\core\gui\simulator\out\build\6202_W5230`
+- 运行产物：`D:\Agent-loop\workspaces\firmware\6202_W5230\core\gui\simulator\bin\main.exe`
+- 用例映射：`D:\Agent-loop\system\case_map\6202_simulator_case_map`
 - 前端项目：`6202_W5230_SIMULATOR`（显示为 `6202 W5230 · 模拟器`）
 
 不得把 `D:\TOPSTEP\shenju_w30` 当作开发、构建或补丁目录。

@@ -64,6 +64,32 @@ class SimulatorResourceTests(unittest.TestCase):
         with mock.patch.dict("os.environ", {}, clear=True):
             self.assertEqual(get_simulator_exe(), DEFAULT_SIM_EXE)
 
+    def test_relative_simulator_path_is_anchored_at_app_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            app_root = Path(directory) / "system"
+            app_root.mkdir()
+            with mock.patch.dict(
+                "os.environ",
+                {
+                    "AGENT_LOOP_ROOT": str(app_root),
+                    "SIMULATOR_ARTIFACT_PATH": "../workspaces/firmware/620C_W6830/main.exe",
+                },
+                clear=True,
+            ):
+                self.assertEqual(
+                    get_simulator_exe(),
+                    str(
+                        (
+                            app_root
+                            / ".."
+                            / "workspaces"
+                            / "firmware"
+                            / "620C_W6830"
+                            / "main.exe"
+                        ).resolve()
+                    ),
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

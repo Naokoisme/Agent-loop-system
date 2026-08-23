@@ -41,7 +41,7 @@ Agent-loop 适配器只负责：
 可通过 `--tool` 显式指定 EXE：
 
 ```powershell
-cd D:\Agent-loop-system
+cd D:\Agent-loop\system
 uv run python -m agent_loop_system.tools.w30_ui_compare compare `
   --tool D:\UI_AUTO_TEST_TOOLS-xushuo\ui_check_tools\build-cli-qt683\Release\ui_compare_cli.exe `
   --actual D:\evidence\actual.bmp `

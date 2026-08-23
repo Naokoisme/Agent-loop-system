@@ -14,6 +14,7 @@ import os
 import sys
 from pathlib import Path
 
+from agent_loop_system.runtime_root import RuntimePaths, load_app_env
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
@@ -21,8 +22,9 @@ from agent_loop_system.tools.llm_retry import (
 )
 from agent_loop_system.tools.ones import Defect, OnesClient, OnesConfig, extract_desc_image_uuids
 
-DEFECTS_ROOT = Path(__file__).resolve().parents[3] / "defects"
-DEFECTS_IMG_ROOT = Path(__file__).resolve().parents[3] / "defects_img"
+_RUNTIME_PATHS = RuntimePaths.from_root()
+DEFECTS_ROOT = _RUNTIME_PATHS.defects
+DEFECTS_IMG_ROOT = _RUNTIME_PATHS.defect_images
 
 _SOURCE_SUFFIXES = frozenset({".c", ".h"})
 _MAX_SOURCE_FILE_BYTES = 2 * 1024 * 1024
@@ -40,18 +42,7 @@ _COMM_BRANCH = "TuoBu"
 
 def _load_env() -> None:
     """从 .env 加载环境变量（不覆盖已存在的）。"""
-    path = Path(__file__).resolve().parents[3] / ".env"
-    if not path.is_file():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = value
+    load_app_env()
 
 
 def _media_kind(mime: str) -> str:

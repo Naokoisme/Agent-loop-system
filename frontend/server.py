@@ -37,7 +37,12 @@ from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from agent_loop_system.internal_dispatcher import build_child_command
-from agent_loop_system.runtime_root import resolve_app_root
+from agent_loop_system.runtime_root import (
+    RuntimePaths,
+    load_app_env,
+    resolve_app_root,
+    resolve_config_path,
+)
 from agent_loop_system.tools.case_map import (
     OBSERVATION_ONLY_COMMANDS,
     validated_case_entries,
@@ -97,19 +102,10 @@ TEST_PROJECTS: dict[str, dict[str, str]] = {
         "execution_target_label": "模拟器",
         "case_map_dir": "6202_simulator_case_map",
         "case_map_profile": "6202_W5230_SIMULATOR",
-        "simulator_source_root": os.environ.get(
-            "W30_6202_SIMULATOR_SOURCE_ROOT",
-            r"D:\Agent-loop-workspace\6202_W5230",
-        ),
+        "simulator_source_root": "../workspaces/firmware/6202_W5230",
         "simulator_project": "6202_W5230",
-        "simulator_build_directory": os.environ.get(
-            "W30_6202_SIMULATOR_BUILD_DIRECTORY",
-            r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\out\build\6202_W5230",
-        ),
-        "simulator_artifact_path": os.environ.get(
-            "W30_6202_SIMULATOR_ARTIFACT_PATH",
-            r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\bin\main.exe",
-        ),
+        "simulator_build_directory": "../workspaces/firmware/6202_W5230/core/gui/simulator/out/build/6202_W5230",
+        "simulator_artifact_path": "../workspaces/firmware/6202_W5230/core/gui/simulator/bin/main.exe",
     },
 }
 
@@ -264,9 +260,20 @@ def _test_project(value: str | None = None) -> dict[str, str]:
 
     project = str(value or DEFAULT_TEST_PROJECT).strip()
     try:
-        return dict(TEST_PROJECTS[project])
+        metadata = dict(TEST_PROJECTS[project])
     except KeyError as exc:
         raise ValueError(f"测试项目不存在: {project or '空'}") from exc
+    if project == "6202_W5230_SIMULATOR":
+        _load_test_runtime_environment()
+        for field, environment_key in (
+            ("simulator_source_root", "W30_6202_SIMULATOR_SOURCE_ROOT"),
+            ("simulator_build_directory", "W30_6202_SIMULATOR_BUILD_DIRECTORY"),
+            ("simulator_artifact_path", "W30_6202_SIMULATOR_ARTIFACT_PATH"),
+        ):
+            metadata[field] = str(resolve_config_path(
+                os.environ.get(environment_key, metadata[field])
+            ))
+    return metadata
 
 
 def _test_project_options() -> list[dict[str, str]]:
@@ -327,17 +334,17 @@ class AppPaths:
 
     @classmethod
     def from_root(cls, root: Path) -> "AppPaths":
-        root = root.resolve()
+        runtime_paths = RuntimePaths.from_root(root)
         return cls(
-            root=root,
-            frontend=root / "frontend",
-            defects=root / "defects",
-            defect_images=root / "defects_img",
-            history=root / "history",
-            test_history=root / "history" / "tests",
-            evidence=root / "evidence",
-            case_map=root / "case_map",
-            runtime_jobs=root / ".runtime" / "jobs",
+            root=runtime_paths.root,
+            frontend=runtime_paths.frontend,
+            defects=runtime_paths.defects,
+            defect_images=runtime_paths.defect_images,
+            history=runtime_paths.history,
+            test_history=runtime_paths.test_history,
+            evidence=runtime_paths.evidence,
+            case_map=runtime_paths.case_map,
+            runtime_jobs=runtime_paths.runtime_jobs,
         )
 
 
@@ -3713,6 +3720,8 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     llm_configured = bool(
         llm_cfg["api_key"] and llm_cfg["base_url"] and llm_cfg["model"]
     )
+    runtime_paths = RuntimePaths.from_root(paths.root)
+    simulator_root = runtime_paths.firmware_workspaces / "620C_W6830"
     return {
         "llm": {
             "provider": "builtin",
@@ -3740,18 +3749,48 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "ble_scan_timeout": float(
                 os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")
             ),
-            "profile_root": os.environ.get(
-                "W30_HARDWARE_PROFILE_ROOT",
-                str(paths.root / "profiles"),
-            ),
+            "profile_root": str(resolve_config_path(
+                os.environ.get(
+                    "W30_HARDWARE_PROFILE_ROOT",
+                    str(paths.root / "profiles"),
+                ),
+                app_root=paths.root,
+            )),
             "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
         },
         "simulator": {
-            "source_root": os.environ.get("W30_SIMULATOR_SOURCE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
-            "workspace_root": os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
-            "simulator_path": os.environ.get("W30_SIMULATOR_PATH", r"D:\Agent-loop-workspace\620C_W6830\core\gui\simulator\bin\main.exe"),
+            "source_root": str(resolve_config_path(
+                os.environ.get("W30_SIMULATOR_SOURCE_ROOT", simulator_root),
+                app_root=paths.root,
+            )),
+            "workspace_root": str(resolve_config_path(
+                os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", simulator_root),
+                app_root=paths.root,
+            )),
+            "simulator_path": str(resolve_config_path(
+                os.environ.get(
+                    "W30_SIMULATOR_PATH",
+                    simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe",
+                ),
+                app_root=paths.root,
+            )),
         },
     }
+
+
+def _config_path_for_storage(value: Any, *, app_root: Path) -> str:
+    """Keep paths inside the unified layout portable in the local .env."""
+
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    resolved = resolve_config_path(raw, app_root=app_root)
+    layout_root = RuntimePaths.from_root(app_root).layout_root.resolve()
+    try:
+        resolved.relative_to(layout_root)
+    except ValueError:
+        return str(resolved)
+    return os.path.relpath(resolved, app_root)
 
 
 def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
@@ -3794,18 +3833,38 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
         if "ble_scan_timeout" in hw and hw["ble_scan_timeout"] is not None:
             env_updates["W30_HARDWARE_BLE_SCAN_TIMEOUT"] = str(hw["ble_scan_timeout"])
         if "profile_root" in hw and hw["profile_root"] is not None:
-            env_updates["W30_HARDWARE_PROFILE_ROOT"] = str(hw["profile_root"])
+            env_updates["W30_HARDWARE_PROFILE_ROOT"] = _config_path_for_storage(
+                hw["profile_root"], app_root=paths.root
+            )
         if "profile_version" in hw and hw["profile_version"] is not None:
             env_updates["W30_HARDWARE_PROFILE_VERSION"] = str(hw["profile_version"])
             
     if "simulator" in cfg and isinstance(cfg["simulator"], dict):
         sim = cfg["simulator"]
         if "source_root" in sim and sim["source_root"] is not None:
-            env_updates["W30_SIMULATOR_SOURCE_ROOT"] = str(sim["source_root"])
+            env_updates["W30_SIMULATOR_SOURCE_ROOT"] = _config_path_for_storage(
+                sim["source_root"], app_root=paths.root
+            )
         if "workspace_root" in sim and sim["workspace_root"] is not None:
-            env_updates["W30_SIMULATOR_WORKSPACE_ROOT"] = str(sim["workspace_root"])
+            env_updates["W30_SIMULATOR_WORKSPACE_ROOT"] = _config_path_for_storage(
+                sim["workspace_root"], app_root=paths.root
+            )
         if "simulator_path" in sim and sim["simulator_path"] is not None:
-            env_updates["W30_SIMULATOR_PATH"] = str(sim["simulator_path"])
+            env_updates["W30_SIMULATOR_PATH"] = _config_path_for_storage(
+                sim["simulator_path"], app_root=paths.root
+            )
+
+    if "simulator_6202" in cfg and isinstance(cfg["simulator_6202"], dict):
+        simulator_6202 = cfg["simulator_6202"]
+        for field, environment_key in (
+            ("source_root", "W30_6202_SIMULATOR_SOURCE_ROOT"),
+            ("build_directory", "W30_6202_SIMULATOR_BUILD_DIRECTORY"),
+            ("artifact_path", "W30_6202_SIMULATOR_ARTIFACT_PATH"),
+        ):
+            if field in simulator_6202 and simulator_6202[field] is not None:
+                env_updates[environment_key] = _config_path_for_storage(
+                    simulator_6202[field], app_root=paths.root
+                )
             
     for k, v in env_updates.items():
         os.environ[k] = v
@@ -5684,12 +5743,16 @@ class RequestHandler(BaseHTTPRequestHandler):
                             {"hardware": hardware_update},
                         )
                 elif project == "6202_W5230_SIMULATOR":
-                    if "source_root" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_SOURCE_ROOT"] = str(paths_obj["source_root"])
-                    if "build_directory" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_BUILD_DIRECTORY"] = str(paths_obj["build_directory"])
-                    if "artifact_path" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_ARTIFACT_PATH"] = str(paths_obj["artifact_path"])
+                    simulator_6202_update = {
+                        key: paths_obj[key]
+                        for key in ("source_root", "build_directory", "artifact_path")
+                        if key in paths_obj
+                    }
+                    if simulator_6202_update:
+                        _save_system_config(
+                            self.app.paths,
+                            {"simulator_6202": simulator_6202_update},
+                        )
                 else:
                     if "source_root" in paths_obj:
                         config_update["simulator"]["source_root"] = paths_obj["source_root"]
@@ -5917,6 +5980,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     root = resolve_app_root()
+    load_app_env(app_root=root)
     app = WebApplication(AppPaths.from_root(root))
     server = FrontendHTTPServer((args.host, args.port), make_handler(app))
     print(f"W30 Agent UI: http://{args.host}:{args.port}")

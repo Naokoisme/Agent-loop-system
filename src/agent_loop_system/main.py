@@ -10,24 +10,15 @@ import os
 import sys
 from pathlib import Path
 
+from agent_loop_system.runtime_root import load_app_env
+
 
 def _load_env(env_path: Path | None = None) -> None:
     """从 .env 文件加载环境变量到 os.environ（不覆盖已存在的）。
 
     用标准库 parse，避免引入 python-dotenv 依赖。
     """
-    path = env_path or Path(__file__).resolve().parents[2] / ".env"
-    if not path.is_file():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = value
+    load_app_env(env_path)
 
 
 def _auto_source_files(defect: dict, limit: int = 5) -> list[str]:

@@ -17,6 +17,7 @@ if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
 from agent_loop_system.version import __version__
+from agent_loop_system.runtime_root import RuntimePaths, load_app_env
 
 
 RELEASE_VERSION = __version__
@@ -45,6 +46,9 @@ RELEASE_ENV_COPY_KEYS = {
 }
 
 RELEASE_ENV_CLEAR_KEYS = {
+    "AGENT_LOOP_LAYOUT_ROOT",
+    "AGENT_LOOP_WORKSPACE_BASE",
+    "W30_WORKSPACE_BASE",
     "W30_SOURCE_ROOT",
     "W30_AGENT_WORKSPACE_ROOT",
     "SIMULATOR_TOOL_PATH",
@@ -52,6 +56,9 @@ RELEASE_ENV_CLEAR_KEYS = {
     "SIMULATOR_ARTIFACT_PATH",
     "W30_HARDWARE_SOURCE_ROOT",
     "W30_HARDWARE_WORKSPACE_ROOT",
+    "W30_SIMULATOR_SOURCE_ROOT",
+    "W30_SIMULATOR_WORKSPACE_ROOT",
+    "W30_SIMULATOR_PATH",
     "W30_6202_SIMULATOR_SOURCE_ROOT",
     "W30_6202_SIMULATOR_BUILD_DIRECTORY",
     "W30_6202_SIMULATOR_ARTIFACT_PATH",
@@ -156,6 +163,8 @@ def build_exe(
     clean: bool = True,
 ) -> dict[str, object]:
     root = (workspace_root or Path(__file__).resolve().parents[1]).resolve()
+    load_app_env(app_root=root)
+    runtime_paths = RuntimePaths.from_root(root)
     target_dir = (output_dir or (root / "dist" / "agent-loop-windows-x64")).resolve()
     work_dir = root / ".work" / "pyinstaller"
     if profile_source is not None and not profile_source.resolve().is_dir():
@@ -322,9 +331,10 @@ def build_exe(
             shutil.copy2(src_f, frontend_dst / static_file)
 
     # 5. tools/SuperCom (F11: Built-in SuperCom-AgentBridge serial bridge tool)
-    supercom_src = Path(r"D:\Agent-loop-workspace\SuperCom-AgentBridge\SuperCom\bin\Release")
+    supercom_project = runtime_paths.tool_workspaces / "SuperCom-AgentBridge"
+    supercom_src = supercom_project / "SuperCom" / "bin" / "Release"
     if not supercom_src.exists():
-        supercom_src = Path(r"D:\Agent-loop-workspace\SuperCom-AgentBridge\SuperCom\bin\Debug")
+        supercom_src = supercom_project / "SuperCom" / "bin" / "Debug"
 
     supercom_dst = target_dir / "tools" / "SuperCom"
     if supercom_src.exists():
@@ -342,7 +352,9 @@ def build_exe(
         # Ensure default user_data.sqlite with saved commands is included
         user_data_db = supercom_src / "user_data.sqlite"
         if not user_data_db.exists():
-            user_data_db = Path(r"D:\Agent-loop-workspace\SuperCom-AgentBridge\user_data.sqlite")
+            user_data_db = runtime_paths.supercom_data / "user_data.sqlite"
+        if not user_data_db.exists():
+            user_data_db = supercom_project / "user_data.sqlite"
         if user_data_db.exists():
             shutil.copy2(user_data_db, supercom_dst / "user_data.sqlite")
 

@@ -66,6 +66,35 @@ class WorkspaceIsolationTests(unittest.TestCase):
                 with self.assertRaisesRegex(WorkspaceConflictError, "越出 Agent 专用工作区"):
                     ensure_path_in_workspace(base / "shared-build", "build")
 
+    def test_relative_workspace_paths_ignore_the_process_cwd(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = Path(tmp)
+            app_root = layout / "system"
+            source = self._workspace(
+                layout / "workspaces" / "firmware" / "620C_W6830"
+            )
+            app_root.mkdir()
+            env = {
+                "AGENT_LOOP_ROOT": str(app_root),
+                "W30_SOURCE_ROOT": "../workspaces/firmware/620C_W6830",
+                "W30_AGENT_WORKSPACE_ROOT": "../workspaces/firmware/620C_W6830",
+                "W30_PROJECT": "620C_W6830",
+            }
+            with mock.patch.dict(os.environ, env, clear=True):
+                original_cwd = os.getcwd()
+                try:
+                    os.chdir("C:\\")
+                    self.assertEqual(resolve_source_root(), source.resolve())
+                    self.assertEqual(
+                        ensure_path_in_workspace(
+                            "../workspaces/firmware/620C_W6830/build",
+                            "build",
+                        ),
+                        (source / "build").resolve(),
+                    )
+                finally:
+                    os.chdir(original_cwd)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.hardware_serial import dangerous_command_reason
 
 
@@ -51,17 +52,14 @@ def find_hardware_workspace(
         or os.environ.get("W30_WORKSPACE_BASE", "").strip()
     )
     if env_base:
-        candidates.append(Path(env_base).resolve() / project)
+        candidates.append(resolve_config_path(env_base) / project)
 
-    # 仓库同级目录
-    repo_root = Path(__file__).resolve().parents[3]
-    candidates.append(repo_root.parent / "Agent-loop-workspace" / project)
-    candidates.append(repo_root.parent / project)
+    # 统一布局目录
+    candidates.append(RuntimePaths.from_root().firmware_workspaces / project)
 
     # 当前执行目录相关
     cwd = Path.cwd().resolve()
-    candidates.append(cwd.parent / "Agent-loop-workspace" / project)
-    candidates.append(cwd / "workspaces" / project)
+    candidates.append(cwd / "workspaces" / "firmware" / project)
     candidates.append(cwd / project)
 
     seen: set[Path] = set()
@@ -145,8 +143,8 @@ class HardwareTargetConfig:
         source_root: Path | None = None
 
         if root_value and workspace_value:
-            src_path = Path(root_value).resolve()
-            ws_path = Path(workspace_value).resolve()
+            src_path = resolve_config_path(root_value)
+            ws_path = resolve_config_path(workspace_value)
             if src_path != ws_path:
                 raise ValueError(
                     "HARDWARE_WORKSPACE_CONFLICT: W30_HARDWARE_SOURCE_ROOT "
@@ -154,9 +152,9 @@ class HardwareTargetConfig:
                 )
             source_root = src_path
         elif root_value:
-            source_root = Path(root_value).resolve()
+            source_root = resolve_config_path(root_value)
         elif workspace_value:
-            source_root = Path(workspace_value).resolve()
+            source_root = resolve_config_path(workspace_value)
         else:
             discovered = find_hardware_workspace(expected_project)
             if discovered is not None:
@@ -164,7 +162,7 @@ class HardwareTargetConfig:
             else:
                 raise ValueError(
                     f"HARDWARE_WORKSPACE_NOT_FOUND: 未配置真机工作区路径，且未能在标准候选目录"
-                    f"（如 ../Agent-loop-workspace/{expected_project}）自动探测到有效的隔离工作区。"
+                    f"（如 ../workspaces/firmware/{expected_project}）自动探测到有效的隔离工作区。"
                     f"请在 .env 中设置 W30_HARDWARE_WORKSPACE 或 W30_HARDWARE_WORKSPACE_ROOT"
                 )
 
