@@ -8,8 +8,11 @@
 - 6202 真机：`D:\Agent-loop-workspace\6202_W5230`
 - 6204 真机：`D:\Agent-loop-workspace\6204_W5230`
 - `D:\TOPSTEP\shenju_w30` 只作上游参考。不要在那里开发、构建或打补丁。
-- 真机任务必须同时使用 `W30_HARDWARE_SOURCE_ROOT` 和
-  `W30_HARDWARE_WORKSPACE_ROOT`，两者必须指向同一个、与当前项目匹配的隔离工作区。
+- 涉及固件源码诊断、修改、构建或重新生成 Runtime Profile 的真机工程任务，必须同时使用
+  `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT`；两者必须指向同一个、
+  与当前项目匹配的隔离工作区。
+- 普通真机探索和固化用例只读取发布包内的 `profiles/<project>`，不得要求测试人员持有
+  固件源码工作区。
 
 ## 当前已验证的 6202 真机截图方向
 
