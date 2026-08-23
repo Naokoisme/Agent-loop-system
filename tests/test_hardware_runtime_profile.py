@@ -18,6 +18,15 @@ from scripts.generate_hardware_runtime_assets import generate_hardware_runtime_a
 
 
 class HardwareRuntimeProfileTests(unittest.TestCase):
+    def setUp(self) -> None:
+        profile_version = patch.dict(
+            os.environ,
+            {"W30_HARDWARE_PROFILE_VERSION": ""},
+            clear=False,
+        )
+        profile_version.start()
+        self.addCleanup(profile_version.stop)
+
     def _publish(self, base: Path, *, version: str = "v30-test.1") -> Path:
         project = "6202_W5230"
         profile_root = base / "profiles" / project

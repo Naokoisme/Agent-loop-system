@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.command_protocol import (
     collect_command_json,
     normalize_command,
@@ -89,13 +90,14 @@ class CommandProtocolTest(unittest.TestCase):
                     if line.startswith("W30_SOURCE_ROOT="):
                         source_root = line.split("=", 1)[1].strip()
                         break
-        if not source_root or not Path(source_root).is_dir():
-            fallback = Path(r"D:\Agent-loop-workspace\620C_W6830")
-            if fallback.is_dir():
-                source_root = str(fallback)
-            else:
-                self.skipTest("W30_SOURCE_ROOT 目录不可用")
-        return Path(source_root)
+        resolved = (
+            resolve_config_path(source_root)
+            if source_root
+            else RuntimePaths.from_root().firmware_workspaces / "620C_W6830"
+        )
+        if not resolved.is_dir():
+            self.skipTest("W30_SOURCE_ROOT 目录不可用")
+        return resolved
 
     def test_three_forms_normalize_equally(self) -> None:
         quoted_wire = normalize_command('srv_quick_cmd send "TOP5STEP:GUI_TREE:1;"')

@@ -638,7 +638,9 @@ def main():
     except ImportError:
         pass
 
-    source_root = Path(os.environ.get("W30_SOURCE_ROOT", str(W30_ROOT)))
+    source_root = resolve_config_path(
+        os.environ.get("W30_SOURCE_ROOT", str(W30_ROOT))
+    )
     project_name = os.environ.get("W30_PROJECT", PROJECT_NAME)
     c_file = source_root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
     project_cmake = source_root / "app" / "projects" / project_name / "Project.cmake"

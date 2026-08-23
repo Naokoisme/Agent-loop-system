@@ -37,8 +37,8 @@ def find_hardware_workspace(
     探测顺序：
     1. search_roots（如调用者指定）
     2. AGENT_LOOP_WORKSPACE_BASE / W30_WORKSPACE_BASE 环境变量目录下的项目子目录
-    3. Agent-loop-system 仓库的同级目录 ../Agent-loop-workspace/{project} 或 ../{project}
-    4. 当前工作目录下的 workspaces/{project} 或 ../Agent-loop-workspace/{project}
+    3. 统一布局根目录下的 workspaces/firmware/{project}
+    4. 当前工作目录下的 workspaces/firmware/{project} 或 {project}
     """
     candidates: list[Path] = []
 
