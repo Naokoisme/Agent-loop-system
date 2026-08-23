@@ -23,29 +23,32 @@ from agent_loop_system.runtime_root import RuntimePaths, load_app_env
 RELEASE_VERSION = __version__
 
 
-RELEASE_ENV_COPY_KEYS = {
-    "OPENAI_API_KEY",
-    "OPENAI_API_KEY_EXPLORATION",
-    "OPENAI_API_KEY_FIXED",
+RELEASE_ENV_SAFE_COPY_KEYS = {
     "OPENAI_BASE_URL",
     "OPENAI_MODEL",
     "OPENAI_EXPLORATION_MODEL",
     "OPENAI_FIXED_MODEL",
     "OPENAI_REQUEST_TIMEOUT",
     "ONES_BASE_URL",
-    "ONES_AUTH_TOKEN",
-    "ONES_TEAM_UUID",
-    "ONES_USER_ID",
-    "W30_HARDWARE_PORT",
     "W30_HARDWARE_BAUDRATE",
     "W30_HARDWARE_TRANSPORT",
     "W30_HARDWARE_CAPTURE_PROVIDER",
     "W30_HARDWARE_PROJECT",
-    "W30_HARDWARE_BLE_ADDRESS",
     "W30_HARDWARE_BLE_SCAN_TIMEOUT",
 }
 
-RELEASE_ENV_CLEAR_KEYS = {
+RELEASE_ENV_SECRET_KEYS = {
+    "OPENAI_API_KEY",
+    "OPENAI_API_KEY_EXPLORATION",
+    "OPENAI_API_KEY_FIXED",
+    "ONES_AUTH_TOKEN",
+}
+
+RELEASE_ENV_LOCAL_STATE_KEYS = {
+    "ONES_TEAM_UUID",
+    "ONES_USER_ID",
+    "W30_HARDWARE_PORT",
+    "W30_HARDWARE_BLE_ADDRESS",
     "AGENT_LOOP_LAYOUT_ROOT",
     "AGENT_LOOP_WORKSPACE_BASE",
     "W30_WORKSPACE_BASE",
@@ -65,6 +68,8 @@ RELEASE_ENV_CLEAR_KEYS = {
     "DESIGNER_MCP_ADAPTER_PATH",
 }
 
+RELEASE_ENV_CLEAR_KEYS = RELEASE_ENV_SECRET_KEYS | RELEASE_ENV_LOCAL_STATE_KEYS
+
 
 def read_dotenv_assignments(path: Path) -> dict[str, str]:
     """Read raw dotenv assignment values without evaluating or logging them."""
@@ -80,18 +85,23 @@ def read_dotenv_assignments(path: Path) -> dict[str, str]:
     return assignments
 
 
-def write_release_env_example(template: Path, source: Path, destination: Path) -> None:
-    """Render the distributable env template with credentials but no local paths."""
-    source_values = read_dotenv_assignments(source)
+def write_release_env_example(
+    template: Path,
+    source: Path | None,
+    destination: Path,
+) -> None:
+    """Render a portable env template without credentials or machine-local state."""
+    template_values = read_dotenv_assignments(template)
+    source_values = read_dotenv_assignments(source) if source is not None else {}
     replacements = {
-        key: source_values[key]
-        for key in RELEASE_ENV_COPY_KEYS
-        if key in source_values
+        key: source_values.get(key, template_values.get(key, ""))
+        for key in RELEASE_ENV_SAFE_COPY_KEYS
     }
     replacements.update({key: "" for key in RELEASE_ENV_CLEAR_KEYS})
     replacements["W30_HARDWARE_PROFILE_ROOT"] = "profiles"
     replacements["W30_HARDWARE_PROFILE_VERSION"] = source_values.get(
-        "W30_HARDWARE_PROFILE_VERSION", ""
+        "W30_HARDWARE_PROFILE_VERSION",
+        template_values.get("W30_HARDWARE_PROFILE_VERSION", ""),
     )
 
     rendered: list[str] = []
@@ -361,14 +371,11 @@ def build_exe(
     # Root files: only .env.example
     env_example = root / ".env.example"
     if env_example.is_file():
-        if release_env_source is not None:
-            write_release_env_example(
-                env_example,
-                release_env_source.resolve(),
-                target_dir / ".env.example",
-            )
-        else:
-            shutil.copy2(env_example, target_dir / ".env.example")
+        write_release_env_example(
+            env_example,
+            release_env_source.resolve() if release_env_source is not None else None,
+            target_dir / ".env.example",
+        )
 
     # Empty runtime directories
     for runtime_dir in ["history", "history/tests", "evidence", "defects", "defects_img", ".runtime/jobs"]:
@@ -390,6 +397,28 @@ def build_exe(
         sensitive_leaks.append("sim_tools (should be bundled in _internal)")
     if (target_dir / "frontend" / "server.py").exists():
         sensitive_leaks.append("frontend/server.py (should be bundled in _internal)")
+
+    packaged_env = target_dir / ".env.example"
+    if packaged_env.is_file():
+        packaged_values = read_dotenv_assignments(packaged_env)
+        leaked_secrets = sorted(
+            key
+            for key in RELEASE_ENV_SECRET_KEYS
+            if packaged_values.get(key, "").strip()
+        )
+        leaked_local_state = sorted(
+            key
+            for key in RELEASE_ENV_LOCAL_STATE_KEYS
+            if packaged_values.get(key, "").strip()
+        )
+        if leaked_secrets:
+            sensitive_leaks.append(
+                f".env.example contains credentials: {leaked_secrets}"
+            )
+        if leaked_local_state:
+            sensitive_leaks.append(
+                f".env.example contains machine-local settings: {leaked_local_state}"
+            )
 
     for r_dir, _, fnames in os.walk(target_dir):
         for fname in fnames:
