@@ -3360,6 +3360,79 @@ class FrontendDataTest(unittest.TestCase):
             remembered = json.loads(resp.read().decode("utf-8"))
         self.assertEqual(remembered["items"], [])
 
+    def test_hardware_serial_ports_endpoint(self) -> None:
+        _, base = self._server()
+        os.environ["W30_HARDWARE_PORT"] = "COM7"
+
+        mock_payload = {
+            "configured_port": "COM7",
+            "selected_port": "COM7",
+            "default_port": "COM7",
+            "active_count": 1,
+            "items": [
+                {
+                    "port": "COM7",
+                    "friendly_name": "USB Serial Port (COM7)",
+                    "description": "USB Serial Port",
+                    "hardware_id": r"FTDIBUS\VID_0403+PID_6001\0000",
+                    "manufacturer": "FTDI",
+                    "kind": "usb",
+                    "kind_label": "USB 串口",
+                    "present": True,
+                    "supercom_open": True,
+                    "pipe_name": "SuperCom.AgentBridge.COM7",
+                    "pipe_path": r"\\.\pipe\SuperCom.AgentBridge.COM7",
+                    "missing": False,
+                },
+                {
+                    "port": "COM1",
+                    "friendly_name": "Communications Port (COM1)",
+                    "description": "Communications Port",
+                    "hardware_id": r"ACPI\PNP0501\1",
+                    "manufacturer": "Standard",
+                    "kind": "system",
+                    "kind_label": "系统/板载串口",
+                    "present": True,
+                    "supercom_open": False,
+                    "pipe_name": "SuperCom.AgentBridge.COM1",
+                    "pipe_path": r"\\.\pipe\SuperCom.AgentBridge.COM1",
+                    "missing": False,
+                },
+            ],
+            "available": True,
+        }
+
+        with patch(
+            "agent_loop_system.tools.hardware_serial_ports.get_serial_ports_status",
+            return_value=mock_payload,
+        ) as mock_get_status:
+            with urlopen(base + "/api/hardware/serial-ports", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(data["configured_port"], "COM7")
+            self.assertEqual(data["selected_port"], "COM7")
+            self.assertEqual(data["active_count"], 1)
+            self.assertEqual(len(data["items"]), 2)
+            self.assertTrue(data["items"][0]["supercom_open"])
+            self.assertEqual(data["items"][0]["kind"], "usb")
+            self.assertFalse(data["items"][1]["supercom_open"])
+            self.assertEqual(data["items"][1]["kind"], "system")
+            mock_get_status.assert_called_once_with("COM7")
+
+        post_cfg = {
+            "hardware": {
+                "port": "COM8",
+                "baudrate": 1500000,
+                "transport": "supercom",
+                "capture_provider": "mtp",
+            }
+        }
+        with self._post_json(base + "/api/config", post_cfg) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(data["status"], "ok")
+        self.assertEqual(os.environ["W30_HARDWARE_PORT"], "COM8")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -155,6 +155,37 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.stylesheet)
 
+    def test_hardware_settings_expose_supercom_port_selector(self) -> None:
+        self.assertIn("SuperCom 端口设备", self.index)
+        self.assertIn('<select id="cfg-hw-port" class="select" required', self.index)
+        self.assertNotIn('<input id="cfg-hw-port"', self.index)
+        self.assertIn('id="btn-refresh-serial-ports"', self.index)
+        self.assertIn('id="cfg-hw-port-status"', self.index)
+
+        for token in (
+            "/api/hardware/serial-ports",
+            "loadSerialPorts",
+            "renderSerialPortOptions",
+            "updateSerialPortStatus",
+            "btnRefreshSerialPorts",
+            "SuperCom 桥接管道已就绪",
+            "SuperCom 桥接已开启",
+            "data?.available === false",
+            "Agent-loop 无法读取串口设备",
+            "await loadSerialPorts()",
+            "请选择 SuperCom 端口（检测到多个活动端口）",
+            "未检测到 SuperCom 开启的串口（请在 SuperCom 中打开端口）",
+        ):
+            self.assertIn(token, self.javascript)
+
+        for token in (
+            ".serial-port-status-banner",
+            '.serial-port-status-banner[data-tone="success"]',
+            '.serial-port-status-banner[data-tone="warning"]',
+            '.serial-port-status-banner[data-tone="error"]',
+        ):
+            self.assertIn(token, self.stylesheet)
+
     def test_llm_settings_keep_configuration_runtime_and_probe_independent(self) -> None:
         for token in (
             'id="llm-config-status"',

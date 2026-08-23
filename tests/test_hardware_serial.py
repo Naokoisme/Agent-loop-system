@@ -27,6 +27,10 @@ from agent_loop_system.tools.hardware_serial import (
     is_dangerous_command,
     strip_ansi,
 )
+from agent_loop_system.tools.hardware_serial_ports import (
+    get_supercom_pipe_name,
+    get_supercom_pipe_path,
+)
 
 
 class FakeTransport:
@@ -667,6 +671,18 @@ class HardwareSerialTest(unittest.TestCase):
             session.stop()
             self.assertTrue(transport.closed)
             self.assertIn("partial log without newline", session.lines_since(0))
+
+    def test_supercom_pipe_transport_shared_normalization(self) -> None:
+        t1 = SuperComPipeTransport("com7")
+        self.assertEqual(t1.pipe_name, "SuperCom.AgentBridge.COM7")
+        self.assertEqual(t1.pipe_path, r"\\.\pipe\SuperCom.AgentBridge.COM7")
+
+        t2 = SuperComPipeTransport("COM10")
+        self.assertEqual(t2.pipe_name, "SuperCom.AgentBridge.COM10")
+        self.assertEqual(t2.pipe_path, r"\\.\pipe\SuperCom.AgentBridge.COM10")
+
+        self.assertEqual(get_supercom_pipe_name("COM7"), "SuperCom.AgentBridge.COM7")
+        self.assertEqual(get_supercom_pipe_path("COM7"), r"\\.\pipe\SuperCom.AgentBridge.COM7")
 
 
 if __name__ == "__main__":
