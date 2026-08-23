@@ -10,6 +10,7 @@ import os
 import sys
 from pathlib import Path
 
+from agent_loop_system.outcome import outcome_fields
 from agent_loop_system.runtime_root import load_app_env
 
 
@@ -42,6 +43,8 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--defect", help="ONES 缺陷编号，从 ONES 获取 objective")
     group.add_argument("--objective", help="bug 描述/修复目标")
     parser.add_argument("--task-id", default=None, help="任务标识（默认用 defect 编号）")
+    parser.add_argument("--project", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--profile", default=None, help=argparse.SUPPRESS)
     parser.add_argument("--max-attempts", type=int, default=5, help="重试上限")
     parser.add_argument(
         "--target",
@@ -120,7 +123,18 @@ def main(argv: list[str] | None = None) -> int:
     from agent_loop_system import reporting
     from agent_loop_system.graph import build_graph
 
-    reporting.configure(args.progress_file, task_id=task_id)
+    project = str(args.project or os.environ.get("W30_PROJECT") or "").strip()
+    profile = str(args.profile or "").strip()
+    execution_context = {
+        "project": project or None,
+        "profile": profile or None,
+        "target": args.target,
+    }
+    reporting.configure(
+        args.progress_file,
+        task_id=task_id,
+        execution_context=execution_context,
+    )
     graph = build_graph()
     try:
         result = graph.invoke(
@@ -131,6 +145,8 @@ def main(argv: list[str] | None = None) -> int:
                 "defect_image_paths": defect_image_paths,
                 "max_attempts": args.max_attempts,
                 "target": args.target,
+                "project": project,
+                "profile": profile,
                 "test_cases": test_cases,
                 "source_files": source_files,
                 "designer_enabled": os.environ.get("DESIGNER_ENABLED", "0").strip().casefold()
@@ -140,10 +156,16 @@ def main(argv: list[str] | None = None) -> int:
     except BaseException as exc:
         error_result = {
             "task_id": task_id,
-            "verdict": "FAIL",
+            **execution_context,
+            "verdict": "CANNOT_VERIFY",
             "attempts": 0,
             "history": [],
             "error": f"{type(exc).__name__}: {exc}",
+            "workflow_status": "failed",
+            "execution_status": "ERROR",
+            "evidence_status": "NOT_RECORDED",
+            "mapping_status": "NOT_APPLICABLE",
+            "reason_code": "GRAPH_EXCEPTION",
         }
         error_result = _normalize_result(error_result)
         reporting.finish(error_result, error=error_result["error"])
@@ -152,7 +174,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {error_result['error']}", file=sys.stderr)
         return 1
 
-    result = _normalize_result(result)
+    authoritative_context = {
+        key: value for key, value in execution_context.items() if value is not None
+    }
+    result = _normalize_result({**result, **authoritative_context})
     reporting.finish(result)
     if args.result_file:
         reporting.write_result(args.result_file, result)
@@ -173,6 +198,9 @@ def main(argv: list[str] | None = None) -> int:
 
 _RESULT_KEYS = (
     "task_id",
+    "project",
+    "profile",
+    "target",
     "verdict",
     "attempts",
     "reproduction_attempts",
@@ -189,6 +217,11 @@ _RESULT_KEYS = (
     "history",
     "error",
     "error_code",
+    "workflow_status",
+    "execution_status",
+    "evidence_status",
+    "mapping_status",
+    "reason_code",
     "rollback_error",
     "restore_build_result",
     "restore_build_error",
@@ -197,7 +230,17 @@ _RESULT_KEYS = (
 
 def _normalize_result(result: dict) -> dict:
     """对齐第 13 节结果契约：未执行的阶段字段保留但值为 None，不省略。"""
-    return {key: result.get(key) for key in _RESULT_KEYS}
+    normalized = {key: result.get(key) for key in _RESULT_KEYS}
+    raw_verdict = str(normalized.get("verdict") or "").upper()
+    if raw_verdict == "ERROR":
+        normalized["verdict"] = "CANNOT_VERIFY"
+    normalized.update(outcome_fields(
+        result,
+        workflow_default=(
+            "failed" if result.get("error") or raw_verdict == "ERROR" else "completed"
+        ),
+    ))
+    return normalized
 
 
 if __name__ == "__main__":

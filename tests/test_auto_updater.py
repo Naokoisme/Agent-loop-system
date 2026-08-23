@@ -76,9 +76,9 @@ def test_launch_update_script_writes_parseable_command_quoting(
     script = (app_root / ".runtime" / "apply_update.ps1").read_text(
         encoding="utf-8-sig"
     )
-    assert "$wsh.Run('\"' + $exePath + '\"', 0, $false)" in script
-    assert "$wsh.Run('python \"' + $pyLauncher + '\"', 0, $false)" in script
-    assert '$curDirName -match "(\\d+\\.\\d+\\.\\d+)"' in script
+    assert "$wsh.Run(('\"' + $exePath + '\"'), 0, $false)" in script
+    assert "$wsh.Run(('python \"' + $pyLauncher + '\"'), 0, $false)" in script
+    assert '$curDirName -match "([0-9]+[.][0-9]+[.][0-9]+)"' in script
     script_path = app_root / ".runtime" / "apply_update.ps1"
     escaped_script_path = str(script_path).replace("'", "''")
     subprocess.run(

@@ -36,18 +36,29 @@ def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     os.replace(temporary, path)
 
 
-def configure(progress_file: str | Path | None, *, task_id: str = "") -> None:
+def configure(
+    progress_file: str | Path | None,
+    *,
+    task_id: str = "",
+    execution_context: dict[str, Any] | None = None,
+) -> None:
     """启用或关闭当前进程的进度文件。"""
     global _progress_path, _progress
     with _lock:
         _progress_path = Path(progress_file).resolve() if progress_file else None
         _progress = {
             "task_id": task_id,
+            "execution_context": dict(execution_context or {}),
             "status": "running",
             "current_node": None,
             "nodes": {node: "pending" for node in WORKFLOW_NODES},
             "attempts": 0,
             "verdict": "PENDING",
+            "workflow_status": "running",
+            "execution_status": "PENDING",
+            "evidence_status": "PENDING",
+            "mapping_status": "NOT_APPLICABLE",
+            "reason_code": None,
             "error": None,
             "updated_at": _now(),
         }
@@ -121,9 +132,18 @@ def finish(result: dict[str, Any] | None = None, *, error: str | None = None) ->
         return
     with _lock:
         result = result or {}
-        _progress["status"] = "failed" if error else "completed"
+        workflow_status = str(
+            result.get("workflow_status") or ("failed" if error else "completed")
+        ).lower()
+        _progress["status"] = workflow_status
+        _progress["workflow_status"] = workflow_status
         _progress["current_node"] = None
-        _progress["verdict"] = result.get("verdict", "FAIL" if error else _progress["verdict"])
+        _progress["verdict"] = result.get("verdict", _progress["verdict"])
+        for key in (
+            "execution_status", "evidence_status", "mapping_status", "reason_code",
+        ):
+            if result.get(key) is not None:
+                _progress[key] = result[key]
         _progress["attempts"] = int(result.get("attempts", _progress["attempts"]) or 0)
         _progress["error"] = error or result.get("error")
         _progress["finished_at"] = _now()

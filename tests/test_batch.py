@@ -76,4 +76,7 @@ def test_run_batch_routes_every_case_through_single_case_runner(tmp_path: Path) 
     )
     assert summary["executed"] == 1
     assert summary["verdict_counts"] == {"PASS": 1}
+    assert summary["execution_status"] == "OK"
+    assert summary["evidence_status"] == "COMPLETE"
+    assert summary["records"][0]["evidence_status"] == "COMPLETE"
     assert json.loads((tmp_path / "summary.json").read_text(encoding="utf-8"))["record_count"] == 1

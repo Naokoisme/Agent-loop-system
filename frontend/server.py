@@ -8,7 +8,9 @@ import argparse
 import asyncio
 import base64
 import copy
+from contextlib import contextmanager
 import hashlib
+import ipaddress
 import io
 import math
 import openpyxl
@@ -22,6 +24,7 @@ import os
 import re
 import shutil
 import socket
+import ssl
 import struct
 import subprocess
 import sys
@@ -37,6 +40,16 @@ from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from agent_loop_system.internal_dispatcher import build_child_command
+from agent_loop_system.outcome import outcome_fields
+from agent_loop_system.process_lifecycle import (
+    DEFAULT_TERMINATION_GRACE_SECONDS as PROCESS_TERMINATION_GRACE_SECONDS,
+    communicate_process as _communicate_process,
+    positive_timeout as _positive_timeout,
+    process_identity as _process_identity,
+    process_is_alive as _process_is_alive,
+    terminate_pid_tree as _terminate_pid_tree,
+    terminate_process_tree as _terminate_process_tree,
+)
 from agent_loop_system.runtime_root import (
     RuntimePaths,
     load_app_env,
@@ -75,9 +88,26 @@ HISTORY_SCHEMA_VERSION = 2
 DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 BATCH_STATE_FILE = "batch-state.json"
 BATCH_CASES_FILE = "batch-cases.json"
+SINGLE_TEST_STATE_FILE = "single-test-state.json"
+REPAIR_JOB_STATE_FILE = "repair-job-state.json"
 PROMOTION_STATE_FILE = "promotion-state.json"
 BLE_DEVICE_STORE_FILE = "ble-devices.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
+CASE_TEST_TIMEOUT_SECONDS = 1800.0
+REPAIR_JOB_TIMEOUT_SECONDS = 3600.0
+
+
+def _reload_runtime_limits() -> None:
+    """Refresh limits after the portable app's .env has been loaded."""
+
+    global CASE_TEST_TIMEOUT_SECONDS, REPAIR_JOB_TIMEOUT_SECONDS
+    CASE_TEST_TIMEOUT_SECONDS = _positive_timeout("AGENT_LOOP_CASE_TIMEOUT", 1800.0)
+    REPAIR_JOB_TIMEOUT_SECONDS = _positive_timeout("AGENT_LOOP_REPAIR_TIMEOUT", 3600.0)
+
+
+_reload_runtime_limits()
+
+
 TEST_PROJECTS: dict[str, dict[str, str]] = {
     "620C_W6830": {
         "project": "620C_W6830",
@@ -114,6 +144,21 @@ def _now() -> str:
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
+def _is_loopback_host(host: str | None) -> bool:
+    value = str(host or "").strip().strip("[]").casefold()
+    if value == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(value).is_loopback
+    except ValueError:
+        return False
+
+
+def _ones_ssl_context() -> ssl.SSLContext:
+    ca_bundle = os.environ.get("ONES_CA_BUNDLE", "").strip() or None
+    return ssl.create_default_context(cafile=ca_bundle)
+
+
 def _read_json(path: Path, default: Any = None) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -129,6 +174,23 @@ def _write_json(path: Path, payload: Any) -> None:
         encoding="utf-8",
     )
     os.replace(temporary, path)
+
+
+@contextmanager
+def _staged_directory(final_path: Path):
+    """Build one artifact set off to the side, then publish it as one directory."""
+
+    final_path.parent.mkdir(parents=True, exist_ok=True)
+    staging = final_path.with_name(
+        f".{final_path.name}.staging-{uuid.uuid4().hex[:12]}"
+    )
+    staging.mkdir(parents=False, exist_ok=False)
+    try:
+        yield staging
+        os.replace(staging, final_path)
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
 
 
 def _test_commands(result: dict[str, Any]) -> list[str]:
@@ -293,6 +355,7 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
 
     _load_test_runtime_environment()
     execution_env = dict(os.environ)
+    execution_env["W30_PROJECT"] = str(project_meta["project"])
     if project_meta.get("execution_target") == "hardware":
         hardware_project = str(project_meta["project"])
         execution_env.update({
@@ -317,6 +380,9 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
             "SIMULATOR_SHELL_READY_MARKER": "W30_SIM_SHELL_READY",
             "SIMULATOR_GUI_COMMAND_READY_MARKER": "W30_QUICK_CMD_GUI_READY",
         })
+        execution_env.pop("W30_HARDWARE_PROJECT", None)
+    else:
+        execution_env.pop("W30_HARDWARE_PROJECT", None)
     return execution_env
 
 
@@ -420,7 +486,6 @@ class HistoryStore:
         defect = _safe_segment(defect, "缺陷编号")
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(defect, run_id)
-        run_dir.mkdir(parents=True, exist_ok=False)
 
         progress = job.get("progress") or {}
         patch = _actual_patch(result)
@@ -432,10 +497,15 @@ class HistoryStore:
             "timestamp": job.get("finished_at") or _now(),
             "started_at": job.get("started_at"),
             "finished_at": job.get("finished_at"),
-            "verdict": result.get("verdict", "FAIL"),
+            "verdict": result.get("verdict", "CANNOT_VERIFY"),
             "reproduction_outcome": result.get("reproduction_outcome"),
             "attempts": result.get("attempts", 0),
             "execution_mode": job.get("execution_mode", "agent_generated"),
+            "project": job.get("project"),
+            "project_label": job.get("project_label"),
+            "execution_target": job.get("execution_target"),
+            "execution_target_label": job.get("execution_target_label"),
+            "profile": job.get("case_map_profile") or result.get("profile"),
             "test_case": job.get("test_case"),
             "source_file": patch.get("file_path") or job.get("source_file"),
             "test_commands": _test_commands(result),
@@ -455,15 +525,24 @@ class HistoryStore:
             "stdout": stdout[-MAX_LOG_CHARS:],
             "stderr": stderr[-MAX_LOG_CHARS:],
         }
-        _write_json(run_dir / "run.json", run_payload)
-        _write_json(run_dir / "patch.json", patch)
-        _write_json(run_dir / "test_result.json", test_output or {})
+        run_payload.update(outcome_fields({**result, **{
+            key: job.get(key)
+            for key in (
+                "workflow_status", "execution_status", "evidence_status",
+                "mapping_status", "reason_code",
+            )
+            if job.get(key) is not None
+        }}))
+        with _staged_directory(run_dir) as staging:
+            _write_json(staging / "run.json", run_payload)
+            _write_json(staging / "patch.json", patch)
+            _write_json(staging / "test_result.json", test_output or {})
 
-        evidence_dir = self.paths.evidence / defect
-        for kind in ("before", "after"):
-            source = evidence_dir / f"{kind}.bmp"
-            if source.is_file():
-                shutil.copy2(source, run_dir / f"{kind}.bmp")
+            evidence_dir = self.paths.evidence / defect
+            for kind in ("before", "after"):
+                source = evidence_dir / f"{kind}.bmp"
+                if source.is_file():
+                    shutil.copy2(source, staging / f"{kind}.bmp")
         return run_id
 
     def list(self, defect: str) -> list[dict[str, Any]]:
@@ -778,7 +857,6 @@ class TestHistoryStore:
         project = project_meta["project"]
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(sheet, case_id, run_id, project=project)
-        run_dir.mkdir(parents=True, exist_ok=False)
         case = job.get("case") if isinstance(job.get("case"), dict) else {}
         payload = {
             "schema_version": 2,
@@ -791,12 +869,16 @@ class TestHistoryStore:
             "timestamp": job.get("finished_at") or _now(),
             "started_at": job.get("started_at"),
             "finished_at": job.get("finished_at"),
-            "verdict": result.get("verdict", "ERROR"),
+            "verdict": result.get("verdict", "CANNOT_VERIFY"),
             "reason": result.get("reason") or job.get("error") or "",
             "execution_mode": result.get("execution_mode", "fixed_mapping"),
             "result_schema_version": result.get("schema_version"),
             "provenance": result.get("provenance", {}),
             "execution_status": result.get("execution_status"),
+            "workflow_status": result.get("workflow_status") or job.get("workflow_status"),
+            "evidence_status": result.get("evidence_status"),
+            "mapping_status": result.get("mapping_status"),
+            "reason_code": result.get("reason_code"),
             "priority": case.get("priority", ""),
             "precondition_text": case.get("precondition_text", ""),
             "steps_text": case.get("steps_text", ""),
@@ -825,41 +907,47 @@ class TestHistoryStore:
             "stdout": stdout[-MAX_LOG_CHARS:],
             "stderr": stderr[-MAX_LOG_CHARS:],
         }
+        payload.update(outcome_fields(
+            payload,
+            workflow_default=str(job.get("workflow_status") or "completed"),
+            mapping_default=str(case.get("mapping_status") or "NOT_RECORDED"),
+        ))
         if job.get("batch_id"):
             payload["batch_id"] = str(job["batch_id"])
         if job.get("batch_token"):
             payload["batch_token"] = str(job["batch_token"])
         archived_screenshots: list[dict[str, Any]] = []
-        raw_screenshots = result.get("screenshots", [])
-        if isinstance(raw_screenshots, list):
-            for item in raw_screenshots:
-                if not isinstance(item, dict):
-                    continue
-                source = Path(str(item.get("path") or ""))
-                if not source.is_file():
-                    continue
-                file_name = f"screenshot-{len(archived_screenshots) + 1:02d}.bmp"
-                shutil.copy2(source, run_dir / file_name)
+        with _staged_directory(run_dir) as staging:
+            raw_screenshots = result.get("screenshots", [])
+            if isinstance(raw_screenshots, list):
+                for item in raw_screenshots:
+                    if not isinstance(item, dict):
+                        continue
+                    source = Path(str(item.get("path") or ""))
+                    if not source.is_file():
+                        continue
+                    file_name = f"screenshot-{len(archived_screenshots) + 1:02d}.bmp"
+                    shutil.copy2(source, staging / file_name)
+                    archived_screenshots.append({
+                        "index": len(archived_screenshots) + 1,
+                        "label": str(item.get("label") or f"检查点 {len(archived_screenshots) + 1}"),
+                        "phase": str(item.get("phase") or ""),
+                        "command": str(item.get("command") or ""),
+                        "captured_at": str(item.get("captured_at") or ""),
+                        "trace_index": item.get("trace_index"),
+                        "file": file_name,
+                    })
+            if not archived_screenshots and screenshot and screenshot.is_file():
+                shutil.copy2(screenshot, staging / "screenshot.bmp")
                 archived_screenshots.append({
-                    "index": len(archived_screenshots) + 1,
-                    "label": str(item.get("label") or f"检查点 {len(archived_screenshots) + 1}"),
-                    "phase": str(item.get("phase") or ""),
-                    "command": str(item.get("command") or ""),
-                    "captured_at": str(item.get("captured_at") or ""),
-                    "trace_index": item.get("trace_index"),
-                    "file": file_name,
+                    "index": 1,
+                    "label": "最终画面",
+                    "phase": "final",
+                    "command": "",
+                    "file": "screenshot.bmp",
                 })
-        if not archived_screenshots and screenshot and screenshot.is_file():
-            shutil.copy2(screenshot, run_dir / "screenshot.bmp")
-            archived_screenshots.append({
-                "index": 1,
-                "label": "最终画面",
-                "phase": "final",
-                "command": "",
-                "file": "screenshot.bmp",
-            })
-        payload["screenshots"] = archived_screenshots
-        _write_json(run_dir / "run.json", payload)
+            payload["screenshots"] = archived_screenshots
+            _write_json(staging / "run.json", payload)
         project_cache = self._summary_index_cache.get(project)
         if project_cache is not None:
             key = (sheet, case_id)
@@ -1033,6 +1121,11 @@ class TestHistoryStore:
         return {
             "id": run.get("id"),
             "verdict": run.get("verdict"),
+            "workflow_status": run.get("workflow_status"),
+            "execution_status": run.get("execution_status"),
+            "evidence_status": run.get("evidence_status"),
+            "mapping_status": run.get("mapping_status"),
+            "reason_code": run.get("reason_code"),
             "timestamp": run.get("timestamp"),
             "project": run.get("project"),
             "execution_target": run.get("execution_target"),
@@ -1805,6 +1898,11 @@ class CaseMapRepository:
             "last_run_at": latest.get("timestamp") if latest else None,
             "history_count": history_count,
             "latest_verdict": normalized_verdict,
+            "latest_workflow_status": latest.get("workflow_status") if latest else None,
+            "latest_execution_status": latest.get("execution_status") if latest else None,
+            "latest_evidence_status": latest.get("evidence_status") if latest else None,
+            "latest_mapping_status": latest.get("mapping_status") if latest else None,
+            "latest_reason_code": latest.get("reason_code") if latest else None,
         }
 
     @staticmethod
@@ -1856,7 +1954,9 @@ class CaseMapRepository:
             key: row.get(key)
             for key in (
                 "project", "case_id", "sheet", "file_sheet", "last_run_at",
-                "history_count", "latest_verdict",
+                "history_count", "latest_verdict", "latest_workflow_status",
+                "latest_execution_status", "latest_evidence_status",
+                "latest_mapping_status", "latest_reason_code",
             )
         }
 
@@ -2117,7 +2217,7 @@ class CaseMapRepository:
 class CaseTestManager:
     """复用现有测试 CLI，负责网页端单条及批次测试。"""
 
-    ACTIVE_STATUSES = {"queued", "running", "finalizing"}
+    ACTIVE_STATUSES = {"queued", "running", "finalizing", "orphaned"}
     RESUMABLE_STATUSES = {"cancelled", "interrupted", "failed"}
     HARDWARE_INFRASTRUCTURE_MARKERS = (
         "gui_ping",
@@ -2191,6 +2291,53 @@ class CaseTestManager:
     def _promotion_state_path(self, job_id: str) -> Path:
         return self.paths.runtime_jobs / job_id / PROMOTION_STATE_FILE
 
+    def _single_test_state_path(self, job_id: str) -> Path:
+        return self.paths.runtime_jobs / job_id / SINGLE_TEST_STATE_FILE
+
+    def _persist_single_test_locked(self, job: dict[str, Any]) -> None:
+        if job.get("type") != "single":
+            return
+        job_id = str(job["id"])
+        _write_json(
+            self._single_test_state_path(job_id),
+            {"state_schema_version": 1, **self._job_snapshot_locked(job)},
+        )
+
+    def _persist_test_job_locked(self, job: dict[str, Any]) -> None:
+        if job.get("type") == "batch":
+            self._persist_batch_locked(job)
+        elif job.get("type") == "single":
+            self._persist_single_test_locked(job)
+
+    def _recover_loaded_test_job(self, job: dict[str, Any]) -> None:
+        """Reconcile a persisted active task without trusting a possibly reused PID."""
+
+        pid = job.get("process_pid")
+        identity = str(job.get("process_identity") or "") or None
+        process_stopped = not _process_is_alive(pid) or _terminate_pid_tree(
+            pid,
+            expected_identity=identity,
+        )
+        job["finished_at"] = _now()
+        job["current_node"] = None
+        job["cancel_requested"] = False
+        job["workflow_status"] = "interrupted"
+        job["execution_status"] = "ERROR"
+        if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+            job["verdict"] = "CANNOT_VERIFY"
+        if process_stopped:
+            job["status"] = "interrupted"
+            job["reason_code"] = "SERVICE_RESTART"
+            job["interruption_reason"] = "前端服务重启，原执行进程已结束"
+        else:
+            job["status"] = "orphaned"
+            job["reason_code"] = "ORPHAN_PROCESS"
+            job["interruption_reason"] = (
+                "前端服务重启后仍检测到无法安全确认或停止的原执行进程"
+            )
+            self._claim_execution_slot_locked(job)
+        job["error"] = job["interruption_reason"]
+
     def _persist_promotion_state(
         self,
         job: dict[str, Any],
@@ -2239,6 +2386,13 @@ class CaseTestManager:
             state["issues"] = issues
             state["updated_at"] = _now()
             _write_json(state_path, state)
+            job_id = str(state.get("job_id") or "")
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["promotion_status"] = state["status"]
+                    job["promotion_issues"] = issues
+                    self._persist_single_test_locked(job)
 
     def _persist_batch_locked(self, job: dict[str, Any]) -> None:
         if job.get("type") != "batch":
@@ -2255,6 +2409,7 @@ class CaseTestManager:
                 "current_runtime_archived",
             }
         }
+        state["state_schema_version"] = 1
         _write_json(self._batch_state_path(job_id), state)
 
     def _reconcile_batch_history(
@@ -2328,6 +2483,10 @@ class CaseTestManager:
             job.setdefault("completed", 0)
             job.setdefault("total", len(cases))
             job.setdefault("case_attempts", {})
+            job.setdefault("execution_error_count", 0)
+            job.setdefault("evidence_error_count", 0)
+            job.setdefault("evidence_status", "NOT_RECORDED")
+            job.setdefault("mapping_status", "NOT_APPLICABLE")
             loaded_jobs.append(job)
 
         records_by_batch = self.history.batch_records_many({
@@ -2340,13 +2499,26 @@ class CaseTestManager:
                 records=records_by_batch[job_id],
             )
             if job.get("status") in self.ACTIVE_STATUSES:
-                job["status"] = "interrupted"
-                job["interruption_reason"] = "前端服务重启或测试进程中断"
-                job["finished_at"] = _now()
-                job["current_node"] = None
-                job["cancel_requested"] = False
+                self._recover_loaded_test_job(job)
             self._jobs[job_id] = job
             self._persist_batch_locked(job)
+
+        for state_path in self.paths.runtime_jobs.glob(f"*/{SINGLE_TEST_STATE_FILE}"):
+            state = _read_json(state_path)
+            if not isinstance(state, dict) or state.get("type") != "single":
+                continue
+            job_id = str(state.get("id") or "")
+            if not SAFE_SEGMENT.fullmatch(job_id) or state_path.parent.name != job_id:
+                continue
+            project_meta = _test_project(str(state.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+            ):
+                state.setdefault(key, project_meta[key])
+            if state.get("status") in self.ACTIVE_STATUSES:
+                self._recover_loaded_test_job(state)
+            self._jobs[job_id] = state
+            self._persist_single_test_locked(state)
 
     def start(
         self,
@@ -2396,6 +2568,11 @@ class CaseTestManager:
                     "current_node": "load",
                     "nodes": {node: "pending" for node in TEST_WORKFLOW_NODES},
                     "verdict": "PENDING",
+                    "workflow_status": "queued",
+                    "execution_status": "PENDING",
+                    "evidence_status": "PENDING",
+                    "mapping_status": str(case.get("mapping_status") or "NOT_RECORDED"),
+                    "reason_code": None,
                     "reason": "",
                     "created_at": _now(),
                     "started_at": None,
@@ -2413,6 +2590,7 @@ class CaseTestManager:
                     "promotion_context": promotion_context,
                 }
                 self._jobs[job_id] = job
+                self._persist_single_test_locked(job)
                 if candidate_replay:
                     self._persist_promotion_state(job, status="queued")
             except BaseException:
@@ -2429,7 +2607,12 @@ class CaseTestManager:
                 job = self._jobs[job_id]
                 job["status"] = "failed"
                 job["error"] = "候选复跑线程启动失败" if candidate_replay else "测试线程启动失败"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["finished_at"] = _now()
                 self._release_execution_slot_locked(job_id)
+                self._persist_single_test_locked(job)
             if promotion_context is not None:
                 rollback = self.cases.rollback_agent_candidate(promotion_context)
                 with self._lock:
@@ -2486,6 +2669,11 @@ class CaseTestManager:
                     "project", "project_label", "execution_target", "execution_target_label"
                 )},
                 "status": "queued",
+                "workflow_status": "queued",
+                "execution_status": "PENDING",
+                "evidence_status": "PENDING",
+                "mapping_status": "NOT_APPLICABLE",
+                "reason_code": None,
                 "created_at": _now(),
                 "started_at": None,
                 "finished_at": None,
@@ -2500,6 +2688,8 @@ class CaseTestManager:
                     "ERROR": 0,
                     "CANNOT_VERIFY": 0,
                 },
+                "execution_error_count": 0,
+                "evidence_error_count": 0,
                 "recent_results": [],
                 "cancel_requested": False,
                 "error": None,
@@ -2509,29 +2699,82 @@ class CaseTestManager:
             }
             self._claim_execution_slot_locked(job)
             self._jobs[job_id] = job
+            self._persist_batch_locked(job)
         thread = threading.Thread(
             target=self._run_batch,
             args=(job_id,),
             daemon=True,
             name=f"case-test-batch-{job_id}",
         )
-        thread.start()
+        try:
+            thread.start()
+        except BaseException:
+            with self._lock:
+                job = self._jobs[job_id]
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["error"] = "批次测试线程启动失败"
+                job["finished_at"] = _now()
+                self._release_execution_slot_locked(job_id)
+                self._persist_batch_locked(job)
+            raise
         return self.get(job_id) or job
 
-    def cancel_batch(self, job_id: str) -> dict[str, Any]:
+    def cancel(self, job_id: str) -> dict[str, Any]:
         job_id = _safe_segment(job_id, "任务编号")
+        process: Any = None
+        orphan_pid: int | None = None
+        orphan_identity: str | None = None
         with self._lock:
             job = self._jobs.get(job_id)
             if job is None:
                 raise ValueError("测试任务不存在")
-            if job.get("type") != "batch":
-                raise ValueError("只能停止批次测试")
+            if job.get("status") == "finalizing":
+                raise ValueError("业务执行已结束，正在保存测试记录，不能再取消")
             if job.get("status") not in self.ACTIVE_STATUSES:
-                raise ValueError("批次测试已经结束")
+                raise ValueError("测试任务已经结束")
             job["cancel_requested"] = True
-            job["interruption_reason"] = "用户请求在当前用例结束后暂停"
-            self._persist_batch_locked(job)
+            job["interruption_reason"] = "用户请求取消当前测试任务"
+            job["reason_code"] = "USER_CANCELLED"
+            process = job.get("process")
+            if job.get("status") == "orphaned":
+                orphan_pid = job.get("process_pid")
+                orphan_identity = str(job.get("process_identity") or "") or None
+            self._persist_test_job_locked(job)
+
+        stopped = True
+        if process is not None:
+            stopped = _terminate_process_tree(process)
+        elif orphan_pid is not None:
+            stopped = _terminate_pid_tree(
+                orphan_pid,
+                expected_identity=orphan_identity,
+            )
+
+        if orphan_pid is not None:
+            with self._lock:
+                job = self._jobs[job_id]
+                if stopped:
+                    job["status"] = "cancelled"
+                    job["workflow_status"] = "cancelled"
+                    job["execution_status"] = "ERROR"
+                    if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                        job["verdict"] = "CANNOT_VERIFY"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    self._release_execution_slot_locked(job_id)
+                else:
+                    job["cancel_requested"] = False
+                    job["error"] = "无法确认原执行进程身份或停止进程，任务仍保持隔离"
+                self._persist_test_job_locked(job)
+            if not stopped:
+                raise RuntimeError("无法安全停止重启前遗留的测试进程")
         return self.get(job_id) or {}
+
+    def cancel_batch(self, job_id: str) -> dict[str, Any]:
+        return self.cancel(job_id)
 
     def resume_batch(self, job_id: str) -> dict[str, Any]:
         job_id = _safe_segment(job_id, "任务编号")
@@ -2567,6 +2810,7 @@ class CaseTestManager:
             job["resume_count"] = int(job.get("resume_count") or 0) + 1
             job["error"] = None
             job.pop("interruption_reason", None)
+            job.pop("last_interrupted_case", None)
             self._claim_execution_slot_locked(job)
             self._persist_batch_locked(job)
             should_start = True
@@ -2577,7 +2821,20 @@ class CaseTestManager:
                 daemon=True,
                 name=f"case-test-batch-{job_id}",
             )
-            thread.start()
+            try:
+                thread.start()
+            except BaseException:
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "THREAD_START_FAILED"
+                    job["error"] = "批次恢复线程启动失败"
+                    job["finished_at"] = _now()
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_batch_locked(job)
+                raise
         return self.get(job_id) or {}
 
     @staticmethod
@@ -2744,6 +3001,8 @@ class CaseTestManager:
         stdout = ""
         stderr = ""
         return_code: int | None = None
+        process: Any = None
+        timed_out = False
         execution_env = _test_process_environment(project_meta)
         try:
             process = subprocess.Popen(
@@ -2757,20 +3016,50 @@ class CaseTestManager:
                 errors="replace",
             )
             with self._lock:
-                self._jobs[job_id]["process"] = process
-            stdout, stderr = process.communicate()
-            return_code = process.returncode
+                active_job = self._jobs[job_id]
+                active_job["process"] = process
+                active_job["process_pid"] = getattr(process, "pid", None)
+                active_job["process_identity"] = _process_identity(
+                    active_job["process_pid"]
+                )
+                self._persist_test_job_locked(active_job)
+            try:
+                stdout, stderr = _communicate_process(
+                    process,
+                    CASE_TEST_TIMEOUT_SECONDS,
+                )
+                return_code = getattr(process, "returncode", None)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                _terminate_process_tree(process)
+                try:
+                    stdout, stderr = _communicate_process(
+                        process,
+                        PROCESS_TERMINATION_GRACE_SECONDS,
+                    )
+                except (OSError, subprocess.SubprocessError):
+                    stdout, stderr = "", ""
+                return_code = getattr(process, "returncode", None)
+                stderr = (
+                    f"{stderr}\n测试进程执行超时（上限 {CASE_TEST_TIMEOUT_SECONDS:g}s）"
+                ).strip()
         except BaseException as exc:
+            _terminate_process_tree(process)
             stderr = f"{type(exc).__name__}: {exc}"
+
+        with self._lock:
+            cancelled = bool(self._jobs[job_id].get("cancel_requested"))
 
         loaded = _read_json(result_file, {})
         result = loaded if isinstance(loaded, dict) else {}
+        raw_verdict = str(result.get("verdict") or "ERROR").upper()
         if result.get("skipped"):
             verdict = "CANNOT_VERIFY"
+        elif raw_verdict in {"PASS", "FAIL", "CANNOT_VERIFY"}:
+            verdict = raw_verdict
         else:
-            verdict = str(result.get("verdict") or "ERROR").upper()
-        if verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}:
-            verdict = "ERROR"
+            # ERROR is an execution outcome, not a product verdict.
+            verdict = "CANNOT_VERIFY"
         evidence_contract = result.get("evidence_contract")
         evidence_issues = (
             evidence_contract.get("issues", [])
@@ -2789,14 +3078,23 @@ class CaseTestManager:
             and not result.get("skipped")
         )
         execute_failed = bool(
-            not result
+            cancelled
+            or timed_out
+            or not result
             or result.get("aborted")
             or result.get("setup_errors")
             or result.get("action_errors")
             or result.get("collect_errors")
             or evidence_incomplete
+            or raw_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}
         )
         error = "" if result else (stderr.strip() or "测试进程未生成结果文件")
+        if cancelled:
+            error = "用户取消测试任务"
+            verdict = "CANNOT_VERIFY"
+        elif timed_out:
+            error = f"测试进程执行超时（上限 {CASE_TEST_TIMEOUT_SECONDS:g}s）"
+            verdict = "CANNOT_VERIFY"
         reason = str(result.get("reason") or error)
         execution_errors = [
             str(value)
@@ -2808,6 +3106,35 @@ class CaseTestManager:
             result.get("execution_reason")
             or (execution_errors[0] if execution_errors else evidence_error or error)
         )
+        if cancelled or timed_out:
+            execution_reason = error
+        outcome = outcome_fields(
+            result,
+            workflow_default="failed" if not result else "completed",
+            mapping_default=str(case.get("mapping_status") or "NOT_RECORDED"),
+        )
+        if cancelled:
+            outcome.update({
+                "workflow_status": "cancelled",
+                "execution_status": "ERROR",
+                "reason_code": "USER_CANCELLED",
+            })
+        elif timed_out:
+            outcome.update({
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_TIMEOUT",
+            })
+        elif execute_failed:
+            outcome.update({
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": (
+                    "EVIDENCE_INCOMPLETE"
+                    if evidence_incomplete
+                    else str(result.get("reason_code") or "CASE_EXECUTION_ERROR")
+                ),
+            })
         return {
             "result": result,
             "stdout": stdout,
@@ -2817,14 +3144,117 @@ class CaseTestManager:
             "reason": reason,
             "execution_reason": execution_reason,
             "execute_failed": execute_failed,
+            "cancelled": cancelled,
+            "timed_out": timed_out,
+            **outcome,
             "started_at": started_at,
             "finished_at": _now(),
             "screenshot": screenshot,
         }
 
     def _run(self, job_id: str) -> None:
+        promotion_context: dict[str, Any] | None = None
+        promotion_needs_rollback = False
+        try:
+            self._run_single_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    promotion_context = (
+                        job.get("promotion_context")
+                        if isinstance(job.get("promotion_context"), dict)
+                        else None
+                    )
+                    promotion_needs_rollback = bool(
+                        job.get("promotion_flow")
+                        and job.get("promotion_status")
+                        not in {"promoted", "rolled_back", "rollback_conflict"}
+                    )
+                    self._persist_single_test_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+                if job is not None and (
+                    job.get("cancel_requested") or job.get("status") == "failed"
+                ):
+                    context = job.get("promotion_context")
+                    if isinstance(context, dict) and job.get("promotion_status") not in {
+                        "promoted", "rolled_back", "rollback_conflict",
+                    }:
+                        promotion_context = context
+                        promotion_needs_rollback = True
+            _terminate_process_tree(process)
+            if promotion_needs_rollback and promotion_context is not None:
+                try:
+                    rollback = self.cases.rollback_agent_candidate(promotion_context)
+                except BaseException as exc:
+                    rollback = {
+                        "status": "rollback_conflict",
+                        "issues": [f"异常终止后的候选回滚失败: {exc}"],
+                    }
+                with self._lock:
+                    job = self._jobs.get(job_id)
+                    if job is not None:
+                        job["promotion_status"] = str(
+                            rollback.get("status") or "rollback_conflict"
+                        )
+                        job["promotion_issues"] = list(rollback.get("issues") or [])
+                        self._persist_promotion_state(
+                            job,
+                            status=job["promotion_status"],
+                            issues=job["promotion_issues"],
+                        )
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = "USER_CANCELLED"
+                            if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                                job["verdict"] = "CANNOT_VERIFY"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "测试任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_single_test_locked(job)
+
+    def _run_single_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["finished_at"] = _now()
+                return
+            project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+                "case_map_profile",
+            ):
+                job.setdefault(key, project_meta[key])
             job["status"] = "running"
             job["started_at"] = _now()
             job["current_node"] = "execute"
@@ -2837,9 +3267,16 @@ class CaseTestManager:
             if job.get("promotion_flow"):
                 job["promotion_status"] = "running"
                 self._persist_promotion_state(job, status="running")
+            self._persist_single_test_locked(job)
 
         execution = self._execute_case(job_id=job_id, case=job["case"], job_dir=job_dir)
         result = execution["result"]
+        for key, value in outcome_fields(
+            result,
+            workflow_default="failed" if not result else "completed",
+            mapping_default=str(job["case"].get("mapping_status") or "NOT_RECORDED"),
+        ).items():
+            execution.setdefault(key, value)
         verdict = execution["verdict"]
         reason = execution["reason"]
         execute_failed = execution["execute_failed"]
@@ -2849,6 +3286,11 @@ class CaseTestManager:
             job["finished_at"] = execution["finished_at"]
             job["verdict"] = verdict
             job["reason"] = reason
+            for key in (
+                "workflow_status", "execution_status", "evidence_status",
+                "mapping_status", "reason_code",
+            ):
+                job[key] = execution[key]
             job["error"] = (
                 execution["execution_reason"] if execute_failed else None
             )
@@ -2860,11 +3302,23 @@ class CaseTestManager:
             if job.get("promotion_flow"):
                 job["promotion_status"] = "finalizing"
                 self._persist_promotion_state(job, status="finalizing")
+            self._persist_single_test_locked(job)
 
         try:
             history_id = self.history.create(
                 job=job,
-                result={**result, "verdict": verdict, "reason": reason},
+                result={
+                    **result,
+                    "verdict": verdict,
+                    "reason": reason,
+                    **{
+                        key: execution[key]
+                        for key in (
+                            "workflow_status", "execution_status", "evidence_status",
+                            "mapping_status", "reason_code",
+                        )
+                    },
+                },
                 stdout=execution["stdout"],
                 stderr=execution["stderr"],
                 screenshot=execution["screenshot"],
@@ -2873,6 +3327,11 @@ class CaseTestManager:
             history_id = None
             with self._lock:
                 job["error"] = f"测试记录保存失败: {exc}"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["evidence_status"] = "ERROR"
+                job["reason_code"] = "HISTORY_WRITE_FAILED"
 
         promotion: dict[str, Any] | None = None
         with self._lock:
@@ -2928,13 +3387,74 @@ class CaseTestManager:
                     issues=job["promotion_issues"],
                 )
             job["current_node"] = None
-            job["status"] = "completed" if history_id else "failed"
+            if job.get("cancel_requested") or execution.get("cancelled"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+            elif not history_id or execution.get("workflow_status") in {
+                "failed", "interrupted", "orphaned",
+            }:
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+            else:
+                job["status"] = "completed"
             job.pop("process", None)
             self._release_execution_slot_locked(job_id)
+            self._persist_single_test_locked(job)
 
     def _run_batch(self, job_id: str) -> None:
+        try:
+            self._run_batch_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    self._persist_batch_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+            _terminate_process_tree(process)
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["reason_code"] = "USER_CANCELLED"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "批次任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_batch_locked(job)
+
+    def _run_batch_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["reason_code"] = "USER_CANCELLED"
+                job["finished_at"] = _now()
+                self._persist_batch_locked(job)
+                return
             execution_target = str(job.get("execution_target") or "simulator")
 
         hardware_environment: dict[str, str] | None = None
@@ -3050,6 +3570,8 @@ class CaseTestManager:
                         job["interruption_reason"] = interruption_reason
                         job["finished_at"] = _now()
                         job["current_node"] = None
+                        job["last_interrupted_case"] = job.get("current_case")
+                        job["current_case"] = None
                         job.pop("process", None)
                         self._release_execution_slot_locked(job_id)
                         self._persist_batch_locked(job)
@@ -3079,6 +3601,41 @@ class CaseTestManager:
                 job_dir=case_dir,
                 hardware_reset_completed=execution_target == "hardware",
             )
+            with self._lock:
+                cancel_requested = bool(self._jobs[job_id].get("cancel_requested"))
+            if cancel_requested:
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "cancelled"
+                    job["workflow_status"] = "cancelled"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "USER_CANCELLED"
+                    job["interruption_reason"] = "用户取消批次测试；当前未完成用例可在恢复后重试"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    job["last_interrupted_case"] = job.get("current_case")
+                    job["current_case"] = None
+                    job["current_runtime_archived"] = False
+                    self._persist_batch_locked(job)
+                return
+            if execution.get("timed_out"):
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "interrupted"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "PROCESS_TIMEOUT"
+                    job["error"] = execution["execution_reason"]
+                    job["interruption_reason"] = (
+                        f"第 {index} 条 {case['case_id']} 执行超时；未计入完成数，可恢复重试"
+                    )
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    job["last_interrupted_case"] = job.get("current_case")
+                    job["current_case"] = None
+                    job["current_runtime_archived"] = False
+                    self._persist_batch_locked(job)
+                return
             infrastructure_failure = (
                 self._hardware_infrastructure_failure(execution)
                 if execution_target == "hardware"
@@ -3092,10 +3649,15 @@ class CaseTestManager:
                 with self._lock:
                     job = self._jobs[job_id]
                     job["status"] = "interrupted"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "HARDWARE_INFRASTRUCTURE_FAILURE"
                     job["error"] = infrastructure_failure
                     job["interruption_reason"] = interruption_reason
                     job["finished_at"] = _now()
                     job["current_node"] = None
+                    job["last_interrupted_case"] = job.get("current_case")
+                    job["current_case"] = None
                     job["current_runtime_archived"] = False
                     job.pop("process", None)
                     self._release_execution_slot_locked(job_id)
@@ -3126,6 +3688,13 @@ class CaseTestManager:
                         **execution["result"],
                         "verdict": execution["verdict"],
                         "reason": execution["reason"],
+                        **{
+                            key: execution[key]
+                            for key in (
+                                "workflow_status", "execution_status", "evidence_status",
+                                "mapping_status", "reason_code",
+                            )
+                        },
                     },
                     stdout=execution["stdout"],
                     stderr=execution["stderr"],
@@ -3133,7 +3702,11 @@ class CaseTestManager:
                 )
             except BaseException as exc:
                 history_id = None
-                execution["verdict"] = "ERROR"
+                execution["verdict"] = "CANNOT_VERIFY"
+                execution["workflow_status"] = "failed"
+                execution["execution_status"] = "ERROR"
+                execution["evidence_status"] = "ERROR"
+                execution["reason_code"] = "HISTORY_WRITE_FAILED"
                 execution["reason"] = f"测试记录保存失败: {exc}"
 
             record = {
@@ -3144,6 +3717,11 @@ class CaseTestManager:
                 "execution_target": case.get("execution_target", job.get("execution_target", "simulator")),
                 "execution_target_label": case.get("execution_target_label", job.get("execution_target_label", "模拟器")),
                 "verdict": execution["verdict"],
+                "workflow_status": execution["workflow_status"],
+                "execution_status": execution["execution_status"],
+                "evidence_status": execution["evidence_status"],
+                "mapping_status": execution["mapping_status"],
+                "reason_code": execution["reason_code"],
                 "reason": execution["reason"],
                 "history_id": history_id,
                 "finished_at": execution["finished_at"],
@@ -3153,6 +3731,14 @@ class CaseTestManager:
                 job = self._jobs[job_id]
                 job["completed"] = index
                 job["verdict_counts"][execution["verdict"]] += 1
+                if execution["execution_status"] == "ERROR":
+                    job["execution_error_count"] = int(
+                        job.get("execution_error_count") or 0
+                    ) + 1
+                if execution["evidence_status"] in {"ERROR", "INCOMPLETE", "MISSING"}:
+                    job["evidence_error_count"] = int(
+                        job.get("evidence_error_count") or 0
+                    ) + 1
                 job["recent_results"] = ([record] + job["recent_results"])[:30]
                 job["current_runtime_archived"] = history_id is not None
                 job.pop("process", None)
@@ -3169,12 +3755,30 @@ class CaseTestManager:
             job["status"] = "cancelled" if job.get("cancel_requested") else "completed"
             if job["status"] == "completed":
                 job.pop("interruption_reason", None)
+                job.pop("last_interrupted_case", None)
+                job["workflow_status"] = "completed"
+                job["execution_status"] = (
+                    "ERROR" if int(job.get("execution_error_count") or 0) else "OK"
+                )
+                job["evidence_status"] = (
+                    "ERROR" if int(job.get("evidence_error_count") or 0) else "COMPLETE"
+                )
+                job["reason_code"] = (
+                    "CASE_EXECUTION_ERROR"
+                    if int(job.get("execution_error_count") or 0)
+                    else None
+                )
+            else:
+                job["workflow_status"] = "cancelled"
+                job["reason_code"] = "USER_CANCELLED"
             job.pop("process", None)
             self._release_execution_slot_locked(job_id)
             self._persist_batch_locked(job)
 
 
 class JobManager:
+    ACTIVE_STATUSES = {"queued", "running", "finalizing", "orphaned"}
+
     def __init__(self, paths: AppPaths, defects: DefectRepository, history: HistoryStore):
         self.paths = paths
         self.defects = defects
@@ -3182,43 +3786,179 @@ class JobManager:
         self._lock = threading.Lock()
         self._jobs: dict[str, dict[str, Any]] = {}
         self._active_job_id: str | None = None
+        self._load_jobs()
 
-    def start(self, *, defect: str) -> dict[str, Any]:
+    def _job_state_path(self, job_id: str) -> Path:
+        return self.paths.runtime_jobs / job_id / REPAIR_JOB_STATE_FILE
+
+    def _persist_job_locked(self, job: dict[str, Any]) -> None:
+        state = {
+            key: value
+            for key, value in job.items()
+            if key not in {"process", "progress"}
+        }
+        state["state_schema_version"] = 1
+        _write_json(self._job_state_path(str(job["id"])), state)
+
+    def _load_jobs(self) -> None:
+        if not self.paths.runtime_jobs.is_dir():
+            return
+        for state_path in self.paths.runtime_jobs.glob(f"*/{REPAIR_JOB_STATE_FILE}"):
+            state = _read_json(state_path)
+            if not isinstance(state, dict):
+                continue
+            job_id = str(state.get("id") or "")
+            if not SAFE_SEGMENT.fullmatch(job_id) or state_path.parent.name != job_id:
+                continue
+            if state.get("status") in self.ACTIVE_STATUSES:
+                pid = state.get("process_pid")
+                identity = str(state.get("process_identity") or "") or None
+                process_stopped = not _process_is_alive(pid) or _terminate_pid_tree(
+                    pid,
+                    expected_identity=identity,
+                )
+                state["finished_at"] = _now()
+                state["current_node"] = None
+                state["cancel_requested"] = False
+                state["workflow_status"] = "interrupted"
+                state["execution_status"] = "ERROR"
+                if str(state.get("verdict") or "PENDING").upper() == "PENDING":
+                    state["verdict"] = "CANNOT_VERIFY"
+                if process_stopped:
+                    state["status"] = "interrupted"
+                    state["reason_code"] = "SERVICE_RESTART"
+                    state["interruption_reason"] = "前端服务重启，原修复进程已结束"
+                else:
+                    state["status"] = "orphaned"
+                    state["reason_code"] = "ORPHAN_PROCESS"
+                    state["interruption_reason"] = (
+                        "前端服务重启后仍检测到无法安全确认或停止的原修复进程"
+                    )
+                    self._active_job_id = job_id
+                state["error"] = state["interruption_reason"]
+                _write_json(state_path, state)
+            self._jobs[job_id] = state
+
+    def start(self, *, defect: str, project: str = DEFAULT_TEST_PROJECT) -> dict[str, Any]:
         if self.defects.get(defect) is None:
             raise ValueError("缺陷不存在")
+        project_meta = _test_project(project)
 
         with self._lock:
             if self._active_job_id:
                 active = self._jobs.get(self._active_job_id, {})
-                if active.get("status") in {"queued", "running", "finalizing"}:
+                if active.get("status") in self.ACTIVE_STATUSES:
                     raise RuntimeError(f"已有修复任务 {self._active_job_id} 正在运行")
 
             job_id = uuid.uuid4().hex[:12]
             job = {
                 "id": job_id,
                 "defect": defect,
+                **{key: project_meta[key] for key in (
+                    "project", "project_label", "execution_target", "execution_target_label",
+                    "case_map_profile",
+                )},
                 "execution_mode": "agent_generated",
                 "status": "queued",
                 "current_node": None,
                 "nodes": {node: "pending" for node in WORKFLOW_NODES},
                 "verdict": "PENDING",
+                "workflow_status": "queued",
+                "execution_status": "PENDING",
+                "evidence_status": "PENDING",
+                "mapping_status": "NOT_APPLICABLE",
+                "reason_code": None,
                 "created_at": _now(),
                 "started_at": None,
                 "finished_at": None,
                 "history_id": None,
                 "error": None,
+                "cancel_requested": False,
             }
             self._jobs[job_id] = job
             self._active_job_id = job_id
+            self._persist_job_locked(job)
 
         thread = threading.Thread(target=self._run, args=(job_id,), daemon=True, name=f"repair-{job_id}")
-        thread.start()
+        try:
+            thread.start()
+        except BaseException:
+            with self._lock:
+                job = self._jobs[job_id]
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["error"] = "修复线程启动失败"
+                job["finished_at"] = _now()
+                if self._active_job_id == job_id:
+                    self._active_job_id = None
+                self._persist_job_locked(job)
+            raise
         return self.get(job_id) or job
+
+    def cancel(self, job_id: str) -> dict[str, Any]:
+        job_id = _safe_segment(job_id, "任务编号")
+        process: Any = None
+        orphan_pid: int | None = None
+        orphan_identity: str | None = None
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None:
+                raise ValueError("修复任务不存在")
+            if job.get("status") == "finalizing":
+                raise ValueError("修复执行已结束，正在保存历史记录，不能再取消")
+            if job.get("status") not in self.ACTIVE_STATUSES:
+                raise ValueError("修复任务已经结束")
+            job["cancel_requested"] = True
+            job["reason_code"] = "USER_CANCELLED"
+            job["interruption_reason"] = "用户取消修复任务"
+            process = job.get("process")
+            if job.get("status") == "orphaned":
+                orphan_pid = job.get("process_pid")
+                orphan_identity = str(job.get("process_identity") or "") or None
+            self._persist_job_locked(job)
+
+        stopped = True
+        if process is not None:
+            stopped = _terminate_process_tree(process)
+        elif orphan_pid is not None:
+            stopped = _terminate_pid_tree(
+                orphan_pid,
+                expected_identity=orphan_identity,
+            )
+
+        if orphan_pid is not None:
+            with self._lock:
+                job = self._jobs[job_id]
+                if stopped:
+                    job["status"] = "cancelled"
+                    job["workflow_status"] = "cancelled"
+                    job["execution_status"] = "ERROR"
+                    if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                        job["verdict"] = "CANNOT_VERIFY"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    if self._active_job_id == job_id:
+                        self._active_job_id = None
+                else:
+                    job["cancel_requested"] = False
+                    job["error"] = "无法确认原修复进程身份或停止进程，任务仍保持隔离"
+                self._persist_job_locked(job)
+            if not stopped:
+                raise RuntimeError("无法安全停止重启前遗留的修复进程")
+        return self.get(job_id) or {}
 
     def get(self, job_id: str) -> dict[str, Any] | None:
         job_id = _safe_segment(job_id, "任务编号")
         with self._lock:
             job = self._jobs.get(job_id)
+            if job is None:
+                state_path = self._job_state_path(job_id)
+                loaded = _read_json(state_path)
+                if isinstance(loaded, dict) and str(loaded.get("id") or "") == job_id:
+                    job = loaded
+                    self._jobs[job_id] = job
             if job is None:
                 return None
             snapshot = {key: value for key, value in job.items() if key not in {"process", "progress"}}
@@ -3230,6 +3970,21 @@ class JobManager:
                     "current_node": progress.get("current_node"),
                     "nodes": progress.get("nodes", snapshot["nodes"]),
                     "verdict": progress.get("verdict", snapshot["verdict"]),
+                    "workflow_status": progress.get(
+                        "workflow_status", snapshot.get("workflow_status")
+                    ),
+                    "execution_status": progress.get(
+                        "execution_status", snapshot.get("execution_status")
+                    ),
+                    "evidence_status": progress.get(
+                        "evidence_status", snapshot.get("evidence_status")
+                    ),
+                    "mapping_status": progress.get(
+                        "mapping_status", snapshot.get("mapping_status")
+                    ),
+                    "reason_code": progress.get(
+                        "reason_code", snapshot.get("reason_code")
+                    ),
                     "attempts": progress.get("attempts", 0),
                     "progress_updated_at": progress.get("updated_at"),
                 }
@@ -3246,13 +4001,74 @@ class JobManager:
         if not job_id:
             return None
         job = self.get(job_id)
-        if job and job.get("status") in {"queued", "running", "finalizing"}:
+        if job and job.get("status") in self.ACTIVE_STATUSES:
             return job
         return None
 
     def _run(self, job_id: str) -> None:
+        try:
+            self._run_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    self._persist_job_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+            _terminate_process_tree(process)
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = "USER_CANCELLED"
+                            if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                                job["verdict"] = "CANNOT_VERIFY"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "修复任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    if self._active_job_id == job_id:
+                        self._active_job_id = None
+                    self._persist_job_locked(job)
+
+    def _run_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["finished_at"] = _now()
+                self._persist_job_locked(job)
+                return
+            project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+                "case_map_profile",
+            ):
+                job.setdefault(key, project_meta[key])
             job["status"] = "running"
             job["started_at"] = _now()
             job_dir = self.paths.runtime_jobs / job_id
@@ -3261,6 +4077,7 @@ class JobManager:
             result_file = job_dir / "result.json"
             job["progress_file"] = str(progress_file)
             job["result_file"] = str(result_file)
+            self._persist_job_locked(job)
 
         argv = build_child_command(
             "agent",
@@ -3269,6 +4086,12 @@ class JobManager:
                 job["defect"],
                 "--task-id",
                 job["defect"],
+                "--project",
+                job["project"],
+                "--profile",
+                job["case_map_profile"],
+                "--target",
+                job["execution_target"],
                 "--progress-file",
                 str(progress_file),
                 "--result-file",
@@ -3279,10 +4102,13 @@ class JobManager:
         stderr = ""
         return_code: int | None = None
         result: dict[str, Any] = {}
+        process: Any = None
+        timed_out = False
         try:
             process = subprocess.Popen(
                 argv,
                 cwd=self.paths.root,
+                env=_test_process_environment(project_meta),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -3291,15 +4117,82 @@ class JobManager:
             )
             with self._lock:
                 job["process"] = process
-            stdout, stderr = process.communicate()
-            return_code = process.returncode
+                job["process_pid"] = getattr(process, "pid", None)
+                job["process_identity"] = _process_identity(job["process_pid"])
+                self._persist_job_locked(job)
+            try:
+                stdout, stderr = _communicate_process(
+                    process,
+                    REPAIR_JOB_TIMEOUT_SECONDS,
+                )
+                return_code = getattr(process, "returncode", None)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                _terminate_process_tree(process)
+                try:
+                    stdout, stderr = _communicate_process(
+                        process,
+                        PROCESS_TERMINATION_GRACE_SECONDS,
+                    )
+                except (OSError, subprocess.SubprocessError):
+                    stdout, stderr = "", ""
+                return_code = getattr(process, "returncode", None)
+                stderr = (
+                    f"{stderr}\n修复进程执行超时（上限 {REPAIR_JOB_TIMEOUT_SECONDS:g}s）"
+                ).strip()
             loaded = _read_json(result_file, {})
             result = loaded if isinstance(loaded, dict) else {}
             if not result:
-                result = {"verdict": "FAIL", "attempts": 0, "error": stderr.strip() or "修复进程未生成结果文件"}
+                result = {
+                    "verdict": "CANNOT_VERIFY",
+                    "attempts": 0,
+                    "error": stderr.strip() or "修复进程未生成结果文件",
+                    "workflow_status": "failed",
+                    "execution_status": "ERROR",
+                    "reason_code": "RESULT_MISSING",
+                }
         except BaseException as exc:
-            result = {"verdict": "FAIL", "attempts": 0, "error": f"{type(exc).__name__}: {exc}"}
+            _terminate_process_tree(process)
+            result = {
+                "verdict": "CANNOT_VERIFY",
+                "attempts": 0,
+                "error": f"{type(exc).__name__}: {exc}",
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_EXCEPTION",
+            }
             stderr = (stderr + "\n" + result["error"]).strip()
+
+        with self._lock:
+            cancelled = bool(self._jobs[job_id].get("cancel_requested"))
+        if cancelled:
+            result = {
+                **result,
+                "verdict": "CANNOT_VERIFY",
+                "error": "用户取消修复任务",
+                "workflow_status": "cancelled",
+                "execution_status": "ERROR",
+                "reason_code": "USER_CANCELLED",
+            }
+        elif timed_out:
+            result = {
+                **result,
+                "verdict": "CANNOT_VERIFY",
+                "error": f"修复进程执行超时（上限 {REPAIR_JOB_TIMEOUT_SECONDS:g}s）",
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_TIMEOUT",
+            }
+
+        if str(result.get("verdict") or "").upper() == "ERROR":
+            result["verdict"] = "CANNOT_VERIFY"
+            result.setdefault("workflow_status", "failed")
+            result.setdefault("execution_status", "ERROR")
+            result.setdefault("reason_code", "JUDGEMENT_ERROR")
+        result.update(outcome_fields(
+            result,
+            workflow_default="failed" if result.get("error") else "completed",
+        ))
 
         progress = _read_json(progress_file, {})
         with self._lock:
@@ -3308,9 +4201,15 @@ class JobManager:
             job["return_code"] = return_code
             job["progress"] = progress if isinstance(progress, dict) else {}
             job["nodes"] = job["progress"].get("nodes", job["nodes"])
-            job["verdict"] = result.get("verdict", "FAIL")
+            job["verdict"] = result.get("verdict", "CANNOT_VERIFY")
             job["error"] = result.get("error")
+            for key in (
+                "workflow_status", "execution_status", "evidence_status",
+                "mapping_status", "reason_code",
+            ):
+                job[key] = result.get(key)
             job["status"] = "finalizing"
+            self._persist_job_locked(job)
 
         try:
             history_id = self.history.create(
@@ -3325,14 +4224,27 @@ class JobManager:
             with self._lock:
                 job["status"] = "failed"
                 job["error"] = f"历史记录保存失败: {exc}"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["evidence_status"] = "ERROR"
+                job["reason_code"] = "HISTORY_WRITE_FAILED"
 
         with self._lock:
             job["history_id"] = history_id
             if history_id is not None:
-                job["status"] = "completed" if result_file.is_file() else "failed"
+                if cancelled:
+                    job["status"] = "cancelled"
+                elif result.get("workflow_status") in {"failed", "interrupted", "orphaned"}:
+                    job["status"] = "failed"
+                else:
+                    job["status"] = "completed"
+            if job["status"] == "failed":
+                job["workflow_status"] = "failed"
             job.pop("process", None)
             if self._active_job_id == job_id:
                 self._active_job_id = None
+            self._persist_job_locked(job)
 
 
 class WebApplication:
@@ -3349,11 +4261,16 @@ class WebApplication:
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
 
-    def start_repair(self, *, defect: str) -> dict[str, Any]:
+    def start_repair(
+        self,
+        *,
+        defect: str,
+        project: str = DEFAULT_TEST_PROJECT,
+    ) -> dict[str, Any]:
         with self._execution_lock:
             if self.test_jobs.active():
                 raise RuntimeError("已有 Agent 测试正在运行")
-            return self.jobs.start(defect=defect)
+            return self.jobs.start(defect=defect, project=project)
 
     def start_case_test(
         self,
@@ -4313,13 +5230,22 @@ def _report_abnormal_run(
 ) -> dict[str, Any]:
     detail = _report_run_reason(run)
     screenshots = run.get("screenshots")
+    workflow_status = str(run.get("workflow_status") or "").casefold()
+    execution_status = str(run.get("execution_status") or "").upper()
+    reason_code = str(run.get("reason_code") or "").upper()
+    execution_anomaly = reason_code != "USER_CANCELLED" and (
+        execution_status == "ERROR"
+        or workflow_status in {"failed", "interrupted", "orphaned"}
+    )
     return {
         "timestamp": timestamp,
         "sheet": sheet,
         "case_id": _report_cell_text(run.get("case_id")),
         "priority": _report_cell_text(run.get("priority")),
         "verdict": verdict,
-        "verdict_label": REPORT_VERDICT_LABELS[verdict],
+        "verdict_label": (
+            "执行异常" if execution_anomaly else REPORT_VERDICT_LABELS[verdict]
+        ),
         "precondition_text": _report_cell_text(run.get("precondition_text")),
         "steps_text": _report_cell_text(run.get("steps_text")),
         "expected_text": _report_cell_text(run.get("expected_text")),
@@ -4499,8 +5425,10 @@ def _get_reports_summary_data(
     dist = {"PASS": 0, "FAIL": 0, "ERROR": 0, "CANNOT_VERIFY": 0}
     by_date: dict[str, dict[str, int]] = {}
     module_fails: dict[str, dict[str, int]] = {}
+    module_execution_errors: dict[str, dict[str, int]] = {}
     recent_fails: list[dict[str, Any]] = []
     abnormal_runs: list[dict[str, Any]] = []
+    execution_error_count = 0
     
     for r in filtered_runs:
         v = str(r.get("verdict") or "ERROR").upper()
@@ -4509,6 +5437,15 @@ def _get_reports_summary_data(
         if v not in dist:
             v = "ERROR"
         dist[v] += 1
+        workflow_status = str(r.get("workflow_status") or "").casefold()
+        execution_status = str(r.get("execution_status") or "").upper()
+        reason_code = str(r.get("reason_code") or "").upper()
+        is_execution_error = reason_code != "USER_CANCELLED" and (
+            execution_status == "ERROR"
+            or workflow_status in {"failed", "interrupted", "orphaned"}
+        )
+        if is_execution_error:
+            execution_error_count += 1
         
         ts = str(r.get("timestamp") or r.get("started_at") or "")
         date_str = ts[:10] if len(ts) >= 10 else "未知"
@@ -4532,21 +5469,29 @@ def _get_reports_summary_data(
                 sheet=sheet,
                 timestamp=ts,
             ))
-        if v in {"FAIL", "ERROR"}:
+        if v == "FAIL":
             if sheet not in module_fails:
                 module_fails[sheet] = {"module": sheet, "fail": 0, "error": 0, "total": 0}
-            if v == "FAIL":
-                module_fails[sheet]["fail"] += 1
-            else:
-                module_fails[sheet]["error"] += 1
+            module_fails[sheet]["fail"] += 1
             module_fails[sheet]["total"] += 1
-            
+
+        if is_execution_error:
+            current = module_execution_errors.setdefault(
+                sheet,
+                {"module": sheet, "execution_error": 0},
+            )
+            current["execution_error"] += 1
+
+        if v == "FAIL" or is_execution_error:
             recent_fails.append({
                 "case_id": str(r.get("case_id") or ""),
                 "sheet": sheet,
                 "module": sheet,
                 "history_id": str(r.get("id") or ""),
                 "verdict": v,
+                "workflow_status": workflow_status or None,
+                "execution_status": execution_status or None,
+                "reason_code": reason_code or None,
                 "at": ts,
                 "timestamp": ts,
                 "message": str(r.get("reason") or r.get("error") or "测试未通过"),
@@ -4567,6 +5512,11 @@ def _get_reports_summary_data(
         })
         
     top_fail_modules = sorted(module_fails.values(), key=lambda m: m["total"], reverse=True)[:8]
+    top_execution_error_modules = sorted(
+        module_execution_errors.values(),
+        key=lambda item: item["execution_error"],
+        reverse=True,
+    )[:8]
     recent_fails.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
     abnormal_runs.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
     
@@ -4580,6 +5530,7 @@ def _get_reports_summary_data(
             "fail": dist["FAIL"],
             "error": dist["ERROR"],
             "cannot_verify": dist["CANNOT_VERIFY"],
+            "execution_error": execution_error_count,
             "pass_rate": pass_rate,
             "batches": sum(1 for r in filtered_runs if r.get("batch_id")),
             "repairs": sum(1 for r in filtered_runs if r.get("execution_mode") == "agent_generated"),
@@ -4587,10 +5538,18 @@ def _get_reports_summary_data(
         "distribution": dist,
         "trend": trend,
         "top_fail_modules": top_fail_modules,
+        "top_execution_error_modules": top_execution_error_modules,
         "recent_failures": recent_fails[:15],
         "insight": {
             "title": "测试稳定性与质量态势",
-            "description": f"已完成 {total_count} 次测试运行，综合通过率为 {pass_rate}%。" + (f" 建议优先关注高频异常模块: {top_fail_modules[0]['module']}。" if top_fail_modules else " 当前运行状态平稳。"),
+            "description": (
+                f"已完成 {total_count} 次测试运行，综合通过率为 {pass_rate}%，"
+                f"其中框架执行异常 {execution_error_count} 次。"
+                + (
+                    f" 建议优先关注高频产品失败模块: {top_fail_modules[0]['module']}。"
+                    if top_fail_modules else " 当前未发现产品失败热点。"
+                )
+            ),
         },
     }
     if include_abnormal_runs:
@@ -4724,30 +5683,38 @@ class RequestHandler(BaseHTTPRequestHandler):
                 j_proj = str(j.get("project") or DEFAULT_TEST_PROJECT)
                 j_status = str(j.get("status") or "completed")
                 j_verdict = str(j.get("verdict") or "ERROR")
+                j_workflow = str(j.get("workflow_status") or "").casefold()
+                j_execution = str(j.get("execution_status") or "").upper()
+                j_reason_code = str(j.get("reason_code") or "").upper()
+
+                if project and j_proj != project and project != "all":
+                    continue
                 
-                if j_status in {"queued", "running", "finalizing"}:
+                if j_status in {"queued", "running", "finalizing", "orphaned"}:
                     queued_cnt += 1
                 if j_status in {"completed", "done"}:
                     fin = str(j.get("finished_at") or j.get("created_at") or "")
                     if fin.startswith(today_str):
                         completed_today += 1
-                if j_verdict in {"FAIL", "ERROR"} or j_status == "failed":
+                if j_reason_code != "USER_CANCELLED" and (
+                    j_execution == "ERROR"
+                    or j_workflow in {"failed", "interrupted", "orphaned"}
+                    or j_status in {"failed", "interrupted", "orphaned"}
+                    or int(j.get("execution_error_count") or 0) > 0
+                ):
                     error_cnt += 1
-                    
-                if project and j_proj != project and project != "all":
-                    continue
                     
                 if status_filter == "queue":
                     if j_status != "queued":
                         continue
                 elif status_filter == "running":
-                    if j_status not in {"running", "finalizing", "queued"}:
+                    if j_status not in {"running", "finalizing", "queued", "orphaned"}:
                         continue
                 elif status_filter == "completed":
                     if j_status not in {"completed", "done"}:
                         continue
                 elif status_filter == "interrupted":
-                    if j_status not in {"cancelled", "interrupted", "failed"}:
+                    if j_status not in {"cancelled", "interrupted", "failed", "orphaned"}:
                         continue
                         
                 meta = _test_project(j_proj)
@@ -4757,6 +5724,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                     "project_label": meta["project_label"],
                     "status": j_status,
                     "verdict": j_verdict,
+                    "workflow_status": j_workflow or None,
+                    "execution_status": j_execution or None,
+                    "reason_code": j_reason_code or None,
                     "completed": j.get("completed", 1 if j_status in {"completed", "done"} else 0),
                     "total": j.get("total", 1),
                     "started_at": j.get("started_at") or j.get("created_at"),
@@ -4999,6 +5969,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             ws_summary.append(["失败 (FAIL)", summary_data["metrics"]["fail"]])
             ws_summary.append(["错误 (ERROR)", summary_data["metrics"]["error"]])
             ws_summary.append(["无法验证", summary_data["metrics"]["cannot_verify"]])
+            ws_summary.append(["框架执行异常", summary_data["metrics"]["execution_error"]])
             ws_summary.append(["通过率", f"{summary_data['metrics']['pass_rate']}%"])
             
             ws_fail = wb.create_sheet(title="高频失败模块")
@@ -5245,7 +6216,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         match = re.fullmatch(r"/api/tests/jobs/([^/]+)/cancel", path)
         if match:
-            self._json(self.app.test_jobs.cancel_batch(match.group(1)), HTTPStatus.ACCEPTED)
+            self._json(self.app.test_jobs.cancel(match.group(1)), HTTPStatus.ACCEPTED)
             return
 
         match = re.fullmatch(r"/api/tests/jobs/([^/]+)/resume", path)
@@ -5673,16 +6644,24 @@ class RequestHandler(BaseHTTPRequestHandler):
             body = self._body_json()
             email = str(body.get("email", "")).strip()
             password = str(body.get("password", "")).strip()
-            base_url = str(body.get("base_url", "")).strip() or "https://ones.topstepht.com:8443"
+            base_url = (
+                str(body.get("base_url", "")).strip()
+                or os.environ.get("ONES_BASE_URL", "").strip()
+                or "https://ones.topstepht.com:8443"
+            )
             if not email or not password:
                 raise ValueError("请提供 ONES 账号和密码")
 
             import urllib.request
             import urllib.error
-            import ssl
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
+            parsed_base_url = urlparse(base_url)
+            if parsed_base_url.scheme not in {"http", "https"} or not parsed_base_url.hostname:
+                raise ValueError("ONES 地址必须是有效的 http(s) URL")
+            if parsed_base_url.scheme != "https" and not _is_loopback_host(
+                parsed_base_url.hostname
+            ):
+                raise ValueError("ONES 登录包含密码，非本机地址必须使用 HTTPS")
+            ctx = _ones_ssl_context()
 
             login_url = f"{base_url.rstrip('/')}/project/api/project/auth/login"
             req_data = json.dumps({"email": email, "password": password}).encode("utf-8")
@@ -5712,6 +6691,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise ValueError(f"连接 ONES 服务器失败: {exc}")
             return
 
+        match = re.fullmatch(r"/api/run/([^/]+)/cancel", path)
+        if match:
+            self._json(self.app.jobs.cancel(match.group(1)), HTTPStatus.ACCEPTED)
+            return
+
         if path != "/api/run":
             self._json({"error": "接口不存在"}, HTTPStatus.NOT_FOUND)
             return
@@ -5719,7 +6703,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         body = self._body_json()
         if not isinstance(body.get("defect"), str) or not body["defect"].strip():
             raise ValueError("defect 必填")
-        job = self.app.start_repair(defect=body["defect"].strip())
+        project = _test_project(str(body.get("project") or DEFAULT_TEST_PROJECT))["project"]
+        job = self.app.start_repair(
+            defect=body["defect"].strip(),
+            project=project,
+        )
         self._json(job, HTTPStatus.ACCEPTED)
 
     def _put(self) -> None:
@@ -5973,17 +6961,26 @@ class FrontendHTTPServer(ThreadingHTTPServer):
         super().server_bind()
 
 
+class FrontendIPv6HTTPServer(FrontendHTTPServer):
+    address_family = socket.AF_INET6
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="W30 Agent 自闭环前端服务")
     parser.add_argument("--host", default="127.0.0.1", help="监听地址")
     parser.add_argument("--port", type=int, default=8765, help="监听端口")
     args = parser.parse_args(argv)
+    if not _is_loopback_host(args.host):
+        parser.error("前端接口当前没有远程认证，只允许监听 localhost/127.0.0.1/::1")
 
     root = resolve_app_root()
     load_app_env(app_root=root)
+    _reload_runtime_limits()
     app = WebApplication(AppPaths.from_root(root))
-    server = FrontendHTTPServer((args.host, args.port), make_handler(app))
-    print(f"W30 Agent UI: http://{args.host}:{args.port}")
+    server_class = FrontendIPv6HTTPServer if ":" in args.host else FrontendHTTPServer
+    server = server_class((args.host, args.port), make_handler(app))
+    display_host = f"[{args.host}]" if ":" in args.host else args.host
+    print(f"W30 Agent UI: http://{display_host}:{server.server_address[1]}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

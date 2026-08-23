@@ -16,6 +16,8 @@ class LoopState(TypedDict, total=False):
     objective: str  # bug 描述
     max_attempts: int  # 重试上限，默认 5
     target: str  # simulator / hardware；hardware 首版只做复现诊断
+    project: str  # 前端选择的显式项目标识
+    profile: str  # 对应目标运行/用例配置标识
 
     # 交互复现（interactive_reproduce 节点填）
     reproduction_attempts: int
@@ -50,7 +52,7 @@ class LoopState(TypedDict, total=False):
 
     # 测试结果（test 节点填）
     test_output: dict | None  # {results, evidence_issue}
-    verdict: str  # PENDING / PASS / FAIL / CANNOT_VERIFY / ERROR
+    verdict: str  # PENDING / PASS / FAIL / CANNOT_VERIFY；ERROR 仅兼容旧内部结果
 
     # 重试控制（record 节点维护）
     attempts: int  # 已尝试轮数

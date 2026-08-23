@@ -1,12 +1,65 @@
 import json
 from pathlib import Path
+from types import SimpleNamespace
+import zipfile
 
+import pytest
+from agent_loop_system.tools import auto_updater
 from agent_loop_system.tools.update_checker import (
     DEFAULT_MANIFEST_PATH,
     check_for_updates,
     get_current_system_version,
     get_manifest_source,
 )
+
+
+def test_auto_updater_module_is_importable() -> None:
+    assert callable(auto_updater.launch_update_script)
+
+
+def test_auto_updater_quotes_powershell_data_without_interpolation() -> None:
+    assert auto_updater._powershell_literal(r"C:\Agent's $root") == (
+        r"'C:\Agent''s $root'"
+    )
+
+
+def test_auto_updater_rejects_zip_path_traversal(tmp_path: Path) -> None:
+    archive_path = tmp_path / "unsafe.zip"
+    destination = tmp_path / "staging"
+    destination.mkdir()
+    with zipfile.ZipFile(archive_path, "w") as archive:
+        archive.writestr("../escaped.txt", "unsafe")
+
+    with zipfile.ZipFile(archive_path, "r") as archive:
+        with pytest.raises(auto_updater.AutoUpdaterError) as raised:
+            auto_updater._extract_zip_safely(archive, destination)
+
+    assert raised.value.error_code == "UNSAFE_ARCHIVE"
+    assert not (tmp_path / "escaped.txt").exists()
+
+
+def test_auto_updater_writes_quoted_restart_commands(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(auto_updater.subprocess, "Popen", lambda *args, **kwargs: object())
+    monkeypatch.setattr(
+        auto_updater.threading,
+        "Thread",
+        lambda *args, **kwargs: SimpleNamespace(start=lambda: None),
+    )
+
+    auto_updater.launch_update_script(
+        tmp_path,
+        tmp_path / "staging",
+        parent_pid=123,
+        target_version="0.4.3",
+    )
+
+    script = (tmp_path / ".runtime" / "apply_update.ps1").read_text(
+        encoding="utf-8-sig"
+    )
+    assert "$wsh.Run(('\"' + $exePath + '\"'), 0, $false)" in script
+    assert "$wsh.Run(('python \"' + $pyLauncher + '\"'), 0, $false)" in script
+    assert 'Join-Path (Join-Path $AppRoot ".runtime") "update_staging"' in script
+    assert 'Copy-Item -Path (Join-Path $src "*") -Destination $dst' in script
 
 
 def test_manifest_source_defaults_to_official_nas(monkeypatch) -> None:

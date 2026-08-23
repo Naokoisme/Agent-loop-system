@@ -685,8 +685,11 @@ def test(state: LoopState) -> dict:
                 results.append({
                     "case_id": case_id,
                     "sheet": sheet,
-                    "verdict": "ERROR",
+                    "verdict": "CANNOT_VERIFY",
                     "reason": f"用例执行异常: {exc}",
+                    "workflow_status": "failed",
+                    "execution_status": "ERROR",
+                    "reason_code": "CASE_EXECUTION_EXCEPTION",
                     "terminal_json": [],
                     "screenshots": [],
                 })

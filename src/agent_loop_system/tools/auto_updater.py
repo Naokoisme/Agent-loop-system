@@ -13,7 +13,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
+import stat
 import subprocess
 import sys
 import threading
@@ -40,6 +42,34 @@ class AutoUpdaterError(Exception):
         self.error_code = error_code
 
 
+def _extract_zip_safely(archive: zipfile.ZipFile, destination: Path) -> None:
+    """Reject path traversal and symlink entries before extracting an update."""
+
+    root = destination.resolve()
+    for member in archive.infolist():
+        member_path = Path(member.filename.replace("\\", "/"))
+        unix_mode = (member.external_attr >> 16) & 0o170000
+        if member_path.is_absolute() or ".." in member_path.parts or unix_mode == stat.S_IFLNK:
+            raise AutoUpdaterError(
+                f"更新包包含不安全路径: {member.filename}",
+                error_code="UNSAFE_ARCHIVE",
+            )
+        try:
+            (root / member_path).resolve().relative_to(root)
+        except ValueError as exc:
+            raise AutoUpdaterError(
+                f"更新包路径越出暂存区: {member.filename}",
+                error_code="UNSAFE_ARCHIVE",
+            ) from exc
+    archive.extractall(root)
+
+
+def _powershell_literal(value: object) -> str:
+    """Quote data as one non-interpolating PowerShell string literal."""
+
+    return "'" + str(value).replace("'", "''") + "'"
+
+
 def prepare_upgrade(
     app_root: Path,
     manifest_source: str | None = None,
@@ -55,10 +85,17 @@ def prepare_upgrade(
             raise AutoUpdaterError(f"无法访问更新源: {update_info.get('error', '未知错误')}", error_code="SOURCE_OFFLINE")
         raise AutoUpdaterError(f"当前版本 ({cur_ver}) 已是最新版本，无需升级", error_code="ALREADY_UP_TO_DATE")
 
-    latest_ver = update_info["latest_version"]
+    latest_ver = str(update_info["latest_version"])
+    if not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?", latest_ver):
+        raise AutoUpdaterError("更新清单版本号格式不合法", error_code="INVALID_MANIFEST")
     packages = update_info.get("packages", {})
     full_pkg = packages.get("full_system", {})
-    rel_path = full_pkg.get("relative_path", f"releases/v{latest_ver}/Agent-loop-system-{latest_ver}-windows-x64.zip")
+    rel_path = Path(str(full_pkg.get(
+        "relative_path",
+        f"releases/v{latest_ver}/Agent-loop-system-{latest_ver}-windows-x64.zip",
+    )).replace("/", os.sep))
+    if rel_path.is_absolute() or ".." in rel_path.parts:
+        raise AutoUpdaterError("更新包相对路径不合法", error_code="INVALID_MANIFEST")
 
     nas_base = Path(source).parent
     pkg_path = nas_base / rel_path
@@ -75,7 +112,9 @@ def prepare_upgrade(
             # 避免直接在远程 SMB 网络路径上解压引发数百次网络 seek 延迟
             shutil.copyfile(pkg_path, local_temp_zip)
             with zipfile.ZipFile(local_temp_zip, "r") as zf:
-                zf.extractall(staging_dir)
+                _extract_zip_safely(zf, staging_dir)
+        except AutoUpdaterError:
+            raise
         except Exception as exc:
             raise AutoUpdaterError(f"拉取或解压安装包失败: {exc}", error_code="EXTRACTION_FAILED") from exc
         finally:
@@ -119,18 +158,18 @@ def launch_update_script(
     script_path = runtime_dir / "apply_update.ps1"
     log_path = runtime_dir / "update.log"
 
-    app_root_str = str(app_root.resolve())
-    staging_dir_str = str(staging_dir.resolve())
-    log_path_str = str(log_path.resolve())
-    t_ver = str(target_version or "").strip()
+    app_root_literal = _powershell_literal(app_root.resolve())
+    staging_dir_literal = _powershell_literal(staging_dir.resolve())
+    log_path_literal = _powershell_literal(log_path.resolve())
+    target_version_literal = _powershell_literal(str(target_version or "").strip())
 
-    ps_content = fr"""# Agent-loop 独立热更新脚本 (PID: {pid})
+    ps_content = f"""# Agent-loop 独立热更新脚本 (PID: {pid})
 $ErrorActionPreference = "Continue"
 $ParentPid = {pid}
-$AppRoot = "{app_root_str}"
-$StagingDir = "{staging_dir_str}"
-$LogPath = "{log_path_str}"
-$TargetVer = "{t_ver}"
+$AppRoot = {app_root_literal}
+$StagingDir = {staging_dir_literal}
+$LogPath = {log_path_literal}
+$TargetVer = {target_version_literal}
 
 function Log-Msg($msg) {{
     $time = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
@@ -157,7 +196,7 @@ Start-Sleep -Milliseconds 300
 if ($TargetVer -ne "") {{
     $curDirName = Split-Path -Leaf $AppRoot
     $parentDir = Split-Path -Parent $AppRoot
-    if ($curDirName -match "(\d+\.\d+\.\d+)") {{
+    if ($curDirName -match "([0-9]+[.][0-9]+[.][0-9]+)") {{
         $oldVer = $matches[1]
         if ($oldVer -ne $TargetVer) {{
             $newDirName = $curDirName.Replace($oldVer, $TargetVer)
@@ -200,7 +239,7 @@ foreach ($name in $whitelist) {{
             if (-not (Test-Path $dst)) {{
                 New-Item -ItemType Directory -Path $dst -Force | Out-Null
             }}
-            Copy-Item -Path "$src\*" -Destination "$dst\" -Recurse -Force -ErrorAction SilentlyContinue
+            Copy-Item -Path (Join-Path $src "*") -Destination $dst -Recurse -Force -ErrorAction SilentlyContinue
             Log-Msg "覆盖目录: $name"
         }} else {{
             Copy-Item -Path $src -Destination $dst -Force -ErrorAction SilentlyContinue
@@ -210,7 +249,7 @@ foreach ($name in $whitelist) {{
 }}
 
 # 5. 清理暂存区
-$curStaging = Join-Path $AppRoot ".runtime\update_staging"
+$curStaging = Join-Path (Join-Path $AppRoot ".runtime") "update_staging"
 if (Test-Path $curStaging) {{
     Remove-Item -Path $curStaging -Recurse -Force -ErrorAction SilentlyContinue
 }}
@@ -225,14 +264,14 @@ if (Test-Path $exePath) {{
     Log-Msg "正在通过 WScript.Shell 顶级脱离启动新版本: $exePath"
     $wsh = New-Object -ComObject WScript.Shell
     $wsh.CurrentDirectory = $AppRoot
-    $wsh.Run('"' + $exePath + '"', 0, $false)
+    $wsh.Run(('"' + $exePath + '"'), 0, $false)
 }} else {{
     $pyLauncher = Join-Path $AppRoot "start_ui.py"
     if (Test-Path $pyLauncher) {{
         Log-Msg "正在通过 Python 启动新版本: $pyLauncher"
         $wsh = New-Object -ComObject WScript.Shell
         $wsh.CurrentDirectory = $AppRoot
-        $wsh.Run('python "' + $pyLauncher + '"', 0, $false)
+        $wsh.Run(('python "' + $pyLauncher + '"'), 0, $false)
     }}
 }}
 Log-Msg "=== 升级与重启流程结束 ==="
