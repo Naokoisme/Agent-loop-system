@@ -124,7 +124,7 @@ def launch_update_script(
     log_path_str = str(log_path.resolve())
     t_ver = str(target_version or "").strip()
 
-    ps_content = f"""# Agent-loop 独立热更新脚本 (PID: {pid})
+    ps_content = fr"""# Agent-loop 独立热更新脚本 (PID: {pid})
 $ErrorActionPreference = "Continue"
 $ParentPid = {pid}
 $AppRoot = "{app_root_str}"
@@ -225,14 +225,14 @@ if (Test-Path $exePath) {{
     Log-Msg "正在通过 WScript.Shell 顶级脱离启动新版本: $exePath"
     $wsh = New-Object -ComObject WScript.Shell
     $wsh.CurrentDirectory = $AppRoot
-    $wsh.Run("""$exePath""", 0, $false)
+    $wsh.Run('"' + $exePath + '"', 0, $false)
 }} else {{
     $pyLauncher = Join-Path $AppRoot "start_ui.py"
     if (Test-Path $pyLauncher) {{
         Log-Msg "正在通过 Python 启动新版本: $pyLauncher"
         $wsh = New-Object -ComObject WScript.Shell
         $wsh.CurrentDirectory = $AppRoot
-        $wsh.Run("python ""$pyLauncher""", 0, $false)
+        $wsh.Run('python "' + $pyLauncher + '"', 0, $false)
     }}
 }}
 Log-Msg "=== 升级与重启流程结束 ==="
