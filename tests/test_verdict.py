@@ -532,6 +532,42 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "截图内容无法辨认")
 
+    def test_fixed_mapping_visual_judgement_uses_fixed_api_key(self) -> None:
+        from agent_loop_system.tools.llm_config import get_llm_api_key
+
+        result = CaseRunResult(
+            case_id="FIXED_KEY_001",
+            sheet="demo",
+            expected_text="显示结果页",
+            execution_mode="fixed_mapping",
+            evidence_contract={"complete": True, "issues": []},
+            screenshots=[{"path": "screenshot.bmp", "label": "结果页"}],
+        )
+        selected_keys: list[str] = []
+
+        def judge_with_scoped_key(*args, **kwargs):
+            selected_keys.append(get_llm_api_key())
+            return Verdict(verdict="PASS", reason="截图符合预期")
+
+        with (
+            mock.patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_API_KEY": "shared-key",
+                    "OPENAI_API_KEY_EXPLORATION": "exploration-key",
+                    "OPENAI_API_KEY_FIXED": "fixed-key",
+                },
+            ),
+            mock.patch(
+                "agent_loop_system.tools.test.judge_test_with_vision",
+                side_effect=judge_with_scoped_key,
+            ),
+        ):
+            decision = judge_case_result(result)
+
+        self.assertEqual(decision.verdict, "PASS")
+        self.assertEqual(selected_keys, ["fixed-key"])
+
     def test_runner_passes_6202_project_to_visual_translation_lookup(self) -> None:
         result = CaseRunResult(
             case_id="MENU_032",

@@ -87,9 +87,12 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
 
 
 def _create_llm():
-    from agent_loop_system.tools.llm_config import create_chat_llm
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        create_chat_llm,
+    )
 
-    return create_chat_llm()
+    return create_chat_llm(api_key_scope=LLM_API_KEY_SCOPE_EXPLORATION)
 
 
 def _load_images(image_dir: str | None) -> list[tuple[str, str]]:

@@ -4,6 +4,9 @@
 """
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 import os
 import ssl
 import time
@@ -14,6 +17,37 @@ DEFAULT_OPENAI_API_KEY = "sk-Q7ltq1BNR1ouXNdKCDAPj1hWm3lYEvVsK7ok48g74AyBGN9Q"
 DEFAULT_OPENAI_BASE_URL = "https://api.onefaka.com/v1"
 DEFAULT_OPENAI_MODEL = "gpt-5.6-sol"
 DEFAULT_OPENAI_TIMEOUT = 120.0
+
+LLM_API_KEY_SCOPE_EXPLORATION = "exploration"
+LLM_API_KEY_SCOPE_FIXED = "fixed"
+_SCOPED_API_KEY_ENV = {
+    LLM_API_KEY_SCOPE_EXPLORATION: "OPENAI_API_KEY_EXPLORATION",
+    LLM_API_KEY_SCOPE_FIXED: "OPENAI_API_KEY_FIXED",
+}
+_CURRENT_API_KEY_SCOPE: ContextVar[str | None] = ContextVar(
+    "agent_loop_openai_api_key_scope",
+    default=None,
+)
+
+
+def _normalize_api_key_scope(scope: str | None) -> str | None:
+    if scope is None:
+        return None
+    normalized = str(scope).strip().lower()
+    if normalized not in _SCOPED_API_KEY_ENV:
+        raise ValueError(f"未知大模型 API key 作用域: {scope!r}")
+    return normalized
+
+
+@contextmanager
+def llm_api_key_scope(scope: str) -> Iterator[None]:
+    """在当前调用上下文中选择专用密钥，不修改进程环境。"""
+
+    token = _CURRENT_API_KEY_SCOPE.set(_normalize_api_key_scope(scope))
+    try:
+        yield
+    finally:
+        _CURRENT_API_KEY_SCOPE.reset(token)
 
 
 def _create_compatible_ssl_context() -> ssl.SSLContext:
@@ -39,8 +73,17 @@ def _create_http_client(timeout: float | None = None) -> Any:
         return None
 
 
-def get_llm_api_key() -> str:
-    """获取当前生效的 API Key（优先环境变量，其次内置默认）。"""
+def get_llm_api_key(scope: str | None = None) -> str:
+    """获取当前生效的 API Key；专用 key 缺失时兼容旧配置。"""
+
+    selected_scope = _normalize_api_key_scope(scope)
+    if selected_scope is None:
+        selected_scope = _CURRENT_API_KEY_SCOPE.get()
+    if selected_scope is not None:
+        scoped_key = os.environ.get(_SCOPED_API_KEY_ENV[selected_scope], "").strip()
+        if scoped_key and not scoped_key.startswith("暂时"):
+            return scoped_key
+
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not key or key.startswith("暂时"):
         return DEFAULT_OPENAI_API_KEY
@@ -89,6 +132,7 @@ def create_chat_llm(
     *,
     model: str | None = None,
     api_key: str | None = None,
+    api_key_scope: str | None = None,
     base_url: str | None = None,
     timeout: float | None = None,
 ):
@@ -101,7 +145,7 @@ def create_chat_llm(
     client = _create_http_client(timeout)
     kwargs: dict[str, Any] = {
         "model": model or get_llm_model(),
-        "api_key": api_key or get_llm_api_key(),
+        "api_key": api_key or get_llm_api_key(api_key_scope),
         "base_url": (base_url or get_llm_base_url()) or None,
         "timeout": timeout if timeout is not None else get_llm_timeout(),
     }

@@ -272,15 +272,21 @@ def interactive_reproduce_node(state: LoopState) -> dict:
     except ValueError:
         return _source_invalid(f"task_id 越出证据目录: {task_id}")
 
-    trace = run_interactive_reproduction(
-        task_id=task_id,
-        objective=state.get("objective", ""),
-        source_files=source_files,
-        defect_image_paths=state.get("defect_image_paths", []),
-        evidence_dir=reproduction_dir,
-        max_actions=6,
-        target=state.get("target", "simulator"),
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        llm_api_key_scope,
     )
+
+    with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+        trace = run_interactive_reproduction(
+            task_id=task_id,
+            objective=state.get("objective", ""),
+            source_files=source_files,
+            defect_image_paths=state.get("defect_image_paths", []),
+            evidence_dir=reproduction_dir,
+            max_actions=6,
+            target=state.get("target", "simulator"),
+        )
     trace_payload = trace.model_dump(mode="json")
     outcome = trace.outcome or ReproductionOutcome.SYSTEM_ERROR
     commands = successful_reproduction_commands(trace)
@@ -643,6 +649,10 @@ def test(state: LoopState) -> dict:
         judge_with_vision,
         run_single_case,
     )
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        llm_api_key_scope,
+    )
 
     task_id = state.get("task_id", "unknown")
     shot_dir = EVIDENCE_ROOT / task_id
@@ -713,12 +723,13 @@ def test(state: LoopState) -> dict:
 
         if defect_criteria and shot_ok:
             ref = before_path if Path(before_path).is_file() else None
-            verdict = judge_with_vision(
-                after_path,
-                defect_criteria,
-                reference_screenshot=ref,
-                defect_image_paths=state.get("defect_image_paths", []),
-            )
+            with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                verdict = judge_with_vision(
+                    after_path,
+                    defect_criteria,
+                    reference_screenshot=ref,
+                    defect_image_paths=state.get("defect_image_paths", []),
+                )
             results.append({
                 "case_id": "agent_generated",
                 "sheet": "agent",
@@ -755,7 +766,8 @@ def test(state: LoopState) -> dict:
 
         try:
             HardwareTargetConfig.from_env()
-            reset_hardware_case_state(evidence_dir=shot_dir / "hardware-reset")
+            with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                reset_hardware_case_state(evidence_dir=shot_dir / "hardware-reset")
             session = RealDeviceSession(evidence_dir=shot_dir)
         except Exception as exc:
             return {
@@ -815,12 +827,13 @@ def test(state: LoopState) -> dict:
     if defect_criteria and shot_ok:
         # before_path 存在时传作参考（对比判定）
         ref = before_path if Path(before_path).is_file() else None
-        verdict = judge_with_vision(
-            after_path,
-            defect_criteria,
-            reference_screenshot=ref,
-            defect_image_paths=state.get("defect_image_paths", []),
-        )
+        with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+            verdict = judge_with_vision(
+                after_path,
+                defect_criteria,
+                reference_screenshot=ref,
+                defect_image_paths=state.get("defect_image_paths", []),
+            )
         results.append({
             "case_id": "agent_generated",
             "sheet": "agent",

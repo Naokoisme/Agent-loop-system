@@ -222,9 +222,13 @@ def judge_with_vision(
     defect_image_paths 为缺陷原图/规格参考图；
     reference_screenshot 非空时为修复前截图，用于对比判定修复效果。
     """
-    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        create_chat_llm,
+        get_llm_api_key,
+    )
 
-    api_key = get_llm_api_key()
+    api_key = get_llm_api_key(LLM_API_KEY_SCOPE_EXPLORATION)
     if not api_key or api_key.startswith("暂时"):
         return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
@@ -238,7 +242,7 @@ def judge_with_vision(
         return Verdict(verdict="CANNOT_VERIFY", reason=f"截图读取失败: {screenshot_path}")
 
     try:
-        llm = create_chat_llm()
+        llm = create_chat_llm(api_key_scope=LLM_API_KEY_SCOPE_EXPLORATION)
         if llm is None:
             return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
@@ -510,12 +514,24 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
             reason=result.precomputed_reason or "Agent-loop 探索已完成",
         )
 
-    visual = judge_test_with_vision(
-        result.expected_text,
-        result.screenshots,
-        result.verification_points,
-        project=str(result.provenance.get("project") or ""),
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        LLM_API_KEY_SCOPE_FIXED,
+        llm_api_key_scope,
     )
+
+    scope = (
+        LLM_API_KEY_SCOPE_EXPLORATION
+        if result.execution_mode == "agent_exploration"
+        else LLM_API_KEY_SCOPE_FIXED
+    )
+    with llm_api_key_scope(scope):
+        visual = judge_test_with_vision(
+            result.expected_text,
+            result.screenshots,
+            result.verification_points,
+            project=str(result.provenance.get("project") or ""),
+        )
     return CaseDecision(verdict=visual.verdict, reason=visual.reason)
 
 
@@ -818,53 +834,65 @@ def run_single_case(
         screenshot_path = str(
             EVIDENCE_DIR / target / sheet_name / case_id / run_stamp / "screenshot.bmp"
         )
-    if external_executor is not None:
-        if target != "hardware":
-            raise ValueError("外部真机执行器只能用于 hardware target")
-        return _stamp_result_provenance(
-            external_executor(case, screenshot_path),
-            provenance=provenance,
-        )
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        LLM_API_KEY_SCOPE_FIXED,
+        llm_api_key_scope,
+    )
 
-    if not case.is_promoted and not candidate_replay:
-        exploration_kwargs = {
-            "screenshot_path": screenshot_path,
-            "target": target,
-            "project": str(provenance.get("project") or ""),
-            "reset_hardware": reset_hardware,
-        }
-        if hardware_runtime_profile is not None:
-            exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
-        return _stamp_result_provenance(
-            _run_agent_exploration(
-                case,
-                **exploration_kwargs,
-            ),
-            provenance=provenance,
-        )
+    scope = (
+        LLM_API_KEY_SCOPE_EXPLORATION
+        if not case.is_promoted and not candidate_replay
+        else LLM_API_KEY_SCOPE_FIXED
+    )
+    with llm_api_key_scope(scope):
+        if external_executor is not None:
+            if target != "hardware":
+                raise ValueError("外部真机执行器只能用于 hardware target")
+            return _stamp_result_provenance(
+                external_executor(case, screenshot_path),
+                provenance=provenance,
+            )
 
-    if target == "hardware":
-        from agent_loop_system.tools.real_device import (
-            RealDeviceSession,
-            reset_hardware_case_state,
-        )
+        if not case.is_promoted and not candidate_replay:
+            exploration_kwargs = {
+                "screenshot_path": screenshot_path,
+                "target": target,
+                "project": str(provenance.get("project") or ""),
+                "reset_hardware": reset_hardware,
+            }
+            if hardware_runtime_profile is not None:
+                exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
+            return _stamp_result_provenance(
+                _run_agent_exploration(
+                    case,
+                    **exploration_kwargs,
+                ),
+                provenance=provenance,
+            )
 
-        _validate_hardware_case_commands(case, hardware_runtime_profile)
-        evidence_dir = Path(screenshot_path).resolve().parent
-        if reset_hardware:
-            reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")
-        session = RealDeviceSession(evidence_dir=evidence_dir)
-    elif target == "simulator":
-        session = SimulatorSession(get_simulator_exe())
-    session.start()
-    try:
-        result = run_case(session, case, screenshot_path=screenshot_path)
-        return _stamp_result_provenance(
-            result,
-            provenance=provenance,
-        )
-    finally:
-        session.stop()
+        if target == "hardware":
+            from agent_loop_system.tools.real_device import (
+                RealDeviceSession,
+                reset_hardware_case_state,
+            )
+
+            _validate_hardware_case_commands(case, hardware_runtime_profile)
+            evidence_dir = Path(screenshot_path).resolve().parent
+            if reset_hardware:
+                reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")
+            session = RealDeviceSession(evidence_dir=evidence_dir)
+        elif target == "simulator":
+            session = SimulatorSession(get_simulator_exe())
+        session.start()
+        try:
+            result = run_case(session, case, screenshot_path=screenshot_path)
+            return _stamp_result_provenance(
+                result,
+                provenance=provenance,
+            )
+        finally:
+            session.stop()
 
 
 def main(argv: list[str] | None = None) -> int:

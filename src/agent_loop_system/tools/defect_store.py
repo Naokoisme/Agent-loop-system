@@ -69,15 +69,21 @@ def _media_kind(mime: str) -> str:
 
 def _get_llm():
     """创建 LLM 实例，复用统一配置方式。"""
-    from agent_loop_system.tools.llm_config import create_chat_llm
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        create_chat_llm,
+    )
 
-    return create_chat_llm()
+    return create_chat_llm(api_key_scope=LLM_API_KEY_SCOPE_EXPLORATION)
 
 
 def _llm_available() -> bool:
-    from agent_loop_system.tools.llm_config import get_llm_api_key
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        get_llm_api_key,
+    )
 
-    api_key = get_llm_api_key()
+    api_key = get_llm_api_key(LLM_API_KEY_SCOPE_EXPLORATION)
     return bool(api_key and not api_key.startswith("暂时"))
 
 
