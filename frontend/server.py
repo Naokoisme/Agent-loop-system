@@ -3741,7 +3741,7 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "user_id": os.environ.get("ONES_USER_ID", ""),
         },
         "hardware": {
-            "port": os.environ.get("W30_HARDWARE_PORT", "COM7"),
+            "port": os.environ.get("W30_HARDWARE_PORT", ""),
             "baudrate": int(os.environ.get("W30_HARDWARE_BAUDRATE", 1500000)),
             "transport": os.environ.get("W30_HARDWARE_TRANSPORT", "supercom"),
             "capture_provider": os.environ.get("W30_HARDWARE_CAPTURE_PROVIDER", "mtp"),
@@ -5031,7 +5031,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/hardware/serial-ports":
-            configured_port = os.environ.get("W30_HARDWARE_PORT", "COM7")
+            configured_port = os.environ.get("W30_HARDWARE_PORT", "")
             try:
                 from agent_loop_system.tools.hardware_serial_ports import (
                     get_serial_ports_status,

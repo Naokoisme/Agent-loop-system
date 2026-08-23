@@ -225,6 +225,18 @@ class RealDeviceSessionTest(unittest.TestCase):
         transport_class.assert_called_once_with("COM7")
         self.assertIs(serial_class.call_args.kwargs["transport"], fake_transport)
 
+    def test_missing_hardware_port_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as root, mock.patch.dict(
+            "os.environ",
+            {"W30_HARDWARE_TRANSPORT": "supercom"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(
+                ValueError,
+                "W30_HARDWARE_PORT must be explicitly configured",
+            ):
+                RealDeviceSession(evidence_dir=root)
+
     def test_ble_capture_provider_accepts_explicit_address_override(
         self,
     ) -> None:

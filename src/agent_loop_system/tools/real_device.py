@@ -102,7 +102,9 @@ def _create_hardware_serial_session(
     allow_dangerous_commands: bool = False,
 ) -> HardwareSerialSession:
     settings = os.environ if environment is None else environment
-    port = settings.get("W30_HARDWARE_PORT", DEFAULT_PORT).strip() or DEFAULT_PORT
+    port = settings.get("W30_HARDWARE_PORT", "").strip()
+    if not port:
+        raise ValueError("W30_HARDWARE_PORT must be explicitly configured")
     baudrate_text = settings.get(
         "W30_HARDWARE_BAUDRATE", str(DEFAULT_BAUDRATE)
     ).strip()

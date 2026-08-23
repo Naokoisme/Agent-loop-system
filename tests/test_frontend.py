@@ -3498,6 +3498,34 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(data["status"], "ok")
         self.assertEqual(os.environ["W30_HARDWARE_PORT"], "COM8")
 
+    def test_hardware_serial_ports_endpoint_has_no_fixed_default(self) -> None:
+        _, base = self._server()
+        mock_payload = {
+            "configured_port": "",
+            "selected_port": "",
+            "default_port": None,
+            "active_count": 0,
+            "items": [],
+            "available": True,
+        }
+
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            patch(
+                "agent_loop_system.tools.hardware_serial_ports.get_serial_ports_status",
+                return_value=mock_payload,
+            ) as mock_get_status,
+        ):
+            with urlopen(base + "/api/config", timeout=3) as resp:
+                config = json.loads(resp.read().decode("utf-8"))
+            with urlopen(base + "/api/hardware/serial-ports", timeout=3) as resp:
+                serial_ports = json.loads(resp.read().decode("utf-8"))
+
+        self.assertEqual(config["hardware"]["port"], "")
+        self.assertEqual(serial_ports["configured_port"], "")
+        self.assertEqual(serial_ports["selected_port"], "")
+        mock_get_status.assert_called_once_with("")
+
 
 if __name__ == "__main__":
     unittest.main()
