@@ -2,12 +2,14 @@ from pathlib import Path
 
 import json
 import re
+import sqlite3
 import tomllib
 
 from scripts.build_exe import (
     copy_release_case_map,
     find_embedded_release_secrets,
     find_release_case_map_local_paths,
+    sanitize_supercom_release_db,
     write_release_env_example,
 )
 
@@ -176,6 +178,9 @@ def test_release_case_map_removes_machine_local_provenance(tmp_path: Path) -> No
                         "coordinate_source": (
                             r"D:\\Agent-loop\\workspaces\\firmware\\demo.json"
                         ),
+                        "note": (
+                            r"历史证据 D:\\Agent-loop\\data\\legacy-evidence\\demo"
+                        ),
                     }
                 ],
             }
@@ -203,5 +208,36 @@ def test_release_case_map_removes_machine_local_provenance(tmp_path: Path) -> No
         .strip()
     )
     assert "coordinate_source" not in case_data["cases"][0]
+    assert "D:" not in case_data["cases"][0]["note"]
+    assert "./Agent-loop" in case_data["cases"][0]["note"]
     assert ledger["evidence_root"] == "."
     assert find_release_case_map_local_paths(destination) == []
+
+
+def test_release_supercom_database_disables_saved_auto_connect(tmp_path: Path) -> None:
+    database = tmp_path / "user_data.sqlite"
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            "CREATE TABLE com_settings (PortName TEXT, Connected INTEGER)"
+        )
+        connection.executemany(
+            "INSERT INTO com_settings VALUES (?, ?)",
+            [("COM7", 1), ("COM9", 0)],
+        )
+        connection.execute(
+            "CREATE TABLE advanced_send (ProjectName TEXT, Commands TEXT)"
+        )
+        connection.execute(
+            "INSERT INTO advanced_send VALUES (?, ?)",
+            ("保留命令", "TOP5STEP:GUI_PING:;"),
+        )
+
+    sanitize_supercom_release_db(database)
+
+    with sqlite3.connect(database) as connection:
+        assert connection.execute(
+            "SELECT PortName, Connected FROM com_settings ORDER BY PortName"
+        ).fetchall() == [("COM7", 0), ("COM9", 0)]
+        assert connection.execute(
+            "SELECT ProjectName, Commands FROM advanced_send"
+        ).fetchall() == [("保留命令", "TOP5STEP:GUI_PING:;")]

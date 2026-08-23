@@ -8,6 +8,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -72,7 +73,12 @@ RELEASE_ENV_LOCAL_STATE_KEYS = {
 RELEASE_ENV_CLEAR_KEYS = RELEASE_ENV_SECRET_KEYS | RELEASE_ENV_LOCAL_STATE_KEYS
 
 OPENAI_STYLE_API_KEY_PATTERN = re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")
-WINDOWS_JSON_PATH_LITERAL_PATTERN = re.compile(r'"[A-Za-z]:(?:/|\\\\)')
+WINDOWS_VALUE_DRIVE_PREFIX_PATTERN = re.compile(
+    r"(?<![A-Za-z])[A-Za-z]:[\\/]+"
+)
+WINDOWS_JSON_PATH_LITERAL_PATTERN = re.compile(
+    r"(?<![A-Za-z])[A-Za-z]:(?:/|\\\\)"
+)
 
 
 def read_dotenv_assignments(path: Path) -> dict[str, str]:
@@ -167,6 +173,8 @@ def _portable_case_map_value(value: object) -> object:
         return portable
     if isinstance(value, list):
         return [_portable_case_map_value(item) for item in value]
+    if isinstance(value, str):
+        return WINDOWS_VALUE_DRIVE_PREFIX_PATTERN.sub("./", value)
     return value
 
 
@@ -212,6 +220,26 @@ def find_release_case_map_local_paths(case_map_root: Path) -> list[str]:
         ):
             findings.append(path.relative_to(case_map_root).as_posix())
     return findings
+
+
+def sanitize_supercom_release_db(database_path: Path) -> None:
+    """Disable machine-specific auto-connect state in a copied SuperCom DB."""
+
+    if not database_path.is_file():
+        return
+    with sqlite3.connect(database_path) as connection:
+        table_exists = connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='com_settings'"
+        ).fetchone()
+        if not table_exists:
+            return
+        columns = {
+            str(row[1])
+            for row in connection.execute("PRAGMA table_info(com_settings)")
+        }
+        if "Connected" in columns:
+            connection.execute("UPDATE com_settings SET Connected = 0")
+            connection.commit()
 
 
 def calc_sha256(path: Path) -> str:
@@ -459,6 +487,7 @@ def build_exe(
             user_data_db = supercom_project / "user_data.sqlite"
         if user_data_db.exists():
             shutil.copy2(user_data_db, supercom_dst / "user_data.sqlite")
+            sanitize_supercom_release_db(supercom_dst / "user_data.sqlite")
 
     # Root files: only .env.example
     env_example = root / ".env.example"
@@ -540,8 +569,8 @@ def build_exe(
         "### 场景 B：6202 真机自动化测试\n"
         "1. **第一步（打开串口助手）**：\n"
         "   - 打开本目录下的 `tools\\SuperCom\\SuperCom.exe`；\n"
-        "   - 选择手表的调试串口（如 `COM7`，波特率 `1500000`），点击打开串口。\n"
-        "   - *说明*：内置的 SuperCom 已自动启用后台 AgentBridge 管道服务（`\\\\.\\pipe\\SuperCom.AgentBridge.COM7`），无需手动输入命令。\n"
+        "   - 选择当前手表实际对应的调试串口，波特率设为 `1500000`，点击打开串口。\n"
+        "   - *说明*：内置 SuperCom 已启用 AgentBridge；命名管道尾部随所选端口变化，例如 `COM7` 对应 `\\\\.\\pipe\\SuperCom.AgentBridge.COM7`。\n"
         "2. **第二步（连接 USB MTP）**：\n"
         "   - 手表通过 USB 数据线连接电脑，确保 Windows 资源管理器中可识别到 MTP 手表存储设备（用于自动化截图下载）。\n"
         "3. **第三步（启动测试平台）**：\n"
@@ -550,7 +579,7 @@ def build_exe(
         "## 2. 首次大模型环境配置（.env）\n\n"
         "发布包不会携带开发机的 API 密钥、ONES 身份、串口号、BLE 地址或本机路径：\n"
         "1. 将本目录下的 `.env.example` 复制一份并重命名为 `.env`。\n"
-        "2. 在系统设置中填写大模型与 ONES 配置，或直接编辑 `.env`。\n"
+        "2. 在 `.env` 中填写大模型凭据；ONES 与设备连接也可在系统设置中配置。\n"
         "3. 6202 真机探索和固化用例使用包内相对路径 `profiles`，不需要固件源码工作区。\n"
         "4. 串口和 BLE 设备由系统设置中的实时枚举/扫描选择，不应复制开发机设备标识。\n\n"
         "---\n\n"
