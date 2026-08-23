@@ -55,7 +55,7 @@
       <img id="image-preview-image" alt="">
     </div>
   </dialog>
-  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
+  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 960px; width: 94vw;">
     <form id="system-settings-form">
       <header class="dialog-head">
         <div>
@@ -67,7 +67,7 @@
       <div class="settings-tabs-nav">
         <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">🤖 大模型</button>
         <button type="button" class="settings-tab-btn" data-settings-tab="ones">📋 ONES 平台</button>
-        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机串口</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机连接</button>
       </div>
 
       <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
@@ -177,9 +177,75 @@
               <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">真机截图抓取方式</label>
               <select id="cfg-hw-capture" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
                 <option value="mtp">Windows MTP 传输 (推荐)</option>
-                <option value="serial">串口数据传输</option>
+                <option value="ble">BLE 运行时自动发现 (实验)</option>
               </select>
             </div>
+          </div>
+          <div id="cfg-hw-ble-options" class="ble-device-manager" style="display: none;">
+            <header class="ble-device-manager-head">
+              <div>
+                <strong>手表蓝牙连接</strong>
+                <p>扫描只发现设备；只有点击“连接”才会发起真实 GATT 连接验证。</p>
+              </div>
+              <span class="chip chip-pending">按需连接</span>
+            </header>
+
+            <div class="ble-target-grid">
+              <label for="cfg-hw-ble-address">
+                <span>当前截图目标地址（可选）</span>
+                <input id="cfg-hw-ble-address" type="text" class="input" placeholder="留空时截图任务自动发现唯一手表" autocomplete="off">
+              </label>
+              <label for="cfg-hw-ble-scan-timeout">
+                <span>扫描 / 连接超时（秒）</span>
+                <input id="cfg-hw-ble-scan-timeout" type="number" class="input" min="1" max="60" step="1" value="15">
+              </label>
+            </div>
+
+            <div class="ble-device-search-row">
+              <label class="ble-device-search" for="ble-device-search">
+                <span aria-hidden="true">⌕</span>
+                <input id="ble-device-search" type="search" placeholder="搜索设备名称或地址" autocomplete="off">
+              </label>
+              <button id="btn-scan-ble" class="button button-secondary" type="button">扫描设备</button>
+            </div>
+
+            <div id="ble-connection-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite">
+              <span class="ble-connection-dot" aria-hidden="true"></span>
+              <div>
+                <strong>未选择 BLE 设备</strong>
+                <small>打开设置不会自动扫描或连接</small>
+              </div>
+            </div>
+
+            <div class="ble-device-columns">
+              <section class="ble-device-column" aria-labelledby="ble-discovered-title">
+                <header>
+                  <div>
+                    <strong id="ble-discovered-title">发现设备</strong>
+                    <small>本次手动扫描结果</small>
+                  </div>
+                  <span id="ble-discovered-count" class="chip chip-pending">0 台</span>
+                </header>
+                <div id="ble-discovered-list" class="ble-device-list">
+                  <div class="ble-device-empty">点击“扫描设备”开始发现</div>
+                </div>
+              </section>
+
+              <section class="ble-device-column" aria-labelledby="ble-remembered-title">
+                <header>
+                  <div>
+                    <strong id="ble-remembered-title">已连接过的设备</strong>
+                    <small>仅记录验证成功的设备</small>
+                  </div>
+                  <span id="ble-remembered-count" class="chip chip-pending">0 台</span>
+                </header>
+                <div id="ble-remembered-list" class="ble-device-list">
+                  <div class="ble-device-empty">正在读取连接记录…</div>
+                </div>
+              </section>
+            </div>
+
+            <p class="ble-device-note">连接成功后会立即释放 GATT，不保持后台连接；已连接设备显示的是最近一次真实验证状态。删除只清除本地记录和同地址的当前目标，不会连接或操作手表。</p>
           </div>
         </div>
 

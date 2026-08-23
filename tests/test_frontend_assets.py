@@ -109,6 +109,52 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(text, self.javascript)
         self.assertIn("chip-warning", self.javascript)
 
+    def test_hardware_settings_expose_real_on_demand_ble_device_manager(self) -> None:
+        for token in (
+            '<option value="ble">BLE 运行时自动发现 (实验)</option>',
+            'id="cfg-hw-ble-options"',
+            'id="cfg-hw-ble-address"',
+            'id="cfg-hw-ble-scan-timeout"',
+            'id="ble-device-search"',
+            'placeholder="搜索设备名称或地址"',
+            'id="btn-scan-ble"',
+            'id="ble-connection-status"',
+            'id="ble-discovered-list"',
+            'id="ble-remembered-list"',
+            "已连接过的设备",
+            "不保持后台连接",
+            "删除只清除本地记录",
+        ):
+            self.assertIn(token, self.index)
+        for token in (
+            "async function loadRememberedBleDevices()",
+            "api('/api/hardware/ble/remembered')",
+            "/api/hardware/ble/devices?timeout=",
+            "api('/api/hardware/ble/connect'",
+            "/api/hardware/ble/remembered/${encodeURIComponent(address)}",
+            "data-ble-action=\"connect\"",
+            "data-ble-action=\"delete\"",
+            "bleDeviceMatches",
+            "正在建立真实 GATT 连接并校验手表服务",
+            "真实连接验证成功；连接已释放",
+            "cfg.hardware?.ble_address || ''",
+            "cfg.hardware?.ble_scan_timeout || 15",
+            "ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim()",
+            "ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15",
+        ):
+            self.assertIn(token, self.javascript)
+        load_start = self.javascript.index("async function loadSettings()")
+        load_end = self.javascript.index("openBtn.addEventListener", load_start)
+        initial_load = self.javascript[load_start:load_end]
+        self.assertNotIn("/api/hardware/ble/devices", initial_load)
+        self.assertNotIn("/api/hardware/ble/connect", initial_load)
+        for token in (
+            ".ble-device-columns",
+            ".ble-device-card.is-selected",
+            '.ble-connection-status[data-tone="success"]',
+        ):
+            self.assertIn(token, self.stylesheet)
+
     def test_llm_settings_keep_configuration_runtime_and_probe_independent(self) -> None:
         for token in (
             'id="llm-config-status"',

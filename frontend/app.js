@@ -3329,6 +3329,216 @@ function initSystemSettings() {
 
   if (!dialog || !openBtn) return;
 
+  const hwCaptureSelect = dialog.querySelector('#cfg-hw-capture');
+  const hwBleOptions = dialog.querySelector('#cfg-hw-ble-options');
+  const hwBleAddress = dialog.querySelector('#cfg-hw-ble-address');
+  const hwBleScanTimeout = dialog.querySelector('#cfg-hw-ble-scan-timeout');
+  const bleSearchInput = dialog.querySelector('#ble-device-search');
+  const bleScanButton = dialog.querySelector('#btn-scan-ble');
+  const bleConnectionStatus = dialog.querySelector('#ble-connection-status');
+  const bleDiscoveredList = dialog.querySelector('#ble-discovered-list');
+  const bleRememberedList = dialog.querySelector('#ble-remembered-list');
+  const bleDiscoveredCount = dialog.querySelector('#ble-discovered-count');
+  const bleRememberedCount = dialog.querySelector('#ble-remembered-count');
+  let bleDiscoveredDevices = [];
+  let bleRememberedDevices = [];
+  let bleRememberedLoaded = false;
+  let bleHasScanned = false;
+  let bleBusy = false;
+
+  const bleAddressKey = value => String(value || '').trim().toLocaleLowerCase();
+  const bleTimeout = () => {
+    const value = Number(hwBleScanTimeout?.value || 15);
+    if (!Number.isFinite(value) || value < 1 || value > 60) {
+      throw new Error('BLE 超时必须是 1 到 60 秒之间的数字');
+    }
+    return value;
+  };
+  const setBleConnectionStatus = (tone, title, detail) => {
+    if (!bleConnectionStatus) return;
+    bleConnectionStatus.dataset.tone = tone;
+    const titleNode = bleConnectionStatus.querySelector('strong');
+    const detailNode = bleConnectionStatus.querySelector('small');
+    if (titleNode) titleNode.textContent = title;
+    if (detailNode) detailNode.textContent = detail;
+  };
+  const refreshSelectedBleStatus = () => {
+    const address = String(hwBleAddress?.value || '').trim();
+    if (!address) {
+      setBleConnectionStatus('neutral', '未选择 BLE 设备', '截图时将自动发现唯一匹配手表；当前未保持连接');
+      return;
+    }
+    const remembered = bleRememberedDevices.find(device => bleAddressKey(device.address) === bleAddressKey(address));
+    if (remembered) {
+      const name = remembered.name || '未命名手表';
+      const at = remembered.last_connected_at ? formatTime(remembered.last_connected_at) : '时间未知';
+      setBleConnectionStatus('success', `${name} · ${address}`, `最近真实连接验证成功于 ${at}；当前未保持连接`);
+      return;
+    }
+    setBleConnectionStatus('neutral', `已填写目标 · ${address}`, '尚无成功连接记录；截图任务需要时才会尝试连接');
+  };
+  const setBleBusy = busy => {
+    bleBusy = busy;
+    if (hwBleOptions) hwBleOptions.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (bleScanButton) bleScanButton.disabled = busy;
+    hwBleOptions?.querySelectorAll('[data-ble-action]').forEach(button => {
+      button.disabled = busy;
+    });
+  };
+  const bleDeviceMatches = (device, query) => {
+    const needle = String(query || '').trim().toLocaleLowerCase();
+    if (!needle) return true;
+    return String(device.address || '').toLocaleLowerCase().includes(needle)
+      || String(device.name || '').toLocaleLowerCase().includes(needle);
+  };
+  const bleDeviceRow = (device, kind) => {
+    const address = String(device.address || '').trim();
+    const name = String(device.name || '').trim() || '未命名手表';
+    const selected = bleAddressKey(address) === bleAddressKey(hwBleAddress?.value);
+    const remembered = bleRememberedDevices.some(item => bleAddressKey(item.address) === bleAddressKey(address));
+    const hasRssi = device.rssi !== null && device.rssi !== undefined && Number.isFinite(Number(device.rssi));
+    const meta = kind === 'discovered'
+      ? (hasRssi ? `信号 ${Number(device.rssi)} dBm` : '信号强度未知')
+      : `最近验证 ${device.last_connected_at ? formatTime(device.last_connected_at) : '时间未知'}`;
+    const actions = kind === 'discovered'
+      ? `<button class="ble-device-action is-primary" type="button" data-ble-action="connect" data-address="${escapeHtml(address)}" data-name="${escapeHtml(name === '未命名手表' ? '' : name)}" ${bleBusy ? 'disabled' : ''}>${remembered ? '重新验证' : '连接'}</button>`
+      : `<button class="ble-device-action" type="button" data-ble-action="select" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>${selected ? '当前目标' : '设为目标'}</button><button class="ble-device-action is-danger" type="button" data-ble-action="delete" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>删除</button>`;
+    return `<article class="ble-device-card ${selected ? 'is-selected' : ''}">
+      <div class="ble-device-card-copy"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(address)}</code><small>${escapeHtml(meta)} · ${kind === 'discovered' ? '已发现，未连接' : '已验证，按需连接'}</small></div>
+      <div class="ble-device-card-actions">${actions}</div>
+    </article>`;
+  };
+  const renderBleDevices = () => {
+    const query = bleSearchInput?.value || '';
+    const discovered = bleDiscoveredDevices.filter(device => bleDeviceMatches(device, query));
+    const remembered = bleRememberedDevices.filter(device => bleDeviceMatches(device, query));
+    if (bleDiscoveredCount) bleDiscoveredCount.textContent = `${discovered.length} 台`;
+    if (bleRememberedCount) bleRememberedCount.textContent = `${remembered.length} 台`;
+    if (bleDiscoveredList) {
+      const emptyText = !bleHasScanned
+        ? '点击“扫描设备”开始发现'
+        : (bleDiscoveredDevices.length && query ? '没有匹配名称或地址的发现设备' : '本次扫描未发现匹配手表');
+      bleDiscoveredList.innerHTML = discovered.length
+        ? discovered.map(device => bleDeviceRow(device, 'discovered')).join('')
+        : `<div class="ble-device-empty">${escapeHtml(emptyText)}</div>`;
+    }
+    if (bleRememberedList) {
+      const emptyText = bleRememberedDevices.length && query
+        ? '没有匹配名称或地址的连接记录'
+        : '还没有通过真实连接验证的设备';
+      bleRememberedList.innerHTML = remembered.length
+        ? remembered.map(device => bleDeviceRow(device, 'remembered')).join('')
+        : `<div class="ble-device-empty">${escapeHtml(emptyText)}</div>`;
+    }
+  };
+  async function loadRememberedBleDevices() {
+    try {
+      const data = await api('/api/hardware/ble/remembered');
+      bleRememberedDevices = Array.isArray(data.items) ? data.items : [];
+      bleRememberedLoaded = true;
+      renderBleDevices();
+      refreshSelectedBleStatus();
+    } catch (error) {
+      bleRememberedDevices = [];
+      bleRememberedLoaded = false;
+      if (bleRememberedList) {
+        bleRememberedList.innerHTML = `<div class="ble-device-empty">读取连接记录失败：${escapeHtml(error.message)}</div>`;
+      }
+      setBleConnectionStatus('error', 'BLE 状态读取失败', error.message);
+    }
+  }
+  const syncBleOptions = () => {
+    if (hwBleOptions) {
+      hwBleOptions.style.display = hwCaptureSelect?.value === 'ble' ? 'grid' : 'none';
+    }
+  };
+  hwCaptureSelect?.addEventListener('change', () => {
+    syncBleOptions();
+    if (hwCaptureSelect.value === 'ble' && !bleRememberedLoaded) {
+      void loadRememberedBleDevices();
+    }
+  });
+  bleSearchInput?.addEventListener('input', renderBleDevices);
+  hwBleAddress?.addEventListener('input', () => {
+    renderBleDevices();
+    refreshSelectedBleStatus();
+  });
+
+  bleScanButton?.addEventListener('click', async () => {
+    const originalText = bleScanButton.textContent;
+    try {
+      const timeout = bleTimeout();
+      setBleBusy(true);
+      bleScanButton.textContent = '正在扫描…';
+      setBleConnectionStatus('pending', '正在扫描附近手表', '扫描只读取 BLE 广播，不会连接设备');
+      const query = String(bleSearchInput?.value || '').trim();
+      const data = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(timeout)}&q=${encodeURIComponent(query)}`);
+      bleDiscoveredDevices = Array.isArray(data.items) ? data.items : [];
+      bleHasScanned = true;
+      renderBleDevices();
+      refreshSelectedBleStatus();
+      showToast(`BLE 扫描完成，发现 ${bleDiscoveredDevices.length} 台匹配手表`);
+    } catch (error) {
+      setBleConnectionStatus('error', 'BLE 扫描失败', error.message);
+      showToast(error.message, 'error');
+    } finally {
+      setBleBusy(false);
+      bleScanButton.textContent = originalText;
+      renderBleDevices();
+    }
+  });
+
+  hwBleOptions?.addEventListener('click', async event => {
+    const button = event.target.closest('button[data-ble-action]');
+    if (!button || bleBusy) return;
+    const action = button.dataset.bleAction;
+    const address = String(button.dataset.address || '').trim();
+    if (!address) return;
+    try {
+      setBleBusy(true);
+      if (action === 'connect') {
+        const name = String(button.dataset.name || '').trim();
+        setBleConnectionStatus('pending', `正在连接 ${name || address}`, '正在建立真实 GATT 连接并校验手表服务…');
+        const data = await api('/api/hardware/ble/connect', {
+          method: 'POST',
+          body: JSON.stringify({address, name, timeout: bleTimeout()}),
+        });
+        if (!data.verified) throw new Error(data.error || 'BLE 连接未通过验证');
+        if (hwBleAddress) hwBleAddress.value = data.device?.address || address;
+        await loadRememberedBleDevices();
+        const verifiedName = data.device?.name || name || '未命名手表';
+        setBleConnectionStatus('success', `${verifiedName} · ${address}`, '真实连接验证成功；连接已释放，后续按需使用');
+        showToast('BLE 真实连接验证成功，已设为当前截图目标');
+      } else if (action === 'select') {
+        await api('/api/config', {
+          method: 'POST',
+          body: JSON.stringify({hardware: {ble_address: address}}),
+        });
+        if (hwBleAddress) hwBleAddress.value = address;
+        bleRememberedDevices = bleRememberedDevices.map(device => ({
+          ...device,
+          selected: bleAddressKey(device.address) === bleAddressKey(address),
+        }));
+        renderBleDevices();
+        refreshSelectedBleStatus();
+        showToast('已设为 BLE 截图目标；当前不会主动连接');
+      } else if (action === 'delete') {
+        const data = await api(`/api/hardware/ble/remembered/${encodeURIComponent(address)}`, {method: 'DELETE'});
+        bleRememberedDevices = bleRememberedDevices.filter(device => bleAddressKey(device.address) !== bleAddressKey(address));
+        if (hwBleAddress && data.selected_address !== undefined) hwBleAddress.value = data.selected_address;
+        renderBleDevices();
+        refreshSelectedBleStatus();
+        showToast('已删除本地 BLE 连接记录；未连接或操作手表');
+      }
+    } catch (error) {
+      setBleConnectionStatus('error', action === 'connect' ? 'BLE 连接失败' : 'BLE 操作失败', error.message);
+      showToast(error.message, 'error');
+    } finally {
+      setBleBusy(false);
+      renderBleDevices();
+    }
+  });
+
   const setLlmSignal = (element, text, tone = 'neutral') => {
     if (!element) return;
     element.textContent = text;
@@ -3365,6 +3575,12 @@ function initSystemSettings() {
 
   async function loadSettings() {
     if (errorBox) errorBox.style.display = 'none';
+    bleDiscoveredDevices = [];
+    bleRememberedDevices = [];
+    bleRememberedLoaded = false;
+    bleHasScanned = false;
+    if (bleSearchInput) bleSearchInput.value = '';
+    renderBleDevices();
     try {
       const resp = await fetch('/api/config');
       if (!resp.ok) throw new Error('读取系统配置失败');
@@ -3410,6 +3626,10 @@ function initSystemSettings() {
       if (hwBaud) hwBaud.value = cfg.hardware?.baudrate || 1500000;
       if (hwTrans) hwTrans.value = cfg.hardware?.transport || 'supercom';
       if (hwCap) hwCap.value = cfg.hardware?.capture_provider || 'mtp';
+      if (hwBleAddress) hwBleAddress.value = cfg.hardware?.ble_address || '';
+      if (hwBleScanTimeout) hwBleScanTimeout.value = cfg.hardware?.ble_scan_timeout || 15;
+      syncBleOptions();
+      await loadRememberedBleDevices();
     } catch (err) {
       if (errorBox) {
         errorBox.textContent = `读取配置失败: ${err.message}`;
@@ -3543,6 +3763,8 @@ function initSystemSettings() {
           baudrate: Number(document.querySelector('#cfg-hw-baudrate')?.value) || 1500000,
           transport: document.querySelector('#cfg-hw-transport')?.value || 'supercom',
           capture_provider: document.querySelector('#cfg-hw-capture')?.value || 'mtp',
+          ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim(),
+          ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15,
         },
       };
 

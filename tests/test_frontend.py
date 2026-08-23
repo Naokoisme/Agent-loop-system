@@ -8,9 +8,9 @@ import threading
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from urllib.error import HTTPError
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 from frontend.server import (
@@ -536,6 +536,10 @@ class FrontendDataTest(unittest.TestCase):
             method="POST",
         )
         return urlopen(request, timeout=3)
+
+    @staticmethod
+    def _delete_json(url: str):
+        return urlopen(Request(url, method="DELETE"), timeout=3)
 
     def test_defect_detail_keeps_read_only_source_and_case_compatibility(self) -> None:
         detail = self.defects.get("100")
@@ -3092,6 +3096,8 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
             self.assertEqual(cfg["hardware"]["profile_root"], str(self.paths.root / "profiles"))
+            self.assertIn("ble_address", cfg["hardware"])
+            self.assertEqual(cfg["hardware"]["ble_scan_timeout"], 15.0)
             self.assertNotIn("hardware_source_root", cfg["simulator"])
             self.assertNotIn("hardware_workspace_root", cfg["simulator"])
             self.assertTrue(cfg["llm"]["configured"])
@@ -3121,11 +3127,21 @@ class FrontendDataTest(unittest.TestCase):
             
         post_cfg = {
             "llm": {"model": "gpt-4o-mini", "timeout": 60},
+            "hardware": {
+                "capture_provider": "ble",
+                "ble_address": "",
+                "ble_scan_timeout": 12,
+            },
         }
         with self._post_json(base + "/api/config", post_cfg) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
+        with urlopen(base + "/api/config", timeout=3) as resp:
+            cfg = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(cfg["hardware"]["capture_provider"], "ble")
+            self.assertEqual(cfg["hardware"]["ble_address"], "")
+            self.assertEqual(cfg["hardware"]["ble_scan_timeout"], 12.0)
             
         # 5. LLM Connectivity check
         with patch("agent_loop_system.tools.llm_config.test_llm_connectivity", return_value={"ok": True, "latency_ms": 120, "model": "gpt-5.6-sol", "message": "连接成功"}):
@@ -3145,6 +3161,124 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
+
+    def test_ble_device_manager_scans_connects_remembers_and_forgets(self) -> None:
+        _, base = self._server()
+        discovered = [
+            SimpleNamespace(
+                address="42:74:DC:C8:0A:02",
+                name="oraimo Watch Tank N",
+                rssi=-48,
+            ),
+            SimpleNamespace(
+                address="11:22:33:44:55:66",
+                name="oraimo Watch Tank N Pro",
+                rssi=-71,
+            ),
+        ]
+        scan_mock = AsyncMock(return_value=discovered)
+        with (
+            patch("frontend.server.scan_watches", scan_mock),
+            patch("frontend.server.WatchBleClient") as client_type,
+        ):
+            query = urlencode({"q": "c8:0a", "timeout": "3"})
+            with urlopen(base + f"/api/hardware/ble/devices?{query}", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(len(data["items"]), 1)
+            self.assertEqual(data["items"][0]["address"], "42:74:DC:C8:0A:02")
+            self.assertEqual(data["items"][0]["status"], "discovered")
+            self.assertFalse(data["items"][0]["connected"])
+            scan_mock.assert_awaited_once_with(timeout=3.0, address=None)
+            client_type.assert_not_called()
+
+        fake_client = SimpleNamespace(
+            connect=AsyncMock(return_value=None),
+            close=AsyncMock(return_value=None),
+            connected=True,
+        )
+        with patch("frontend.server.WatchBleClient", return_value=fake_client) as client_type:
+            with self._post_json(
+                base + "/api/hardware/ble/connect",
+                {
+                    "address": "42:74:DC:C8:0A:02",
+                    "name": "oraimo Watch Tank N",
+                    "timeout": 4,
+                },
+            ) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertTrue(data["verified"])
+            self.assertFalse(data["connected"])
+            self.assertEqual(data["connection_mode"], "on_demand")
+            self.assertEqual(data["device"]["status"], "verified")
+            client_type.assert_called_once()
+            fake_client.connect.assert_awaited_once_with(pair=False)
+            fake_client.close.assert_awaited_once_with()
+
+        remembered_path = self.paths.root / ".runtime" / "ble-devices.json"
+        remembered_payload = json.loads(remembered_path.read_text(encoding="utf-8"))
+        self.assertEqual(remembered_payload["schema_version"], 1)
+        self.assertEqual(len(remembered_payload["items"]), 1)
+        self.assertEqual(
+            remembered_payload["items"][0]["address"],
+            "42:74:DC:C8:0A:02",
+        )
+        self.assertEqual(
+            os.environ["W30_HARDWARE_BLE_ADDRESS"],
+            "42:74:DC:C8:0A:02",
+        )
+
+        with (
+            patch("frontend.server.scan_watches", new=AsyncMock()) as scan_again,
+            patch("frontend.server.WatchBleClient") as client_again,
+        ):
+            with urlopen(base + "/api/hardware/ble/remembered", timeout=3) as resp:
+                remembered = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(len(remembered["items"]), 1)
+            self.assertTrue(remembered["items"][0]["selected"])
+            self.assertEqual(remembered["items"][0]["status"], "verified")
+            self.assertFalse(remembered["items"][0]["connected"])
+            scan_again.assert_not_awaited()
+            client_again.assert_not_called()
+
+        failed_client = SimpleNamespace(
+            connect=AsyncMock(side_effect=RuntimeError("device unavailable")),
+            close=AsyncMock(return_value=None),
+            connected=False,
+        )
+        with patch("frontend.server.WatchBleClient", return_value=failed_client):
+            with self.assertRaises(HTTPError) as context:
+                self._post_json(
+                    base + "/api/hardware/ble/connect",
+                    {
+                        "address": "AA:BB:CC:DD:EE:FF",
+                        "name": "unavailable watch",
+                        "timeout": 2,
+                    },
+                )
+            self.assertEqual(context.exception.code, 502)
+            error = json.loads(context.exception.read().decode("utf-8"))
+            self.assertFalse(error["verified"])
+            failed_client.close.assert_awaited_once_with()
+        remembered_payload = json.loads(remembered_path.read_text(encoding="utf-8"))
+        self.assertEqual(len(remembered_payload["items"]), 1)
+
+        address = quote("42:74:DC:C8:0A:02", safe="")
+        with (
+            patch("frontend.server.scan_watches", new=AsyncMock()) as passive_scan,
+            patch("frontend.server.WatchBleClient") as passive_client,
+        ):
+            with self._delete_json(base + f"/api/hardware/ble/remembered/{address}") as resp:
+                deleted = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(deleted["deleted"])
+            self.assertEqual(deleted["selected_address"], "")
+            passive_scan.assert_not_awaited()
+            passive_client.assert_not_called()
+        self.assertEqual(os.environ["W30_HARDWARE_BLE_ADDRESS"], "")
+        with urlopen(base + "/api/hardware/ble/remembered", timeout=3) as resp:
+            remembered = json.loads(resp.read().decode("utf-8"))
+        self.assertEqual(remembered["items"], [])
 
 
 if __name__ == "__main__":

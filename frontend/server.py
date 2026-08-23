@@ -5,10 +5,12 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import base64
 import copy
 import hashlib
 import io
+import math
 import openpyxl
 from agent_loop_system.tools.update_checker import (
     check_for_updates,
@@ -43,6 +45,12 @@ from agent_loop_system.tools.command_protocol import normalize_command
 from agent_loop_system.tools.external_execution_history import (
     read_external_execution_history,
 )
+from agent_loop_system.tools.watch_ble import (
+    WatchBleClient,
+    WatchBleConnectionError,
+    WatchBleDevice,
+    scan_watches,
+)
 
 
 WORKFLOW_NODES = (
@@ -62,6 +70,7 @@ DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 BATCH_STATE_FILE = "batch-state.json"
 BATCH_CASES_FILE = "batch-cases.json"
 PROMOTION_STATE_FILE = "promotion-state.json"
+BLE_DEVICE_STORE_FILE = "ble-devices.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
 TEST_PROJECTS: dict[str, dict[str, str]] = {
     "620C_W6830": {
@@ -3327,6 +3336,7 @@ class WebApplication:
         self.cases = CaseMapRepository(paths, self.test_history)
         self.jobs = JobManager(paths, self.defects, self.history)
         self.test_jobs = CaseTestManager(paths, self.cases, self.test_history)
+        self.ble_devices = BleDeviceManager(paths)
         self._execution_lock = threading.Lock()
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
@@ -3725,6 +3735,10 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "baudrate": int(os.environ.get("W30_HARDWARE_BAUDRATE", 1500000)),
             "transport": os.environ.get("W30_HARDWARE_TRANSPORT", "supercom"),
             "capture_provider": os.environ.get("W30_HARDWARE_CAPTURE_PROVIDER", "mtp"),
+            "ble_address": os.environ.get("W30_HARDWARE_BLE_ADDRESS", ""),
+            "ble_scan_timeout": float(
+                os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")
+            ),
             "profile_root": os.environ.get(
                 "W30_HARDWARE_PROFILE_ROOT",
                 str(paths.root / "profiles"),
@@ -3774,6 +3788,10 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_TRANSPORT"] = str(hw["transport"])
         if "capture_provider" in hw and hw["capture_provider"] is not None:
             env_updates["W30_HARDWARE_CAPTURE_PROVIDER"] = str(hw["capture_provider"])
+        if "ble_address" in hw and hw["ble_address"] is not None:
+            env_updates["W30_HARDWARE_BLE_ADDRESS"] = str(hw["ble_address"])
+        if "ble_scan_timeout" in hw and hw["ble_scan_timeout"] is not None:
+            env_updates["W30_HARDWARE_BLE_SCAN_TIMEOUT"] = str(hw["ble_scan_timeout"])
         if "profile_root" in hw and hw["profile_root"] is not None:
             env_updates["W30_HARDWARE_PROFILE_ROOT"] = str(hw["profile_root"])
         if "profile_version" in hw and hw["profile_version"] is not None:
@@ -3814,6 +3832,247 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             new_lines.append(f"{k}={v}")
             
     env_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+
+class BleDeviceManager:
+    """On-demand BLE discovery, real connection checks, and local device memory."""
+
+    def __init__(self, paths: AppPaths):
+        self.paths = paths
+        self._operation_lock = threading.Lock()
+        self._store_lock = threading.Lock()
+
+    @property
+    def store_path(self) -> Path:
+        return self.paths.root / ".runtime" / BLE_DEVICE_STORE_FILE
+
+    @staticmethod
+    def _timeout(value: Any) -> float:
+        if isinstance(value, bool):
+            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字")
+        try:
+            timeout = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字") from exc
+        if not math.isfinite(timeout) or not 1 <= timeout <= 60:
+            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字")
+        return timeout
+
+    @staticmethod
+    def _address(value: Any) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("BLE 设备地址不能为空")
+        address = value.strip()
+        if len(address) > 200:
+            raise ValueError("BLE 设备地址过长")
+        return address
+
+    @staticmethod
+    def _name(value: Any) -> str | None:
+        if value is None:
+            return None
+        if not isinstance(value, str):
+            raise ValueError("BLE 设备名称必须是字符串")
+        name = value.strip()
+        if len(name) > 200:
+            raise ValueError("BLE 设备名称过长")
+        return name or None
+
+    @staticmethod
+    def _address_key(address: str) -> str:
+        return address.strip().casefold()
+
+    def _load_unlocked(self) -> list[dict[str, Any]]:
+        raw = _read_json(self.store_path, {})
+        values = raw.get("items", []) if isinstance(raw, dict) else []
+        if not isinstance(values, list):
+            return []
+        items: dict[str, dict[str, Any]] = {}
+        for value in values:
+            if not isinstance(value, dict):
+                continue
+            address = value.get("address")
+            if not isinstance(address, str) or not address.strip():
+                continue
+            clean_address = address.strip()
+            key = self._address_key(clean_address)
+            items[key] = {
+                "address": clean_address,
+                "name": str(value.get("name") or "").strip() or None,
+                "first_connected_at": str(value.get("first_connected_at") or ""),
+                "last_connected_at": str(value.get("last_connected_at") or ""),
+            }
+        return sorted(
+            items.values(),
+            key=lambda item: str(item.get("last_connected_at") or ""),
+            reverse=True,
+        )
+
+    def _write_unlocked(self, items: list[dict[str, Any]]) -> None:
+        _write_json(
+            self.store_path,
+            {"schema_version": 1, "items": items},
+        )
+
+    def remembered(self) -> dict[str, Any]:
+        with self._store_lock:
+            items = self._load_unlocked()
+        selected_address = os.environ.get("W30_HARDWARE_BLE_ADDRESS", "").strip()
+        selected_key = self._address_key(selected_address)
+        return {
+            "items": [
+                {
+                    **item,
+                    "status": "verified",
+                    "connected": False,
+                    "selected": bool(
+                        selected_key
+                        and self._address_key(str(item["address"])) == selected_key
+                    ),
+                }
+                for item in items
+            ],
+            "selected_address": selected_address,
+            "connection_mode": "on_demand",
+        }
+
+    def scan(self, *, query: str = "", timeout: Any = 15) -> dict[str, Any]:
+        query = str(query or "").strip()
+        if len(query) > 200:
+            raise ValueError("BLE 搜索内容过长")
+        scan_timeout = self._timeout(timeout)
+        address_hint = (
+            query
+            if re.fullmatch(r"(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}", query)
+            else None
+        )
+        with self._operation_lock:
+            devices = asyncio.run(
+                scan_watches(timeout=scan_timeout, address=address_hint)
+            )
+        items = [
+            {
+                "address": device.address,
+                "name": device.name,
+                "rssi": device.rssi,
+                "status": "discovered",
+                "connected": False,
+            }
+            for device in devices
+        ]
+        if query:
+            needle = query.casefold()
+            items = [
+                item
+                for item in items
+                if needle in str(item["address"]).casefold()
+                or needle in str(item.get("name") or "").casefold()
+            ]
+        return {"items": items, "scanned_at": _now(), "query": query}
+
+    @staticmethod
+    async def _verify_connection(
+        *,
+        address: str,
+        name: str | None,
+        timeout: float,
+    ) -> None:
+        client = WatchBleClient(
+            WatchBleDevice(address=address, name=name),
+            timeout=timeout,
+        )
+        try:
+            await asyncio.wait_for(client.connect(pair=False), timeout=timeout)
+            if not client.connected:
+                raise WatchBleConnectionError("BLE GATT 连接未进入已连接状态")
+        finally:
+            try:
+                await asyncio.wait_for(client.close(), timeout=min(timeout, 5.0))
+            except Exception:
+                # The explicit connection probe must not leave cleanup failures unobserved
+                # by holding the HTTP request forever. WatchBleClient.close is itself
+                # idempotent and best-effort.
+                pass
+
+    def connect(
+        self,
+        *,
+        address: Any,
+        name: Any = None,
+        timeout: Any = 15,
+    ) -> dict[str, Any]:
+        clean_address = self._address(address)
+        clean_name = self._name(name)
+        connect_timeout = self._timeout(timeout)
+        with self._operation_lock:
+            asyncio.run(
+                self._verify_connection(
+                    address=clean_address,
+                    name=clean_name,
+                    timeout=connect_timeout,
+                )
+            )
+
+        connected_at = _now()
+        key = self._address_key(clean_address)
+        with self._store_lock:
+            items = self._load_unlocked()
+            existing = next(
+                (
+                    item
+                    for item in items
+                    if self._address_key(str(item["address"])) == key
+                ),
+                None,
+            )
+            item = {
+                "address": clean_address,
+                "name": clean_name or (existing or {}).get("name"),
+                "first_connected_at": (existing or {}).get("first_connected_at")
+                or connected_at,
+                "last_connected_at": connected_at,
+            }
+            remaining = [
+                value
+                for value in items
+                if self._address_key(str(value["address"])) != key
+            ]
+            self._write_unlocked([item, *remaining])
+
+        # A successful explicit connection also selects the device for later
+        # on-demand BLE screenshots. No persistent GATT connection is kept.
+        _save_system_config(
+            self.paths,
+            {"hardware": {"ble_address": clean_address}},
+        )
+        return {
+            **item,
+            "status": "verified",
+            "verified": True,
+            "connected": False,
+            "selected": True,
+            "connection_mode": "on_demand",
+        }
+
+    def forget(self, address: Any) -> dict[str, Any]:
+        clean_address = self._address(address)
+        key = self._address_key(clean_address)
+        with self._store_lock:
+            items = self._load_unlocked()
+            remaining = [
+                item
+                for item in items
+                if self._address_key(str(item["address"])) != key
+            ]
+            deleted = len(remaining) != len(items)
+            if deleted:
+                self._write_unlocked(remaining)
+
+        selected_address = os.environ.get("W30_HARDWARE_BLE_ADDRESS", "").strip()
+        if selected_address and self._address_key(selected_address) == key:
+            _save_system_config(self.paths, {"hardware": {"ble_address": ""}})
+            selected_address = ""
+        return {"deleted": deleted, "selected_address": selected_address}
 
 
 def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
@@ -4683,6 +4942,32 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json(_get_system_config(self.app.paths))
             return
 
+        if path == "/api/hardware/ble/devices":
+            query_text = query.get("q", [""])[0]
+            timeout = query.get(
+                "timeout",
+                [os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")],
+            )[0]
+            try:
+                result = self.app.ble_devices.scan(
+                    query=query_text,
+                    timeout=timeout,
+                )
+            except ValueError:
+                raise
+            except Exception as exc:
+                self._json(
+                    {"error": f"BLE 扫描失败: {exc}"},
+                    HTTPStatus.BAD_GATEWAY,
+                )
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/remembered":
+            self._json(self.app.ble_devices.remembered())
+            return
+
         if path == "/api/update-check":
             cur_ver = get_current_system_version()
             try:
@@ -5194,6 +5479,43 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"status": "ok", "message": "系统设置已保存并生效"})
             return
 
+        if path == "/api/hardware/ble/connect":
+            body = self._body_json()
+            try:
+                device = self.app.ble_devices.connect(
+                    address=body.get("address"),
+                    name=body.get("name"),
+                    timeout=body.get(
+                        "timeout",
+                        os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15"),
+                    ),
+                )
+            except ValueError:
+                raise
+            except Exception as exc:
+                self._json(
+                    {
+                        "ok": False,
+                        "verified": False,
+                        "connected": False,
+                        "connection_mode": "on_demand",
+                        "error": f"BLE 连接验证失败: {exc}",
+                    },
+                    HTTPStatus.BAD_GATEWAY,
+                )
+                return
+            self._json(
+                {
+                    "ok": True,
+                    "verified": True,
+                    "connected": False,
+                    "connection_mode": "on_demand",
+                    "device": device,
+                    "message": "真实 BLE 连接验证成功；连接已释放，后续按需使用",
+                }
+            )
+            return
+
         if path == "/api/defects/import":
             body = self._body_json()
             include_completed = body.get("include_completed", False)
@@ -5424,6 +5746,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
         query = parse_qs(parsed.query)
+        match = re.fullmatch(r"/api/hardware/ble/remembered/([^/]+)", path)
+        if match:
+            result = self.app.ble_devices.forget(match.group(1))
+            self._json(
+                result,
+                HTTPStatus.OK if result["deleted"] else HTTPStatus.NOT_FOUND,
+            )
+            return
         match = re.fullmatch(r"/api/test-history/([^/]+)/([^/]+)/([^/]+)", path)
         if match:
             project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
