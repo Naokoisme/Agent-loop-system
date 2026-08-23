@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -17,7 +18,8 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_source_location_panel_is_collapsible_and_large_results_start_closed(self) -> None:
         self.assertIn('<details class="panel collapsible-panel"', self.javascript)
-        self.assertIn("sourceMatches.length < 3", self.javascript)
+        self.assertIn("<div><h2>诊断信息</h2><p>源码位置</p></div>", self.javascript)
+        self.assertNotIn("sourceMatches.length < 3", self.javascript)
         self.assertIn('.collapse-action::after { content: "展开 ↓"; }', self.stylesheet)
         self.assertIn(".collapsible-panel[open]", self.stylesheet)
 
@@ -55,8 +57,10 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.stylesheet)
 
     def test_defect_navigation_is_named_ones_defect_list(self) -> None:
-        self.assertIn("ONES缺陷列表", self.index)
-        self.assertIn("ONES缺陷列表", self.javascript)
+        self.assertIn("ONES 缺陷", self.index)
+        self.assertIn("ONES 缺陷", self.javascript)
+        self.assertNotIn("ONES缺陷列表", self.index)
+        self.assertNotIn("ONES缺陷列表", self.javascript)
         self.assertNotIn("缺陷闭环", self.index)
         self.assertNotIn("缺陷闭环", self.javascript)
 
@@ -71,13 +75,14 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_second_run_resets_workflow_without_replacing_status_node(self) -> None:
         self.assertIn("updateWorkflow({});", self.javascript)
         self.assertIn("setResultChip(chip, job.verdict);", self.javascript)
-        self.assertIn("chip.textContent = '任务已创建';", self.javascript)
+        self.assertIn("chip.textContent = '正在启动';", self.javascript)
+        self.assertNotIn("chip.textContent = '任务已创建';", self.javascript)
         self.assertNotIn("chip.outerHTML = resultChip", self.javascript)
 
     def test_history_refresh_waits_until_record_is_saved(self) -> None:
         self.assertIn("job.status === 'finalizing'", self.javascript)
         self.assertIn("保存记录中", self.javascript)
-        self.assertIn("正在保存修复历史", self.javascript)
+        self.assertIn("修复已结束，正在保存结果", self.javascript)
         self.assertIn("historyPayload.history", self.javascript)
 
     def test_history_uses_canonical_evidence_and_explicit_legacy_state(self) -> None:
@@ -88,8 +93,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "record?.legacy_record",
             "本次记录保存异常：缺少",
             "当前版本符合预期，本次无需修改代码",
-            "LLM 思考步骤",
-            "复现 Agent 每轮输出的决策理由",
+            "分析过程",
+            "每一步的判断依据",
         ):
             self.assertIn(token, self.javascript)
         self.assertNotIn("record.test_result?.results", self.javascript)
@@ -118,21 +123,135 @@ class FrontendAssetsTest(unittest.TestCase):
             "/api/run/active",
             "restoreActiveRepair",
             "await restoreActiveRepair(String(defect.number))",
-            "已找回任务",
+            "修复仍在运行，已恢复最新进度",
             "其他任务运行中",
             "正在修复…",
         ):
             self.assertIn(token, self.javascript)
 
     def test_visible_product_copy_is_chinese_and_tristate_is_distinct(self) -> None:
-        self.assertIn("自动化测试平台", self.index)
-        for text in ("已通过", "失败", "无法验证", "未运行", "生成方案", "代码改动", "修复前", "修复后"):
+        self.assertIn("Agent-loop 自动化测试", self.index)
+        for text in ("已通过", "失败", "执行异常", "无法验证", "未运行", "生成自动化步骤", "代码改动", "修复前", "修复后"):
             self.assertIn(text, self.javascript)
         self.assertIn("chip-warning", self.javascript)
 
+    def test_visible_chinese_copy_uses_chinese_punctuation(self) -> None:
+        combined = self.index + self.javascript
+        for text in (
+            "模型：",
+            "服务地址：",
+            "账号（邮箱）",
+            "例如：",
+            "新增用例：",
+            "文件（.xlsx）",
+        ):
+            with self.subTest(text=text):
+                self.assertIn(text, combined)
+
+        for text in ("模型:", "服务地址:", "账号 (邮箱)", "例如:", "新增用例:", "文件 (.xlsx)"):
+            with self.subTest(text=text):
+                self.assertNotIn(text, combined)
+
+    def test_default_markup_does_not_expose_api_routes_or_engineering_explanations(self) -> None:
+        html_line = re.compile(
+            r"<(?:article|aside|button|details|div|form|h[1-6]|header|label|li|p|section|small|span|summary|table)\b"
+        )
+        visible_markup = "\n".join(
+            line
+            for source in (self.index, self.javascript)
+            for line in source.splitlines()
+            if html_line.search(line)
+        )
+        self.assertNotIn("/api/", visible_markup)
+
+        for text in (
+            "已固化、Agent-loop 可执行",
+            "分类依据探索账本和正式 case_map",
+            "当前后端未提供",
+            "未伪造历史趋势",
+            "空缺项不以 0 冒充",
+            "运行期间每 2 秒",
+            "Runner 自动加入",
+            "写入 PROMOTED",
+            "安全防御拦截（DIVERGED）",
+            "actions 实际尝试",
+            "证据合同完整",
+            "Socket 命令通道",
+            "SuperCom 命名管道",
+            "USB MTP 截图",
+            "历史执行异常",
+            "新建修复任务",
+            "任务 ID",
+        ):
+            with self.subTest(text=text):
+                self.assertNotIn(text, self.index + self.javascript)
+
+    def test_test_detail_primary_markup_uses_product_language(self) -> None:
+        render_start = self.javascript.index("async function renderTest(sheet, caseId)")
+        markup_start = self.javascript.index("app.innerHTML = `", render_start)
+        markup_end = self.javascript.index("\n\n  const promoteBtn", markup_start)
+        primary_markup = self.javascript[markup_start:markup_end]
+
+        for text in ("用例内容", "自动化步骤", "首次运行", "测试进度", "验证并保存步骤"):
+            self.assertIn(text, primary_markup)
+        for text in (
+            "/api/",
+            "PROMOTED",
+            "DIVERGED",
+            "case_map",
+            "Runner",
+            "evidence_contract",
+            "command_trace",
+            "promotion_flow",
+            "job_id",
+        ):
+            with self.subTest(text=text):
+                self.assertNotIn(text, primary_markup)
+
+    def test_errors_keep_raw_diagnostics_behind_product_summaries(self) -> None:
+        for token in (
+            "function issuePresentation(",
+            "服务暂时不可用，请稍后重试。",
+            "无法连接服务，请检查服务状态后重试。",
+            "error.diagnosticMessage = diagnosticMessage;",
+            "error.code = 'NETWORK_ERROR';",
+            "error.payload = payload;",
+            "FileNotFoundError",
+            '<details class="import-log-details"><summary>诊断信息',
+            '<details class="inline-diagnostics"><summary>诊断信息</summary>',
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_destructive_confirmations_explain_irreversible_effects(self) -> None:
+        for token in (
+            "已执行的设备操作无法撤回",
+            "之后可继续剩余用例",
+            "删除后无法恢复",
+            "当前用例完成后暂停",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_environment_checks_use_product_summaries_with_collapsed_diagnostics(self) -> None:
+        for token in (
+            "const ENVIRONMENT_CHECK_COPY",
+            "function environmentCheckPresentation(",
+            "function environmentLogRows(",
+            "项目文件需要配置",
+            "测试程序尚未准备好",
+            "模型服务尚未配置或不可用",
+            "环境检查完成：${health.label}",
+            "environmentLogRows(environmentItem.logs, targetHealth)",
+            "检查操作、截图和必要服务是否可用",
+            "可用项",
+            "<summary>诊断信息</summary>",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (".environment-check-detail", ".environment-log .inline-diagnostics"):
+            self.assertIn(token, self.stylesheet)
+
     def test_hardware_settings_expose_real_on_demand_ble_device_manager(self) -> None:
         for token in (
-            '<option value="ble">BLE 运行时自动发现 (实验)</option>',
+            '<option value="ble">通过蓝牙获取截图（实验）</option>',
             'id="cfg-hw-ble-options"',
             'id="cfg-hw-ble-address"',
             'id="cfg-hw-ble-scan-timeout"',
@@ -143,8 +262,8 @@ class FrontendAssetsTest(unittest.TestCase):
             'id="ble-discovered-list"',
             'id="ble-remembered-list"',
             "已连接过的设备",
-            "不保持后台连接",
-            "删除只清除本地记录",
+            "设备仅在需要时连接",
+            "删除这里只会清除连接记录",
         ):
             self.assertIn(token, self.index)
         for token in (
@@ -156,8 +275,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "data-ble-action=\"connect\"",
             "data-ble-action=\"delete\"",
             "bleDeviceMatches",
-            "正在建立真实 GATT 连接并校验手表服务",
-            "真实连接验证成功；连接已释放",
+            "正在连接并检查手表",
+            "连接成功，已设为截图设备",
             "cfg.hardware?.ble_address || ''",
             "cfg.hardware?.ble_scan_timeout || 15",
             "ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim()",
@@ -177,7 +296,7 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.stylesheet)
 
     def test_hardware_settings_expose_supercom_port_selector(self) -> None:
-        self.assertIn("SuperCom 端口设备", self.index)
+        self.assertIn("SuperCom 端口", self.index)
         self.assertIn('<select id="cfg-hw-port" class="select" required', self.index)
         self.assertNotIn('<input id="cfg-hw-port"', self.index)
         self.assertIn('id="btn-refresh-serial-ports"', self.index)
@@ -189,10 +308,9 @@ class FrontendAssetsTest(unittest.TestCase):
             "renderSerialPortOptions",
             "updateSerialPortStatus",
             "btnRefreshSerialPorts",
-            "SuperCom 桥接管道已就绪",
-            "SuperCom 桥接已开启",
+            "SuperCom 已就绪",
             "data?.available === false",
-            "Agent-loop 无法读取串口设备",
+            "无法读取串口设备，请检查系统权限后重试",
             "await loadSerialPorts()",
             "请选择 SuperCom 端口（检测到多个活动端口）",
             "未检测到 SuperCom 开启的串口（请在 SuperCom 中打开端口）",
@@ -212,16 +330,16 @@ class FrontendAssetsTest(unittest.TestCase):
             'id="llm-config-status"',
             'id="llm-actual-success"',
             'id="llm-test-status"',
-            "服务已配置",
-            "最近实际调用成功",
-            "本次快速探测",
-            "快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。",
+            "配置状态",
+            "最近调用",
+            "连接测试",
+            "只检查当前连接，不影响已有运行记录。",
         ):
             self.assertIn(token, self.index)
         for token in (
             "cfg.llm?.configured === true",
             "cfg.llm?.last_actual_success_at",
-            "本次探测失败",
+            "连接失败：",
             "setLlmSignal(llmTestStatus",
         ):
             self.assertIn(token, self.javascript)
@@ -240,10 +358,10 @@ class FrontendAssetsTest(unittest.TestCase):
             "a.download = filename;",
             "exportExcelBtn.addEventListener('click', () => {",
             "startBrowserDownload(url, `test_cases_${curProj}.xlsx`);",
-            "测试用例表下载已开始",
+            "测试用例表已开始下载",
             "[data-report-export]:not(:disabled)')?.addEventListener('click', () => {",
             "startBrowserDownload(url, `test_report_${project}.xlsx`);",
-            "测试报告下载已开始",
+            "测试报告已开始下载",
         ):
             self.assertIn(token, self.javascript)
         self.assertEqual(self.javascript.count("startBrowserDownload(url, `"), 2)
@@ -301,7 +419,7 @@ class FrontendAssetsTest(unittest.TestCase):
             'id="open-import"', 'id="import-dialog"', 'name="import-type"',
             'id="import-limit"', 'id="import-force"', '/api/defects/import',
             "setTimeout(() => pollImport(jobId), 3000)", "localStorage.setItem",
-            "展开完整日志", "已有拉取任务在运行",
+            "诊断信息", "已有同步任务在运行",
         ):
             self.assertIn(token, self.javascript)
         self.assertIn(".import-dialog", self.stylesheet)
@@ -321,8 +439,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "/api/tests/run",
             "/api/tests/run-batch",
             "restoreActiveTest",
-            "测试语义",
-            "命令映射",
+            "用例内容",
+            "执行计划",
             "测试历史",
         ):
             target = self.index if token == 'data-nav="cases"' else self.javascript
@@ -334,10 +452,10 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "function actualCommandTrace(items = [])",
             "record.command_trace",
-            "Runner 自动加入的栅栏、等待和截图",
+            "系统补充",
             "function evidenceContractEvidence(record)",
-            "证据合同不完整",
-            "命令映射只能说明计划",
+            "证据不完整",
+            "本次记录没有保存执行步骤。下面仅显示运行计划，不能证明已经执行。",
             "item.checkpoint_index",
         ):
             self.assertIn(token, self.javascript)
@@ -347,9 +465,9 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_agent_test_queue_uses_only_four_maturity_filters(self) -> None:
         for token in (
             "['all', 'all', '全部用例']",
-            "['unexplored', 'unexplored', '尚未探索']",
-            "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
-            "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
+            "['unexplored', 'unexplored', '待生成步骤']",
+            "['explored_unsolidified', 'explored_unsolidified', '步骤待确认']",
+            "['solidified', 'solidified', '可直接运行']",
             'data-test-filter="${state}"',
         ):
             self.assertIn(token, self.javascript)
@@ -370,12 +488,12 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_agent_test_metrics_show_only_the_four_detailed_maturity_categories(self) -> None:
         for token in (
-            "探索与固化",
-            "分类依据探索账本和正式 case_map",
+            "自动化状态",
+            "按用例当前准备情况分类",
             "['all', 'all', '全部用例']",
-            "['unexplored', 'unexplored', '尚未探索']",
-            "['explored_unsolidified', 'explored_unsolidified', '已探索但未固化']",
-            "['solidified', 'solidified', '已固化、Agent-loop 可执行']",
+            "['unexplored', 'unexplored', '待生成步骤']",
+            "['explored_unsolidified', 'explored_unsolidified', '步骤待确认']",
+            "['solidified', 'solidified', '可直接运行']",
         ):
             self.assertIn(token, self.javascript)
         self.assertIn('class="test-metric-groups"', self.javascript)
@@ -392,11 +510,11 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_interrupted_batch_notice_only_emphasizes_resume_message(self) -> None:
         self.assertIn(
-            "job.resume_available ? `<strong>${escapeHtml(job.interruption_reason || '批次已中断')}，可从第 ${completed + 1} 条继续。</strong>`",
+            "job.resume_available ? `<strong>${escapeHtml(testResultReason(job, '批次已中断'))} 可从第 ${completed + 1} 条继续。</strong>`",
             self.javascript,
         )
         self.assertIn(
-            "job.status === 'completed' ? '全部用例已执行完成。'",
+            "job.status === 'completed' ? '全部用例已完成。'",
             self.javascript,
         )
         self.assertIn(": '正在准备下一条用例…'", self.javascript)
@@ -475,29 +593,28 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "function maturityChip(row = {})",
             "function caseStatusChip(row = {})",
-            "已固化",
-            "未固化",
-            "尚未探索",
+            "可直接运行",
+            "步骤待确认",
+            "待生成步骤",
             "${caseStatusChip(row)}",
             "caseStatusChip({...testCase, latest_verdict: initialVerdict})",
             "const usesFixedMapping = Boolean(testCase.is_promoted);",
-            "本条将临时探索",
-            "不会写入外部探索账本",
-            "生成候选、复跑并晋升",
+            "本次将尝试生成自动化步骤",
+            "结果只用于本次运行，不会自动保存",
+            "验证并保存步骤",
             "candidate_replay_started",
             "Boolean(job.promotion_flow)",
             "job.promotion_status === 'promoted'",
-            "候选复跑未达晋升门禁，已自动回滚",
+            "步骤验证未通过，未保存",
             "historyCount > 0",
             "? rawVerdict : 'ERROR'",
         ):
             self.assertIn(token, self.javascript)
         for token in (
-            "PASS: 'PASS'",
-            "FAIL: 'FAIL'",
-            "CANNOT_VERIFY: 'CANNOT_VERIFY'",
-            "SKIP: 'CANNOT_VERIFY'",
-            "ERROR: 'ERROR'",
+            "['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict)",
+            "{SKIP: 'CANNOT_VERIFY'}[rawVerdict]",
+            "const presentation = resultPresentation(normalized);",
+            "${presentation.label}",
         ):
             self.assertIn(token, self.javascript)
         self.assertNotIn("function executionCapabilityChip", self.javascript)
@@ -566,12 +683,13 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_report_keeps_product_failures_separate_from_execution_errors(self) -> None:
         for token in (
-            "历史 ERROR",
-            "高频产品失败模块",
-            "仅按产品 FAIL 统计",
-            "高频执行异常模块",
+            "function reportInsightPresentation(",
+            "测试概况",
+            "失败较多的模块",
+            "仅统计产品功能失败",
+            "执行异常较多的模块",
             "renderExecutionErrorModules(report.top_execution_error_modules || [])",
-            "<th>产品 FAIL</th>",
+            "<th>产品失败</th>",
             "<th>执行异常</th>",
             "executionAnomaly ? '执行异常' : workspaceVerdictLabel(verdict)",
         ):
@@ -586,14 +704,14 @@ class FrontendAssetsTest(unittest.TestCase):
             "cannot_verify: '最近无法验证'",
             "error: '最近执行异常'",
             "latestBatchCandidateSummary.pass",
-            "最新结果已通过的用例不会重跑",
+            "最新结果已通过的 ${Number(latestBatchCandidateSummary.pass || 0)} 条已排除",
             "JSON.stringify({limit: 0, categories, project: projectSelect.value})",
             "batch-resume-button",
             "/resume",
             "继续运行剩余",
             "const cancellable = ['queued', 'running', 'orphaned'].includes(job.status);",
             "cancel.hidden = !cancellable;",
-            "批次完成，有执行异常",
+            "批次已完成，部分用例异常",
         ):
             self.assertIn(token, self.javascript)
         for token in (".batch-scope", ".batch-option", ".batch-launch-actions"):

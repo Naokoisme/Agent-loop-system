@@ -1875,7 +1875,13 @@ pre, code { font-family: var(--font-ui); }
 .environment-config-panel form label span { color: var(--ink-soft); font-size: var(--font-size-secondary); }
 .environment-config-panel form input { width: 100%; min-width: 0; height: 39px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--surface); }
 .environment-config-panel form input[readonly] { color: var(--ink-soft); background: #f6f4ef; }
+.environment-advanced { border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.environment-advanced > summary { padding: 10px 12px; color: var(--ink-soft); font-size: var(--font-size-secondary); font-weight: 650; cursor: pointer; }
+.environment-advanced-fields { display: grid; gap: 12px; padding: 2px 12px 12px; }
 .environment-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+.inline-diagnostics { margin-top: 10px; color: var(--ink-soft); font-size: var(--font-size-caption); }
+.inline-diagnostics summary { cursor: pointer; font-weight: 650; }
+.inline-diagnostics pre { max-height: 240px; overflow: auto; white-space: pre-wrap; }
 .readiness-score { color: var(--ink-soft); font-size: var(--font-size-caption); }
 .readiness-score strong { margin-left: 8px; color: var(--green); font-size: 20px; }
 .environment-check-list { padding: 8px 18px; }
@@ -1888,11 +1894,15 @@ pre, code { font-family: var(--font-ui); }
 .environment-check-row strong { font-size: var(--font-size-secondary); }
 .environment-check-row > span { color: var(--ink-soft); font-size: var(--font-size-caption); }
 .environment-check-row p { margin: 0; color: var(--ink-soft); font-size: var(--font-size-caption); }
+.environment-check-detail { min-width: 0; }
+.environment-check-detail .inline-diagnostics { margin: 4px 0 6px; }
 .environment-check-panel > .environment-form-actions { padding: 0 18px 16px; }
 .environment-log-panel { margin-top: 16px; }
 .environment-log { display: grid; gap: 0; margin: 0; padding: 8px 18px 16px; list-style: none; }
 .environment-log li { display: grid; grid-template-columns: 155px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: var(--font-size-secondary); }
 .environment-log time { color: var(--ink-soft); }
+.environment-log li > div { min-width: 0; }
+.environment-log .inline-diagnostics { margin-top: 4px; }
 .settings-summary-panel { margin-top: 0; }
 .settings-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 18px; }
 .settings-summary-grid div { padding: 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
@@ -1977,7 +1987,7 @@ pre, code { font-family: var(--font-ui); }
   .report-period-option { flex: 1; min-width: 0; }
   .environment-config-panel form label { grid-template-columns: 1fr; gap: 4px; }
   .environment-check-row { grid-template-columns: 24px 1fr auto; padding: 8px 0; }
-  .environment-check-row p { grid-column: 2 / -1; }
+  .environment-check-detail { grid-column: 2 / -1; }
   .settings-summary-grid { grid-template-columns: 1fr; }
   .ble-target-grid, .ble-device-columns { grid-template-columns: 1fr; }
   .ble-device-search-row { grid-template-columns: 1fr; }
