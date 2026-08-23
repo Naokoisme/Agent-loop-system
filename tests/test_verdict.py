@@ -176,9 +176,11 @@ class SaveEvidenceTest(unittest.TestCase):
                 output,
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
-        self.assertEqual(payload["verdict"], "ERROR")
+        self.assertEqual(payload["verdict"], "CANNOT_VERIFY")
         self.assertEqual(payload["reason"], "点击命令被拒绝")
+        self.assertEqual(payload["workflow_status"], "failed")
         self.assertEqual(payload["execution_status"], "ERROR")
+        self.assertEqual(payload["reason_code"], "CASE_EXECUTION_ERROR")
         self.assertEqual(payload["execution_reason"], "点击命令被拒绝")
 
     def test_diagnostic_collection_error_does_not_override_complete_visual_pass(self) -> None:
@@ -217,8 +219,9 @@ class SaveEvidenceTest(unittest.TestCase):
             )
             save_evidence(result, None, output)
             payload = json.loads(output.read_text(encoding="utf-8"))
-        self.assertEqual(payload["verdict"], "ERROR")
+        self.assertEqual(payload["verdict"], "CANNOT_VERIFY")
         self.assertEqual(payload["reason"], "Agent-loop 探索没有取得截图")
+        self.assertEqual(payload["reason_code"], "EVIDENCE_INCOMPLETE")
 
 
 class VisionEvidenceTest(unittest.TestCase):
@@ -493,7 +496,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         ) as visual:
             decision = judge_case_result(result)
 
-        self.assertEqual(decision.verdict, "ERROR")
+        self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "业务动作未执行")
         visual.assert_not_called()
 
@@ -511,7 +514,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         )
         decision = judge_case_result(result)
 
-        self.assertEqual(decision.verdict, "ERROR")
+        self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "Agent-loop 探索没有取得截图")
 
     def test_runner_gate_keeps_cannot_verify_for_complete_but_unreadable_visual_evidence(self) -> None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 import os
+import ssl
 import sys
 from threading import Barrier
 from types import ModuleType
@@ -13,7 +14,9 @@ from agent_loop_system.tools.llm_config import (
     LLM_API_KEY_SCOPE_EXPLORATION,
     LLM_API_KEY_SCOPE_FIXED,
     create_chat_llm,
+    _create_compatible_ssl_context,
     get_llm_api_key,
+    get_llm_ca_bundle,
     get_llm_config,
     get_llm_model,
     llm_api_key_scope,
@@ -73,6 +76,38 @@ def test_missing_keys_do_not_fall_back_to_an_embedded_credential() -> None:
         config = get_llm_config()
         assert config["api_key"] == ""
         assert config["is_builtin"] is False
+
+
+def test_default_ssl_context_verifies_hostname_and_certificate() -> None:
+    with mock.patch.dict(
+        os.environ,
+        {"OPENAI_CA_BUNDLE": "", "OPENAI_TLS_ALLOW_LEGACY_CIPHERS": ""},
+        clear=False,
+    ):
+        context = _create_compatible_ssl_context()
+        assert get_llm_ca_bundle() is None
+
+    assert context.check_hostname is True
+    assert context.verify_mode == ssl.CERT_REQUIRED
+
+
+def test_explicit_ca_bundle_is_passed_to_the_trust_store() -> None:
+    context = mock.Mock()
+    with (
+        mock.patch.dict(
+            os.environ,
+            {"OPENAI_CA_BUNDLE": "D:/certs/company-ca.pem"},
+            clear=True,
+        ),
+        mock.patch(
+            "agent_loop_system.tools.llm_config.ssl.create_default_context",
+            return_value=context,
+        ) as create_context,
+    ):
+        assert _create_compatible_ssl_context() is context
+
+    create_context.assert_called_once_with(cafile="D:/certs/company-ca.pem")
+    context.set_ciphers.assert_not_called()
 
 
 @pytest.mark.parametrize(

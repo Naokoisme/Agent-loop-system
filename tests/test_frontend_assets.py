@@ -12,6 +12,9 @@ class FrontendAssetsTest(unittest.TestCase):
         cls.javascript = (root / "frontend" / "app.js").read_text(encoding="utf-8")
         cls.stylesheet = (root / "frontend" / "styles.css").read_text(encoding="utf-8")
 
+    def test_hidden_attribute_always_hides_interactive_controls(self) -> None:
+        self.assertIn("[hidden] { display: none !important; }", self.stylesheet)
+
     def test_source_location_panel_is_collapsible_and_large_results_start_closed(self) -> None:
         self.assertIn('<details class="panel collapsible-panel"', self.javascript)
         self.assertIn("sourceMatches.length < 3", self.javascript)
@@ -57,8 +60,9 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("缺陷闭环", self.index)
         self.assertNotIn("缺陷闭环", self.javascript)
 
-    def test_run_form_only_submits_defect(self) -> None:
-        self.assertIn("JSON.stringify({ defect: String(defect.number) })", self.javascript)
+    def test_run_form_submits_defect_and_explicit_project_only(self) -> None:
+        self.assertIn("defect: String(defect.number)", self.javascript)
+        self.assertIn("project: repairProject.project", self.javascript)
         self.assertNotIn('id="sheet"', self.javascript)
         self.assertNotIn('id="test-case"', self.javascript)
         self.assertNotIn('id="source-file"', self.javascript)
@@ -91,6 +95,23 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("record.test_result?.results", self.javascript)
         self.assertNotIn("终端原始数据与判定", self.javascript)
         self.assertNotIn("JSON.stringify(rawEvidence", self.javascript)
+
+    def test_legacy_detail_renderers_ignore_stale_route_responses(self) -> None:
+        for signature in (
+            "renderTest(sheet, caseId)",
+            "renderTestBatch(jobId)",
+            "renderDefect(number)",
+            "renderHistory(number, runId)",
+            "renderTestHistory(sheet, caseId, runId)",
+        ):
+            with self.subTest(renderer=signature):
+                start = self.javascript.index(f"async function {signature}")
+                next_start = self.javascript.find("\nasync function ", start + 1)
+                section = self.javascript[
+                    start: next_start if next_start >= 0 else len(self.javascript)
+                ]
+                self.assertIn("const routeToken = routeRequestToken;", section)
+                self.assertIn("if (routeToken !== routeRequestToken) return;", section)
 
     def test_active_repair_is_restored_after_page_reload(self) -> None:
         for token in (
@@ -543,6 +564,20 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.javascript)
 
+    def test_report_keeps_product_failures_separate_from_execution_errors(self) -> None:
+        for token in (
+            "历史 ERROR",
+            "高频产品失败模块",
+            "仅按产品 FAIL 统计",
+            "高频执行异常模块",
+            "renderExecutionErrorModules(report.top_execution_error_modules || [])",
+            "<th>产品 FAIL</th>",
+            "<th>执行异常</th>",
+            "executionAnomaly ? '执行异常' : workspaceVerdictLabel(verdict)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("按 FAIL 与 ERROR 合计排序", self.javascript)
+
     def test_batch_launch_selects_latest_result_categories_and_excludes_pass(self) -> None:
         for token in (
             'name="batch-category"',
@@ -556,6 +591,9 @@ class FrontendAssetsTest(unittest.TestCase):
             "batch-resume-button",
             "/resume",
             "继续运行剩余",
+            "const cancellable = ['queued', 'running', 'orphaned'].includes(job.status);",
+            "cancel.hidden = !cancellable;",
+            "批次完成，有执行异常",
         ):
             self.assertIn(token, self.javascript)
         for token in (".batch-scope", ".batch-option", ".batch-launch-actions"):

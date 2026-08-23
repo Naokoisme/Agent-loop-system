@@ -24,6 +24,8 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from agent_loop_system.outcome import outcome_fields
+from agent_loop_system.reporting import write_result
 from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
@@ -517,7 +519,7 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
             if isinstance(item, dict) and str(item.get("message") or "").strip()
         ]
         reason = messages[0] if messages else "证据合同不完整，禁止进入产品 PASS 判定"
-        return CaseDecision(verdict="ERROR", reason=reason)
+        return CaseDecision(verdict="CANNOT_VERIFY", reason=reason)
 
     if result.precomputed_verdict:
         return CaseDecision(
@@ -564,25 +566,37 @@ def save_evidence(
         for item in contract_issues
         if isinstance(item, dict) and str(item.get("message") or "").strip()
     ), "")
+    execution_errors = (
+        result.setup_errors + result.action_errors + result.collect_errors
+    )
+    execution_failure = bool(result.aborted or execution_errors or evidence_error)
+    reason_code = (
+        "EVIDENCE_INCOMPLETE"
+        if evidence_error
+        else "CASE_EXECUTION_ERROR" if execution_failure else None
+    )
     if result.skipped:
-        result_verdict = "CANNOT_VERIFY"
+        raw_verdict = "CANNOT_VERIFY"
         reason = "旧 Runner 返回了跳过结果；当前用例应重新运行"
+        reason_code = "LEGACY_SKIPPED"
     elif result.aborted or result.setup_errors or result.action_errors or evidence_error:
-        result_verdict = "ERROR"
+        raw_verdict = "CANNOT_VERIFY"
         reason = (
             (result.setup_errors + result.action_errors)[0]
             if result.setup_errors or result.action_errors
             else evidence_error or "准备或操作阶段未完整执行"
         )
     elif result.precomputed_verdict:
-        result_verdict = result.precomputed_verdict
+        raw_verdict = result.precomputed_verdict
         reason = result.precomputed_reason or "Agent-loop 探索已完成"
     else:
-        result_verdict = verdict.verdict if verdict else "CANNOT_VERIFY"
+        raw_verdict = verdict.verdict if verdict else "CANNOT_VERIFY"
         reason = verdict.reason if verdict else "LLM 不可用，需人工判定"
-    execution_errors = (
-        result.setup_errors + result.action_errors + result.collect_errors
-    )
+    result_verdict = str(raw_verdict or "CANNOT_VERIFY").upper()
+    if result_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}:
+        result_verdict = "CANNOT_VERIFY"
+        execution_failure = True
+        reason_code = reason_code or "JUDGEMENT_ERROR"
     payload = {
         "schema_version": 3,
         "case_id": result.case_id,
@@ -600,8 +614,14 @@ def save_evidence(
         "setup_errors": result.setup_errors,
         "action_errors": result.action_errors,
         "collect_errors": result.collect_errors,
-        "execution_status": "ERROR" if execution_errors or evidence_error else "OK",
-        "execution_reason": execution_errors[0] if execution_errors else evidence_error,
+        "workflow_status": "failed" if execution_failure else "completed",
+        "execution_status": "ERROR" if execution_failure else "OK",
+        "execution_reason": (
+            execution_errors[0]
+            if execution_errors
+            else evidence_error or (reason if execution_failure else "")
+        ),
+        "reason_code": reason_code,
         "terminal_json": result.terminal_json,
         "screenshots": result.screenshots,
         "exploration_trace": result.exploration_trace,
@@ -609,7 +629,12 @@ def save_evidence(
         "verdict": result_verdict,
         "reason": reason,
     }
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    payload.update(outcome_fields(
+        payload,
+        workflow_default="failed" if execution_failure else "completed",
+        mapping_default=str(result.provenance.get("mapping_status") or "NOT_RECORDED"),
+    ))
+    write_result(path, payload)
     return path
 
 

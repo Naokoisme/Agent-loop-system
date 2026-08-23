@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import json
 import os
+import subprocess
+import ssl
 import tempfile
 import threading
 import unittest
@@ -24,10 +26,15 @@ from frontend.server import (
     HistoryStore,
     JobManager,
     RequestHandler,
+    REPAIR_JOB_STATE_FILE,
+    SINGLE_TEST_STATE_FILE,
     TestHistoryStore as CaseRunHistoryStore,
     ThreadingHTTPServer,
     WebApplication,
+    _reload_runtime_limits,
     _save_system_config,
+    _test_process_environment,
+    _ones_ssl_context,
     main as frontend_main,
     make_handler,
 )
@@ -242,6 +249,7 @@ class FrontendDataTest(unittest.TestCase):
     def test_frontend_main_uses_the_runtime_app_root(self) -> None:
         runtime_root = Path(self.temporary.name) / "portable-app"
         fake_server = SimpleNamespace(
+            server_address=("127.0.0.1", 0),
             serve_forever=lambda: None,
             server_close=lambda: None,
         )
@@ -256,6 +264,76 @@ class FrontendDataTest(unittest.TestCase):
         paths = application_class.call_args.args[0]
         self.assertEqual(paths.root, runtime_root.resolve())
         self.assertEqual(paths.frontend, runtime_root.resolve() / "frontend")
+
+    def test_frontend_main_rejects_non_loopback_binding_without_authentication(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            frontend_main(["--host", "0.0.0.0", "--port", "8765"])
+        self.assertEqual(raised.exception.code, 2)
+
+    def test_frontend_main_uses_ipv6_server_for_ipv6_loopback(self) -> None:
+        fake_server = SimpleNamespace(
+            server_address=("::1", 0, 0, 0),
+            serve_forever=lambda: None,
+            server_close=lambda: None,
+        )
+        with (
+            patch("frontend.server.WebApplication"),
+            patch(
+                "frontend.server.FrontendIPv6HTTPServer",
+                return_value=fake_server,
+            ) as server_class,
+        ):
+            self.assertEqual(frontend_main(["--host", "::1", "--port", "0"]), 0)
+
+        server_class.assert_called_once()
+        self.assertEqual(server_class.call_args.args[0], ("::1", 0))
+
+    def test_runtime_limits_refresh_after_environment_load(self) -> None:
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "AGENT_LOOP_CASE_TIMEOUT": "12.5",
+                    "AGENT_LOOP_REPAIR_TIMEOUT": "34",
+                },
+                clear=False,
+            ),
+            patch("frontend.server.CASE_TEST_TIMEOUT_SECONDS", 1800.0),
+            patch("frontend.server.REPAIR_JOB_TIMEOUT_SECONDS", 3600.0),
+        ):
+            _reload_runtime_limits()
+            from frontend import server as frontend_server
+
+            self.assertEqual(frontend_server.CASE_TEST_TIMEOUT_SECONDS, 12.5)
+            self.assertEqual(frontend_server.REPAIR_JOB_TIMEOUT_SECONDS, 34.0)
+
+    def test_default_simulator_child_cannot_inherit_another_project(self) -> None:
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "W30_PROJECT": "6202_W5230",
+                    "W30_HARDWARE_PROJECT": "6202_W5230",
+                    "W30_SOURCE_ROOT": r"D:\firmware\620C_W6830",
+                },
+                clear=False,
+            ),
+            patch("frontend.server._load_test_runtime_environment"),
+        ):
+            child_env = _test_process_environment({
+                "project": "620C_W6830",
+                "execution_target": "simulator",
+            })
+
+        self.assertEqual(child_env["W30_PROJECT"], "620C_W6830")
+        self.assertNotIn("W30_HARDWARE_PROJECT", child_env)
+        self.assertEqual(child_env["W30_SOURCE_ROOT"], r"D:\firmware\620C_W6830")
+
+    def test_ones_ssl_context_keeps_certificate_and_hostname_verification(self) -> None:
+        with patch.dict(os.environ, {"ONES_CA_BUNDLE": ""}, clear=False):
+            context = _ones_ssl_context()
+        self.assertTrue(context.check_hostname)
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
 
     def _write_defect(
         self,
@@ -1074,6 +1152,42 @@ class FrontendDataTest(unittest.TestCase):
         self.assertIn("screenshot_url", record)
         self.assertEqual(record["screenshot_urls"][0]["label"], "最终画面")
 
+    def test_agent_test_history_does_not_publish_partial_artifacts(self) -> None:
+        screenshot = self.paths.evidence / "partial-case.bmp"
+        screenshot.write_bytes(b"BM-partial")
+        case_dir = self.test_history._case_dir("计算器", "CALC_001")
+
+        with (
+            patch("frontend.server.shutil.copy2", side_effect=OSError("copy failed")),
+            self.assertRaisesRegex(OSError, "copy failed"),
+        ):
+            self.test_history.create(
+                job={
+                    "sheet": "计算器",
+                    "case_id": "CALC_001",
+                    "case": self.cases.get("计算器", "CALC_001"),
+                },
+                result={"verdict": "PASS"},
+                stdout="",
+                stderr="",
+                screenshot=screenshot,
+            )
+
+        self.assertTrue(case_dir.is_dir())
+        self.assertEqual(list(case_dir.iterdir()), [])
+
+    def test_repair_history_does_not_publish_partial_artifacts(self) -> None:
+        defect_dir = self.paths.history / "100"
+
+        with (
+            patch("frontend.server.shutil.copy2", side_effect=OSError("copy failed")),
+            self.assertRaisesRegex(OSError, "copy failed"),
+        ):
+            self._create_history()
+
+        self.assertTrue(defect_dir.is_dir())
+        self.assertEqual(list(defect_dir.iterdir()), [])
+
     def test_batch_records_many_groups_multiple_batches_in_one_scan(self) -> None:
         case = self.cases.get("计算器", "CALC_001")
         for batch_id, batch_token in (
@@ -1595,6 +1709,71 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(active["simulator"]["id"], simulator["id"])
         self.assertEqual(active["hardware"]["id"], hardware["id"])
 
+    def test_single_test_state_survives_restart_as_interrupted_not_running(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        with patch("frontend.server.threading.Thread.start"):
+            started = manager.start(sheet="计算器", case_id="CALC_001")
+
+        state_path = self.paths.runtime_jobs / started["id"] / SINGLE_TEST_STATE_FILE
+        self.assertTrue(state_path.is_file())
+
+        restarted = CaseTestManager(self.paths, self.cases, self.test_history)
+        recovered = restarted.get(started["id"])
+        self.assertEqual(recovered["status"], "interrupted")
+        self.assertEqual(recovered["workflow_status"], "interrupted")
+        self.assertEqual(recovered["execution_status"], "ERROR")
+        self.assertEqual(recovered["verdict"], "CANNOT_VERIFY")
+        self.assertIsNone(restarted.active("simulator"))
+
+    def test_case_timeout_is_framework_error_not_product_fail(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        case = self.cases.get("计算器", "CALC_001")
+        manager._jobs["timeout-case"] = {
+            "id": "timeout-case",
+            "type": "single",
+            "case": case,
+            "candidate_replay": False,
+            "cancel_requested": False,
+        }
+
+        class TimedOutProcess:
+            pid = None
+            returncode = None
+
+            def __init__(self) -> None:
+                self.terminated = False
+
+            def communicate(self, timeout: float | None = None) -> tuple[str, str]:
+                if not self.terminated:
+                    raise subprocess.TimeoutExpired("test", timeout)
+                return "", ""
+
+            def poll(self) -> int | None:
+                return self.returncode
+
+            def terminate(self) -> None:
+                self.terminated = True
+                self.returncode = -15
+
+            def wait(self, timeout: float | None = None) -> int:
+                return int(self.returncode or 0)
+
+        with (
+            patch("frontend.server.subprocess.Popen", return_value=TimedOutProcess()),
+            patch("frontend.server.CASE_TEST_TIMEOUT_SECONDS", 0.01),
+        ):
+            execution = manager._execute_case(
+                job_id="timeout-case",
+                case=case,
+                job_dir=self.paths.runtime_jobs / "timeout-case",
+            )
+
+        self.assertTrue(execution["timed_out"])
+        self.assertEqual(execution["verdict"], "CANNOT_VERIFY")
+        self.assertEqual(execution["workflow_status"], "failed")
+        self.assertEqual(execution["execution_status"], "ERROR")
+        self.assertEqual(execution["reason_code"], "PROCESS_TIMEOUT")
+
     def test_active_test_api_returns_both_resource_slots(self) -> None:
         application, base = self._server()
         jobs = [
@@ -2005,6 +2184,9 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(result["verdict"], "PASS")
         self.assertTrue(result["execute_failed"])
         self.assertEqual(result["execution_reason"], "GUI_TREE 回包不完整")
+        self.assertEqual(result["workflow_status"], "failed")
+        self.assertEqual(result["execution_status"], "ERROR")
+        self.assertEqual(result["reason_code"], "CASE_EXECUTION_ERROR")
 
     def test_incomplete_evidence_contract_marks_execution_failed(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
@@ -2046,9 +2228,13 @@ class FrontendDataTest(unittest.TestCase):
                 job_dir=self.paths.runtime_jobs / "evidence-error" / "single",
             )
 
-        self.assertEqual(result["verdict"], "ERROR")
+        self.assertEqual(result["verdict"], "CANNOT_VERIFY")
         self.assertTrue(result["execute_failed"])
         self.assertEqual(result["execution_reason"], "业务动作未执行")
+        self.assertEqual(result["workflow_status"], "failed")
+        self.assertEqual(result["execution_status"], "ERROR")
+        self.assertEqual(result["evidence_status"], "INCOMPLETE")
+        self.assertEqual(result["reason_code"], "EVIDENCE_INCOMPLETE")
 
     def test_case_test_manager_runs_executable_batch_and_reports_progress(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
@@ -2104,6 +2290,9 @@ class FrontendDataTest(unittest.TestCase):
 
         snapshot = manager.get(job_id)
         self.assertEqual(snapshot["status"], "completed")
+        self.assertEqual(snapshot["workflow_status"], "completed")
+        self.assertEqual(snapshot["execution_status"], "OK")
+        self.assertEqual(snapshot["evidence_status"], "COMPLETE")
         self.assertEqual(snapshot["completed"], 1)
         self.assertEqual(snapshot["verdict_counts"]["PASS"], 1)
         self.assertEqual(snapshot["recent_results"][0]["case_id"], "CALC_001")
@@ -2279,6 +2468,11 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(executed_cases, ["CALC_001"])
         self.assertEqual(parent_reset_flags, [True])
         self.assertEqual(interrupted["status"], "interrupted")
+        self.assertEqual(interrupted["workflow_status"], "failed")
+        self.assertEqual(interrupted["execution_status"], "ERROR")
+        self.assertEqual(
+            interrupted["reason_code"], "HARDWARE_INFRASTRUCTURE_FAILURE"
+        )
         self.assertEqual(interrupted["completed"], 0)
         self.assertEqual(interrupted["current_index"], 1)
         self.assertTrue(interrupted["resume_available"])
@@ -2515,7 +2709,15 @@ class FrontendDataTest(unittest.TestCase):
                 payload = json.loads(response.read().decode("utf-8"))
             self.assertEqual(response.status, 202)
             self.assertEqual(payload["id"], "job1")
-            start.assert_called_once_with(defect="100")
+            start.assert_called_once_with(defect="100", project="620C_W6830")
+
+        with patch.object(application.jobs, "start", return_value=job) as start:
+            with self._post_json(
+                base + "/api/run",
+                {"defect": "100", "project": "6202_W5230"},
+            ) as response:
+                self.assertEqual(response.status, 202)
+            start.assert_called_once_with(defect="100", project="6202_W5230")
 
         for payload in ({}, {"defect": ""}, {"defect": 100}):
             with self.assertRaises(HTTPError) as raised:
@@ -2537,6 +2739,16 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(payload["job"], job)
         active.assert_called_once_with()
 
+    def test_repair_cancel_api_terminates_the_named_job(self) -> None:
+        application, base = self._server()
+        cancelled = {"id": "job-live", "status": "running", "cancel_requested": True}
+        with patch.object(application.jobs, "cancel", return_value=cancelled) as cancel:
+            with self._post_json(base + "/api/run/job-live/cancel", {}) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(response.status, 202)
+        self.assertEqual(payload, cancelled)
+        cancel.assert_called_once_with("job-live")
+
     def test_active_job_snapshot_only_returns_live_job(self) -> None:
         manager = JobManager(self.paths, self.defects, self.history)
         job_id = "job-live"
@@ -2553,6 +2765,75 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(manager.active()["status"], "finalizing")
         manager._jobs[job_id]["status"] = "completed"
         self.assertIsNone(manager.active())
+
+    def test_repair_job_state_survives_restart_as_interrupted(self) -> None:
+        manager = JobManager(self.paths, self.defects, self.history)
+        with patch("frontend.server.threading.Thread.start"):
+            started = manager.start(defect="100", project="6202_W5230_SIMULATOR")
+
+        state_path = self.paths.runtime_jobs / started["id"] / REPAIR_JOB_STATE_FILE
+        self.assertTrue(state_path.is_file())
+
+        restarted = JobManager(self.paths, self.defects, self.history)
+        recovered = restarted.get(started["id"])
+        self.assertEqual(recovered["status"], "interrupted")
+        self.assertEqual(recovered["workflow_status"], "interrupted")
+        self.assertEqual(recovered["execution_status"], "ERROR")
+        self.assertEqual(recovered["project"], "6202_W5230_SIMULATOR")
+        self.assertIsNone(restarted.active())
+
+    def test_repair_product_fail_with_nonzero_exit_is_completed_workflow(self) -> None:
+        manager = JobManager(self.paths, self.defects, self.history)
+        job_id = "product-fail"
+        manager._jobs[job_id] = {
+            "id": job_id,
+            "defect": "100",
+            "status": "queued",
+            "current_node": None,
+            "nodes": {
+                node: "pending"
+                for node in (
+                    "validate", "interactive_reproduce", "agent", "apply",
+                    "build", "test", "record",
+                )
+            },
+            "verdict": "PENDING",
+            "cancel_requested": False,
+        }
+        manager._active_job_id = job_id
+
+        class ProductFailProcess:
+            pid = None
+            returncode = 1
+
+            def __init__(self, argv: list[str]) -> None:
+                self.argv = argv
+
+            def communicate(self) -> tuple[str, str]:
+                result_file = Path(self.argv[self.argv.index("--result-file") + 1])
+                result_file.write_text(json.dumps({
+                    "verdict": "FAIL",
+                    "workflow_status": "completed",
+                    "execution_status": "OK",
+                    "attempts": 1,
+                }), encoding="utf-8")
+                return "product did not satisfy expectation", ""
+
+        with (
+            patch(
+                "frontend.server.subprocess.Popen",
+                side_effect=lambda argv, **_: ProductFailProcess(argv),
+            ),
+            patch.object(manager.history, "create", return_value="history-product-fail"),
+        ):
+            manager._run(job_id)
+
+        snapshot = manager.get(job_id)
+        self.assertEqual(snapshot["return_code"], 1)
+        self.assertEqual(snapshot["status"], "completed")
+        self.assertEqual(snapshot["workflow_status"], "completed")
+        self.assertEqual(snapshot["execution_status"], "OK")
+        self.assertEqual(snapshot["verdict"], "FAIL")
 
     def test_job_stays_finalizing_until_history_is_saved(self) -> None:
         manager = JobManager(self.paths, self.defects, self.history)
@@ -2619,6 +2900,57 @@ class FrontendDataTest(unittest.TestCase):
         manager._jobs["active"] = {"id": "active", "status": "finalizing"}
         with self.assertRaisesRegex(RuntimeError, "已有修复任务"):
             manager.start(defect="100")
+
+    def test_repair_job_forwards_explicit_project_context_to_child(self) -> None:
+        manager = JobManager(self.paths, self.defects, self.history)
+        job_id = "project-context"
+        manager._jobs[job_id] = {
+            "id": job_id,
+            "defect": "100",
+            "project": "6202_W5230_SIMULATOR",
+            "status": "queued",
+            "nodes": {
+                node: "pending"
+                for node in (
+                    "validate", "interactive_reproduce", "agent", "apply",
+                    "build", "test", "record",
+                )
+            },
+            "verdict": "PENDING",
+        }
+        manager._active_job_id = job_id
+
+        class FakeProcess:
+            returncode = 0
+
+            def __init__(self, argv: list[str]):
+                self.argv = argv
+
+            def communicate(self) -> tuple[str, str]:
+                result_file = Path(self.argv[self.argv.index("--result-file") + 1])
+                result_file.write_text(
+                    json.dumps({"verdict": "PASS", "attempts": 1}),
+                    encoding="utf-8",
+                )
+                return "done", ""
+
+        with (
+            patch("frontend.server.subprocess.Popen") as popen,
+            patch.object(manager.history, "create", return_value="history-project"),
+        ):
+            popen.side_effect = lambda argv, **_: FakeProcess(argv)
+            manager._run(job_id)
+
+        argv = popen.call_args.args[0]
+        environment = popen.call_args.kwargs["env"]
+        self.assertEqual(argv[argv.index("--project") + 1], "6202_W5230_SIMULATOR")
+        self.assertEqual(argv[argv.index("--profile") + 1], "6202_W5230_SIMULATOR")
+        self.assertEqual(argv[argv.index("--target") + 1], "simulator")
+        self.assertEqual(environment["W30_PROJECT"], "6202_W5230")
+        self.assertIn("workspaces", environment["W30_SOURCE_ROOT"])
+        snapshot = manager.get(job_id)
+        self.assertEqual(snapshot["project"], "6202_W5230_SIMULATOR")
+        self.assertEqual(snapshot["history_id"], "history-project")
 
     def test_import_api_accepts_options_reports_progress_and_returns_conflict(self) -> None:
         application, base = self._server()
@@ -2957,6 +3289,36 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/reports/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
             self.assertIn("application/vnd.openxmlformats-officedocument", resp.headers.get("Content-Type"))
+
+    def test_project_job_summary_excludes_other_projects(self) -> None:
+        application, base = self._server()
+        application.test_jobs._jobs.update({
+            "current-project": {
+                "id": "current-project",
+                "project": "620C_W6830",
+                "status": "queued",
+                "verdict": "PENDING",
+            },
+            "other-project": {
+                "id": "other-project",
+                "project": "6202_W5230",
+                "status": "queued",
+                "verdict": "FAIL",
+            },
+        })
+
+        with urlopen(
+            base + "/api/tests/jobs?project=620C_W6830&status=running&page=1&page_size=20",
+            timeout=3,
+        ) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+
+        self.assertEqual([item["id"] for item in payload["items"]], ["current-project"])
+        self.assertEqual(payload["summary"], {
+            "queued": 1,
+            "completed_today": 0,
+            "error": 0,
+        })
 
     def test_report_24h_period_filters_runs_batches_and_export_by_timestamp(self) -> None:
         application, base = self._server()

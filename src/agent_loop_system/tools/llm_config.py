@@ -54,27 +54,34 @@ def llm_api_key_scope(scope: str) -> Iterator[None]:
         _CURRENT_API_KEY_SCOPE.reset(token)
 
 
+def get_llm_ca_bundle() -> str | None:
+    """返回显式 CA bundle；留空时使用系统信任链。"""
+
+    value = os.environ.get("OPENAI_CA_BUNDLE", "").strip()
+    return value or None
+
+
 def _create_compatible_ssl_context() -> ssl.SSLContext:
-    """创建高兼容性 SSL 上下文（解决部分网关 renegotiation 与 SECLEVEL=2 导致的 UNEXPECTED_EOF 握手失败）。"""
-    ctx = ssl.create_default_context()
-    try:
+    """创建默认验证证书的 SSL 上下文，并允许显式配置企业 CA。"""
+
+    ca_bundle = get_llm_ca_bundle()
+    ctx = ssl.create_default_context(cafile=ca_bundle) if ca_bundle else ssl.create_default_context()
+    if os.environ.get("OPENAI_TLS_ALLOW_LEGACY_CIPHERS", "").strip().casefold() in {
+        "1", "true", "yes", "on",
+    }:
         ctx.set_ciphers("DEFAULT@SECLEVEL=1")
-    except Exception:
-        pass
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
     return ctx
 
 
 def _create_http_client(timeout: float | None = None) -> Any:
-    """创建并返回配置了高兼容性 SSL 上下文的 httpx.Client 实例。"""
+    """创建并返回显式启用证书验证的 httpx.Client 实例。"""
     try:
         import httpx
-        ctx = _create_compatible_ssl_context()
-        t = timeout if timeout is not None else get_llm_timeout()
-        return httpx.Client(verify=ctx, timeout=t)
-    except Exception:
+    except ImportError:
         return None
+    ctx = _create_compatible_ssl_context()
+    t = timeout if timeout is not None else get_llm_timeout()
+    return httpx.Client(verify=ctx, timeout=t)
 
 
 def get_llm_api_key(scope: str | None = None) -> str:
@@ -134,6 +141,7 @@ def get_llm_config() -> dict[str, Any]:
         "base_url": get_llm_base_url(),
         "model": get_llm_model(),
         "timeout": get_llm_timeout(),
+        "ca_bundle": get_llm_ca_bundle(),
         "is_builtin": bool(DEFAULT_OPENAI_API_KEY)
         and get_llm_api_key() == DEFAULT_OPENAI_API_KEY,
     }

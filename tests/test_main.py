@@ -16,6 +16,13 @@ class NormalizeResultTest(unittest.TestCase):
         ):
             self.assertIn(key, result)
 
+    def test_legacy_error_verdict_becomes_execution_failure(self) -> None:
+        result = _normalize_result({"task_id": "T1", "verdict": "ERROR"})
+
+        self.assertEqual(result["verdict"], "CANNOT_VERIFY")
+        self.assertEqual(result["workflow_status"], "failed")
+        self.assertEqual(result["execution_status"], "ERROR")
+
 
 class MainCliModeTest(unittest.TestCase):
     def _invoke(self, argv: list[str]) -> tuple[int, dict]:
@@ -54,6 +61,27 @@ class MainCliModeTest(unittest.TestCase):
             ]
         )
         self.assertEqual(code, 0)
+        self.assertEqual(state["target"], "hardware")
+
+    def test_explicit_project_and_profile_are_forwarded_to_graph(self) -> None:
+        code, state = self._invoke(
+            [
+                "--objective",
+                "天气显示异常",
+                "--task-id",
+                "T1",
+                "--project",
+                "6202_W5230",
+                "--profile",
+                "6202_W5230",
+                "--target",
+                "hardware",
+            ]
+        )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(state["project"], "6202_W5230")
+        self.assertEqual(state["profile"], "6202_W5230")
         self.assertEqual(state["target"], "hardware")
 
     def test_objective_mode_without_source_file_still_passes_empty(self) -> None:
