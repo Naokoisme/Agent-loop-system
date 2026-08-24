@@ -478,9 +478,29 @@ class FrontendAssetsTest(unittest.TestCase):
             ".case-platform-context",
         ):
             self.assertIn(selector, self.stylesheet)
-        self.assertIn('<a class="case-platform-entry is-w30"', self.javascript)
-        self.assertIn('<a class="case-platform-entry is-579"', self.javascript)
-        self.assertNotIn('<button type="button" class="case-platform-entry', self.javascript)
+        self.assertIn('<form class="case-platform-entry is-w30" method="get" action="/cases"', self.javascript)
+        self.assertIn('<form class="case-platform-entry is-579" method="get" action="/cases"', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="w30">', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="579">', self.javascript)
+        self.assertIn('<button class="case-platform-entry-submit" type="submit">', self.javascript)
+        self.assertIn('.case-platform-entry-submit', self.stylesheet)
+        self.assertIn('<form class="case-platform-switch-form" method="get" action="/cases"', self.javascript)
+        self.assertIn('.case-platform-switch-form', self.stylesheet)
+        self.assertNotIn('data-native-navigation="true"', self.javascript)
+
+    def test_case_project_switch_keeps_or_selects_a_compatible_platform(self) -> None:
+        for token in (
+            "const requestedPlatform = new URLSearchParams(location.search).get('platform_id');",
+            "const allowedPlatforms = projectProfile.allowed_platforms || [];",
+            "allowedPlatforms.includes(requestedPlatform)",
+            "{platform_id: compatiblePlatform}",
+            "pageUrl('/cases', project, {platform_id: initialPlatform})",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
+        self.assertIn('/assets/styles.css?v=20260824-3', self.index)
+        self.assertIn('/assets/app.js?v=20260824-3', self.index)
 
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (

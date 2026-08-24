@@ -484,7 +484,16 @@ function initGlobalTargetSwitcher() {
     selectedRunTarget = '';
     invalidateCaseCatalog();
     const targetPath = TOP_LEVEL_ROUTE_PATHS.includes(location.pathname) ? location.pathname : '/cases';
-    history.pushState({}, '', pageUrl(targetPath, project));
+    const requestedPlatform = new URLSearchParams(location.search).get('platform_id');
+    const projectProfile = testProject(project);
+    const allowedPlatforms = projectProfile.allowed_platforms || [];
+    const compatiblePlatform = allowedPlatforms.includes(requestedPlatform)
+      ? requestedPlatform
+      : String(projectProfile.default_platform || allowedPlatforms[0] || '');
+    const extra = targetPath === '/cases' && compatiblePlatform
+      ? {platform_id: compatiblePlatform}
+      : {};
+    history.pushState({}, '', pageUrl(targetPath, project, extra));
     switchDialog?.close();
     route();
   };
@@ -996,8 +1005,7 @@ function caseManagementPlatformButtons(activePlatform = '') {
     const label = platformId === 'w30' ? 'W30' : '579';
     const project = caseProjectForPlatform(platformId);
     if (!project) return `<span class="platform-choice is-disabled">${label}</span>`;
-    const href = pageUrl('/cases', project, {platform_id: platformId});
-    return `<a class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" data-case-platform="${platformId}" href="${escapeHtml(href)}" ${platformId === activePlatform ? 'aria-current="page"' : ''}>${label}</a>`;
+    return `<form class="case-platform-switch-form" method="get" action="/cases" data-case-platform="${platformId}"><input type="hidden" name="project" value="${escapeHtml(project)}"><input type="hidden" name="platform_id" value="${platformId}"><button class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" type="submit" ${platformId === activePlatform ? 'aria-current="page"' : ''}>${label}</button></form>`;
   }).join('');
 }
 
@@ -1803,16 +1811,24 @@ async function renderCasePlatformLanding() {
     <section class="workspace-card case-platform-gateway" aria-labelledby="case-platform-gateway-title">
       <header><p class="eyebrow">平台入口</p><h2 id="case-platform-gateway-title">选择用例平台</h2><p>W30 与 579 使用独立的项目范围、自动化绑定和执行链路。</p></header>
       <div class="case-platform-gateway-grid">
-        <a class="case-platform-entry is-w30" data-case-platform="w30" href="${escapeHtml(pageUrl('/cases', w30Project, {platform_id: 'w30'}))}">
-          <span class="case-platform-entry-code">W30</span>
-          <strong>进入 W30 用例管理</strong>
-          <small>管理 W30 模拟器与真机项目用例，执行时使用 W30 命令链路。</small>
-        </a>
-        <a class="case-platform-entry is-579" data-case-platform="579" href="${escapeHtml(pageUrl('/cases', platform579Project, {platform_id: '579'}))}">
-          <span class="case-platform-entry-code">579</span>
-          <strong>进入 579 用例管理</strong>
-          <small>管理 579 O2 用例，执行时使用 APP Bridge → BLE 与 O1/O2 证据链路。</small>
-        </a>
+        <form class="case-platform-entry is-w30" method="get" action="/cases" data-case-platform="w30">
+          <input type="hidden" name="project" value="${escapeHtml(w30Project)}">
+          <input type="hidden" name="platform_id" value="w30">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">W30</span>
+            <strong>进入 W30 用例管理</strong>
+            <small>管理 W30 模拟器与真机项目用例，执行时使用 W30 命令链路。</small>
+          </button>
+        </form>
+        <form class="case-platform-entry is-579" method="get" action="/cases" data-case-platform="579">
+          <input type="hidden" name="project" value="${escapeHtml(platform579Project)}">
+          <input type="hidden" name="platform_id" value="579">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">579</span>
+            <strong>进入 579 用例管理</strong>
+            <small>管理 579 O2 用例，执行时使用 APP Bridge → BLE 与 O1/O2 证据链路。</small>
+          </button>
+        </form>
       </div>
     </section>`;
 }
