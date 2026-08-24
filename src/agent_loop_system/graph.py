@@ -27,6 +27,7 @@ from agent_loop_system.reproduction import (
     successful_reproduction_commands,
 )
 from agent_loop_system.state import LoopState
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.build import BuildConfig, run_build
 from agent_loop_system.tools.source_context import (
     SourceContextError,
@@ -35,7 +36,8 @@ from agent_loop_system.tools.source_context import (
 )
 from agent_loop_system.tools.workspace import WorkspaceConflictError, resolve_source_root
 
-EVIDENCE_ROOT = Path(r"d:\Agent-loop-system\evidence")
+_RUNTIME_PATHS = RuntimePaths.from_root()
+EVIDENCE_ROOT = _RUNTIME_PATHS.evidence
 _TASK_ID_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
@@ -271,15 +273,21 @@ def interactive_reproduce_node(state: LoopState) -> dict:
     except ValueError:
         return _source_invalid(f"task_id 越出证据目录: {task_id}")
 
-    trace = run_interactive_reproduction(
-        task_id=task_id,
-        objective=state.get("objective", ""),
-        source_files=source_files,
-        defect_image_paths=state.get("defect_image_paths", []),
-        evidence_dir=reproduction_dir,
-        max_actions=6,
-        target=state.get("target", "simulator"),
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        llm_api_key_scope,
     )
+
+    with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+        trace = run_interactive_reproduction(
+            task_id=task_id,
+            objective=state.get("objective", ""),
+            source_files=source_files,
+            defect_image_paths=state.get("defect_image_paths", []),
+            evidence_dir=reproduction_dir,
+            max_actions=6,
+            target=state.get("target", "simulator"),
+        )
     trace_payload = trace.model_dump(mode="json")
     outcome = trace.outcome or ReproductionOutcome.SYSTEM_ERROR
     commands = successful_reproduction_commands(trace)
@@ -642,6 +650,10 @@ def test(state: LoopState) -> dict:
         judge_with_vision,
         run_single_case,
     )
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        llm_api_key_scope,
+    )
 
     task_id = state.get("task_id", "unknown")
     shot_dir = EVIDENCE_ROOT / task_id
@@ -674,8 +686,11 @@ def test(state: LoopState) -> dict:
                 results.append({
                     "case_id": case_id,
                     "sheet": sheet,
-                    "verdict": "ERROR",
+                    "verdict": "CANNOT_VERIFY",
                     "reason": f"用例执行异常: {exc}",
+                    "workflow_status": "failed",
+                    "execution_status": "ERROR",
+                    "reason_code": "CASE_EXECUTION_EXCEPTION",
                     "terminal_json": [],
                     "screenshots": [],
                 })
@@ -712,12 +727,13 @@ def test(state: LoopState) -> dict:
 
         if defect_criteria and shot_ok:
             ref = before_path if Path(before_path).is_file() else None
-            verdict = judge_with_vision(
-                after_path,
-                defect_criteria,
-                reference_screenshot=ref,
-                defect_image_paths=state.get("defect_image_paths", []),
-            )
+            with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                verdict = judge_with_vision(
+                    after_path,
+                    defect_criteria,
+                    reference_screenshot=ref,
+                    defect_image_paths=state.get("defect_image_paths", []),
+                )
             results.append({
                 "case_id": "agent_generated",
                 "sheet": "agent",
@@ -746,17 +762,39 @@ def test(state: LoopState) -> dict:
         }
 
     if target == "hardware":
+        from agent_loop_system.tools.hardware_preflight import (
+            require_hardware_preflight,
+        )
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-        from agent_loop_system.tools.real_device import RealDeviceSession
+        from agent_loop_system.tools.real_device import (
+            RealDeviceSession,
+            prepare_hardware_case_state,
+        )
 
         try:
             HardwareTargetConfig.from_env()
+            with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                require_hardware_preflight(
+                    evidence_dir=shot_dir / "preflight",
+                    persist_paths=(
+                        shot_dir / "preflight.json",
+                        _RUNTIME_PATHS.environment_checks
+                        / "6202_W5230"
+                        / "preflight.json",
+                    ),
+                )
+                prepare_hardware_case_state(
+                    evidence_dir=shot_dir / "hardware-preparation"
+                )
             session = RealDeviceSession(evidence_dir=shot_dir)
         except Exception as exc:
             return {
                 "verdict": "CANNOT_VERIFY",
-                "error": f"真机环境配置失败: {exc}",
-                "test_output": {"results": [], "evidence_issue": "真机环境配置失败"},
+                "error": f"真机环境配置、探测或状态准备失败: {exc}",
+                "test_output": {
+                    "results": [],
+                    "evidence_issue": "真机环境配置、探测或状态准备失败",
+                },
             }
     else:
         session = SimulatorSession(get_simulator_exe())
@@ -807,12 +845,13 @@ def test(state: LoopState) -> dict:
     if defect_criteria and shot_ok:
         # before_path 存在时传作参考（对比判定）
         ref = before_path if Path(before_path).is_file() else None
-        verdict = judge_with_vision(
-            after_path,
-            defect_criteria,
-            reference_screenshot=ref,
-            defect_image_paths=state.get("defect_image_paths", []),
-        )
+        with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+            verdict = judge_with_vision(
+                after_path,
+                defect_criteria,
+                reference_screenshot=ref,
+                defect_image_paths=state.get("defect_image_paths", []),
+            )
         results.append({
             "case_id": "agent_generated",
             "sheet": "agent",

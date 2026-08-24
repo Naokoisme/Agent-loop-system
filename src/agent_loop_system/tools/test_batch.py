@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import argparse
-import json
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 
 from agent_loop_system.main import _load_env
+from agent_loop_system.outcome import outcome_fields
+from agent_loop_system.reporting import write_result
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.case_map import (
     CaseRunResult,
     case_map_dir_for_target,
@@ -22,7 +24,7 @@ from agent_loop_system.tools.test import (
 
 
 CASE_MAP_DIR = case_map_dir_for_target("simulator")
-DEFAULT_OUTPUT_ROOT = Path(r"D:\Agent-loop-system\evidence\batch")
+DEFAULT_OUTPUT_ROOT = RuntimePaths.from_root().evidence / "batch"
 
 
 def _judgement_text(result: CaseRunResult) -> str:
@@ -39,6 +41,49 @@ def _sheet_names(requested: list[str] | None) -> list[str]:
     if requested:
         return requested
     return sorted(path.stem for path in CASE_MAP_DIR.glob("*.json"))
+
+
+def _case_record(
+    result: CaseRunResult,
+    decision: CaseDecision,
+    evidence_path: Path,
+    *,
+    reason_code: str | None = None,
+) -> dict[str, object]:
+    raw_verdict = str(decision.verdict or "CANNOT_VERIFY").upper()
+    product_verdict = (
+        raw_verdict
+        if raw_verdict in {"PASS", "FAIL", "CANNOT_VERIFY"}
+        else "CANNOT_VERIFY"
+    )
+    execution_error = bool(
+        result.aborted
+        or result.setup_errors
+        or result.action_errors
+        or result.collect_errors
+        or reason_code == "JUDGE_EXCEPTION"
+        or raw_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}
+    )
+    record: dict[str, object] = {
+        "sheet": result.sheet,
+        "case_id": result.case_id,
+        "verdict": product_verdict,
+        "reason": decision.reason,
+        "evidence": str(evidence_path),
+        "workflow_status": "completed",
+        "execution_status": "ERROR" if execution_error else "OK",
+        "evidence_status": "COMPLETE",
+        "reason_code": reason_code or (
+            "JUDGEMENT_ERROR"
+            if raw_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}
+            else "CASE_EXECUTION_ERROR" if execution_error else None
+        ),
+    }
+    record.update(outcome_fields(
+        record,
+        mapping_default=str(result.provenance.get("mapping_status") or "NOT_RECORDED"),
+    ))
+    return record
 
 
 def run_batch(
@@ -89,13 +134,12 @@ def run_batch(
                         reason="本次批量运行关闭了视觉判定",
                     )
                     save_evidence(result, decision, evidence_path)
-                    records.append({
-                        "sheet": sheet_name,
-                        "case_id": case.case_id,
-                        "verdict": decision.verdict,
-                        "reason": decision.reason,
-                        "evidence": str(evidence_path),
-                    })
+                    records.append(_case_record(
+                        result,
+                        decision,
+                        evidence_path,
+                        reason_code="JUDGEMENT_DISABLED",
+                    ))
                     continue
                 future = executor.submit(judge_case_result, result)
                 futures[future] = (result, evidence_path)
@@ -104,16 +148,17 @@ def run_batch(
             result, evidence_path = futures[future]
             try:
                 decision = future.result()
+                reason_code = None
             except Exception as exc:  # 单条模型异常不能丢失整批证据
                 decision = CaseDecision(verdict="CANNOT_VERIFY", reason=f"批量判定异常: {exc}")
+                reason_code = "JUDGE_EXCEPTION"
             save_evidence(result, decision, evidence_path)
-            records.append({
-                "sheet": result.sheet,
-                "case_id": result.case_id,
-                "verdict": decision.verdict,
-                "reason": decision.reason,
-                "evidence": str(evidence_path),
-            })
+            records.append(_case_record(
+                result,
+                decision,
+                evidence_path,
+                reason_code=reason_code,
+            ))
 
     verdict_counts: dict[str, int] = {}
     for record in records:
@@ -123,12 +168,22 @@ def run_batch(
         "executed": executed,
         "record_count": len(records),
         "verdict_counts": verdict_counts,
+        "workflow_status": "completed",
+        "execution_status": (
+            "ERROR"
+            if any(record.get("execution_status") == "ERROR" for record in records)
+            else "OK"
+        ),
+        "evidence_status": "COMPLETE" if len(records) == executed else "INCOMPLETE",
+        "mapping_status": "NOT_APPLICABLE",
+        "reason_code": (
+            "CASE_EXECUTION_ERROR"
+            if any(record.get("execution_status") == "ERROR" for record in records)
+            else None
+        ),
         "records": sorted(records, key=lambda item: (str(item["sheet"]), str(item["case_id"]))),
     }
-    (output_root / "summary.json").write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    write_result(output_root / "summary.json", summary)
     return summary
 
 

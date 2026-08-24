@@ -16,15 +16,17 @@ import time
 from pathlib import Path
 
 from agent_loop_system.main import _load_env
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 
 BRIDGE_MARKER = '{"protocol":"w30_test_bridge"'
 
 _load_env()
-SIM_EXE = os.environ.get(
+_PATHS = RuntimePaths.from_root()
+SIM_EXE = str(resolve_config_path(os.environ.get(
     "SIMULATOR_ARTIFACT_PATH",
-    r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe",
-)
-INBOX = Path(r"D:\Agent-loop-system\sim_tools\w30-test-command.txt")
+    _PATHS.firmware_workspaces / "620C_W6830" / "core" / "gui" / "simulator" / "bin" / "main.exe",
+)))
+INBOX = _PATHS.root / "sim_tools" / "w30-test-command.txt"
 READY_MARKERS = ("gui_comm_system_open_first_window",)
 
 

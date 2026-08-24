@@ -67,7 +67,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:4001;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_004\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_004\\result.json。",
       "verification_points": [
         "未开始状态点击置灰计次按钮后主计时仍为00:00.00且没有计次记录"
       ],
@@ -96,7 +96,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:5001;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_005\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_005\\result.json。",
       "verification_points": [
         "点击开始并等待后主计时增加，页面显示计次和暂停按钮"
       ],
@@ -155,7 +155,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:8001;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_008\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_008\\result.json。",
       "verification_points": [
         "点击计次后列表新增序号1和当前累计时间"
       ],
@@ -187,7 +187,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:9001;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_009\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_009\\result.json。",
       "verification_points": [
         "第二次计次后序号2显示在序号1上方"
       ],
@@ -277,7 +277,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:12002;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_012\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_012\\result.json。",
       "verification_points": [
         "已有30条计次时左侧计次按钮显示置灰",
         "再次点击置灰计次按钮后列表仍保持30条计次"
@@ -318,7 +318,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:13001;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_013\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_013\\result.json。",
       "verification_points": [
         "动作前截图显示较新的计次记录",
         "上滑后截图显示较旧的计次记录"
@@ -361,7 +361,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:14002;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_014\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_014\\result.json。",
       "verification_points": [
         "下滑前计次列表已离开顶部并显示较旧计次记录",
         "下滑后计次列表显示较新的高序号记录"
@@ -406,7 +406,7 @@
         "旋转后计次列表沿旋转方向滚动"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_015\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_015\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -470,7 +470,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:18003;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_018\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=3张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry\\秒表\\SW_018\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {
@@ -505,7 +505,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:19002;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_019\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\秒表\\SW_019\\result.json。",
       "mapping_status": "PROMOTED"
     },
     {

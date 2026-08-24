@@ -14,6 +14,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.case_map import (
     CaseEntry,
     OBSERVATION_ONLY_COMMANDS,
@@ -100,7 +101,12 @@ def _live_capabilities(target: str = "simulator") -> tuple[set[str], set[str]]:
         app_windows = config.app_windows
         app_quick_cmd = config.app_quick_cmd
     elif normalized_target == "simulator":
-        source_root = Path(os.environ.get("W30_SOURCE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"))
+        source_root = resolve_config_path(
+            os.environ.get(
+                "W30_SOURCE_ROOT",
+                RuntimePaths.from_root().firmware_workspaces / "620C_W6830",
+            )
+        )
         project = os.environ.get("W30_PROJECT", "620C_W6830")
         command_source = source_root / "core/comm/srv/test/hlq_quick_cmd_handler.c"
         project_cmake = source_root / f"app/projects/{project}/Project.cmake"

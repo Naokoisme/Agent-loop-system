@@ -32,6 +32,20 @@ from typing import Any, Mapping, Sequence
 
 _SAFE_SEGMENT = re.compile(r"[A-Za-z0-9][A-Za-z0-9._+-]{0,127}\Z")
 _BUFFER_SIZE = 1024 * 1024
+_RUNTIME_ASSET_PATHS = {
+    "commands": "runtime/commands.json",
+    "pages": "runtime/pages.json",
+}
+_REQUIRED_RUNTIME_METADATA = (
+    "project",
+    "target",
+    "firmware_version",
+    "firmware_sha256",
+    "automation_protocol_version",
+    "agent_loop_min_version",
+    "case_map_version",
+    "verified_capabilities",
+)
 
 
 class PublishError(RuntimeError):
@@ -56,6 +70,7 @@ class PublishResult:
     release: str
     latest: str
     artifact: FileRecord
+    runtime_assets: tuple[FileRecord, ...]
     download_artifact: str | None
     download_version_info: str | None
 
@@ -168,6 +183,108 @@ def _metadata_object(value: Mapping[str, Any], label: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise PublishError(f"{label} metadata must be a JSON object")
     return copy.deepcopy(dict(value))
+
+
+def _prepare_runtime_payload(
+    *,
+    runtime_assets: Mapping[str, Path] | None,
+    runtime_metadata: Mapping[str, Any] | None,
+    profile_id: str,
+    artifact_record: FileRecord,
+    firmware_metadata: Mapping[str, Any],
+) -> tuple[dict[str, Any] | None, dict[str, Path], tuple[FileRecord, ...]]:
+    """Validate optional runtime assets and bind them to the published firmware."""
+
+    if runtime_assets is None and runtime_metadata is None:
+        return None, {}, ()
+    if runtime_assets is None or runtime_metadata is None:
+        raise PublishError("runtime assets and runtime metadata must be supplied together")
+    if set(runtime_assets) != set(_RUNTIME_ASSET_PATHS):
+        raise PublishError(
+            "runtime assets must contain exactly: "
+            + ", ".join(sorted(_RUNTIME_ASSET_PATHS))
+        )
+
+    sources: dict[str, Path] = {}
+    records: list[FileRecord] = []
+    for name, relative_path in _RUNTIME_ASSET_PATHS.items():
+        source = Path(runtime_assets[name]).resolve(strict=True)
+        if not source.is_file():
+            raise PublishError(f"runtime asset is not a regular file: {source}")
+        sources[name] = source
+        records.append(_record(source, relative_path))
+    if len(set(sources.values())) != len(sources):
+        raise PublishError("runtime command and page assets must be distinct files")
+    runtime_documents: dict[str, dict[str, Any]] = {}
+    for name, source in sources.items():
+        try:
+            document = json.loads(source.read_text(encoding="utf-8-sig"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise PublishError(f"runtime {name} asset is not valid JSON: {source}") from exc
+        if not isinstance(document, dict):
+            raise PublishError(f"runtime {name} asset must be a JSON object")
+        if document.get("schema_version") != 1 or document.get("project") != profile_id:
+            raise PublishError(
+                f"runtime {name} asset schema/project does not match the profile"
+            )
+        runtime_documents[name] = document
+    commands_document = runtime_documents["commands"]
+    if (
+        not isinstance(commands_document.get("capabilities"), list)
+        or not commands_document["capabilities"]
+        or not str(commands_document.get("catalog") or "").strip()
+    ):
+        raise PublishError("runtime commands asset must contain capabilities and catalog")
+    if not str(runtime_documents["pages"].get("catalog") or "").strip():
+        raise PublishError("runtime pages asset must contain a non-empty catalog")
+
+    runtime = _metadata_object(runtime_metadata, "runtime")
+    if "assets" in runtime:
+        raise PublishError("runtime metadata key 'assets' is reserved")
+    for field in _REQUIRED_RUNTIME_METADATA:
+        if field not in runtime:
+            raise PublishError(f"runtime metadata must contain '{field}'")
+    if str(runtime.get("project") or "").strip() != profile_id:
+        raise PublishError("runtime project must match the profile id")
+    if str(runtime.get("target") or "").strip() != "hardware":
+        raise PublishError("runtime target must be 'hardware'")
+    expected_hash = artifact_record.sha256
+    if str(runtime.get("firmware_sha256") or "").strip().upper() != expected_hash:
+        raise PublishError("runtime firmware_sha256 must match the published artifact")
+    runtime_version = str(runtime.get("firmware_version") or "").strip()
+    if not runtime_version:
+        raise PublishError("runtime firmware_version must be non-empty")
+    published_value = firmware_metadata.get("runtime_version")
+    if isinstance(published_value, Mapping):
+        published_version = str(
+            published_value.get("ui_firmware_version")
+            or published_value.get("project_semver")
+            or ""
+        ).strip()
+    else:
+        published_version = str(published_value or "").strip()
+    if published_version and runtime_version != published_version:
+        raise PublishError("runtime firmware_version must match firmware runtime_version")
+    for field in (
+        "automation_protocol_version",
+        "agent_loop_min_version",
+        "case_map_version",
+    ):
+        if not str(runtime.get(field) or "").strip():
+            raise PublishError(f"runtime {field} must be non-empty")
+    verified = runtime.get("verified_capabilities")
+    if (
+        not isinstance(verified, list)
+        or not verified
+        or any(not isinstance(item, str) or not item.strip() for item in verified)
+    ):
+        raise PublishError("runtime verified_capabilities must be a non-empty string list")
+    runtime["firmware_sha256"] = expected_hash
+    runtime["assets"] = {
+        name: asdict(record)
+        for name, record in zip(_RUNTIME_ASSET_PATHS, records, strict=True)
+    }
+    return runtime, sources, tuple(records)
 
 
 def _json_bytes(payload: Mapping[str, Any]) -> bytes:
@@ -403,6 +520,8 @@ def publish_profile(
     firmware_metadata: Mapping[str, Any],
     source_metadata: Mapping[str, Any],
     validation_metadata: Mapping[str, Any],
+    runtime_assets: Mapping[str, Path] | None = None,
+    runtime_metadata: Mapping[str, Any] | None = None,
     artifact_name: str | None = None,
     download_root: Path | None = None,
     latest_artifact_name: str | None = None,
@@ -441,6 +560,13 @@ def publish_profile(
 
     relative_artifact = f"firmware/{artifact_name}"
     artifact_record = _record(artifact, relative_artifact)
+    runtime_payload, runtime_sources, runtime_records = _prepare_runtime_payload(
+        runtime_assets=runtime_assets,
+        runtime_metadata=runtime_metadata,
+        profile_id=profile_id,
+        artifact_record=artifact_record,
+        firmware_metadata=firmware,
+    )
     published_at = published_at or datetime.now(UTC).isoformat().replace("+00:00", "Z")
     incoming = _safe_child(profile_root, ".incoming", publish_id)
     release = _safe_child(profile_root, "releases", version)
@@ -484,6 +610,7 @@ def publish_profile(
         release=str(release),
         latest=str(latest),
         artifact=artifact_record,
+        runtime_assets=runtime_records,
         download_artifact=download_artifact,
         download_version_info=download_version_info,
     )
@@ -510,6 +637,11 @@ def publish_profile(
         local_staging.mkdir(parents=True, exist_ok=False)
         local_artifact = local_staging / relative_artifact
         _copy_new_file(artifact, local_artifact)
+        for name, source_path in runtime_sources.items():
+            _copy_new_file(
+                source_path,
+                local_staging / _RUNTIME_ASSET_PATHS[name],
+            )
 
         firmware_payload = copy.deepcopy(firmware)
         firmware_payload["artifact"] = asdict(artifact_record)
@@ -526,6 +658,8 @@ def publish_profile(
                 "published_at": published_at,
             },
         }
+        if runtime_payload is not None:
+            profile_manifest["runtime"] = runtime_payload
         firmware_manifest = {
             "schema_version": 1,
             "profile_id": profile_id,
@@ -541,6 +675,10 @@ def publish_profile(
 
         payload_records = [
             _record(local_staging / relative_artifact, relative_artifact),
+            *(
+                _record(local_staging / item.path, item.path)
+                for item in runtime_records
+            ),
             _record(local_staging / "firmware_manifest.json", "firmware_manifest.json"),
             _record(local_staging / "profile_manifest.json", "profile_manifest.json"),
         ]
@@ -637,6 +775,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--firmware-metadata", required=True)
     parser.add_argument("--source-metadata", required=True)
     parser.add_argument("--validation-metadata", required=True)
+    parser.add_argument("--runtime-commands", type=Path)
+    parser.add_argument("--runtime-pages", type=Path)
+    parser.add_argument(
+        "--runtime-metadata",
+        help="JSON object, JSON file, or @JSON-file for the source-free hardware runtime profile",
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -648,6 +792,17 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        runtime_args = (
+            args.runtime_commands,
+            args.runtime_pages,
+            args.runtime_metadata,
+        )
+        if any(value is not None for value in runtime_args) and not all(
+            value is not None for value in runtime_args
+        ):
+            raise PublishError(
+                "--runtime-commands, --runtime-pages and --runtime-metadata must be supplied together"
+            )
         result = publish_profile(
             profile_root=args.profile_root,
             version=args.version,
@@ -660,6 +815,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             firmware_metadata=_load_json_object(args.firmware_metadata, "firmware"),
             source_metadata=_load_json_object(args.source_metadata, "source"),
             validation_metadata=_load_json_object(args.validation_metadata, "validation"),
+            runtime_assets=(
+                {"commands": args.runtime_commands, "pages": args.runtime_pages}
+                if args.runtime_commands is not None and args.runtime_pages is not None
+                else None
+            ),
+            runtime_metadata=(
+                _load_json_object(args.runtime_metadata, "runtime")
+                if args.runtime_metadata is not None
+                else None
+            ),
             dry_run=args.dry_run,
         )
     except (OSError, ValueError, json.JSONDecodeError, PublishError) as exc:

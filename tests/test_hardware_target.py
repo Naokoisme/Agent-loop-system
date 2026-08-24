@@ -177,6 +177,27 @@ class HardwareTargetConfigTest(unittest.TestCase):
                 config = HardwareTargetConfig.from_env()
             self.assertEqual(config.source_root, proj_dir.resolve())
 
+    def test_relative_paths_and_layout_discovery_use_app_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            layout = Path(directory)
+            app_root = layout / "system"
+            project_root = layout / "workspaces" / "firmware" / "6202_W5230"
+            app_root.mkdir()
+            project_root.mkdir(parents=True)
+            self._tree(project_root)
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "AGENT_LOOP_ROOT": str(app_root),
+                    "AGENT_LOOP_LAYOUT_ROOT": "..",
+                    "W30_HARDWARE_SOURCE_ROOT": "../workspaces/firmware/6202_W5230",
+                    "W30_HARDWARE_WORKSPACE_ROOT": "../workspaces/firmware/6202_W5230",
+                },
+                clear=True,
+            ):
+                config = HardwareTargetConfig.from_env()
+            self.assertEqual(config.source_root, project_root.resolve())
+
     def test_auto_discovery_fails_when_workspace_not_found(self) -> None:
         with mock.patch(
             "agent_loop_system.tools.hardware_target.find_hardware_workspace",
@@ -225,7 +246,6 @@ class HardwareCommandPolicyTest(unittest.TestCase):
             "SIM_CHARGE",
             "FACTORY_RESET",
             "POWER_OFF",
-            "TEST_SESSION",
         ):
             with self.subTest(command=command):
                 allowed, reason = hardware_command_allowed(command)
@@ -236,6 +256,9 @@ class HardwareCommandPolicyTest(unittest.TestCase):
         for command in ("GUI_PING", "GUI_STATE", "GUI_TREE", "ENTER_PAGE"):
             with self.subTest(command=command):
                 self.assertEqual(hardware_command_allowed(command), (True, None))
+
+    def test_runner_test_session_command_is_allowed(self) -> None:
+        self.assertEqual(hardware_command_allowed("TEST_SESSION"), (True, None))
 
 
 if __name__ == "__main__":

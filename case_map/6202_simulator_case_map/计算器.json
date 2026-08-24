@@ -3,6 +3,7 @@
   "source_profile": "620C_W6830",
   "sheet": "计算器",
   "window_version": "5803_SBYH_FP410X502",
+  "coordinate_source": "D:\\Agent-loop\\workspaces\\firmware\\6202_W5230\\app\\windows\\5803_SBYH_FP410X502\\gui_win_calculator.json",
   "cases": [
     {
       "case_id": "CALC_001",
@@ -74,7 +75,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_004\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_004\\result.json。",
       "verification_points": [
         "依次输入123456789后，数值区完整显示123456789"
       ],
@@ -109,7 +110,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_005\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_005\\result.json。",
       "verification_points": [
         "已有9位数字时再点击数字键，数值区仍显示123456789且无提示"
       ],
@@ -144,7 +145,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_006\\result.json。 产品真实FAIL：第10位输入后实际显示1234567.89，与原始预期“第10位输入无响应”冲突。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=FAIL，evidence_contract=COMPLETE，独立审计=PROMOTABLE_FAIL，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_006\\result.json。 产品真实FAIL：第10位输入后实际显示1234567.89，与原始预期“第10位输入无响应”冲突。",
       "verification_points": [
         "数值区显示1234567.8共9位",
         "继续点击数字9后数值区仍显示1234567.8"
@@ -172,7 +173,7 @@
       ],
       "collect": [],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_007\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=2张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_007\\result.json。",
       "verification_points": [
         "数值区显示0.",
         "数值区显示0.5"
@@ -202,7 +203,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_008\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_008\\result.json。",
       "verification_points": [
         "数值区已有1.2时再次点击小数点，数值区仍显示1.2"
       ],
@@ -231,7 +232,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_009\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_009\\result.json。",
       "verification_points": [
         "数值区显示123时点击顶部退格图标，数值区显示12"
       ],
@@ -258,7 +259,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_010\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_010\\result.json。",
       "verification_points": [
         "数值区显示7时点击顶部退格图标，数值区显示0"
       ],
@@ -286,7 +287,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_011\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_011\\result.json。",
       "verification_points": [
         "运算结果8点击顶部退格图标后，数值区显示0且无待处理运算状态"
       ],
@@ -315,7 +316,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_012\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal\\计算器\\CALC_012\\result.json。",
       "verification_points": [
         "未完成运算点击AC后，数值区显示0且运算状态清除"
       ],
@@ -344,7 +345,7 @@
         "srv_quick_cmd send TOP5STEP:HOST_SCREENSHOT:1;"
       ],
       "unable": false,
-      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：./Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry2\\CALC_013\\result.json。",
+      "note": "2026-08-15外部探索已实际执行，正式Runner复跑完成；verdict=PASS，evidence_contract=COMPLETE，独立审计=PROMOTABLE_PASS，正式截图=1张。证据：D:\\Agent-loop\\data\\legacy-evidence\\next-batch-calc-stopwatch\\formal-retry2\\CALC_013\\result.json。",
       "verification_points": [
         "依次点击2、+、3、=后，数值区显示5"
       ],

@@ -5,8 +5,8 @@
     srv_quick_cmd send "TOP5STEP:GUI_TREE:1;"
     :GUI_TREE:1
 
-本模块只做发送前的安全检查，并从当前固件源码确认命令是否注册、是否明确不可用。
-参数数量、参数含义和参数值均交给固件 handler 判断。
+本模块做发送前的安全检查，并从当前固件源码确认命令是否注册、是否明确不可用。
+ENTER_PAGE 的必填结构由共享合同确定性校验；其他业务参数仍交给固件 handler 判断。
 """
 from __future__ import annotations
 
@@ -16,6 +16,11 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from agent_loop_system.runtime_root import resolve_config_path
+from agent_loop_system.tools.enter_page_contract import (
+    ENTER_PAGE_COMMAND,
+    parse_enter_page_args,
+)
 from agent_loop_system.tools.simulator import CommandResult, extract_json_objects
 
 if TYPE_CHECKING:
@@ -74,7 +79,7 @@ def _current_command_source() -> Path:
     if not source_root:
         raise ValueError("W30_SOURCE_ROOT 未配置，无法校验当前真实源码命令")
     source = (
-        Path(source_root)
+        resolve_config_path(source_root)
         / "core"
         / "comm"
         / "srv"
@@ -112,7 +117,7 @@ def validate_agent_command(
 ) -> None:
     """校验命令安全性、真实源码注册状态和明确的不可用状态。"""
     bare = normalize_command(raw)
-    name, _args = _parse_bare(bare)
+    name, args = _parse_bare(bare)
     current = capabilities if capabilities is not None else load_current_command_capabilities()
     capability = current.get(name)
     if capability is None:
@@ -120,13 +125,15 @@ def validate_agent_command(
     if not capability.available:
         reason = capability.unavailable_reason or "源码明确标记不可用"
         raise ValueError(f"命令 {name} 不可用: {reason}")
+    if name == ENTER_PAGE_COMMAND:
+        parse_enter_page_args(args)
 
 
 def validate_agent_commands(
     commands: list[str],
     capabilities: Mapping[str, CommandCapability] | None = None,
 ) -> None:
-    """校验命令序列；不限制业务参数，也不限制命令顺序。"""
+    """校验命令序列；除共享合同外不判断业务参数，也不限制命令顺序。"""
     if not commands:
         raise ValueError("命令序列为空")
     current = capabilities if capabilities is not None else load_current_command_capabilities()

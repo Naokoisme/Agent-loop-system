@@ -22,6 +22,7 @@ from agent_loop_system.exploration_core.contracts import (
 )
 from agent_loop_system.exploration_core.runtime import PlatformExplorationRuntime
 
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.command_protocol import (
     collect_command_json,
     load_current_command_capabilities,
@@ -349,11 +350,16 @@ def interactive_reproduce(
     test_case: dict[str, str] | None = None,
     build_simulator: bool = True,
     platform_runtime: PlatformExplorationRuntime | None = None,
+    hardware_runtime_profile=None,
+    reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> ReproductionTrace:
     """在选定目标上按“观察→一个动作→再观察”完成缺陷复现或普通测试。
 
     simulator 保持原有的一次构建、一次会话；hardware 跳过构建，直接使用
-    当前已烧录的 6202 Debug 固件，并从核对后的 6202 源码即时加载命令表。
+    当前已烧录的目标固件，并从版本绑定的运行时档案加载命令与页面能力；
+    默认在首次观察前执行真实 Preflight，并调用无重启真机状态准备入口。
     注入 ``platform_runtime`` 时复用完全相同的 Agent 判断循环，只替换平台会话、
     能力目录、命令校验和平台提示。
     """
@@ -369,6 +375,10 @@ def interactive_reproduce(
         raise ValueError("max_actions 必须大于 0")
     if platform_runtime is None and target not in {"simulator", "hardware"}:
         raise ValueError(f"未知执行目标: {target}")
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
+        )
 
     execution_target = (
         platform_runtime.platform_id if platform_runtime is not None else target
@@ -407,17 +417,53 @@ def interactive_reproduce(
             command_normalizer = platform_runtime.normalize_command
             command_validator = platform_runtime.validate_command
         elif target == "hardware":
-            from agent_loop_system.tools.hardware_target import (
-                HardwareTargetConfig,
-                build_hardware_agent_knowledge,
-                load_hardware_command_capabilities,
+            hardware_project = str(
+                (test_case or {}).get("project")
+                or os.environ.get("W30_HARDWARE_PROJECT")
+                or "6202_W5230"
             )
-            from agent_loop_system.tools.real_device import RealDeviceSession
+            if not hardware_preflight_completed:
+                from agent_loop_system.tools.hardware_preflight import (
+                    require_hardware_preflight,
+                )
+                from agent_loop_system.tools.llm_config import (
+                    LLM_API_KEY_SCOPE_EXPLORATION,
+                    llm_api_key_scope,
+                )
 
-            hardware_config = HardwareTargetConfig.from_env()
-            capabilities = load_hardware_command_capabilities(hardware_config)
-            capability_knowledge = build_hardware_agent_knowledge(hardware_config)
-            navigation_source_root = str(hardware_config.source_root)
+                runtime_paths = RuntimePaths.from_root()
+                with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                    require_hardware_preflight(
+                        project=hardware_project,
+                        evidence_dir=output_dir / "preflight",
+                        persist_paths=(
+                            output_dir / "preflight.json",
+                            runtime_paths.environment_checks
+                            / hardware_project
+                            / "preflight.json",
+                        ),
+                    )
+            from agent_loop_system.tools.hardware_runtime_profile import (
+                load_hardware_runtime_profile,
+            )
+            from agent_loop_system.tools.real_device import (
+                RealDeviceSession,
+                prepare_hardware_case_state,
+                reset_hardware_case_state,
+            )
+
+            runtime_profile = hardware_runtime_profile or load_hardware_runtime_profile(
+                project=hardware_project,
+            )
+            capabilities = runtime_profile.command_capabilities
+            capability_knowledge = runtime_profile.agent_knowledge
+            if reset_hardware:
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=output_dir / "hardware-preparation")
             session: DeviceSession = RealDeviceSession(evidence_dir=output_dir)
         else:
             capabilities = load_current_command_capabilities()
@@ -496,6 +542,9 @@ def interactive_reproduce(
                 defect_image_paths=defect_image_paths,
                 execution_target=execution_target,
                 capability_knowledge=capability_knowledge,
+                navigation_source_enabled=(
+                    platform_runtime is not None or target != "hardware"
+                ),
                 navigation_source_root=navigation_source_root,
                 test_case=test_case,
                 target_label=target_label,
@@ -549,6 +598,7 @@ def interactive_reproduce(
                     verdict = judge_test_with_vision(
                         str(test_case.get("expected_text") or ""),
                         screenshots,
+                        project=str(test_case.get("project") or ""),
                     )
                 trace.verdict = verdict.verdict
                 outcome = {

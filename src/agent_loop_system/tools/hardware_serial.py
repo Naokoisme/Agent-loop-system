@@ -24,6 +24,11 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from agent_loop_system.tools.command_protocol import normalize_command
+from agent_loop_system.tools.hardware_serial_ports import (
+    SUPERCOM_PIPE_PREFIX,
+    get_supercom_pipe_name,
+    get_supercom_pipe_path,
+)
 
 
 DEFAULT_PORT = "COM7"
@@ -36,6 +41,7 @@ DEFAULT_EVENT_CACHE_CAPACITY = 8_192
 DEFAULT_BACKGROUND_ERROR_CACHE_CAPACITY = 4_096
 SHELL_WRITE_BURST_LIMIT = 64
 BRIDGE_PROTOCOL = "w30_test_bridge"
+BRIDGE_PROTOCOL_VERSION = 1
 BRIDGE_MARKER = '{"protocol":"w30_test_bridge"'
 BRIDGE_COMMAND_RESULT_PREFIX = (
     '{"protocol":"w30_test_bridge","version":1,"type":"command'
@@ -376,7 +382,7 @@ class _WinOverlapped(ctypes.Structure):
 class SuperComPipeTransport:
     """Transparent byte transport through a SuperCom-owned COM port."""
 
-    PIPE_PREFIX = "SuperCom.AgentBridge."
+    PIPE_PREFIX = SUPERCOM_PIPE_PREFIX
 
     def __init__(self, port: str = DEFAULT_PORT, *, connect_timeout_ms: int = 2000) -> None:
         if not port or "\r" in port or "\n" in port:
@@ -388,12 +394,8 @@ class SuperComPipeTransport:
         ):
             raise ValueError("connect_timeout_ms must be a positive integer")
         self.port = port
-        safe_port = "".join(
-            value if value.isalnum() or value in "_-" else "_"
-            for value in port.strip().upper()
-        )
-        self.pipe_name = f"{self.PIPE_PREFIX}{safe_port}"
-        self.pipe_path = rf"\\.\pipe\{self.pipe_name}"
+        self.pipe_name = get_supercom_pipe_name(port)
+        self.pipe_path = get_supercom_pipe_path(port)
         self.connect_timeout_ms = connect_timeout_ms
         self._kernel32 = None
         self._handle = None

@@ -5,6 +5,8 @@ import os
 import re
 from pathlib import Path
 
+from agent_loop_system.runtime_root import resolve_config_path
+
 
 class WorkspaceConflictError(ValueError):
     """运行配置指向了非 Agent 专用工作区。"""
@@ -19,13 +21,13 @@ def resolve_source_root() -> Path:
     if not source_value:
         raise WorkspaceConflictError("W30_SOURCE_ROOT 未配置")
 
-    source_root = Path(source_value).resolve()
+    source_root = resolve_config_path(source_value)
     if not source_root.is_dir():
         raise WorkspaceConflictError(f"W30_SOURCE_ROOT 不存在: {source_root}")
 
     workspace_value = os.environ.get("W30_AGENT_WORKSPACE_ROOT", "").strip()
     if workspace_value:
-        workspace_root = Path(workspace_value).resolve()
+        workspace_root = resolve_config_path(workspace_value)
         if source_root != workspace_root:
             raise WorkspaceConflictError(
                 f"WORKSPACE_CONFLICT: W30_SOURCE_ROOT 必须指向 Agent 专用工作区 {workspace_root}"
@@ -48,12 +50,12 @@ def resolve_source_root() -> Path:
 
 def ensure_path_in_workspace(path: str | Path, label: str) -> Path:
     """启用隔离配置时，确保构建目录和产物也位于专用工作区。"""
-    resolved = Path(path).resolve()
+    resolved = resolve_config_path(path)
     workspace_value = os.environ.get("W30_AGENT_WORKSPACE_ROOT", "").strip()
     if not workspace_value:
         return resolved
 
-    workspace_root = Path(workspace_value).resolve()
+    workspace_root = resolve_config_path(workspace_value)
     try:
         resolved.relative_to(workspace_root)
     except ValueError as exc:

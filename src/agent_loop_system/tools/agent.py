@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
+from agent_loop_system.runtime_root import resolve_config_path
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
@@ -55,7 +56,7 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
     if kb_dir == SIMULATOR_KB_DIR and source_root_value:
         from sim_tools.extract_kb import extract_commands, extract_windows
 
-        source_root = Path(source_root_value).resolve()
+        source_root = resolve_config_path(source_root_value)
         project = os.environ.get("W30_PROJECT", "").strip()
         if not project:
             raise ValueError("W30_PROJECT 未配置，不能从真实源码生成模拟器能力目录")
@@ -87,9 +88,12 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
 
 
 def _create_llm():
-    from agent_loop_system.tools.llm_config import create_chat_llm
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        create_chat_llm,
+    )
 
-    return create_chat_llm()
+    return create_chat_llm(api_key_scope=LLM_API_KEY_SCOPE_EXPLORATION)
 
 
 def _load_images(image_dir: str | None) -> list[tuple[str, str]]:
@@ -171,6 +175,7 @@ def decide_reproduction_action(
     execution_target: str = "simulator",
     capability_knowledge: str | None = None,
     navigation_source_root: str | None = None,
+    navigation_source_enabled: bool = True,
     test_case: dict[str, str] | None = None,
     target_label: str | None = None,
     platform_guidance: str | None = None,
@@ -178,6 +183,9 @@ def decide_reproduction_action(
     """根据当前观察只决定下一步，不生成整套命令。"""
     from agent_loop_system.reproduction import ReproductionDecision
     from agent_loop_system.tools.test import VISUAL_RELEVANCE_RULES, _bmp_to_png_b64
+
+    if execution_target == "hardware" and not str(capability_knowledge or "").strip():
+        raise ValueError("真机执行缺少已验证的 HardwareRuntimeProfile 能力目录")
 
     llm = _create_llm()
     if llm is None:
@@ -223,16 +231,18 @@ def decide_reproduction_action(
     actual_window = ""
     if current:
         actual_window = current.popup_name or current.window_name or ""
-    navigation_kwargs: dict[str, Any] = {
-        "existing_paths": [item["path"] for item in source_files]
-    }
-    if navigation_source_root is not None:
-        navigation_kwargs["source_root"] = navigation_source_root
-    navigation_sources = load_runtime_navigation_sources(
-        target_window,
-        actual_window,
-        **navigation_kwargs,
-    )
+    navigation_sources: list[dict[str, str]] = []
+    if navigation_source_enabled:
+        navigation_kwargs: dict[str, Any] = {
+            "existing_paths": [item["path"] for item in source_files]
+        }
+        if navigation_source_root is not None:
+            navigation_kwargs["source_root"] = navigation_source_root
+        navigation_sources = load_runtime_navigation_sources(
+            target_window,
+            actual_window,
+            **navigation_kwargs,
+        )
     navigation_text = "\n\n".join(
         f"=== 运行时入口文件: {item['path']} ===\n{item['content']}"
         for item in navigation_sources
@@ -242,7 +252,11 @@ def decide_reproduction_action(
         str(target_label or "").strip()
         or ("当前真机项目" if execution_target == "hardware" else "模拟器")
     )
-    target_knowledge = capability_knowledge or load_simulator_knowledge()
+    target_knowledge = (
+        str(capability_knowledge)
+        if execution_target == "hardware"
+        else capability_knowledge or load_simulator_knowledge()
+    )
     if platform_guidance:
         navigation_rule = (
             "6. 只能从当前平台能力目录选择业务动作；不得编造平台命令、协议值、坐标或能力别名。\n"
@@ -251,7 +265,8 @@ def decide_reproduction_action(
     else:
         navigation_rule = (
             "6. 优先使用注册窗口的 ENTER_PAGE；目标窗口本身能展示文案、排版或图片时，不得额外读取"
-            " BUSINESS_GET 或注入无关业务数据。\n"
+            " BUSINESS_GET 或注入无关业务数据。使用 ENTER_PAGE 时必须原样复制页面目录的完整示例；"
+            "若目录标记‘完整示例=无’，不得猜测 param，应改走真实 UI 导航或 BLOCKED。\n"
         )
         target_rule = (
             "7. 当前是真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"

@@ -14,6 +14,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from agent_loop_system.runtime_root import resolve_config_path
 from agent_loop_system.tools.workspace import resolve_source_root
 
 DEFAULT_ADAPTER_PATH = Path(r"D:\designer_mcp_adapter\server.py")
@@ -125,7 +126,9 @@ def designer_enabled(value: str | None = None) -> bool:
 
 
 def designer_adapter_path() -> Path:
-    return Path(os.environ.get("DESIGNER_MCP_ADAPTER_PATH", str(DEFAULT_ADAPTER_PATH))).resolve()
+    return resolve_config_path(
+        os.environ.get("DESIGNER_MCP_ADAPTER_PATH", str(DEFAULT_ADAPTER_PATH))
+    )
 
 
 def designer_project_path() -> Path:

@@ -24,6 +24,9 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from agent_loop_system.outcome import outcome_fields
+from agent_loop_system.reporting import write_result
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.case_map import (
     CASE_MAP_PROFILE_DIRS,
     CASE_MAP_PROFILE_PROJECTS,
@@ -33,15 +36,29 @@ from agent_loop_system.tools.case_map import (
     load_case_map,
     run_case,
 )
+from agent_loop_system.tools.command_protocol import (
+    normalize_command,
+    validate_agent_command,
+)
 from agent_loop_system.tools.llm_retry import (
     LLMRetryError,
     get_llm_request_timeout,
     invoke_llm_with_retry,
 )
 from agent_loop_system.tools.simulator import SimulatorSession
+from agent_loop_system.tools.visual_translations import visual_translation_context
 
-DEFAULT_SIM_EXE = r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe"
-EVIDENCE_DIR = Path(r"d:\Agent-loop-system\evidence")
+_RUNTIME_PATHS = RuntimePaths.from_root()
+DEFAULT_SIM_EXE = str(
+    _RUNTIME_PATHS.firmware_workspaces
+    / "620C_W6830"
+    / "core"
+    / "gui"
+    / "simulator"
+    / "bin"
+    / "main.exe"
+)
+EVIDENCE_DIR = _RUNTIME_PATHS.evidence
 VISUAL_RELEVANCE_RULES = (
     "- 只比较缺陷标题、描述和验收条件明确涉及的界面属性，不得从参考图中扩展出新的故障点。\n"
     "- 复合需求图中，明确标注为“说明文案”“预期结果”“需求描述”等规格文字的内容定义预期；"
@@ -80,7 +97,9 @@ def _screenshot_capture_note(path: str) -> str:
 
 def get_simulator_exe() -> str:
     """每次启动时从环境读取模拟器，避免服务进程长期持有旧工作区路径。"""
-    return os.environ.get("SIMULATOR_ARTIFACT_PATH", DEFAULT_SIM_EXE)
+    return str(resolve_config_path(
+        os.environ.get("SIMULATOR_ARTIFACT_PATH", DEFAULT_SIM_EXE)
+    ))
 
 
 def _result_provenance(
@@ -138,6 +157,19 @@ class Verdict(BaseModel):
     """LLM 判定结果。"""
 
     verdict: Literal["PASS", "FAIL", "CANNOT_VERIFY"]
+    reason: str
+
+
+class MenuStyleClassification(BaseModel):
+    """6202 主菜单截图的结构化风格分类。"""
+
+    style: Literal[
+        "LIST_RADIUS",
+        "HONEYCOMB",
+        "WATERFALL",
+        "GALACTIC_RING",
+        "UNKNOWN",
+    ]
     reason: str
 
 
@@ -203,9 +235,13 @@ def judge_with_vision(
     defect_image_paths 为缺陷原图/规格参考图；
     reference_screenshot 非空时为修复前截图，用于对比判定修复效果。
     """
-    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        create_chat_llm,
+        get_llm_api_key,
+    )
 
-    api_key = get_llm_api_key()
+    api_key = get_llm_api_key(LLM_API_KEY_SCOPE_EXPLORATION)
     if not api_key or api_key.startswith("暂时"):
         return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent API 配置出错：API key 不可用")
     try:
@@ -219,7 +255,7 @@ def judge_with_vision(
         return Verdict(verdict="CANNOT_VERIFY", reason=f"截图读取失败: {screenshot_path}")
 
     try:
-        llm = create_chat_llm()
+        llm = create_chat_llm(api_key_scope=LLM_API_KEY_SCOPE_EXPLORATION)
         if llm is None:
             return Verdict(verdict="CANNOT_VERIFY", reason="识图 Agent 初始化失败")
     except Exception as exc:
@@ -318,6 +354,8 @@ def judge_test_with_vision(
     expected_text: str,
     screenshots: list[dict[str, object]],
     verification_points: list[str] | None = None,
+    *,
+    project: str = "",
 ) -> Verdict:
     """只根据检查点截图判定普通测试；命令输出和 GUI_TREE 不进入 LLM。"""
     from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
@@ -359,10 +397,19 @@ def judge_test_with_vision(
     point_text = "\n".join(
         f"{index}. {point}" for index, point in enumerate(points, start=1)
     ) or "未单列验证点；使用最终截图核对完整预期结果。"
+    translation_context = visual_translation_context(
+        project,
+        [expected_text, *points],
+    )
+    translation_section = (
+        f"\n\n{translation_context}\n" if translation_context else ""
+    )
     prompt = (
-        "你是嵌入式手表自动测试的视觉判定器。产品 PASS/FAIL 的唯一证据是下方模拟器截图。\n\n"
+        "你是嵌入式手表自动测试的视觉判定器。产品状态的唯一证据是下方截图；"
+        "翻译对照只用于解释截图中肉眼可见的文字。\n\n"
         f"预期结果：\n{expected_text}\n\n"
-        f"按顺序对应的验证点：\n{point_text}\n\n"
+        f"按顺序对应的验证点：\n{point_text}"
+        f"{translation_section}\n"
         "判定约束：\n"
         "- 只能依据截图中肉眼可见的界面内容判定，不得假设或索要 GUI_TREE、控件属性、页面名、终端 JSON 或命令结果。\n"
         "- 验证点与截图按序一一对应；有多个验证点时，必须逐张核对。\n"
@@ -395,6 +442,65 @@ def judge_test_with_vision(
         return Verdict(verdict="CANNOT_VERIFY", reason=f"识图 Agent API 出错：{exc}")
 
 
+def classify_menu_style_with_vision(
+    screenshot_path: str,
+) -> MenuStyleClassification:
+    """只根据一张主菜单截图返回6202配置中的精确菜单风格。"""
+    from agent_loop_system.tools.llm_config import create_chat_llm, get_llm_api_key
+
+    def unknown(reason: str) -> MenuStyleClassification:
+        return MenuStyleClassification(style="UNKNOWN", reason=reason)
+
+    api_key = get_llm_api_key()
+    if not api_key or api_key.startswith("暂时"):
+        return unknown("识图 Agent API 配置出错：API key 不可用")
+    try:
+        from langchain_core.messages import HumanMessage
+        from langchain_openai import ChatOpenAI
+    except ImportError:
+        return unknown("识图 Agent 依赖缺失：langchain 未安装")
+
+    encoded = _bmp_to_png_b64(screenshot_path)
+    if not encoded:
+        return unknown(f"菜单风格截图读取失败: {screenshot_path}")
+
+    try:
+        llm = create_chat_llm()
+        if llm is None:
+            return unknown("识图 Agent 初始化失败")
+    except Exception as exc:
+        return unknown(f"识图 Agent API 初始化出错：{exc}")
+
+    prompt = (
+        "你是嵌入式手表主菜单风格分类器。只观察下方这一张当前截图，"
+        "必须从以下五个枚举中选择一个 style：\n"
+        "- LIST_RADIUS：单列纵向列表，每行一个应用图标并带应用名称。\n"
+        "- HONEYCOMB：多个圆形应用图标按蜂窝状密集排列，通常不显示名称。\n"
+        "- WATERFALL：应用图标沿纵向弧线或瀑布状排列，图标大小随位置变化。\n"
+        "- GALACTIC_RING：应用图标按圆环或轨道状排列。\n"
+        "- UNKNOWN：截图不是清楚可见的主菜单、被遮挡，或无法可靠区分。\n\n"
+        "只做当前可见布局分类，不依据命令结果、页面名、先前截图或自由联想。"
+        "无法确认时必须返回 UNKNOWN，不得猜测。reason 简要说明肉眼证据。"
+    )
+    content: list[dict[str, object]] = [
+        {"type": "text", "text": prompt},
+        {"type": "text", "text": _screenshot_capture_note(screenshot_path)},
+        {
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{encoded}"},
+        },
+    ]
+    try:
+        message = HumanMessage(content=content)
+        return invoke_llm_with_retry(
+            lambda: llm.with_structured_output(MenuStyleClassification).invoke(
+                [message]
+            )
+        )
+    except LLMRetryError as exc:
+        return unknown(f"识图 Agent API 出错：{exc}")
+
+
 def judge_case_result(result: CaseRunResult) -> CaseDecision:
     """先执行证据门禁，再把完整截图交给视觉模型判产品结果。"""
 
@@ -413,7 +519,7 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
             if isinstance(item, dict) and str(item.get("message") or "").strip()
         ]
         reason = messages[0] if messages else "证据合同不完整，禁止进入产品 PASS 判定"
-        return CaseDecision(verdict="ERROR", reason=reason)
+        return CaseDecision(verdict="CANNOT_VERIFY", reason=reason)
 
     if result.precomputed_verdict:
         return CaseDecision(
@@ -421,11 +527,24 @@ def judge_case_result(result: CaseRunResult) -> CaseDecision:
             reason=result.precomputed_reason or "Agent-loop 探索已完成",
         )
 
-    visual = judge_test_with_vision(
-        result.expected_text,
-        result.screenshots,
-        result.verification_points,
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        LLM_API_KEY_SCOPE_FIXED,
+        llm_api_key_scope,
     )
+
+    scope = (
+        LLM_API_KEY_SCOPE_EXPLORATION
+        if result.execution_mode == "agent_exploration"
+        else LLM_API_KEY_SCOPE_FIXED
+    )
+    with llm_api_key_scope(scope):
+        visual = judge_test_with_vision(
+            result.expected_text,
+            result.screenshots,
+            result.verification_points,
+            project=str(result.provenance.get("project") or ""),
+        )
     return CaseDecision(verdict=visual.verdict, reason=visual.reason)
 
 
@@ -447,25 +566,37 @@ def save_evidence(
         for item in contract_issues
         if isinstance(item, dict) and str(item.get("message") or "").strip()
     ), "")
+    execution_errors = (
+        result.setup_errors + result.action_errors + result.collect_errors
+    )
+    execution_failure = bool(result.aborted or execution_errors or evidence_error)
+    reason_code = (
+        "EVIDENCE_INCOMPLETE"
+        if evidence_error
+        else "CASE_EXECUTION_ERROR" if execution_failure else None
+    )
     if result.skipped:
-        result_verdict = "CANNOT_VERIFY"
+        raw_verdict = "CANNOT_VERIFY"
         reason = "旧 Runner 返回了跳过结果；当前用例应重新运行"
+        reason_code = "LEGACY_SKIPPED"
     elif result.aborted or result.setup_errors or result.action_errors or evidence_error:
-        result_verdict = "ERROR"
+        raw_verdict = "CANNOT_VERIFY"
         reason = (
             (result.setup_errors + result.action_errors)[0]
             if result.setup_errors or result.action_errors
             else evidence_error or "准备或操作阶段未完整执行"
         )
     elif result.precomputed_verdict:
-        result_verdict = result.precomputed_verdict
+        raw_verdict = result.precomputed_verdict
         reason = result.precomputed_reason or "Agent-loop 探索已完成"
     else:
-        result_verdict = verdict.verdict if verdict else "CANNOT_VERIFY"
+        raw_verdict = verdict.verdict if verdict else "CANNOT_VERIFY"
         reason = verdict.reason if verdict else "LLM 不可用，需人工判定"
-    execution_errors = (
-        result.setup_errors + result.action_errors + result.collect_errors
-    )
+    result_verdict = str(raw_verdict or "CANNOT_VERIFY").upper()
+    if result_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}:
+        result_verdict = "CANNOT_VERIFY"
+        execution_failure = True
+        reason_code = reason_code or "JUDGEMENT_ERROR"
     payload = {
         "schema_version": 3,
         "case_id": result.case_id,
@@ -483,8 +614,14 @@ def save_evidence(
         "setup_errors": result.setup_errors,
         "action_errors": result.action_errors,
         "collect_errors": result.collect_errors,
-        "execution_status": "ERROR" if execution_errors or evidence_error else "OK",
-        "execution_reason": execution_errors[0] if execution_errors else evidence_error,
+        "workflow_status": "failed" if execution_failure else "completed",
+        "execution_status": "ERROR" if execution_failure else "OK",
+        "execution_reason": (
+            execution_errors[0]
+            if execution_errors
+            else evidence_error or (reason if execution_failure else "")
+        ),
+        "reason_code": reason_code,
         "terminal_json": result.terminal_json,
         "screenshots": result.screenshots,
         "exploration_trace": result.exploration_trace,
@@ -492,7 +629,12 @@ def save_evidence(
         "verdict": result_verdict,
         "reason": reason,
     }
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    payload.update(outcome_fields(
+        payload,
+        workflow_default="failed" if execution_failure else "completed",
+        mapping_default=str(result.provenance.get("mapping_status") or "NOT_RECORDED"),
+    ))
+    write_result(path, payload)
     return path
 
 
@@ -519,6 +661,11 @@ def _run_agent_exploration(
     *,
     screenshot_path: str,
     target: str,
+    project: str,
+    hardware_runtime_profile=None,
+    reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
 
@@ -542,6 +689,7 @@ def _run_agent_exploration(
         "precondition_text": case.precondition_text,
         "steps_text": case.steps_text,
         "expected_text": case.expected_text,
+        "project": project,
     }
     trace = interactive_reproduce(
         task_id=f"case-{case.case_id}",
@@ -553,6 +701,10 @@ def _run_agent_exploration(
         target=target,
         test_case=test_case,
         build_simulator=False,
+        hardware_runtime_profile=hardware_runtime_profile,
+        reset_hardware=reset_hardware,
+        hardware_recovery_reboot=hardware_recovery_reboot,
+        hardware_preflight_completed=hardware_preflight_completed,
     )
     result = CaseRunResult(
         case_id=case.case_id,
@@ -649,6 +801,28 @@ def _run_agent_exploration(
     return result
 
 
+def _validate_hardware_case_commands(case: CaseEntry, runtime_profile) -> None:
+    """Reject a fixed mapping that does not belong to the selected firmware profile."""
+
+    capabilities = runtime_profile.command_capabilities
+    for phase, commands in (
+        ("setup", case.setup),
+        ("actions", case.actions),
+        ("collect", case.collect),
+    ):
+        for index, raw in enumerate(commands, 1):
+            bare = normalize_command(raw)
+            name = bare[1:].partition(":")[0]
+            if name in {"HOST_SCREENSHOT", "HOST_WAIT"}:
+                continue
+            try:
+                validate_agent_command(bare, capabilities)
+            except ValueError as exc:
+                raise ValueError(
+                    f"真机运行时档案与 {case.case_id} 的 {phase}[{index}] 不兼容: {exc}"
+                ) from exc
+
+
 def run_single_case(
     sheet_name: str,
     case_id: str,
@@ -658,11 +832,16 @@ def run_single_case(
     case_map_profile: str | None = None,
     candidate_replay: bool = False,
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None,
+    reset_hardware: bool = True,
+    hardware_preflight_completed: bool = False,
+    hardware_recovery_reboot: bool = False,
 ) -> CaseRunResult:
     """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
     screenshot_path 不为 None 时，在每个 GUI_TREE 检查点保存一张截图；
     没有 GUI_TREE 时保存最终画面。
+    真机默认先做真实 Preflight，再以无重启方式收敛到可验证的表盘状态；
+    只有已完成同一门禁/准备入口的父流程才可跳过对应阶段。
     """
     load_kwargs = {"target": target}
     if case_map_profile:
@@ -684,50 +863,118 @@ def run_single_case(
         target=target,
         case_map_profile=case_map_profile,
     )
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
+        )
     if screenshot_path is None:
         run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         screenshot_path = str(
             EVIDENCE_DIR / target / sheet_name / case_id / run_stamp / "screenshot.bmp"
         )
-    if external_executor is not None:
-        if target != "hardware":
-            raise ValueError("外部真机执行器只能用于 hardware target")
-        from agent_loop_system.tools.hardware_target import HardwareTargetConfig
+    from agent_loop_system.tools.llm_config import (
+        LLM_API_KEY_SCOPE_EXPLORATION,
+        LLM_API_KEY_SCOPE_FIXED,
+        llm_api_key_scope,
+    )
 
-        HardwareTargetConfig.from_env()
-        return _stamp_result_provenance(
-            external_executor(case, screenshot_path),
-            provenance=provenance,
-        )
-
-    if not case.is_promoted and not candidate_replay:
-        return _stamp_result_provenance(
-            _run_agent_exploration(
-                case,
-                screenshot_path=screenshot_path,
-                target=target,
-            ),
-            provenance=provenance,
-        )
-
-    if target == "hardware":
-        from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-        from agent_loop_system.tools.real_device import RealDeviceSession
-
-        HardwareTargetConfig.from_env()
+    scope = (
+        LLM_API_KEY_SCOPE_EXPLORATION
+        if not case.is_promoted and not candidate_replay
+        else LLM_API_KEY_SCOPE_FIXED
+    )
+    with llm_api_key_scope(scope):
         evidence_dir = Path(screenshot_path).resolve().parent
-        session = RealDeviceSession(evidence_dir=evidence_dir)
-    elif target == "simulator":
-        session = SimulatorSession(get_simulator_exe())
-    session.start()
-    try:
-        result = run_case(session, case, screenshot_path=screenshot_path)
-        return _stamp_result_provenance(
-            result,
-            provenance=provenance,
+        hardware_project = str(
+            provenance.get("project") or "6202_W5230"
         )
-    finally:
-        session.stop()
+        if (
+            target == "hardware"
+            and external_executor is None
+            and not hardware_preflight_completed
+        ):
+            from agent_loop_system.tools.hardware_preflight import (
+                require_hardware_preflight,
+            )
+
+            require_hardware_preflight(
+                project=hardware_project,
+                evidence_dir=evidence_dir / "preflight",
+                persist_paths=(
+                    evidence_dir / "preflight.json",
+                    _RUNTIME_PATHS.environment_checks
+                    / hardware_project
+                    / "preflight.json",
+                ),
+            )
+
+        hardware_runtime_profile = None
+        if target == "hardware":
+            from agent_loop_system.tools.hardware_runtime_profile import (
+                load_hardware_runtime_profile,
+            )
+
+            hardware_runtime_profile = load_hardware_runtime_profile(
+                project=hardware_project or None,
+            )
+
+        if external_executor is not None:
+            if target != "hardware":
+                raise ValueError("外部真机执行器只能用于 hardware target")
+            return _stamp_result_provenance(
+                external_executor(case, screenshot_path),
+                provenance=provenance,
+            )
+
+        if not case.is_promoted and not candidate_replay:
+            exploration_kwargs = {
+                "screenshot_path": screenshot_path,
+                "target": target,
+                "project": str(provenance.get("project") or ""),
+                "reset_hardware": reset_hardware,
+            }
+            if target == "hardware":
+                exploration_kwargs.update({
+                    "hardware_recovery_reboot": hardware_recovery_reboot,
+                    "hardware_preflight_completed": True,
+                })
+            if hardware_runtime_profile is not None:
+                exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
+            return _stamp_result_provenance(
+                _run_agent_exploration(
+                    case,
+                    **exploration_kwargs,
+                ),
+                provenance=provenance,
+            )
+
+        if target == "hardware":
+            from agent_loop_system.tools.real_device import (
+                RealDeviceSession,
+                prepare_hardware_case_state,
+                reset_hardware_case_state,
+            )
+
+            _validate_hardware_case_commands(case, hardware_runtime_profile)
+            if reset_hardware:
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=evidence_dir / "hardware-preparation")
+            session = RealDeviceSession(evidence_dir=evidence_dir)
+        elif target == "simulator":
+            session = SimulatorSession(get_simulator_exe())
+        session.start()
+        try:
+            result = run_case(session, case, screenshot_path=screenshot_path)
+            return _stamp_result_provenance(
+                result,
+                provenance=provenance,
+            )
+        finally:
+            session.stop()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -761,6 +1008,21 @@ def main(argv: list[str] | None = None) -> int:
         choices=("watch_ble",),
         help="显式选择非默认真机动作适配器；普通 Runner 不使用",
     )
+    parser.add_argument(
+        "--skip-hardware-reset",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--hardware-preflight-completed",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--hardware-recovery-reboot",
+        action="store_true",
+        help="显式工程恢复：在 UART 与初始 USB 门禁通过后重启真机",
+    )
     ble_selector = parser.add_mutually_exclusive_group()
     ble_selector.add_argument("--ble-address", help="watch_ble 的目标 BLE 地址")
     ble_selector.add_argument("--ble-name", help="watch_ble 的目标广播名称")
@@ -770,6 +1032,14 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--execution-adapter requires --target hardware")
     if args.execution_adapter and args.candidate_replay:
         parser.error("--execution-adapter cannot be combined with --candidate-replay")
+    if args.skip_hardware_reset and args.target != "hardware":
+        parser.error("--skip-hardware-reset requires --target hardware")
+    if args.hardware_preflight_completed and args.target != "hardware":
+        parser.error("--hardware-preflight-completed requires --target hardware")
+    if args.hardware_recovery_reboot and args.target != "hardware":
+        parser.error("--hardware-recovery-reboot requires --target hardware")
+    if args.hardware_recovery_reboot and args.skip_hardware_reset:
+        parser.error("--hardware-recovery-reboot cannot be combined with --skip-hardware-reset")
     if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
         parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
 
@@ -800,6 +1070,9 @@ def main(argv: list[str] | None = None) -> int:
         case_map_profile=args.case_map_profile,
         candidate_replay=args.candidate_replay,
         external_executor=external_executor,
+        reset_hardware=not args.skip_hardware_reset,
+        hardware_preflight_completed=args.hardware_preflight_completed,
+        hardware_recovery_reboot=args.hardware_recovery_reboot,
     )
 
     print(

@@ -150,7 +150,7 @@ class BleCaptureProvider:
 
     def __init__(
         self,
-        address: str,
+        address: str | None = None,
         *,
         serial_session: _SharedSerialSession,
         sequence_start: int | None = None,
@@ -160,9 +160,7 @@ class BleCaptureProvider:
         scanner: object | None = None,
         client_builder: ClientBuilder | None = None,
     ) -> None:
-        address_value = str(address or "").strip()
-        if not address_value:
-            raise ValueError("address is required")
+        address_value = str(address or "").strip() or None
         if sequence_start is None:
             sequence_start = time.time_ns() % 2_147_483_646 + 1
         if (

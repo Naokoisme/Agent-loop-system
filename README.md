@@ -27,15 +27,15 @@ result.json + 新截图 + 日志
 
 ## 目标、profile 与 case map
 
-| 目标 profile | 执行方式 | 固件工作区 | case map |
+| 目标 profile | 执行方式 | 普通运行依赖 | case map |
 | --- | --- | --- | --- |
-| `620C_W6830` | Windows Simulator | `D:\Agent-loop-workspace\620C_W6830` | `case_map/620C_simulator_case_map` |
-| `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_simulator_case_map` |
-| `6202_W5230` | 真实手表 | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_case_map` |
+| `620C_W6830` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\620C_W6830` | `case_map/620C_simulator_case_map` |
+| `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\6202_W5230` | `case_map/6202_simulator_case_map` |
+| `6202_W5230` | 真实手表 | `profiles/6202_W5230` 版本档案 | `case_map/6202_case_map` |
 | `579_O2` | 579 O2 真机 | APP Bridge / COM3 只读 | `case_map/579_case_map` |
 
 三套映射相互隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。6204 真机源码位于
-`D:\Agent-loop-workspace\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
+`D:\Agent-loop\workspaces\firmware\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
 它不是可执行 Runner 目标。`D:\TOPSTEP\shenju_w30` 只作上游参考，不在其中开发、构建或
 打补丁。
 
@@ -64,12 +64,23 @@ uv run python tools/migrate_case_store.py --output project_data/migration-audit.
 业务数据，不进入 Git。Agent-loop Web 服务直接由 `frontend/server.py` 启动，不需要也不会启动
 `desktop_qt.py`。
 
+普通 6202 真机探索和固化用例不会读取固件源码。它们从不可变发布目录读取
+`runtime/commands.json`、`runtime/pages.json` 和兼容性元数据，并校验发布清单、文件哈希、固件
+SHA256、自动化协议版本及 Agent-loop 最低版本。源码诊断、修复、构建和档案再生成仍使用独立
+固件工作区，这两种模式不能混用。
+
+工程人员先用 `uv run python scripts/generate_hardware_runtime_assets.py --output-dir <临时目录>`
+从已核对的固件工作区提取小型能力目录，再把 `--runtime-commands`、`--runtime-pages` 和
+`--runtime-metadata` 一并交给
+`scripts/publish_profile.py`。普通测试机器只需要随发布包取得 `profiles/`、匹配固件、SuperCom
+和 Windows MTP，不需要 Git、Python SDK 或固件源码。
+
 ## 快速开始
 
 要求：Windows、Python 3.12 和 `uv`。
 
 ```powershell
-Set-Location C:\path\to\Agent-loop-system
+Set-Location D:\Agent-loop\system
 Copy-Item .env.example .env
 uv sync
 uv run pytest -q
@@ -98,7 +109,8 @@ W30/579 统一平台的项目创建、快捷切换、运行平台选择与 579 �
 
 ## 仓库与基线边界
 
-- `D:\Agent-loop-system` 保存编排器、Runner、前端、测试、case map 和文档。
+- `D:\Agent-loop\system` 保存编排器、Runner、前端、测试、case map 和文档。
+- `D:\Agent-loop\workspaces` 只保存固件、配套工具和待人工审查的独立工作区；路径配置可相对 `system` 书写。
 - 固件工作区是独立 Git 仓库，可能包含 `app`、`core/comm`、`core/gui`、`core/lvgl` 等嵌套仓库。
 - `artifacts/`、`evidence/`、`history/`、`logs/` 等目录是本机运行输出，不进入源码基线。
 - 可复现固件清单必须记录根仓库和嵌套仓库的提交、dirty 状态、项目配置及关键产物哈希。
@@ -109,8 +121,9 @@ W30/579 统一平台的项目创建、快捷切换、运行平台选择与 579 �
 
 ## 真机安全边界
 
-- 6202 测试会话由外部人员或批次控制器启动；Runner 只读查询状态，不负责 `START`、续期或
-  `STOP`。
+- 6202 真机批次在每条用例启动前由 Runner 受控重启设备、恢复 GUI/USB、发送
+  `TEST_SESSION:START`，并确认 `DIAL + popup=null`；不要求外部预先持有测试会话，
+  普通用例结束也不发送 `STOP`。
 - MTP 是 6202 默认截图链路；BLE 已通过真实完整 BMP 功能验证，但当前性能不足，不切换默认值。
 - 构建、刷机和真机操作是分别授权的活动；构建许可不包含刷机许可。
 - 不自动修改 Git remote，不自动 push，不在其他 Agent 活跃写入期间操作共享 branch 或 index。

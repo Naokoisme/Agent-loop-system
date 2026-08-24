@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
 from agent_loop_system.tools.command_protocol import (
     collect_command_json,
     normalize_command,
@@ -89,13 +90,14 @@ class CommandProtocolTest(unittest.TestCase):
                     if line.startswith("W30_SOURCE_ROOT="):
                         source_root = line.split("=", 1)[1].strip()
                         break
-        if not source_root or not Path(source_root).is_dir():
-            fallback = Path(r"D:\Agent-loop-workspace\620C_W6830")
-            if fallback.is_dir():
-                source_root = str(fallback)
-            else:
-                self.skipTest("W30_SOURCE_ROOT 目录不可用")
-        return Path(source_root)
+        resolved = (
+            resolve_config_path(source_root)
+            if source_root
+            else RuntimePaths.from_root().firmware_workspaces / "620C_W6830"
+        )
+        if not resolved.is_dir():
+            self.skipTest("W30_SOURCE_ROOT 目录不可用")
+        return resolved
 
     def test_three_forms_normalize_equally(self) -> None:
         quoted_wire = normalize_command('srv_quick_cmd send "TOP5STEP:GUI_TREE:1;"')
@@ -152,8 +154,26 @@ class CommandProtocolTest(unittest.TestCase):
         )
         validate_agent_command(":SCREENSHOT_PRINT", self.capabilities)
 
-    def test_business_arguments_are_not_locally_judged(self) -> None:
-        validate_agent_command(":ENTER_PAGE:WEATHER_HOME", self.capabilities)
+    def test_enter_page_requires_complete_uint32_contract(self) -> None:
+        validate_agent_command(":ENTER_PAGE:CALCULATOR,0", self.capabilities)
+        validate_agent_command(
+            "srv_quick_cmd send TOP5STEP:ENTER_PAGE:CALCULATOR,0;",
+            self.capabilities,
+        )
+        for bad in (
+            ":ENTER_PAGE:CALCULATOR",
+            ":ENTER_PAGE:CALCULATOR,",
+            ":ENTER_PAGE:CALCULATOR,,",
+            ":ENTER_PAGE:CALCULATOR,abc",
+            ":ENTER_PAGE:CALCULATOR,-1",
+            ":ENTER_PAGE:CALCULATOR,1",
+            ":ENTER_PAGE:CALCULATOR,4294967296",
+        ):
+            with self.subTest(command=bad):
+                with self.assertRaisesRegex(ValueError, "ENTER_PAGE"):
+                    validate_agent_command(bad, self.capabilities)
+
+    def test_other_business_arguments_are_not_locally_judged(self) -> None:
         validate_agent_command(":GUI_TREE:1,2", self.capabilities)
         validate_agent_command(
             ":SLEEP_RECORD_CREATE:1,30,30,10,5,45", self.capabilities

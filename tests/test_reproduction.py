@@ -483,6 +483,96 @@ class InteractiveReproduceTest(unittest.TestCase):
             payload = json.loads((Path(tempdir) / "trace.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["outcome"], "CURRENT_CONFORMS")
 
+    def test_rejected_enter_page_is_not_sent_to_session(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            session = FakeInteractiveSession()
+            trace, _, _ = self._run(
+                tempdir,
+                session,
+                [
+                    ReproductionDecision(
+                        action=ReproductionAction.EXECUTE,
+                        command=":ENTER_PAGE:CALCULATOR",
+                        reason="遗漏了必填参数",
+                    ),
+                    ReproductionDecision(
+                        action=ReproductionAction.EXECUTE,
+                        command=":ENTER_PAGE:CALCULATOR,0",
+                        reason="按完整示例重试",
+                    ),
+                    ReproductionDecision(
+                        action=ReproductionAction.READY_TO_JUDGE,
+                        reason="计算器页面已经清楚可见",
+                    ),
+                ],
+                validate_side_effect=[
+                    ValueError("ENTER_PAGE 必须包含页面名和一个 uint32 参数"),
+                    None,
+                ],
+            )
+
+            self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
+            self.assertEqual(session.business_commands, [":ENTER_PAGE:CALCULATOR,0"])
+            self.assertEqual(trace.steps[1].command_status, "error")
+
+    def test_test_case_visual_judgement_forwards_project(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            session = FakeInteractiveSession()
+            visual_judge = mock.Mock(
+                return_value=Verdict(verdict="PASS", reason="中英文文案等价")
+            )
+            with (
+                mock.patch(
+                    "agent_loop_system.tools.build.BuildConfig.from_env",
+                    return_value=object(),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.build.run_build",
+                    return_value=BuildResult(
+                        success=True,
+                        artifact_path="D:/isolated/main.exe",
+                    ),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.agent.decide_reproduction_action",
+                    return_value=ReproductionDecision(
+                        action=ReproductionAction.READY_TO_JUDGE,
+                        reason="目标文案已经清楚可见",
+                    ),
+                ),
+                mock.patch(
+                    "agent_loop_system.tools.test.judge_test_with_vision",
+                    visual_judge,
+                ),
+                mock.patch(
+                    "agent_loop_system.reproduction.SimulatorSession",
+                    return_value=session,
+                ),
+                mock.patch(
+                    "agent_loop_system.reproduction.load_current_command_capabilities",
+                    return_value={},
+                ),
+            ):
+                trace = interactive_reproduce(
+                    task_id="6202-locale",
+                    objective="验证 Timer 入口",
+                    source_files=[],
+                    defect_image_paths=[],
+                    evidence_dir=tempdir,
+                    test_case={
+                        "expected_text": "显示 Timer 入口",
+                        "project": "6202_W5230",
+                    },
+                )
+
+            self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
+            visual_judge.assert_called_once()
+            self.assertEqual(visual_judge.call_args.args[0], "显示 Timer 入口")
+            self.assertEqual(
+                visual_judge.call_args.kwargs["project"],
+                "6202_W5230",
+            )
+
     def test_hardware_target_skips_simulator_build_and_display_time_change(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             session = FakeInteractiveSession()
@@ -490,28 +580,26 @@ class InteractiveReproduceTest(unittest.TestCase):
                 action=ReproductionAction.READY_TO_JUDGE,
                 reason="真机当前画面足够清楚",
             )
-            hardware_config = mock.Mock(source_root=Path(tempdir))
+            runtime_profile = mock.Mock(
+                command_capabilities={},
+                agent_knowledge="GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
+            )
             with (
                 mock.patch(
                     "agent_loop_system.tools.build.BuildConfig.from_env"
                 ) as build_config,
                 mock.patch("agent_loop_system.tools.build.run_build") as run_build,
                 mock.patch(
-                    "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env",
-                    return_value=hardware_config,
-                ),
-                mock.patch(
-                    "agent_loop_system.tools.hardware_target.load_hardware_command_capabilities",
-                    return_value={},
-                ),
-                mock.patch(
-                    "agent_loop_system.tools.hardware_target.build_hardware_agent_knowledge",
-                    return_value="GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
-                ),
+                    "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+                    return_value=runtime_profile,
+                ) as profile_loader,
                 mock.patch(
                     "agent_loop_system.tools.real_device.RealDeviceSession",
                     return_value=session,
                 ) as real_session,
+                mock.patch(
+                    "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+                ) as prepare,
                 mock.patch(
                     "agent_loop_system.tools.agent.decide_reproduction_action",
                     return_value=decision,
@@ -528,11 +616,16 @@ class InteractiveReproduceTest(unittest.TestCase):
                     defect_image_paths=[],
                     evidence_dir=tempdir,
                     target="hardware",
+                    hardware_preflight_completed=True,
                 )
 
             self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
             build_config.assert_not_called()
             run_build.assert_not_called()
+            profile_loader.assert_called_once_with(project="6202_W5230")
+            prepare.assert_called_once_with(
+                evidence_dir=Path(tempdir).resolve() / "hardware-preparation"
+            )
             real_session.assert_called_once_with(evidence_dir=Path(tempdir).resolve())
             self.assertEqual(session.system_commands, [])
             self.assertEqual(session.start_calls, 1)
@@ -542,6 +635,42 @@ class InteractiveReproduceTest(unittest.TestCase):
                 decide.call_args.kwargs["capability_knowledge"],
                 "GUI_PING | GUI_STATE | GUI_TREE | ENTER_PAGE",
             )
+            self.assertFalse(
+                decide.call_args.kwargs["navigation_source_enabled"]
+            )
+
+    def test_hardware_preflight_failure_stops_before_state_preparation(self) -> None:
+        with (
+            tempfile.TemporaryDirectory() as tempdir,
+            mock.patch(
+                "agent_loop_system.tools.hardware_preflight.require_hardware_preflight",
+                side_effect=RuntimeError("SUPERCOM_NO_UART: zero UART bytes"),
+            ) as preflight,
+            mock.patch(
+                "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"
+            ) as profile_loader,
+            mock.patch(
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+            ) as prepare,
+            mock.patch(
+                "agent_loop_system.tools.real_device.RealDeviceSession"
+            ) as real_session,
+        ):
+            trace = interactive_reproduce(
+                task_id="6202-preflight-blocked",
+                objective="执行真机用例",
+                source_files=[],
+                defect_image_paths=[],
+                evidence_dir=tempdir,
+                target="hardware",
+            )
+
+        self.assertEqual(trace.outcome, ReproductionOutcome.SYSTEM_ERROR)
+        self.assertIn("SUPERCOM_NO_UART", trace.reason)
+        preflight.assert_called_once()
+        profile_loader.assert_not_called()
+        prepare.assert_not_called()
+        real_session.assert_not_called()
 
     def test_two_unchanged_steps_stop_as_target_not_reached(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

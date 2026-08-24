@@ -11,9 +11,25 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from agent_loop_system.runtime_root import (
+    RuntimePaths,
+    load_app_env,
+    resolve_config_path,
+)
+from agent_loop_system.tools.enter_page_contract import (
+    EnterPageParamValue,
+    render_enter_page_knowledge,
+)
+
 SIM_TOOLS = Path(__file__).parent
 KB_DIR = SIM_TOOLS / "kb"
-W30_ROOT = Path(os.environ.get("W30_SOURCE_ROOT", r"D:\TOPSTEP\shenju_w30"))
+load_app_env()
+W30_ROOT = resolve_config_path(
+    os.environ.get(
+        "W30_SOURCE_ROOT",
+        RuntimePaths.from_root().firmware_workspaces / "620C_W6830",
+    )
+)
 PROJECT_NAME = os.environ.get("W30_PROJECT", "620C_W6830")
 C_FILE = W30_ROOT / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
 PROJECT_CMAKE = W30_ROOT / "app" / "projects" / PROJECT_NAME / "Project.cmake"
@@ -548,7 +564,7 @@ def _function_body(source: str, function_name: str) -> str:
     return _function_body_any(source, function_name)
 
 
-def _special_window_params(source: str) -> dict[str, str]:
+def _special_window_params(source: str) -> dict[str, tuple[EnterPageParamValue, ...]]:
     """从 special_win 表及其 handler 的 switch(param) 提取参数含义。"""
     table = re.search(
         r"special_win\s*\[\s*\]\s*=\s*\{(?P<body>.*?)\n\};",
@@ -558,14 +574,14 @@ def _special_window_params(source: str) -> dict[str, str]:
     if not table:
         return {}
 
-    result: dict[str, str] = {}
+    result: dict[str, tuple[EnterPageParamValue, ...]] = {}
     for name, handler in re.findall(
         r'\{\s*"([A-Z0-9_]+)"\s*,\s*([A-Za-z0-9_]+)\s*\}',
         table.group("body"),
     ):
         body = _function_body(source, handler)
         cases = list(re.finditer(r"case\s+(\d+)\s*:\s*(?://\s*([^\r\n]*))?", body))
-        labels = []
+        values: list[EnterPageParamValue] = []
         for index, case in enumerate(cases):
             end = cases[index + 1].start() if index + 1 < len(cases) else len(body)
             block = body[case.end():end]
@@ -574,9 +590,9 @@ def _special_window_params(source: str) -> dict[str, str]:
                 constants = re.findall(r"=\s*([A-Z][A-Z0-9_]+)\s*;", block)
                 label = constants[0] if constants else ""
             if label:
-                labels.append(f"{case.group(1)}={label}")
-        if labels:
-            result[name] = ", ".join(labels)
+                values.append(EnterPageParamValue(int(case.group(1)), label))
+        if values:
+            result[name] = tuple(values)
     return result
 
 
@@ -602,11 +618,12 @@ def extract_windows(
             r'GUI_WIN_DEFINE\(\s*([A-Z0-9_]+)\s*,\s*"([^"]+)"\s*,\s*([A-Z0-9_]+)',
             source,
         ):
-            param = special_params.get(name)
-            suffix = f" | param: {param}" if param else ""
             entries[name] = (
                 f"{name} -> {name} | id={win_id} | {win_type} | "
-                f"ENTER_PAGE:{name},<param>{suffix}"
+                + render_enter_page_knowledge(
+                    name,
+                    special_values=special_params.get(name, ()),
+                )
             )
 
     return "\n".join(entries[key] for key in sorted(entries))
@@ -621,7 +638,9 @@ def main():
     except ImportError:
         pass
 
-    source_root = Path(os.environ.get("W30_SOURCE_ROOT", str(W30_ROOT)))
+    source_root = resolve_config_path(
+        os.environ.get("W30_SOURCE_ROOT", str(W30_ROOT))
+    )
     project_name = os.environ.get("W30_PROJECT", PROJECT_NAME)
     c_file = source_root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
     project_cmake = source_root / "app" / "projects" / project_name / "Project.cmake"

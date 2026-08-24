@@ -1,6 +1,6 @@
 r"""最小模拟器会话：inbox 文件发命令 + 读 stdout JSON 回执。
 
-命令格式（来自 D:\TOPSTEP\shenju_w30\.agents\模拟器测试.md）：
+命令格式来自当前隔离固件工作区的模拟器测试约定：
     srv_quick_cmd send "TOP5STEP:<COMMAND>:<PARAM>;"
 调用方传入裸 hlq 命令（如 ":GUI_PING:1"），本模块负责去掉前导冒号、
 加 TOP5STEP 前缀、加 ; 后缀、用双引号包裹。
@@ -20,6 +20,8 @@ import uuid
 from ctypes import wintypes
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from agent_loop_system.runtime_root import resolve_config_path
 
 # 不同项目有两种首窗启动路径：调用 system helper，或直接 gui_open_new_win。
 # 两种标记都只表示可以开始 GUI_PING；最终就绪仍以 gui_ack/processed 为准。
@@ -69,8 +71,8 @@ def verify_simulator_resource_provenance(
     if not source_value or not project_value:
         raise RuntimeError("资源校验配置缺失: W30_SOURCE_ROOT/W30_PROJECT")
 
-    root = Path(source_value).resolve()
-    exe_path = Path(exe).resolve()
+    root = resolve_config_path(source_value)
+    exe_path = resolve_config_path(exe)
     if not exe_path.is_relative_to(root):
         raise RuntimeError(f"模拟器不属于 Agent 工作区: {exe_path}（期望位于 {root}）")
 
@@ -454,7 +456,17 @@ class SimulatorSession:
 
 
 if __name__ == "__main__":
-    _EXE = r"D:\TOPSTEP\shenju_w30\core\gui\simulator\bin\main.exe"
+    from agent_loop_system.runtime_root import RuntimePaths
+
+    _EXE = str(
+        RuntimePaths.from_root().firmware_workspaces
+        / "620C_W6830"
+        / "core"
+        / "gui"
+        / "simulator"
+        / "bin"
+        / "main.exe"
+    )
     _sess = SimulatorSession(_EXE)
     try:
         print("[probe] starting simulator...")

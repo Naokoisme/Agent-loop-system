@@ -16,6 +16,9 @@ from pathlib import Path
 from typing import Any
 
 
+DEFAULT_NAS_ROOT = r"\\nas.topstepht.com\TOPSTEP\公用文件夹\软件工具\拓步自研工具\Agent-loop自动化测试平台"
+DEFAULT_MANIFEST_PATH = os.path.join(DEFAULT_NAS_ROOT, "update-manifest.json")
+
 DATA_SAFETY_NOTICE = (
     "数据安全保证：升级版本时仅需替换主程序 Agent-loop.exe、_internal 与前端资源；"
     "您的用户测试用例 (case_map/)、历史测试记录 (history/)、截图证据 (evidence/) 与环境变量 (.env) "
@@ -24,7 +27,7 @@ DATA_SAFETY_NOTICE = (
 
 
 def get_current_system_version() -> str:
-    """动态获取当前安装版本（优先读取 release_manifest.json，其次环境变量，默认 0.1.0）。"""
+    """动态获取当前版本：发布清单、环境变量、源码版本依次回退。"""
     try:
         from agent_loop_system.runtime_root import resolve_app_root
         manifest_p = resolve_app_root() / "release_manifest.json"
@@ -35,10 +38,30 @@ def get_current_system_version() -> str:
                 return v
     except Exception:
         pass
-    return os.environ.get("AGENT_LOOP_VERSION", "0.1.0").strip() or "0.1.0"
+    configured_version = os.environ.get("AGENT_LOOP_VERSION", "").strip()
+    if configured_version:
+        return configured_version
+    try:
+        from agent_loop_system.version import __version__
+
+        if __version__.strip():
+            return __version__.strip()
+    except Exception:
+        pass
+    return "0.1.0"
 
 
 CURRENT_SYSTEM_VERSION = get_current_system_version()
+
+
+def get_manifest_source(manifest_source: str | Path | None = None) -> str:
+    """获取更新清单来源；显式参数和环境变量优先，最后使用正式 NAS。"""
+    return str(
+        manifest_source
+        or os.environ.get("W30_UPDATE_MANIFEST_URL")
+        or os.environ.get("W30_NAS_MANIFEST_PATH")
+        or DEFAULT_MANIFEST_PATH
+    ).strip()
 
 
 def _parse_version_tuple(v_str: str) -> tuple[int, ...]:
@@ -62,21 +85,7 @@ def check_for_updates(
 ) -> dict[str, Any]:
     """检测是否存在新版本更新。"""
     cur_version = current_version or get_current_system_version()
-    source = str(
-        manifest_source
-        or os.environ.get("W30_UPDATE_MANIFEST_URL")
-        or os.environ.get("W30_NAS_MANIFEST_PATH")
-        or ""
-    ).strip()
-
-    if not source:
-        return {
-            "has_update": False,
-            "status": "unconfigured",
-            "current_version": cur_version,
-            "latest_version": cur_version,
-            "data_safety_notice": DATA_SAFETY_NOTICE,
-        }
+    source = get_manifest_source(manifest_source)
 
     raw_json = ""
     try:

@@ -38,6 +38,7 @@ from agent_loop_system.tools.hardware_serial import (
 
 USB_INSTANCE_PATTERN = "VID_301A&PID_6808"
 MTP_DEVICE_NAME = "ZORA"
+MTP_STORAGE_NAME = "storage"
 MTP_FOLDER_NAME = "download"
 MTP_CAPTURE_PREFIX = "agent_capture_"
 MTP_CAPTURE_SUFFIX = ".bmp"
@@ -72,6 +73,19 @@ class MtpScreenshotError(RuntimeError):
 
 class MtpScreenshotTimeoutError(MtpScreenshotError, TimeoutError):
     """USB、截图或 MTP 操作超时。"""
+
+
+class MtpUsbRestoreError(MtpScreenshotTimeoutError):
+    """USB open retries were exhausted, with structured transition evidence."""
+
+    def __init__(self, message: str, attempts: list[dict[str, Any]]) -> None:
+        self.attempts = [dict(item) for item in attempts]
+        serialized = json.dumps(
+            self.attempts,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        super().__init__(f"{message}; attempts={serialized}")
 
 
 class MtpScreenshotDeviceError(MtpScreenshotError):
@@ -184,6 +198,10 @@ def _powershell_error_detail(value: str | None) -> str:
 
 class MtpSystem(Protocol):
     """可注入的 Windows USB/MTP 边界。"""
+
+    def inspect_usb_devices(self, *, timeout: float = 5.0) -> list[dict[str, Any]]: ...
+
+    def probe_namespace(self, *, timeout: float = 10.0) -> dict[str, Any]: ...
 
     def wait_for_usb(self, *, present: bool, timeout: float) -> None: ...
 
@@ -330,6 +348,114 @@ class WindowsMtpSystem:
             raise MtpScreenshotError(f"Windows MTP operation failed: {detail}")
         return completed.stdout.strip()
 
+    def inspect_usb_devices(
+        self,
+        *,
+        timeout: float = 5.0,
+    ) -> list[dict[str, Any]]:
+        """Return the currently present watch PnP instances without changing USB."""
+
+        script = r"""
+$pattern = $env:WATCH_USB_PATTERN
+if (-not (Get-Command Get-PnpDevice -ErrorAction SilentlyContinue)) {
+    [Console]::Error.WriteLine('Get-PnpDevice is unavailable')
+    exit 6
+}
+$items = @(
+    Get-PnpDevice -PresentOnly -ErrorAction SilentlyContinue |
+    Where-Object { $_.InstanceId -match $pattern } |
+    ForEach-Object {
+        [PSCustomObject]@{
+            instance_id = [string]$_.InstanceId
+            status = [string]$_.Status
+            friendly_name = [string]$_.FriendlyName
+            class = [string]$_.Class
+        }
+    }
+)
+ConvertTo-Json -InputObject $items -Compress -Depth 3
+"""
+        output = self._run(
+            script,
+            timeout=timeout,
+            extra_env={"WATCH_USB_PATTERN": self.usb_instance_pattern},
+        )
+        if not output:
+            return []
+        try:
+            payload = json.loads(output)
+        except json.JSONDecodeError as exc:
+            raise MtpScreenshotError(
+                "Windows PnP probe returned invalid JSON"
+            ) from exc
+        if isinstance(payload, dict):
+            payload = [payload]
+        if not isinstance(payload, list):
+            raise MtpScreenshotError("Windows PnP probe returned an invalid payload")
+        return [dict(item) for item in payload if isinstance(item, dict)]
+
+    def probe_namespace(self, *, timeout: float = 10.0) -> dict[str, Any]:
+        """Read ``ZORA -> storage -> download`` through a fresh Shell namespace."""
+
+        script = r"""
+$deadline = (Get-Date).AddMilliseconds([double]$env:WATCH_MTP_TIMEOUT_MS)
+$lastError = 'MTP namespace not ready'
+do {
+    $shell = New-Object -ComObject Shell.Application
+    $thisPc = $shell.Namespace(17)
+    if (-not $thisPc) {
+        $lastError = 'This PC namespace not found'
+    } else {
+        $devices = @($thisPc.Items() | Where-Object { $_.Name -eq $env:WATCH_MTP_DEVICE })
+        if ($devices.Count -ne 1) {
+            $lastError = "MTP device count was $($devices.Count), expected 1"
+        } else {
+            $device = $devices[0]
+            $storages = @($device.GetFolder.Items() | Where-Object { $_.Name -eq $env:WATCH_MTP_STORAGE })
+            if ($storages.Count -ne 1) {
+                $lastError = "MTP storage count was $($storages.Count), expected 1"
+            } else {
+                $storage = $storages[0]
+                $folders = @($storage.GetFolder.Items() | Where-Object { $_.Name -eq $env:WATCH_MTP_FOLDER })
+                if ($folders.Count -eq 1) {
+                    [PSCustomObject]@{
+                        device = [string]$device.Name
+                        storage = [string]$storage.Name
+                        folder = [string]$folders[0].Name
+                    } | ConvertTo-Json -Compress
+                    exit 0
+                }
+                $lastError = "MTP folder count was $($folders.Count), expected 1"
+            }
+        }
+    }
+    Start-Sleep -Milliseconds 500
+} while ((Get-Date) -lt $deadline)
+[Console]::Error.WriteLine($lastError)
+exit 5
+"""
+        output = self._run(
+            script,
+            timeout=timeout + 10.0,
+            extra_env={
+                "WATCH_MTP_DEVICE": self.device_name,
+                "WATCH_MTP_STORAGE": MTP_STORAGE_NAME,
+                "WATCH_MTP_FOLDER": MTP_FOLDER_NAME,
+                "WATCH_MTP_TIMEOUT_MS": str(round(timeout * 1000)),
+            },
+        )
+        try:
+            payload = json.loads(output)
+        except json.JSONDecodeError as exc:
+            raise MtpScreenshotError(
+                "Windows MTP namespace probe returned invalid JSON"
+            ) from exc
+        if not isinstance(payload, dict):
+            raise MtpScreenshotError(
+                "Windows MTP namespace probe returned an invalid payload"
+            )
+        return dict(payload)
+
     def wait_for_usb(self, *, present: bool, timeout: float) -> None:
         script = r"""
 $wanted = $env:WATCH_USB_PRESENT -eq '1'
@@ -379,7 +505,9 @@ do {
         Start-Sleep -Milliseconds 500
         continue
     }
-    $storage = @($device.GetFolder.Items()) | Select-Object -First 1
+    $storage = @($device.GetFolder.Items()) |
+        Where-Object { $_.Name -eq $env:WATCH_MTP_STORAGE } |
+        Select-Object -First 1
     if (-not $storage) {
         $lastDiscoveryError = 'MTP storage not found'
         Start-Sleep -Milliseconds 500
@@ -429,6 +557,7 @@ exit 8
             timeout=timeout * 2.0 + 10.0,
             extra_env={
                 "WATCH_MTP_DEVICE": self.device_name,
+                "WATCH_MTP_STORAGE": MTP_STORAGE_NAME,
                 "WATCH_MTP_FOLDER": MTP_FOLDER_NAME,
                 "WATCH_MTP_FILE": file_name,
                 "WATCH_MTP_DESTINATION": str(destination_dir.resolve()),
@@ -531,6 +660,123 @@ def _write_line(transport: Any, line: str) -> None:
         if isinstance(exc, SerialTransportError):
             raise
         raise SerialTransportError(f"serial write failed: {exc}") from exc
+
+
+def summarize_usb_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep useful PnP evidence while redacting machine-specific instance IDs."""
+
+    summarized: list[dict[str, Any]] = []
+    for item in devices:
+        instance = str(item.get("instance_id") or item.get("InstanceId") or "")
+        digest = hashlib.sha256(
+            instance.encode("utf-8", errors="replace")
+        ).hexdigest()[:12]
+        summarized.append({
+            "instance_id_hash": digest if instance else "",
+            "status": str(item.get("status") or item.get("Status") or "")[:80],
+            "friendly_name": str(
+                item.get("friendly_name") or item.get("FriendlyName") or ""
+            )[:200],
+            "class": str(item.get("class") or item.get("Class") or "")[:80],
+        })
+    return summarized
+
+
+def _record_usb_instances(
+    record: dict[str, Any],
+    system: MtpSystem,
+    *,
+    timeout: float,
+) -> None:
+    probe = getattr(system, "inspect_usb_devices", None)
+    if not callable(probe):
+        record["pnp_instances"] = []
+        record["pnp_probe_status"] = "unavailable"
+        return
+    try:
+        devices = list(probe(timeout=min(timeout, 5.0)))
+    except Exception as exc:
+        record["pnp_instances"] = []
+        record["pnp_probe_status"] = "error"
+        record["pnp_probe_error"] = str(exc)[:2000]
+    else:
+        record["pnp_instances"] = summarize_usb_devices(devices)
+        record["pnp_probe_status"] = "ok"
+
+
+def restore_usb_device(
+    write_line: Callable[[str], None],
+    system: MtpSystem,
+    *,
+    usb_timeout: float,
+    namespace_timeout: float | None = None,
+    attempts: int = 2,
+) -> list[dict[str, Any]]:
+    """Open USB, wait for PnP, then force one fresh WPD namespace lookup.
+
+    ``dal_usb open`` is idempotent, so one retry is permitted.  Every attempt
+    records whether it failed before PnP appeared or while the WPD namespace
+    was still unavailable; callers can persist this evidence verbatim.
+    """
+
+    if attempts < 1:
+        raise ValueError("attempts must be at least 1")
+    usb_timeout = _positive_timeout("usb_timeout", usb_timeout)
+    if namespace_timeout is not None:
+        namespace_timeout = _positive_timeout(
+            "namespace_timeout", namespace_timeout
+        )
+
+    diagnostics: list[dict[str, Any]] = []
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        started = time.monotonic()
+        record: dict[str, Any] = {
+            "attempt": attempt,
+            "pnp_status": "pending",
+            "wpd_status": "unchecked",
+        }
+        try:
+            write_line("dal_usb open")
+            system.wait_for_usb(present=True, timeout=usb_timeout)
+            record["pnp_status"] = "present"
+            _record_usb_instances(record, system, timeout=usb_timeout)
+            probe = getattr(system, "probe_namespace", None)
+            if namespace_timeout is not None:
+                if not callable(probe):
+                    raise MtpScreenshotError(
+                        "MTP namespace probe is unavailable"
+                    )
+                record["namespace"] = dict(
+                    probe(timeout=namespace_timeout)
+                )
+                record["wpd_status"] = "ready"
+            record["status"] = "ready"
+            record["elapsed_ms"] = round((time.monotonic() - started) * 1000)
+            diagnostics.append(record)
+            return diagnostics
+        except Exception as exc:
+            last_error = exc
+            if record["pnp_status"] == "pending":
+                record["pnp_status"] = "not_present"
+                record["stage"] = "pnp"
+                _record_usb_instances(record, system, timeout=usb_timeout)
+            else:
+                record["wpd_status"] = "not_ready"
+                record["stage"] = "wpd"
+            record["status"] = "failed"
+            record["error_type"] = type(exc).__name__
+            record["error"] = str(exc)[:2000]
+            record["elapsed_ms"] = round((time.monotonic() - started) * 1000)
+            diagnostics.append(record)
+
+    stage = str(diagnostics[-1].get("stage") or "pnp")
+    message = (
+        "dal_usb open restored Windows PnP but the MTP namespace stayed unavailable"
+        if stage == "wpd"
+        else "dal_usb open did not restore the watch USB/PnP device"
+    )
+    raise MtpUsbRestoreError(message, diagnostics) from last_error
 
 
 def _capture_response_state(
@@ -759,9 +1005,13 @@ def capture_mtp_screenshot(
     )
     transport = factory()
     usb_closed = False
+    usb_restore_attempted = False
     receipt: dict[str, Any] | None = None
     try:
         transport.open()
+        # Never close an unproven USB path.  This keeps a missing/ambiguous
+        # host environment from being turned into a destructive recovery loop.
+        system.wait_for_usb(present=True, timeout=usb_timeout)
         _write_line(transport, "dal_usb close")
         usb_closed = True
         system.wait_for_usb(present=False, timeout=usb_timeout)
@@ -774,15 +1024,13 @@ def capture_mtp_screenshot(
             transport, sequence=sequence, timeout=capture_timeout
         )
 
-        _write_line(transport, "dal_usb open")
-        try:
-            system.wait_for_usb(present=True, timeout=usb_timeout)
-        except MtpScreenshotTimeoutError:
-            # ``dal_usb open`` is idempotent.  On the real watch the first
-            # request can occasionally be missed while USB is re-enumerating,
-            # so retry the command once before failing the capture.
-            _write_line(transport, "dal_usb open")
-            system.wait_for_usb(present=True, timeout=usb_timeout)
+        usb_restore_attempted = True
+        restore_usb_device(
+            lambda line: _write_line(transport, line),
+            system,
+            usb_timeout=usb_timeout,
+            namespace_timeout=mtp_timeout,
+        )
         usb_closed = False
 
         with tempfile.TemporaryDirectory(
@@ -810,16 +1058,29 @@ def capture_mtp_screenshot(
                 _validate_receipt(receipt, bmp, file_name=file_name)
             os.replace(downloaded, output)
     finally:
-        if usb_closed:
+        pending_error = sys.exc_info()[1]
+        cleanup_error: Exception | None = None
+        if usb_closed and not usb_restore_attempted:
             try:
-                _write_line(transport, "dal_usb open")
-                system.wait_for_usb(present=True, timeout=usb_timeout)
-            except Exception:
-                pass
+                restore_usb_device(
+                    lambda line: _write_line(transport, line),
+                    system,
+                    usb_timeout=usb_timeout,
+                    namespace_timeout=mtp_timeout,
+                )
+            except Exception as exc:
+                cleanup_error = exc
         try:
             transport.close()
         except Exception:
             pass
+        if cleanup_error is not None:
+            if pending_error is not None:
+                pending_error.add_note(
+                    f"USB cleanup also failed: {cleanup_error}"
+                )
+            else:
+                raise cleanup_error
 
     return MtpScreenshotResult(
         status="ok",
@@ -1021,10 +1282,13 @@ __all__ = [
     "MtpScreenshotError",
     "MtpScreenshotResult",
     "MtpScreenshotTimeoutError",
+    "MtpUsbRestoreError",
     "MtpScreenshotValidationError",
     "WindowsMtpSystem",
     "capture_filename",
     "capture_mtp_screenshot",
     "main",
+    "restore_usb_device",
+    "summarize_usb_devices",
     "validate_bmp",
 ]

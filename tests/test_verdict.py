@@ -7,11 +7,14 @@ from pathlib import Path
 from unittest import mock
 
 from PIL import Image
+from pydantic import ValidationError
 
 from agent_loop_system.tools.test import (
+    MenuStyleClassification,
     Verdict,
     _configure_console_output,
     aggregate_verdicts,
+    classify_menu_style_with_vision,
     judge_case_result,
     judge_test_with_vision,
     judge_with_llm,
@@ -46,6 +49,75 @@ class AggregateVerdictsTest(unittest.TestCase):
     def test_skip_never_yields_pass(self) -> None:
         self.assertEqual(aggregate_verdicts(["SKIP"]), "CANNOT_VERIFY")
         self.assertEqual(aggregate_verdicts(["PASS", "SKIP"]), "CANNOT_VERIFY")
+
+
+class MenuStyleClassificationTest(unittest.TestCase):
+    def test_schema_accepts_only_the_four_configured_styles_or_unknown(self) -> None:
+        style_schema = MenuStyleClassification.model_json_schema()["properties"][
+            "style"
+        ]
+        self.assertEqual(
+            style_schema["enum"],
+            [
+                "LIST_RADIUS",
+                "HONEYCOMB",
+                "WATERFALL",
+                "GALACTIC_RING",
+                "UNKNOWN",
+            ],
+        )
+        with self.assertRaises(ValidationError):
+            MenuStyleClassification(style="LIST", reason="非6202配置枚举")
+
+    def test_unavailable_visual_agent_returns_unknown(self) -> None:
+        with mock.patch(
+            "agent_loop_system.tools.llm_config.get_llm_api_key",
+            return_value="",
+        ):
+            result = classify_menu_style_with_vision("missing.bmp")
+
+        self.assertEqual(result.style, "UNKNOWN")
+        self.assertIn("API key", result.reason)
+
+    def test_classifier_sends_one_image_with_the_structured_schema(self) -> None:
+        captured: dict[str, object] = {}
+
+        class Structured:
+            def invoke(self, messages):
+                captured["content"] = messages[0].content
+                return MenuStyleClassification(
+                    style="WATERFALL",
+                    reason="图标沿纵向弧线排列",
+                )
+
+        class LLM:
+            def with_structured_output(self, schema):
+                captured["schema"] = schema
+                return Structured()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            screenshot = Path(tmp) / "menu.bmp"
+            Image.new("RGB", (4, 4), "black").save(screenshot)
+            with mock.patch(
+                "agent_loop_system.tools.llm_config.get_llm_api_key",
+                return_value="sk-test",
+            ), mock.patch(
+                "agent_loop_system.tools.llm_config.create_chat_llm",
+                return_value=LLM(),
+            ), mock.patch(
+                "agent_loop_system.tools.test.invoke_llm_with_retry",
+                side_effect=lambda fn: fn(),
+            ):
+                result = classify_menu_style_with_vision(str(screenshot))
+
+        self.assertEqual(result.style, "WATERFALL")
+        self.assertIs(captured["schema"], MenuStyleClassification)
+        content = captured["content"]
+        self.assertEqual(sum(item["type"] == "image_url" for item in content), 1)
+        prompt = content[0]["text"]
+        self.assertIn("LIST_RADIUS", prompt)
+        self.assertIn("UNKNOWN", prompt)
+        self.assertIn("不得猜测", prompt)
 
 
 class ConsoleOutputTest(unittest.TestCase):
@@ -104,9 +176,11 @@ class SaveEvidenceTest(unittest.TestCase):
                 output,
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
-        self.assertEqual(payload["verdict"], "ERROR")
+        self.assertEqual(payload["verdict"], "CANNOT_VERIFY")
         self.assertEqual(payload["reason"], "点击命令被拒绝")
+        self.assertEqual(payload["workflow_status"], "failed")
         self.assertEqual(payload["execution_status"], "ERROR")
+        self.assertEqual(payload["reason_code"], "CASE_EXECUTION_ERROR")
         self.assertEqual(payload["execution_reason"], "点击命令被拒绝")
 
     def test_diagnostic_collection_error_does_not_override_complete_visual_pass(self) -> None:
@@ -145,8 +219,9 @@ class SaveEvidenceTest(unittest.TestCase):
             )
             save_evidence(result, None, output)
             payload = json.loads(output.read_text(encoding="utf-8"))
-        self.assertEqual(payload["verdict"], "ERROR")
+        self.assertEqual(payload["verdict"], "CANNOT_VERIFY")
         self.assertEqual(payload["reason"], "Agent-loop 探索没有取得截图")
+        self.assertEqual(payload["reason_code"], "EVIDENCE_INCOMPLETE")
 
 
 class VisionEvidenceTest(unittest.TestCase):
@@ -237,7 +312,15 @@ class VisionEvidenceTest(unittest.TestCase):
 
 
 class TestCaseVisionEvidenceTest(unittest.TestCase):
-    def _judge(self, screenshots, verification_points):
+    def _judge(
+        self,
+        screenshots,
+        verification_points,
+        *,
+        expected_text="先显示按钮，点击后显示测量中",
+        project="",
+        translations_path=None,
+    ):
         captured: dict[str, list[dict]] = {}
 
         class Structured:
@@ -249,12 +332,36 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
             def with_structured_output(self, schema):
                 return Structured()
 
-        with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}), mock.patch(
+        environment = {"OPENAI_API_KEY": "sk-test"}
+        if translations_path is None:
+            translation_patch = mock.patch(
+                "agent_loop_system.tools.test.visual_translation_context",
+                return_value="",
+            )
+        else:
+            from agent_loop_system.tools.visual_translations import (
+                visual_translation_context,
+            )
+
+            translation_patch = mock.patch(
+                "agent_loop_system.tools.test.visual_translation_context",
+                side_effect=lambda selected_project, texts: visual_translation_context(
+                    selected_project,
+                    texts,
+                    document_path=translations_path,
+                ),
+            )
+        with mock.patch.dict("os.environ", environment), mock.patch(
             "langchain_openai.ChatOpenAI", return_value=LLM()
         ), mock.patch(
             "agent_loop_system.tools.test.invoke_llm_with_retry", side_effect=lambda fn: fn()
-        ):
-            verdict = judge_test_with_vision("先显示按钮，点击后显示测量中", screenshots, verification_points)
+        ), translation_patch:
+            verdict = judge_test_with_vision(
+                expected_text,
+                screenshots,
+                verification_points,
+                project=project,
+            )
         return verdict, captured.get("content", [])
 
     def test_each_verification_point_is_paired_with_one_screenshot(self) -> None:
@@ -278,13 +385,64 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         self.assertIn("判定截图 1，对应验证点：显示 Measure 按钮", labels)
         self.assertIn("判定截图 2，对应验证点：显示 Measuring", labels)
         prompt = labels[0]
-        self.assertIn("唯一证据是下方模拟器截图", prompt)
+        self.assertIn("唯一证据是下方截图", prompt)
         self.assertIn("不得假设或索要 GUI_TREE", prompt)
         self.assertIn("有效数值和明确完成时间", prompt)
         self.assertIn("不得把旁边的再次测量按钮或操作提示误读为仍在测量", prompt)
         self.assertIn("不得把相邻用例或先前截图的页面内容套用", prompt)
         self.assertIn("不得臆造图中不存在的列表、文字或按钮", prompt)
         self.assertNotIn("terminal_json", prompt)
+
+    def test_6202_prompt_only_includes_current_checkpoint_translation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            screenshot = root / "timer.bmp"
+            translations = root / "Translations.json"
+            Image.new("RGB", (4, 4), "white").save(screenshot)
+            translations.write_text(
+                json.dumps(
+                    {
+                        "CustomerNumber": "2-赛博",
+                        "TranslationNumber": "客户编号2-1（传音oraimo）",
+                        "Version": 30,
+                        "Entries": [
+                            {
+                                "Key": "STR_Timer",
+                                "Translations": {
+                                    "zh-CN": "计时器",
+                                    "en-US": "Timer",
+                                    "fr-FR": "Minuteur",
+                                },
+                            },
+                            {
+                                "Key": "STR_Workout_rem",
+                                "Translations": {
+                                    "zh-CN": "运动",
+                                    "en-US": "Workout",
+                                },
+                            },
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8-sig",
+            )
+            verdict, content = self._judge(
+                [{"path": str(screenshot)}],
+                ["Clock子菜单第3项显示Timer"],
+                expected_text="第3项显示Timer",
+                project="6202_W5230",
+                translations_path=translations,
+            )
+
+        prompt = next(item["text"] for item in content if item["type"] == "text")
+        self.assertEqual(verdict.verdict, "PASS")
+        self.assertIn("STR_Timer", prompt)
+        self.assertIn('en-US="Timer"', prompt)
+        self.assertIn('zh-CN="计时器"', prompt)
+        self.assertNotIn("STR_Workout_rem", prompt)
+        self.assertNotIn("Minuteur", prompt)
+        self.assertNotIn("LANGUAGE_SET", prompt)
 
     def test_missing_checkpoint_screenshot_cannot_verify(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -338,7 +496,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         ) as visual:
             decision = judge_case_result(result)
 
-        self.assertEqual(decision.verdict, "ERROR")
+        self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "业务动作未执行")
         visual.assert_not_called()
 
@@ -356,7 +514,7 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
         )
         decision = judge_case_result(result)
 
-        self.assertEqual(decision.verdict, "ERROR")
+        self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "Agent-loop 探索没有取得截图")
 
     def test_runner_gate_keeps_cannot_verify_for_complete_but_unreadable_visual_evidence(self) -> None:
@@ -376,6 +534,66 @@ class TestCaseVisionEvidenceTest(unittest.TestCase):
 
         self.assertEqual(decision.verdict, "CANNOT_VERIFY")
         self.assertEqual(decision.reason, "截图内容无法辨认")
+
+    def test_fixed_mapping_visual_judgement_uses_fixed_api_key(self) -> None:
+        from agent_loop_system.tools.llm_config import get_llm_api_key
+
+        result = CaseRunResult(
+            case_id="FIXED_KEY_001",
+            sheet="demo",
+            expected_text="显示结果页",
+            execution_mode="fixed_mapping",
+            evidence_contract={"complete": True, "issues": []},
+            screenshots=[{"path": "screenshot.bmp", "label": "结果页"}],
+        )
+        selected_keys: list[str] = []
+
+        def judge_with_scoped_key(*args, **kwargs):
+            selected_keys.append(get_llm_api_key())
+            return Verdict(verdict="PASS", reason="截图符合预期")
+
+        with (
+            mock.patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_API_KEY": "shared-key",
+                    "OPENAI_API_KEY_EXPLORATION": "exploration-key",
+                    "OPENAI_API_KEY_FIXED": "fixed-key",
+                },
+            ),
+            mock.patch(
+                "agent_loop_system.tools.test.judge_test_with_vision",
+                side_effect=judge_with_scoped_key,
+            ),
+        ):
+            decision = judge_case_result(result)
+
+        self.assertEqual(decision.verdict, "PASS")
+        self.assertEqual(selected_keys, ["fixed-key"])
+
+    def test_runner_passes_6202_project_to_visual_translation_lookup(self) -> None:
+        result = CaseRunResult(
+            case_id="MENU_032",
+            sheet="主菜单",
+            expected_text="第2项显示Workout",
+            evidence_contract={"complete": True, "issues": []},
+            screenshots=[{"path": "screenshot.bmp"}],
+            verification_points=["第2项显示Workout"],
+            provenance={"project": "6202_W5230"},
+        )
+        with mock.patch(
+            "agent_loop_system.tools.test.judge_test_with_vision",
+            return_value=Verdict(verdict="FAIL", reason="第2项不是Workout"),
+        ) as visual:
+            decision = judge_case_result(result)
+
+        self.assertEqual(decision.verdict, "FAIL")
+        visual.assert_called_once_with(
+            result.expected_text,
+            result.screenshots,
+            result.verification_points,
+            project="6202_W5230",
+        )
 
 
 if __name__ == "__main__":

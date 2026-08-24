@@ -116,6 +116,8 @@ class GraphFlowTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
+        evidence_root = root / "evidence"
+        self._last_evidence_root = evidence_root
         src = root / "app" / "a.c"
         src.parent.mkdir(parents=True, exist_ok=True)
         src.write_text("before();\n", encoding="utf-8")
@@ -275,6 +277,10 @@ class GraphFlowTest(unittest.TestCase):
         with mock.patch.dict(os.environ, environment):
             with (
                 mock.patch("agent_loop_system.graph.BuildConfig"),
+                mock.patch(
+                    "agent_loop_system.graph.EVIDENCE_ROOT",
+                    evidence_root,
+                ),
                 mock.patch("agent_loop_system.graph.run_build", run_build),
                 mock.patch(
                     "agent_loop_system.graph.run_interactive_reproduction",
@@ -319,7 +325,7 @@ class GraphFlowTest(unittest.TestCase):
         return _normalize_result(result), src, run_build
 
     def _evidence(self, task_id: str = "T1") -> Path:
-        return Path(r"d:\Agent-loop-system\evidence") / task_id
+        return self._last_evidence_root / task_id
 
     def test_new_graph_calls_interactive_reproduce_once(self) -> None:
         result, _, run_build = self._run(

@@ -47,12 +47,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘左滑",
       "expected_text": "1.手表显示My Fitness一级视图",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘左滑后显示活动记录（My Fitness）一级视图；候选等待正式复跑。",
+      "verification_points": [
+        "在主表盘左滑后显示My Fitness一级视图"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_004",
@@ -61,12 +71,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘右滑",
       "expected_text": "1.手表显示负一屏",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":SWIPE_SIM:3,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘右滑后显示语音、天气和活动卡片组成的负一屏；候选等待正式复跑。",
+      "verification_points": [
+        "在主表盘右滑后显示负一屏"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_005",
@@ -75,12 +95,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘上滑",
       "expected_text": "1.手表显示消息中心",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":SWIPE_SIM:0,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘上滑后显示消息中心的暂无消息空态；候选等待正式复跑。",
+      "verification_points": [
+        "在主表盘上滑后显示消息中心"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_006",
@@ -89,12 +119,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘下滑",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":SWIPE_SIM:1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘下滑后显示包含九个快捷项的控制中心第1页；候选等待正式复跑。",
+      "verification_points": [
+        "在主表盘下滑后显示控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_007",
@@ -103,12 +143,28 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.用可编程触控治具长按主表盘2秒",
       "expected_text": "1.手表显示Watch Faces页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:70001"
+      ],
+      "actions": [
+        ":TP_PRESS:233,233,1",
+        ":HOST_WAIT:2500",
+        ":TP_PRESS:233,233,0",
+        ":HOST_WAIT:1000"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:70002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：长按前后双截图证明全屏表盘缩成蓝框选中卡片且露出下一张表盘；候选等待正式复跑。",
+      "verification_points": [
+        "长按前显示全屏主表盘",
+        "长按2秒后当前表盘缩成带蓝色选中边框的卡片且右侧露出下一张表盘卡片，表明进入Watch Faces页面"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_008",
@@ -117,12 +173,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.顺时针旋转编码器",
       "expected_text": "1.手表显示消息中心",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":QDEC_SET:1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：顺时针旋转编码器后显示消息中心暂无消息空态；候选等待正式复跑。",
+      "verification_points": [
+        "顺时针旋转编码器后显示消息中心"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_009",
@@ -131,12 +197,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.逆时针旋转编码器",
       "expected_text": "1.手表显示控制中心第1页",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":QDEC_SET:0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：逆时针旋转编码器后显示控制中心第1页；候选等待正式复跑。",
+      "verification_points": [
+        "逆时针旋转编码器后显示控制中心第1页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_010",
@@ -145,12 +221,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在主表盘单击编码器",
       "expected_text": "1.手表显示主菜单",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘稳定后单击主编码器显示主菜单列表；候选等待正式复跑。",
+      "verification_points": [
+        "在主表盘单击编码器后显示主菜单"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_011",
@@ -159,12 +245,22 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.从主表盘左滑一次",
       "expected_text": "1.手表显示My Fitness",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：主表盘左滑一次后实际显示活动记录，未显示原始预期的My Fitness；候选等待正式复跑。",
+      "verification_points": [
+        "从主表盘左滑一次后显示My Fitness"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_012",
@@ -173,12 +269,24 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.从前一一级视图左滑",
       "expected_text": "1.手表显示Sleep",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从第一张一级视图继续左滑后实际显示心率，未显示原始预期Sleep；候选等待正式复跑。",
+      "verification_points": [
+        "从My Fitness左滑后显示Sleep"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_013",
@@ -187,12 +295,26 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.从前一一级视图左滑",
       "expected_text": "1.手表显示One Click Measurement",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：连续第三次左滑后实际显示血氧，未显示原始预期One Click Measurement；候选等待正式复跑。",
+      "verification_points": [
+        "从Sleep左滑后显示One Click Measurement"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_014",
@@ -285,12 +407,32 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在Sleep视图右滑",
       "expected_text": "1.手表显示My Fitness",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:20001"
+      ],
+      "actions": [
+        ":SWIPE_SIM:3,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:20002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：真实一级视图链中先确认Sleep空态页，右滑后实际显示血氧而非My Fitness；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "右滑前显示Sleep一级视图",
+        "在Sleep视图右滑后显示My Fitness"
+      ]
     },
     {
       "case_id": "WFACE_021",
@@ -299,12 +441,24 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.执行左滑",
       "expected_text": "1.手表显示Sleep一级视图",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000",
+        ":SWIPE_SIM:2,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从主表盘进入真实一级视图链后再次左滑，实际显示心率而非Sleep；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "在My Fitness视图左滑后显示Sleep一级视图"
+      ]
     },
     {
       "case_id": "WFACE_022",
@@ -341,12 +495,23 @@
       "precondition_text": "1.手表显示主表盘",
       "steps_text": "1.在Sleep视图单击编码器",
       "expected_text": "1.手表显示主表盘",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SLEEP,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：SLEEP,0建立Sleep前置页后单击主编码器返回全屏主表盘；候选等待正式复跑。",
+      "verification_points": [
+        "在Sleep视图单击编码器后显示主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_025",
@@ -355,12 +520,22 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness主页面",
       "expected_text": "1.页面左侧显示三色同心圆环",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从主表盘左滑进入活动记录页面，清晰显示蓝绿红三色同心活动圆环；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "My Fitness主页面左侧显示三色同心圆环"
+      ]
     },
     {
       "case_id": "WFACE_026",
@@ -411,12 +586,22 @@
       "precondition_text": "1.手表显示My Fitness一级视图",
       "steps_text": "1.观察My Fitness主页面",
       "expected_text": "1.页面右侧显示白色滚动条",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：活动记录主页面右侧边缘没有白色滚动条；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "My Fitness主页面右侧显示白色滚动条"
+      ]
     },
     {
       "case_id": "WFACE_030",
@@ -495,12 +680,21 @@
       "precondition_text": "1.手表显示Sleep一级视图",
       "steps_text": "1.观察页面顶部",
       "expected_text": "1.页面顶部显示Sleep标题",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0"
+      ],
+      "actions": [
+        ":ENTER_PAGE:SLEEP,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：当前源码确认SLEEP页面忽略启动参数；SLEEP,0直达后截图顶部显示睡眠标题；候选等待正式复跑。",
+      "verification_points": [
+        "Sleep主页面顶部显示Sleep标题"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_036",
@@ -523,12 +717,25 @@
       "precondition_text": "1.今日无睡眠数据",
       "steps_text": "1.在Sleep主页面上滑",
       "expected_text": "1.页面保持Sleep空态主页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SLEEP,0",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:37001"
+      ],
+      "actions": [
+        ":SWIPE_SIM:0,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:37002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：无睡眠数据时上滑从空态主页面进入夜间睡眠阶段子页面，未保持空态主页面；候选等待正式复跑。",
+      "verification_points": [
+        "上滑前显示Sleep空态主页面",
+        "上滑后仍显示Sleep空态主页面"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_038",
@@ -537,12 +744,23 @@
       "precondition_text": "1.今日无睡眠数据",
       "steps_text": "1.在Sleep空态页左滑",
       "expected_text": "1.手表显示One Click Measurement",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:SLEEP,0",
+        ":HOST_WAIT:1000"
+      ],
+      "actions": [
+        ":SWIPE_SIM:2,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：SLEEP,0建立无数据Sleep空态前置页后左滑仍停留在Sleep，未显示One Click Measurement；候选等待正式复跑。",
+      "verification_points": [
+        "在Sleep空态页左滑后显示One Click Measurement"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "WFACE_039",
@@ -817,12 +1035,22 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察Breathe主页面",
       "expected_text": "1.页面显示绿色播放按钮",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":ENTER_PAGE:BREATH_TRAIN,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：源码确认BREATH_TRAIN入口不依赖参数；真机主页面中央显示绿色半透明圆形播放按钮；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "Breathe主页面显示绿色播放按钮"
+      ]
     },
     {
       "case_id": "WFACE_059",
@@ -831,12 +1059,22 @@
       "precondition_text": "1.手表显示Breathe一级视图",
       "steps_text": "1.观察页面顶部",
       "expected_text": "1.页面顶部以绿色显示Breathe标题",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":ENTER_PAGE:BREATH_TRAIN,0"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：源码确认BREATH_TRAIN入口不依赖参数；真机页面顶部以白色显示中文“呼吸训练”，并非绿色Breathe标题；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "页面顶部以绿色显示Breathe标题"
+      ]
     },
     {
       "case_id": "WFACE_060",

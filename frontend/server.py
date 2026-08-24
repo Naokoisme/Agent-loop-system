@@ -5,10 +5,15 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import base64
 import copy
+from contextlib import contextmanager
+import errno
 import hashlib
+import ipaddress
 import io
+import math
 import openpyxl
 from agent_loop_system.tools.update_checker import (
     check_for_updates,
@@ -20,6 +25,7 @@ import os
 import re
 import shutil
 import socket
+import ssl
 import struct
 import subprocess
 import sys
@@ -27,7 +33,7 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -36,8 +42,24 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from agent_loop_system.case_management import CaseManagementRepository
 from agent_loop_system.internal_dispatcher import build_child_command
+from agent_loop_system.outcome import outcome_fields
 from agent_loop_system.platforms.registry import PlatformRegistry
+from agent_loop_system.process_lifecycle import (
+    DEFAULT_TERMINATION_GRACE_SECONDS as PROCESS_TERMINATION_GRACE_SECONDS,
+    communicate_process as _communicate_process,
+    positive_timeout as _positive_timeout,
+    process_identity as _process_identity,
+    process_is_alive as _process_is_alive,
+    terminate_pid_tree as _terminate_pid_tree,
+    terminate_process_tree as _terminate_process_tree,
+)
 from agent_loop_system.projects.registry import ProjectRegistry
+from agent_loop_system.runtime_root import (
+    RuntimePaths,
+    load_app_env,
+    resolve_app_root,
+    resolve_config_path,
+)
 from agent_loop_system.tools.case_map import (
     OBSERVATION_ONLY_COMMANDS,
     validated_case_entries,
@@ -45,6 +67,12 @@ from agent_loop_system.tools.case_map import (
 from agent_loop_system.tools.command_protocol import normalize_command
 from agent_loop_system.tools.external_execution_history import (
     read_external_execution_history,
+)
+from agent_loop_system.tools.watch_ble import (
+    WatchBleClient,
+    WatchBleConnectionError,
+    WatchBleDevice,
+    discover_ble_devices,
 )
 
 
@@ -54,21 +82,56 @@ WORKFLOW_NODES = (
 TEST_WORKFLOW_NODES = ("load", "execute", "judge", "record")
 SAFE_SEGMENT = re.compile(r"^[A-Za-z0-9_.-]+$")
 TEST_SCREENSHOT_FILE = re.compile(r"^screenshot(?:-\d{2,3})?\.bmp$")
+LIVE_TEST_SCREENSHOT_FILE = re.compile(
+    r"^(?:screenshot(?:-\d{2,3})?|step_\d{2,3})\.bmp$"
+)
 MAX_BODY_BYTES = 50 * 1024 * 1024  # 50 MB 支持大容量 Excel/用例数据上传
-MAX_PORT_SEARCH_ATTEMPTS = 500_000
+DEFAULT_FRONTEND_PORT = 8765
+MAX_PORT_SEARCH_ATTEMPTS = 100
 MAX_LOG_CHARS = 200_000
 HISTORY_SCHEMA_VERSION = 2
 DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 BATCH_STATE_FILE = "batch-state.json"
 BATCH_CASES_FILE = "batch-cases.json"
+SINGLE_TEST_STATE_FILE = "single-test-state.json"
+REPAIR_JOB_STATE_FILE = "repair-job-state.json"
 PROMOTION_STATE_FILE = "promotion-state.json"
+BLE_DEVICE_STORE_FILE = "ble-devices.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
+CASE_TEST_TIMEOUT_SECONDS = 1800.0
+REPAIR_JOB_TIMEOUT_SECONDS = 3600.0
 _PLATFORM_REGISTRY = PlatformRegistry()
 _PROJECT_REGISTRY: ProjectRegistry | None = None
 
 
+def _reload_runtime_limits() -> None:
+    """Refresh limits after the portable app's .env has been loaded."""
+
+    global CASE_TEST_TIMEOUT_SECONDS, REPAIR_JOB_TIMEOUT_SECONDS
+    CASE_TEST_TIMEOUT_SECONDS = _positive_timeout("AGENT_LOOP_CASE_TIMEOUT", 1800.0)
+    REPAIR_JOB_TIMEOUT_SECONDS = _positive_timeout("AGENT_LOOP_REPAIR_TIMEOUT", 3600.0)
+
+
+_reload_runtime_limits()
+
+
 def _now() -> str:
     return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def _is_loopback_host(host: str | None) -> bool:
+    value = str(host or "").strip().strip("[]").casefold()
+    if value == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(value).is_loopback
+    except ValueError:
+        return False
+
+
+def _ones_ssl_context() -> ssl.SSLContext:
+    ca_bundle = os.environ.get("ONES_CA_BUNDLE", "").strip() or None
+    return ssl.create_default_context(cafile=ca_bundle)
 
 
 def _read_json(path: Path, default: Any = None) -> Any:
@@ -86,6 +149,23 @@ def _write_json(path: Path, payload: Any) -> None:
         encoding="utf-8",
     )
     os.replace(temporary, path)
+
+
+@contextmanager
+def _staged_directory(final_path: Path):
+    """Build one artifact set off to the side, then publish it as one directory."""
+
+    final_path.parent.mkdir(parents=True, exist_ok=True)
+    staging = final_path.with_name(
+        f".{final_path.name}.staging-{uuid.uuid4().hex[:12]}"
+    )
+    staging.mkdir(parents=False, exist_ok=False)
+    try:
+        yield staging
+        os.replace(staging, final_path)
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
 
 
 def _test_commands(result: dict[str, Any]) -> list[str]:
@@ -239,21 +319,23 @@ def _test_project(
         target_id=target_id,
     )
     if result.get("target_id") == "w30.6202.simulator":
-        result.update({
-            "simulator_source_root": os.environ.get(
-                "W30_6202_SIMULATOR_SOURCE_ROOT",
-                r"D:\Agent-loop-workspace\6202_W5230",
-            ),
-            "simulator_project": "6202_W5230",
-            "simulator_build_directory": os.environ.get(
-                "W30_6202_SIMULATOR_BUILD_DIRECTORY",
-                r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\out\build\6202_W5230",
-            ),
-            "simulator_artifact_path": os.environ.get(
-                "W30_6202_SIMULATOR_ARTIFACT_PATH",
-                r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\bin\main.exe",
-            ),
-        })
+        _load_test_runtime_environment()
+        defaults = {
+            "simulator_source_root": "../workspaces/firmware/6202_W5230",
+            "simulator_build_directory": "../workspaces/firmware/6202_W5230/core/gui/simulator/out/build/6202_W5230",
+            "simulator_artifact_path": "../workspaces/firmware/6202_W5230/core/gui/simulator/bin/main.exe",
+        }
+        for field, environment_key in (
+            ("simulator_source_root", "W30_6202_SIMULATOR_SOURCE_ROOT"),
+            ("simulator_build_directory", "W30_6202_SIMULATOR_BUILD_DIRECTORY"),
+            ("simulator_artifact_path", "W30_6202_SIMULATOR_ARTIFACT_PATH"),
+        ):
+            configured = (os.environ.get(environment_key) or "").strip()
+            result[field] = str(resolve_config_path(
+                configured or defaults[field],
+                app_root=_project_registry().root,
+            ))
+        result["simulator_project"] = "6202_W5230"
     return result
 
 
@@ -277,22 +359,20 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
 
     _load_test_runtime_environment()
     execution_env = dict(os.environ)
+    execution_env["W30_PROJECT"] = str(project_meta["project"])
     if project_meta.get("execution_target") == "hardware":
-        hardware_source_root = execution_env.get(
-            "W30_HARDWARE_SOURCE_ROOT", ""
-        ).strip()
-        hardware_workspace_root = execution_env.get(
-            "W30_HARDWARE_WORKSPACE_ROOT", ""
-        ).strip()
         hardware_project = str(project_meta["project"])
         execution_env.update({
             "W30_PROJECT": hardware_project,
             "W30_HARDWARE_PROJECT": hardware_project,
         })
-        if hardware_source_root:
-            execution_env["W30_SOURCE_ROOT"] = hardware_source_root
-        if hardware_workspace_root:
-            execution_env["W30_AGENT_WORKSPACE_ROOT"] = hardware_workspace_root
+        for source_key in (
+            "W30_SOURCE_ROOT",
+            "W30_AGENT_WORKSPACE_ROOT",
+            "W30_HARDWARE_SOURCE_ROOT",
+            "W30_HARDWARE_WORKSPACE_ROOT",
+        ):
+            execution_env.pop(source_key, None)
     elif project_meta.get("simulator_source_root"):
         source_root = project_meta["simulator_source_root"]
         execution_env.update({
@@ -304,7 +384,40 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
             "SIMULATOR_SHELL_READY_MARKER": "W30_SIM_SHELL_READY",
             "SIMULATOR_GUI_COMMAND_READY_MARKER": "W30_QUICK_CMD_GUI_READY",
         })
+        execution_env.pop("W30_HARDWARE_PROJECT", None)
+    else:
+        execution_env.pop("W30_HARDWARE_PROJECT", None)
     return execution_env
+
+
+def _hardware_case_llm_scope(
+    case: dict[str, Any],
+    *,
+    candidate_replay: bool = False,
+) -> str:
+    promoted = bool(case.get("is_promoted")) or str(
+        case.get("mapping_status") or ""
+    ).strip().upper() == "PROMOTED"
+    return "fixed" if promoted or candidate_replay else "exploration"
+
+
+def _configured_hardware_llm_scopes(
+    environment: dict[str, str],
+) -> tuple[str, ...]:
+    scopes = [
+        scope
+        for scope, key_name, model_name in (
+            ("fixed", "OPENAI_API_KEY_FIXED", "OPENAI_FIXED_MODEL"),
+            (
+                "exploration",
+                "OPENAI_API_KEY_EXPLORATION",
+                "OPENAI_EXPLORATION_MODEL",
+            ),
+        )
+        if str(environment.get(key_name) or "").strip()
+        or str(environment.get(model_name) or "").strip()
+    ]
+    return tuple(scopes)
 
 
 @dataclass(frozen=True)
@@ -318,6 +431,7 @@ class AppPaths:
     evidence: Path
     case_map: Path
     runtime_jobs: Path
+    environment_checks: Path
     config: Path
     project_data: Path
 
@@ -335,6 +449,7 @@ class AppPaths:
             evidence=root / "evidence",
             case_map=root / "case_map",
             runtime_jobs=root / ".runtime" / "jobs",
+            environment_checks=root / ".runtime" / "environment-checks",
             config=root / "config",
             project_data=root / "project_data",
         )
@@ -481,7 +596,6 @@ class HistoryStore:
         defect = _safe_segment(defect, "缺陷编号")
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(defect, run_id)
-        run_dir.mkdir(parents=True, exist_ok=False)
 
         progress = job.get("progress") or {}
         patch = _actual_patch(result)
@@ -493,10 +607,15 @@ class HistoryStore:
             "timestamp": job.get("finished_at") or _now(),
             "started_at": job.get("started_at"),
             "finished_at": job.get("finished_at"),
-            "verdict": result.get("verdict", "FAIL"),
+            "verdict": result.get("verdict", "CANNOT_VERIFY"),
             "reproduction_outcome": result.get("reproduction_outcome"),
             "attempts": result.get("attempts", 0),
             "execution_mode": job.get("execution_mode", "agent_generated"),
+            "project": job.get("project"),
+            "project_label": job.get("project_label"),
+            "execution_target": job.get("execution_target"),
+            "execution_target_label": job.get("execution_target_label"),
+            "profile": job.get("case_map_profile") or result.get("profile"),
             "test_case": job.get("test_case"),
             "source_file": patch.get("file_path") or job.get("source_file"),
             "test_commands": _test_commands(result),
@@ -516,15 +635,24 @@ class HistoryStore:
             "stdout": stdout[-MAX_LOG_CHARS:],
             "stderr": stderr[-MAX_LOG_CHARS:],
         }
-        _write_json(run_dir / "run.json", run_payload)
-        _write_json(run_dir / "patch.json", patch)
-        _write_json(run_dir / "test_result.json", test_output or {})
+        run_payload.update(outcome_fields({**result, **{
+            key: job.get(key)
+            for key in (
+                "workflow_status", "execution_status", "evidence_status",
+                "mapping_status", "reason_code",
+            )
+            if job.get(key) is not None
+        }}))
+        with _staged_directory(run_dir) as staging:
+            _write_json(staging / "run.json", run_payload)
+            _write_json(staging / "patch.json", patch)
+            _write_json(staging / "test_result.json", test_output or {})
 
-        evidence_dir = self.paths.evidence / defect
-        for kind in ("before", "after"):
-            source = evidence_dir / f"{kind}.bmp"
-            if source.is_file():
-                shutil.copy2(source, run_dir / f"{kind}.bmp")
+            evidence_dir = self.paths.evidence / defect
+            for kind in ("before", "after"):
+                source = evidence_dir / f"{kind}.bmp"
+                if source.is_file():
+                    shutil.copy2(source, staging / f"{kind}.bmp")
         return run_id
 
     def list(self, defect: str) -> list[dict[str, Any]]:
@@ -843,7 +971,6 @@ class TestHistoryStore:
         project = project_meta["project"]
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(sheet, case_id, run_id, project=project)
-        run_dir.mkdir(parents=True, exist_ok=False)
         case = job.get("case") if isinstance(job.get("case"), dict) else {}
         payload = {
             "schema_version": 2,
@@ -864,7 +991,7 @@ class TestHistoryStore:
             "timestamp": job.get("finished_at") or _now(),
             "started_at": job.get("started_at"),
             "finished_at": job.get("finished_at"),
-            "verdict": result.get("verdict", "ERROR"),
+            "verdict": result.get("verdict", "CANNOT_VERIFY"),
             "reason": result.get("reason") or job.get("error") or "",
             "execution_mode": result.get("execution_mode", "fixed_mapping"),
             "result_schema_version": result.get("schema_version"),
@@ -903,41 +1030,47 @@ class TestHistoryStore:
             "stdout": stdout[-MAX_LOG_CHARS:],
             "stderr": stderr[-MAX_LOG_CHARS:],
         }
+        payload.update(outcome_fields(
+            payload,
+            workflow_default=str(job.get("workflow_status") or "completed"),
+            mapping_default=str(case.get("mapping_status") or "NOT_RECORDED"),
+        ))
         if job.get("batch_id"):
             payload["batch_id"] = str(job["batch_id"])
         if job.get("batch_token"):
             payload["batch_token"] = str(job["batch_token"])
         archived_screenshots: list[dict[str, Any]] = []
-        raw_screenshots = result.get("screenshots", [])
-        if isinstance(raw_screenshots, list):
-            for item in raw_screenshots:
-                if not isinstance(item, dict):
-                    continue
-                source = Path(str(item.get("path") or ""))
-                if not source.is_file():
-                    continue
-                file_name = f"screenshot-{len(archived_screenshots) + 1:02d}.bmp"
-                shutil.copy2(source, run_dir / file_name)
+        with _staged_directory(run_dir) as staging:
+            raw_screenshots = result.get("screenshots", [])
+            if isinstance(raw_screenshots, list):
+                for item in raw_screenshots:
+                    if not isinstance(item, dict):
+                        continue
+                    source = Path(str(item.get("path") or ""))
+                    if not source.is_file():
+                        continue
+                    file_name = f"screenshot-{len(archived_screenshots) + 1:02d}.bmp"
+                    shutil.copy2(source, staging / file_name)
+                    archived_screenshots.append({
+                        "index": len(archived_screenshots) + 1,
+                        "label": str(item.get("label") or f"检查点 {len(archived_screenshots) + 1}"),
+                        "phase": str(item.get("phase") or ""),
+                        "command": str(item.get("command") or ""),
+                        "captured_at": str(item.get("captured_at") or ""),
+                        "trace_index": item.get("trace_index"),
+                        "file": file_name,
+                    })
+            if not archived_screenshots and screenshot and screenshot.is_file():
+                shutil.copy2(screenshot, staging / "screenshot.bmp")
                 archived_screenshots.append({
-                    "index": len(archived_screenshots) + 1,
-                    "label": str(item.get("label") or f"检查点 {len(archived_screenshots) + 1}"),
-                    "phase": str(item.get("phase") or ""),
-                    "command": str(item.get("command") or ""),
-                    "captured_at": str(item.get("captured_at") or ""),
-                    "trace_index": item.get("trace_index"),
-                    "file": file_name,
+                    "index": 1,
+                    "label": "最终画面",
+                    "phase": "final",
+                    "command": "",
+                    "file": "screenshot.bmp",
                 })
-        if not archived_screenshots and screenshot and screenshot.is_file():
-            shutil.copy2(screenshot, run_dir / "screenshot.bmp")
-            archived_screenshots.append({
-                "index": 1,
-                "label": "最终画面",
-                "phase": "final",
-                "command": "",
-                "file": "screenshot.bmp",
-            })
-        payload["screenshots"] = archived_screenshots
-        _write_json(run_dir / "run.json", payload)
+            payload["screenshots"] = archived_screenshots
+            _write_json(staging / "run.json", payload)
         project_cache = self._summary_index_cache.get(project)
         if project_cache is not None:
             key = (sheet, case_id)
@@ -967,16 +1100,73 @@ class TestHistoryStore:
         }
         if not normalized_ids or not self.paths.test_history.is_dir():
             return records_by_batch
-        for path in self.paths.test_history.rglob("run.json"):
-            run = _read_json(path)
-            if not isinstance(run, dict):
-                continue
-            records = records_by_batch.get(str(run.get("batch_id") or ""))
-            if records is None:
-                continue
-            token = str(run.get("batch_token") or "")
-            if token and SAFE_SEGMENT.fullmatch(token):
-                records[token] = run
+        project_ids = {
+            str(project["project_id"])
+            for project in _project_registry().list(include_archived=True)
+        }
+        summary_indexes: dict[
+            str, dict[tuple[str, str], dict[str, Any]]
+        ] = {project: {} for project in project_ids}
+        checked_sheets: dict[tuple[str, str], bool] = {}
+        with self._summary_index_lock:
+            for path in self.paths.test_history.rglob("run.json"):
+                run = _read_json(path)
+                if isinstance(run, dict):
+                    records = records_by_batch.get(str(run.get("batch_id") or ""))
+                    if records is not None:
+                        token = str(run.get("batch_token") or "")
+                        if token and SAFE_SEGMENT.fullmatch(token):
+                            records[token] = run
+
+                relative_parts = path.relative_to(self.paths.test_history).parts
+                if (
+                    len(relative_parts) == 5
+                    and relative_parts[0] in project_ids
+                    and relative_parts[0] != DEFAULT_TEST_PROJECT
+                ):
+                    project, sheet, case_id, run_id, _ = relative_parts
+                elif len(relative_parts) == 4:
+                    project = DEFAULT_TEST_PROJECT
+                    sheet, case_id, run_id, _ = relative_parts
+                else:
+                    continue
+                if not SAFE_SEGMENT.fullmatch(case_id) or not SAFE_SEGMENT.fullmatch(run_id):
+                    continue
+                sheet_key = (project, sheet)
+                if sheet_key not in checked_sheets:
+                    try:
+                        _case_map_path(self.paths, sheet, project)
+                    except ValueError:
+                        checked_sheets[sheet_key] = False
+                    else:
+                        checked_sheets[sheet_key] = True
+                if not checked_sheets[sheet_key]:
+                    continue
+
+                key = (sheet, case_id)
+                summary = summary_indexes[project].setdefault(
+                    key,
+                    {"latest": None, "history_count": 0, "latest_run_id": ""},
+                )
+                summary["history_count"] += 1
+
+                if not isinstance(run, dict):
+                    continue
+                if run_id > summary["latest_run_id"]:
+                    summary["latest"] = self._compact_summary(run)
+                    summary["latest_run_id"] = run_id
+
+            self._summary_index_cache = {
+                project: {
+                    key: {
+                        "latest": summary["latest"],
+                        "history_count": summary["history_count"],
+                    }
+                    for key, summary in index.items()
+                    if summary["latest"] is not None
+                }
+                for project, index in summary_indexes.items()
+            }
         return records_by_batch
 
     def list(
@@ -1058,6 +1248,11 @@ class TestHistoryStore:
         return {
             "id": run.get("id"),
             "verdict": run.get("verdict"),
+            "workflow_status": run.get("workflow_status"),
+            "execution_status": run.get("execution_status"),
+            "evidence_status": run.get("evidence_status"),
+            "mapping_status": run.get("mapping_status"),
+            "reason_code": run.get("reason_code"),
             "timestamp": run.get("timestamp"),
             "project": run.get("project"),
             "execution_target": run.get("execution_target"),
@@ -1233,6 +1428,57 @@ class CaseMapRepository:
         self._write_lock = threading.RLock()
         self._source_sync_lock = threading.RLock()
         self._source_sync_fingerprints: dict[str, tuple[tuple[str, int, int], ...]] = {}
+
+    @staticmethod
+    def _history_fields(history: dict[str, Any] | None) -> dict[str, Any]:
+        latest = history.get("latest") if history else None
+        history_count = int(history.get("history_count") or 0) if history else 0
+        latest_verdict = str(latest.get("verdict") or "").upper() if latest else ""
+        if history_count == 0:
+            normalized_verdict = "PENDING"
+        elif latest_verdict == "SKIP":
+            normalized_verdict = "CANNOT_VERIFY"
+        elif latest_verdict in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
+            normalized_verdict = latest_verdict
+        else:
+            normalized_verdict = "ERROR"
+        return {
+            "last_run_at": latest.get("timestamp") if latest else None,
+            "history_count": history_count,
+            "latest_verdict": normalized_verdict,
+            "latest_workflow_status": latest.get("workflow_status") if latest else None,
+            "latest_execution_status": latest.get("execution_status") if latest else None,
+            "latest_evidence_status": latest.get("evidence_status") if latest else None,
+            "latest_mapping_status": latest.get("mapping_status") if latest else None,
+            "latest_reason_code": latest.get("reason_code") if latest else None,
+        }
+
+    @staticmethod
+    def _verdict_summary(rows: list[dict[str, Any]]) -> dict[str, int]:
+        counts = {
+            "PASS": 0,
+            "FAIL": 0,
+            "ERROR": 0,
+            "CANNOT_VERIFY": 0,
+            "PENDING": 0,
+            "RUNNING": 0,
+        }
+        for row in rows:
+            verdict = str(row.get("latest_verdict") or "PENDING").upper()
+            counts[verdict if verdict in counts else "PENDING"] += 1
+        return counts
+
+    @staticmethod
+    def _compact_result(row: dict[str, Any]) -> dict[str, Any]:
+        return {
+            key: row.get(key)
+            for key in (
+                "project", "case_id", "sheet", "file_sheet", "last_run_at",
+                "history_count", "latest_verdict", "latest_workflow_status",
+                "latest_execution_status", "latest_evidence_status",
+                "latest_mapping_status", "latest_reason_code",
+            )
+        }
 
     def _source_catalog_fingerprint(self, project_meta: dict[str, Any]) -> tuple[tuple[str, int, int], ...]:
         root = _case_catalog_root(self.paths, project_meta)
@@ -2164,6 +2410,7 @@ class CaseMapRepository:
         if state_filter not in self.FILTERS:
             raise ValueError("state 参数不合法")
         rows = self._all(project)
+        catalog_total = len(rows)
         module_counts: dict[str, int] = {}
         for row in rows:
             module_name = str(row.get("file_sheet") or row.get("sheet") or "未分类")
@@ -2172,6 +2419,7 @@ class CaseMapRepository:
             category: sum(self.run_category(row) == category for row in rows)
             for category in self.RUN_CATEGORIES
         }
+        verdict_summary = self._verdict_summary(rows)
         keywords = [word.casefold() for word in query.strip().split() if word]
         if keywords:
             rows = [
@@ -2229,6 +2477,8 @@ class CaseMapRepository:
             "automation_maturity_counts": maturity_counts,
             "batch_summary": batch_summary,
             "module_counts": module_counts,
+            "verdict_summary": verdict_summary,
+            "catalog_total": catalog_total,
             "state_filter": state_filter,
             **{key: project_meta[key] for key in (
                 "project", "project_label", "execution_target", "execution_target_label"
@@ -2241,6 +2491,8 @@ class CaseMapRepository:
         *,
         project: str = DEFAULT_TEST_PROJECT,
         limit: int = 20,
+        recent_limit: int | None = None,
+        exception_limit: int | None = None,
     ) -> dict[str, Any]:
         """Return the small aggregate needed by the overview page in one request."""
 
@@ -2270,11 +2522,13 @@ class CaseMapRepository:
             verdict = str(row.get("latest_verdict") or "").upper()
             if verdict:
                 verdict_counts[verdict] = verdict_counts.get(verdict, 0) + 1
+        recent_count = limit if recent_limit is None else recent_limit
+        exception_count = limit if exception_limit is None else exception_limit
         recent_cases = sorted(
             (row for row in rows if row.get("last_run_at")),
             key=lambda row: str(row.get("last_run_at") or ""),
             reverse=True,
-        )[:limit]
+        )[:recent_count]
         recent_exceptions = sorted(
             (
                 row for row in rows
@@ -2283,13 +2537,57 @@ class CaseMapRepository:
             ),
             key=lambda row: str(row.get("last_run_at") or ""),
             reverse=True,
-        )[:limit]
+        )[:exception_count]
         return {
             "summary": summary,
             "automation_maturity_counts": maturity_counts,
             "verdict_counts": verdict_counts,
+            "batch_summary": {
+                category: sum(self.run_category(row) == category for row in rows)
+                for category in self.RUN_CATEGORIES
+            },
+            "module_counts": {
+                module: sum(
+                    str(row.get("file_sheet") or row.get("sheet") or "未分类") == module
+                    for row in rows
+                )
+                for module in {
+                    str(row.get("file_sheet") or row.get("sheet") or "未分类")
+                    for row in rows
+                }
+            },
+            "verdict_summary": self._verdict_summary(rows),
+            "catalog_total": len(rows),
             "recent_cases": recent_cases,
             "recent_exceptions": recent_exceptions,
+            "recent_items": [self._compact_result(row) for row in recent_cases],
+            **{key: project_meta[key] for key in (
+                "project", "project_label", "execution_target", "execution_target_label"
+            )},
+        }
+
+    def recent(
+        self,
+        *,
+        project: str = DEFAULT_TEST_PROJECT,
+        limit: int = 8,
+    ) -> dict[str, Any]:
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        rows: list[dict[str, Any]] = []
+        for (sheet, case_id), history in self.history.summary_index(project=project).items():
+            row = {
+                "project": project,
+                "case_id": case_id,
+                "sheet": sheet,
+                "file_sheet": sheet,
+                **self._history_fields(history),
+            }
+            if row["last_run_at"]:
+                rows.append(row)
+        rows.sort(key=lambda row: str(row.get("last_run_at") or ""), reverse=True)
+        return {
+            "items": rows[:limit],
             **{key: project_meta[key] for key in (
                 "project", "project_label", "execution_target", "execution_target_label"
             )},
@@ -2357,7 +2655,7 @@ class CaseMapRepository:
 class CaseTestManager:
     """复用现有测试 CLI，负责网页端单条及批次测试。"""
 
-    ACTIVE_STATUSES = {"queued", "running", "finalizing"}
+    ACTIVE_STATUSES = {"queued", "running", "finalizing", "orphaned"}
     RESUMABLE_STATUSES = {"cancelled", "interrupted", "failed"}
     HARDWARE_INFRASTRUCTURE_MARKERS = (
         "gui_ping",
@@ -2447,6 +2745,53 @@ class CaseTestManager:
     def _promotion_state_path(self, job_id: str) -> Path:
         return self.paths.runtime_jobs / job_id / PROMOTION_STATE_FILE
 
+    def _single_test_state_path(self, job_id: str) -> Path:
+        return self.paths.runtime_jobs / job_id / SINGLE_TEST_STATE_FILE
+
+    def _persist_single_test_locked(self, job: dict[str, Any]) -> None:
+        if job.get("type") != "single":
+            return
+        job_id = str(job["id"])
+        _write_json(
+            self._single_test_state_path(job_id),
+            {"state_schema_version": 1, **self._job_snapshot_locked(job)},
+        )
+
+    def _persist_test_job_locked(self, job: dict[str, Any]) -> None:
+        if job.get("type") == "batch":
+            self._persist_batch_locked(job)
+        elif job.get("type") == "single":
+            self._persist_single_test_locked(job)
+
+    def _recover_loaded_test_job(self, job: dict[str, Any]) -> None:
+        """Reconcile a persisted active task without trusting a possibly reused PID."""
+
+        pid = job.get("process_pid")
+        identity = str(job.get("process_identity") or "") or None
+        process_stopped = not _process_is_alive(pid) or _terminate_pid_tree(
+            pid,
+            expected_identity=identity,
+        )
+        job["finished_at"] = _now()
+        job["current_node"] = None
+        job["cancel_requested"] = False
+        job["workflow_status"] = "interrupted"
+        job["execution_status"] = "ERROR"
+        if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+            job["verdict"] = "CANNOT_VERIFY"
+        if process_stopped:
+            job["status"] = "interrupted"
+            job["reason_code"] = "SERVICE_RESTART"
+            job["interruption_reason"] = "前端服务重启，原执行进程已结束"
+        else:
+            job["status"] = "orphaned"
+            job["reason_code"] = "ORPHAN_PROCESS"
+            job["interruption_reason"] = (
+                "前端服务重启后仍检测到无法安全确认或停止的原执行进程"
+            )
+            self._claim_execution_slot_locked(job)
+        job["error"] = job["interruption_reason"]
+
     def _persist_promotion_state(
         self,
         job: dict[str, Any],
@@ -2495,6 +2840,13 @@ class CaseTestManager:
             state["issues"] = issues
             state["updated_at"] = _now()
             _write_json(state_path, state)
+            job_id = str(state.get("job_id") or "")
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["promotion_status"] = state["status"]
+                    job["promotion_issues"] = issues
+                    self._persist_single_test_locked(job)
 
     def _persist_batch_locked(self, job: dict[str, Any]) -> None:
         if job.get("type") != "batch":
@@ -2511,6 +2863,7 @@ class CaseTestManager:
                 "current_runtime_archived",
             }
         }
+        state["state_schema_version"] = 1
         _write_json(self._batch_state_path(job_id), state)
 
     def _reconcile_batch_history(
@@ -2588,6 +2941,10 @@ class CaseTestManager:
             job.setdefault("completed", 0)
             job.setdefault("total", len(cases))
             job.setdefault("case_attempts", {})
+            job.setdefault("execution_error_count", 0)
+            job.setdefault("evidence_error_count", 0)
+            job.setdefault("evidence_status", "NOT_RECORDED")
+            job.setdefault("mapping_status", "NOT_APPLICABLE")
             loaded_jobs.append(job)
 
         records_by_batch = self.history.batch_records_many({
@@ -2600,13 +2957,26 @@ class CaseTestManager:
                 records=records_by_batch[job_id],
             )
             if job.get("status") in self.ACTIVE_STATUSES:
-                job["status"] = "interrupted"
-                job["interruption_reason"] = "前端服务重启或测试进程中断"
-                job["finished_at"] = _now()
-                job["current_node"] = None
-                job["cancel_requested"] = False
+                self._recover_loaded_test_job(job)
             self._jobs[job_id] = job
             self._persist_batch_locked(job)
+
+        for state_path in self.paths.runtime_jobs.glob(f"*/{SINGLE_TEST_STATE_FILE}"):
+            state = _read_json(state_path)
+            if not isinstance(state, dict) or state.get("type") != "single":
+                continue
+            job_id = str(state.get("id") or "")
+            if not SAFE_SEGMENT.fullmatch(job_id) or state_path.parent.name != job_id:
+                continue
+            project_meta = _test_project(str(state.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+            ):
+                state.setdefault(key, project_meta[key])
+            if state.get("status") in self.ACTIVE_STATUSES:
+                self._recover_loaded_test_job(state)
+            self._jobs[job_id] = state
+            self._persist_single_test_locked(state)
 
     def start(
         self,
@@ -2696,6 +3066,11 @@ class CaseTestManager:
                     "current_node": "load",
                     "nodes": {node: "pending" for node in TEST_WORKFLOW_NODES},
                     "verdict": "PENDING",
+                    "workflow_status": "queued",
+                    "execution_status": "PENDING",
+                    "evidence_status": "PENDING",
+                    "mapping_status": str(case.get("mapping_status") or "NOT_RECORDED"),
+                    "reason_code": None,
                     "reason": "",
                     "created_at": _now(),
                     "started_at": None,
@@ -2713,6 +3088,7 @@ class CaseTestManager:
                     "promotion_context": promotion_context,
                 }
                 self._jobs[job_id] = job
+                self._persist_single_test_locked(job)
                 if candidate_replay:
                     self._persist_promotion_state(job, status="queued")
             except BaseException:
@@ -2729,7 +3105,12 @@ class CaseTestManager:
                 job = self._jobs[job_id]
                 job["status"] = "failed"
                 job["error"] = "候选复跑线程启动失败" if candidate_replay else "测试线程启动失败"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["finished_at"] = _now()
                 self._release_execution_slot_locked(job_id)
+                self._persist_single_test_locked(job)
             if promotion_context is not None:
                 rollback = self.cases.rollback_agent_candidate(promotion_context)
                 with self._lock:
@@ -2830,6 +3211,11 @@ class CaseTestManager:
                 "requested_platform_id": project_meta["platform_id"],
                 "resolved_execution_adapter": project_meta["execution_adapter"],
                 "status": "queued",
+                "workflow_status": "queued",
+                "execution_status": "PENDING",
+                "evidence_status": "PENDING",
+                "mapping_status": "NOT_APPLICABLE",
+                "reason_code": None,
                 "created_at": _now(),
                 "started_at": None,
                 "finished_at": None,
@@ -2844,6 +3230,8 @@ class CaseTestManager:
                     "ERROR": 0,
                     "CANNOT_VERIFY": 0,
                 },
+                "execution_error_count": 0,
+                "evidence_error_count": 0,
                 "recent_results": [],
                 "cancel_requested": False,
                 "error": None,
@@ -2853,26 +3241,40 @@ class CaseTestManager:
             }
             self._claim_execution_slot_locked(job)
             self._jobs[job_id] = job
+            self._persist_batch_locked(job)
         thread = threading.Thread(
             target=self._run_batch,
             args=(job_id,),
             daemon=True,
             name=f"case-test-batch-{job_id}",
         )
-        thread.start()
+        try:
+            thread.start()
+        except BaseException:
+            with self._lock:
+                job = self._jobs[job_id]
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["error"] = "批次测试线程启动失败"
+                job["finished_at"] = _now()
+                self._release_execution_slot_locked(job_id)
+                self._persist_batch_locked(job)
+            raise
         return self.get(job_id) or job
 
-    def cancel_batch(self, job_id: str) -> dict[str, Any]:
+    def cancel(self, job_id: str) -> dict[str, Any]:
         job_id = _safe_segment(job_id, "任务编号")
         gateway = None
         with self._lock:
             job = self._jobs.get(job_id)
             if job is None:
                 raise ValueError("测试任务不存在")
-            if job.get("type") != "batch":
-                raise ValueError("只能停止批次测试")
+            if job.get("status") == "finalizing":
+                raise ValueError("业务执行已结束，正在保存测试记录，不能再取消")
             if job.get("status") not in self.ACTIVE_STATUSES:
-                raise ValueError("批次测试已经结束")
+                raise ValueError("测试任务已经结束")
             job["cancel_requested"] = True
             job["interruption_reason"] = "用户请求在当前用例结束后暂停"
             if job.get("platform_id") == "579":
@@ -2881,6 +3283,9 @@ class CaseTestManager:
         if gateway is not None:
             gateway.cancel(job_id)
         return self.get(job_id) or {}
+
+    def cancel_batch(self, job_id: str) -> dict[str, Any]:
+        return self.cancel(job_id)
 
     def resume_batch(self, job_id: str) -> dict[str, Any]:
         job_id = _safe_segment(job_id, "任务编号")
@@ -2930,6 +3335,7 @@ class CaseTestManager:
             job["resume_count"] = int(job.get("resume_count") or 0) + 1
             job["error"] = None
             job.pop("interruption_reason", None)
+            job.pop("last_interrupted_case", None)
             self._claim_execution_slot_locked(job)
             self._persist_batch_locked(job)
             should_start = True
@@ -2940,7 +3346,20 @@ class CaseTestManager:
                 daemon=True,
                 name=f"case-test-batch-{job_id}",
             )
-            thread.start()
+            try:
+                thread.start()
+            except BaseException:
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "THREAD_START_FAILED"
+                    job["error"] = "批次恢复线程启动失败"
+                    job["finished_at"] = _now()
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_batch_locked(job)
+                raise
         return self.get(job_id) or {}
 
     @staticmethod
@@ -2968,12 +3387,24 @@ class CaseTestManager:
         if current_dir and current_dir.is_dir() and current_token:
             points = current_case.get("verification_points", [])
             labels = points if isinstance(points, list) else []
-            for index, path in enumerate(sorted(current_dir.glob("screenshot*.bmp")), start=1):
-                if not TEST_SCREENSHOT_FILE.fullmatch(path.name):
-                    continue
+            live_paths = sorted(
+                (
+                    path
+                    for path in current_dir.iterdir()
+                    if path.is_file() and LIVE_TEST_SCREENSHOT_FILE.fullmatch(path.name)
+                ),
+                key=lambda path: path.name,
+            )
+            for index, path in enumerate(live_paths, start=1):
+                step_match = re.fullmatch(r"step_(\d{2,3})\.bmp", path.name)
+                fallback_label = (
+                    f"探索步骤 {int(step_match.group(1)) + 1}"
+                    if step_match
+                    else f"检查点 {index}"
+                )
                 screenshots.append({
                     "index": index,
-                    "label": str(labels[index - 1]) if index <= len(labels) else f"检查点 {index}",
+                    "label": str(labels[index - 1]) if index <= len(labels) else fallback_label,
                     "url": (
                         f"/api/tests/jobs/{quote(job_id, safe='')}/screenshots/"
                         f"{quote(current_token, safe='')}/{quote(path.name, safe='')}"
@@ -2990,7 +3421,7 @@ class CaseTestManager:
     def screenshot_path(self, job_id: str, token: str, file_name: str) -> Path:
         job_id = _safe_segment(job_id, "任务编号")
         token = _safe_segment(token, "用例运行编号")
-        if not TEST_SCREENSHOT_FILE.fullmatch(file_name):
+        if not LIVE_TEST_SCREENSHOT_FILE.fullmatch(file_name):
             raise ValueError("截图文件名不合法")
         with self._lock:
             if job_id not in self._jobs:
@@ -3056,12 +3487,66 @@ class CaseTestManager:
         ), execution.get("execution_reason"))
         return cls._concise_execution_error(matching)
 
+    def _run_job_hardware_preflight(
+        self,
+        *,
+        job_id: str,
+        project_meta: dict[str, str],
+        environment: dict[str, str],
+        llm_scopes: tuple[str, ...],
+    ) -> Any:
+        """Run and persist the execution-owned fresh hardware gate."""
+
+        from agent_loop_system.tools.hardware_preflight import (
+            internal_error_preflight,
+            persist_hardware_preflight,
+            run_hardware_preflight,
+        )
+
+        job_root = self.paths.runtime_jobs / job_id
+        try:
+            result = run_hardware_preflight(
+                project=project_meta["project"],
+                evidence_dir=job_root / "preflight-evidence",
+                environment=environment,
+                llm_scopes=llm_scopes,
+            )
+        except Exception as exc:
+            result = internal_error_preflight(
+                exc,
+                project=project_meta["project"],
+            )
+        persist_paths = (
+            job_root / "preflight.json",
+            _hardware_preflight_path(self.paths, project_meta["project"]),
+        )
+        try:
+            for path in persist_paths:
+                persist_hardware_preflight(result, path)
+        except Exception as exc:
+            result = internal_error_preflight(
+                f"preflight 结果落盘失败: {exc}",
+                project=project_meta["project"],
+            )
+            for path in persist_paths:
+                try:
+                    persist_hardware_preflight(result, path)
+                except Exception:
+                    pass
+        with self._lock:
+            job = self._jobs[job_id]
+            job["preflight"] = result.to_dict()
+            self._persist_test_job_locked(job)
+        return result
+
     def _execute_case(
         self,
         *,
         job_id: str,
         case: dict[str, Any],
         job_dir: Path,
+        hardware_preflight_completed: bool = False,
+        hardware_preparation_completed: bool = False,
     ) -> dict[str, Any]:
         project_meta = _test_project(
             str(case.get("project") or DEFAULT_TEST_PROJECT),
@@ -3148,10 +3633,20 @@ class CaseTestManager:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
         if candidate_replay:
             child_args.append("--candidate-replay")
+        if hardware_preflight_completed:
+            if project_meta["execution_target"] != "hardware":
+                raise ValueError("hardware_preflight_completed 只适用于真机用例")
+            child_args.append("--hardware-preflight-completed")
+        if hardware_preparation_completed:
+            if project_meta["execution_target"] != "hardware":
+                raise ValueError("hardware_preparation_completed 只适用于真机用例")
+            child_args.append("--skip-hardware-reset")
         argv = build_child_command("test", child_args)
         stdout = ""
         stderr = ""
         return_code: int | None = None
+        process: Any = None
+        timed_out = False
         execution_env = _test_process_environment(project_meta)
         try:
             process = subprocess.Popen(
@@ -3165,20 +3660,50 @@ class CaseTestManager:
                 errors="replace",
             )
             with self._lock:
-                self._jobs[job_id]["process"] = process
-            stdout, stderr = process.communicate()
-            return_code = process.returncode
+                active_job = self._jobs[job_id]
+                active_job["process"] = process
+                active_job["process_pid"] = getattr(process, "pid", None)
+                active_job["process_identity"] = _process_identity(
+                    active_job["process_pid"]
+                )
+                self._persist_test_job_locked(active_job)
+            try:
+                stdout, stderr = _communicate_process(
+                    process,
+                    CASE_TEST_TIMEOUT_SECONDS,
+                )
+                return_code = getattr(process, "returncode", None)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                _terminate_process_tree(process)
+                try:
+                    stdout, stderr = _communicate_process(
+                        process,
+                        PROCESS_TERMINATION_GRACE_SECONDS,
+                    )
+                except (OSError, subprocess.SubprocessError):
+                    stdout, stderr = "", ""
+                return_code = getattr(process, "returncode", None)
+                stderr = (
+                    f"{stderr}\n测试进程执行超时（上限 {CASE_TEST_TIMEOUT_SECONDS:g}s）"
+                ).strip()
         except BaseException as exc:
+            _terminate_process_tree(process)
             stderr = f"{type(exc).__name__}: {exc}"
+
+        with self._lock:
+            cancelled = bool(self._jobs[job_id].get("cancel_requested"))
 
         loaded = _read_json(result_file, {})
         result = loaded if isinstance(loaded, dict) else {}
+        raw_verdict = str(result.get("verdict") or "ERROR").upper()
         if result.get("skipped"):
             verdict = "CANNOT_VERIFY"
+        elif raw_verdict in {"PASS", "FAIL", "CANNOT_VERIFY"}:
+            verdict = raw_verdict
         else:
-            verdict = str(result.get("verdict") or "ERROR").upper()
-        if verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}:
-            verdict = "ERROR"
+            # ERROR is an execution outcome, not a product verdict.
+            verdict = "CANNOT_VERIFY"
         evidence_contract = result.get("evidence_contract")
         evidence_issues = (
             evidence_contract.get("issues", [])
@@ -3197,14 +3722,23 @@ class CaseTestManager:
             and not result.get("skipped")
         )
         execute_failed = bool(
-            not result
+            cancelled
+            or timed_out
+            or not result
             or result.get("aborted")
             or result.get("setup_errors")
             or result.get("action_errors")
             or result.get("collect_errors")
             or evidence_incomplete
+            or raw_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}
         )
         error = "" if result else (stderr.strip() or "测试进程未生成结果文件")
+        if cancelled:
+            error = "用户取消测试任务"
+            verdict = "CANNOT_VERIFY"
+        elif timed_out:
+            error = f"测试进程执行超时（上限 {CASE_TEST_TIMEOUT_SECONDS:g}s）"
+            verdict = "CANNOT_VERIFY"
         reason = str(result.get("reason") or error)
         execution_errors = [
             str(value)
@@ -3216,6 +3750,35 @@ class CaseTestManager:
             result.get("execution_reason")
             or (execution_errors[0] if execution_errors else evidence_error or error)
         )
+        if cancelled or timed_out:
+            execution_reason = error
+        outcome = outcome_fields(
+            result,
+            workflow_default="failed" if not result else "completed",
+            mapping_default=str(case.get("mapping_status") or "NOT_RECORDED"),
+        )
+        if cancelled:
+            outcome.update({
+                "workflow_status": "cancelled",
+                "execution_status": "ERROR",
+                "reason_code": "USER_CANCELLED",
+            })
+        elif timed_out:
+            outcome.update({
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_TIMEOUT",
+            })
+        elif execute_failed:
+            outcome.update({
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": (
+                    "EVIDENCE_INCOMPLETE"
+                    if evidence_incomplete
+                    else str(result.get("reason_code") or "CASE_EXECUTION_ERROR")
+                ),
+            })
         return {
             "result": result,
             "stdout": stdout,
@@ -3225,14 +3788,118 @@ class CaseTestManager:
             "reason": reason,
             "execution_reason": execution_reason,
             "execute_failed": execute_failed,
+            "cancelled": cancelled,
+            "timed_out": timed_out,
+            **outcome,
             "started_at": started_at,
             "finished_at": _now(),
             "screenshot": screenshot,
         }
 
     def _run(self, job_id: str) -> None:
+        promotion_context: dict[str, Any] | None = None
+        promotion_needs_rollback = False
+        try:
+            self._run_single_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    promotion_context = (
+                        job.get("promotion_context")
+                        if isinstance(job.get("promotion_context"), dict)
+                        else None
+                    )
+                    promotion_needs_rollback = bool(
+                        job.get("promotion_flow")
+                        and job.get("promotion_status")
+                        not in {"promoted", "rolled_back", "rollback_conflict"}
+                    )
+                    self._persist_single_test_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+                if job is not None and (
+                    job.get("cancel_requested")
+                    or job.get("status") in {"failed", "interrupted"}
+                ):
+                    context = job.get("promotion_context")
+                    if isinstance(context, dict) and job.get("promotion_status") not in {
+                        "promoted", "rolled_back", "rollback_conflict",
+                    }:
+                        promotion_context = context
+                        promotion_needs_rollback = True
+            _terminate_process_tree(process)
+            if promotion_needs_rollback and promotion_context is not None:
+                try:
+                    rollback = self.cases.rollback_agent_candidate(promotion_context)
+                except BaseException as exc:
+                    rollback = {
+                        "status": "rollback_conflict",
+                        "issues": [f"异常终止后的候选回滚失败: {exc}"],
+                    }
+                with self._lock:
+                    job = self._jobs.get(job_id)
+                    if job is not None:
+                        job["promotion_status"] = str(
+                            rollback.get("status") or "rollback_conflict"
+                        )
+                        job["promotion_issues"] = list(rollback.get("issues") or [])
+                        self._persist_promotion_state(
+                            job,
+                            status=job["promotion_status"],
+                            issues=job["promotion_issues"],
+                        )
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = "USER_CANCELLED"
+                            if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                                job["verdict"] = "CANNOT_VERIFY"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "测试任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_single_test_locked(job)
+
+    def _run_single_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["finished_at"] = _now()
+                return
+            project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+                "case_map_profile",
+            ):
+                job.setdefault(key, project_meta[key])
             job["status"] = "running"
             job["started_at"] = _now()
             job["current_node"] = "execute"
@@ -3245,9 +3912,58 @@ class CaseTestManager:
             if job.get("promotion_flow"):
                 job["promotion_status"] = "running"
                 self._persist_promotion_state(job, status="running")
+            self._persist_single_test_locked(job)
 
-        execution = self._execute_case(job_id=job_id, case=job["case"], job_dir=job_dir)
+        hardware_preflight_completed = False
+        if project_meta["execution_target"] == "hardware":
+            hardware_environment = _test_process_environment(project_meta)
+            hardware_case = job["case"]
+            hardware_llm_scope = _hardware_case_llm_scope(
+                hardware_case,
+                candidate_replay=bool(job.get("candidate_replay")),
+            )
+            preflight = self._run_job_hardware_preflight(
+                job_id=job_id,
+                project_meta=project_meta,
+                environment=hardware_environment,
+                llm_scopes=(hardware_llm_scope,),
+            )
+            if not preflight.ready:
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "interrupted"
+                    job["workflow_status"] = "interrupted"
+                    job["execution_status"] = "ERROR"
+                    job["evidence_status"] = "PENDING"
+                    job["reason_code"] = (
+                        preflight.primary_code or "PREFLIGHT_INTERNAL_ERROR"
+                    )
+                    job["verdict"] = "CANNOT_VERIFY"
+                    job["reason"] = preflight.primary_detail
+                    job["error"] = preflight.primary_detail
+                    job["interruption_reason"] = preflight.primary_detail
+                    job["completed"] = 0
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    job["nodes"]["execute"] = "fail"
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_single_test_locked(job)
+                return
+            hardware_preflight_completed = True
+
+        execution = self._execute_case(
+            job_id=job_id,
+            case=job["case"],
+            job_dir=job_dir,
+            hardware_preflight_completed=hardware_preflight_completed,
+        )
         result = execution["result"]
+        for key, value in outcome_fields(
+            result,
+            workflow_default="failed" if not result else "completed",
+            mapping_default=str(job["case"].get("mapping_status") or "NOT_RECORDED"),
+        ).items():
+            execution.setdefault(key, value)
         verdict = execution["verdict"]
         reason = execution["reason"]
         execute_failed = execution["execute_failed"]
@@ -3273,11 +3989,23 @@ class CaseTestManager:
             if job.get("promotion_flow"):
                 job["promotion_status"] = "finalizing"
                 self._persist_promotion_state(job, status="finalizing")
+            self._persist_single_test_locked(job)
 
         try:
             history_id = self.history.create(
                 job=job,
-                result={**result, "verdict": verdict, "reason": reason},
+                result={
+                    **result,
+                    "verdict": verdict,
+                    "reason": reason,
+                    **{
+                        key: execution[key]
+                        for key in (
+                            "workflow_status", "execution_status", "evidence_status",
+                            "mapping_status", "reason_code",
+                        )
+                    },
+                },
                 stdout=execution["stdout"],
                 stderr=execution["stderr"],
                 screenshot=execution["screenshot"],
@@ -3286,6 +4014,11 @@ class CaseTestManager:
             history_id = None
             with self._lock:
                 job["error"] = f"测试记录保存失败: {exc}"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["evidence_status"] = "ERROR"
+                job["reason_code"] = "HISTORY_WRITE_FAILED"
 
         promotion: dict[str, Any] | None = None
         with self._lock:
@@ -3341,59 +4074,125 @@ class CaseTestManager:
                     issues=job["promotion_issues"],
                 )
             job["current_node"] = None
-            job["status"] = "completed" if history_id else "failed"
+            if job.get("cancel_requested") or execution.get("cancelled"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+            elif not history_id or execution.get("workflow_status") in {
+                "failed", "interrupted", "orphaned",
+            }:
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+            else:
+                job["status"] = "completed"
             job.pop("process", None)
             self._release_execution_slot_locked(job_id)
+            self._persist_single_test_locked(job)
 
     def _run_batch(self, job_id: str) -> None:
+        try:
+            self._run_batch_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    self._persist_batch_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+            _terminate_process_tree(process)
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["reason_code"] = "USER_CANCELLED"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "批次任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_batch_locked(job)
+
+    def _run_batch_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["reason_code"] = "USER_CANCELLED"
+                job["finished_at"] = _now()
+                self._persist_batch_locked(job)
+                return
             execution_target = str(job.get("execution_target") or "simulator")
             platform_id = str(job.get("platform_id") or "w30")
 
+        hardware_environment: dict[str, str] | None = None
+        hardware_preflight_completed = False
         if execution_target == "hardware" and platform_id == "w30":
-            try:
-                from agent_loop_system.tools.hardware_target import HardwareTargetConfig
-                from agent_loop_system.tools.real_device import query_test_session_status
-
-                _load_test_runtime_environment()
-                HardwareTargetConfig.from_env()
-                status = query_test_session_status(
-                    evidence_dir=(
-                        self.paths.runtime_jobs
-                        / job_id
-                        / "preflight"
-                        / "test-session"
-                    ),
-                )
-                check = {
-                    "checked_at": _now(),
-                    "active": status.active,
-                    "lease_seconds": status.lease_seconds,
-                }
-                if not status.active:
-                    raise RuntimeError(
-                        "手表 24 小时测试模式未开启或已到期；"
-                        "请先在手表端开启，再启动批次"
-                    )
-            except Exception as exc:
+            project_meta = _test_project(
+                str(job.get("project") or DEFAULT_TEST_PROJECT)
+            )
+            hardware_environment = _test_process_environment(project_meta)
+            remaining_start = min(
+                max(int(job.get("completed") or 0), 0),
+                len(job.get("cases", [])),
+            )
+            hardware_llm_scopes = tuple(dict.fromkeys(
+                _hardware_case_llm_scope(case)
+                for case in job.get("cases", [])[remaining_start:]
+            ))
+            preflight = self._run_job_hardware_preflight(
+                job_id=job_id,
+                project_meta=project_meta,
+                environment=hardware_environment,
+                llm_scopes=hardware_llm_scopes,
+            )
+            if not preflight.ready:
                 with self._lock:
                     job = self._jobs[job_id]
-                    job["test_session_check"] = {
+                    job["hardware_preparation"] = {
                         "checked_at": _now(),
-                        "active": False,
-                        "lease_seconds": 0,
-                        "error": str(exc),
+                        "status": "failed",
+                        "error": preflight.primary_detail,
+                        "code": preflight.primary_code,
                     }
-                    job["status"] = "failed"
-                    job["error"] = f"真机批次前置检查失败: {exc}"
+                    job["hardware_reset"] = dict(job["hardware_preparation"])
+                    job["status"] = "interrupted"
+                    job["workflow_status"] = "interrupted"
+                    job["execution_status"] = "ERROR"
+                    job["evidence_status"] = "PENDING"
+                    job["reason_code"] = (
+                        preflight.primary_code or "PREFLIGHT_INTERNAL_ERROR"
+                    )
+                    job["verdict"] = "CANNOT_VERIFY"
+                    job["reason"] = preflight.primary_detail
+                    job["error"] = preflight.primary_detail
+                    job["interruption_reason"] = preflight.primary_detail
                     job["finished_at"] = _now()
                     job["current_node"] = None
                     self._release_execution_slot_locked(job_id)
                     self._persist_batch_locked(job)
                 return
-            with self._lock:
-                self._jobs[job_id]["test_session_check"] = check
+            hardware_preflight_completed = True
 
         with self._lock:
             job = self._jobs[job_id]
@@ -3448,10 +4247,81 @@ class CaseTestManager:
                 job["current_case_token"] = runtime_token
                 job["current_runtime_dir"] = str(case_dir)
                 job["current_runtime_archived"] = False
-                job["current_node"] = "execute"
+                job["current_node"] = (
+                    "prepare" if execution_target == "hardware" else "execute"
+                )
                 self._persist_batch_locked(job)
 
-            execution = self._execute_case(job_id=job_id, case=case, job_dir=case_dir)
+            hardware_preparation_completed = False
+            if execution_target == "hardware" and platform_id == "w30":
+                try:
+                    from agent_loop_system.tools.real_device import (
+                        prepare_hardware_case_state,
+                    )
+
+                    preparation = prepare_hardware_case_state(
+                        evidence_dir=case_dir / "hardware-preparation",
+                        environment=hardware_environment,
+                    )
+                except Exception as exc:
+                    interruption_reason = (
+                        f"真机状态准备失败，未启动第 {index} 条 {case['case_id']}：{exc}"
+                    )
+                    with self._lock:
+                        job = self._jobs[job_id]
+                        job["hardware_preparation"] = {
+                            "checked_at": _now(),
+                            "status": "failed",
+                            "case_id": case["case_id"],
+                            "error": str(exc),
+                        }
+                        job["hardware_reset"] = dict(job["hardware_preparation"])
+                        job["status"] = "interrupted"
+                        job["workflow_status"] = "interrupted"
+                        job["execution_status"] = "ERROR"
+                        job["verdict"] = "CANNOT_VERIFY"
+                        job["reason_code"] = "HARDWARE_PREPARATION_FAILED"
+                        job["error"] = str(exc)
+                        job["interruption_reason"] = interruption_reason
+                        job["finished_at"] = _now()
+                        job["current_node"] = None
+                        job["last_interrupted_case"] = job.get("current_case")
+                        job["current_case"] = None
+                        job.pop("process", None)
+                        self._release_execution_slot_locked(job_id)
+                        self._persist_batch_locked(job)
+                    return
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["hardware_preparation"] = {
+                        "checked_at": _now(),
+                        "status": "ready",
+                        "case_id": case["case_id"],
+                        "reboot_status": preparation.reboot_status,
+                        "lease_seconds": preparation.status.lease_seconds,
+                        "gui_ping_attempts": preparation.gui_ping_attempts,
+                        "bootstrap_event_seen": preparation.bootstrap_event_seen,
+                        "current_page": preparation.current_page,
+                        "popup": preparation.popup,
+                    }
+                    job["hardware_reset"] = dict(job["hardware_preparation"])
+                    job["hardware_preparation_count"] = int(
+                        job.get("hardware_preparation_count")
+                        or job.get("hardware_reset_count")
+                        or 0
+                    ) + 1
+                    job["hardware_reset_count"] = job["hardware_preparation_count"]
+                    job["current_node"] = "execute"
+                    self._persist_batch_locked(job)
+                hardware_preparation_completed = True
+
+            execution = self._execute_case(
+                job_id=job_id,
+                case=case,
+                job_dir=case_dir,
+                hardware_preflight_completed=hardware_preflight_completed,
+                hardware_preparation_completed=hardware_preparation_completed,
+            )
             if platform_id == "579":
                 infrastructure_status = str(
                     (execution.get("result") or {}).get("infrastructure_status") or ""
@@ -3498,8 +4368,17 @@ class CaseTestManager:
                     job=history_job,
                     result={
                         **execution["result"],
-                        "verdict": execution["verdict"],
+                        "verdict": (
+                            "ERROR" if infrastructure_failure else execution["verdict"]
+                        ),
                         "reason": execution["reason"],
+                        **{
+                            key: execution[key]
+                            for key in (
+                                "workflow_status", "execution_status", "evidence_status",
+                                "mapping_status", "reason_code",
+                            )
+                        },
                     },
                     stdout=execution["stdout"],
                     stderr=execution["stderr"],
@@ -3507,7 +4386,11 @@ class CaseTestManager:
                 )
             except BaseException as exc:
                 history_id = None
-                execution["verdict"] = "ERROR"
+                execution["verdict"] = "CANNOT_VERIFY"
+                execution["workflow_status"] = "failed"
+                execution["execution_status"] = "ERROR"
+                execution["evidence_status"] = "ERROR"
+                execution["reason_code"] = "HISTORY_WRITE_FAILED"
                 execution["reason"] = f"测试记录保存失败: {exc}"
 
             record = {
@@ -3520,6 +4403,11 @@ class CaseTestManager:
                 "execution_target": case.get("execution_target", job.get("execution_target", "simulator")),
                 "execution_target_label": case.get("execution_target_label", job.get("execution_target_label", "模拟器")),
                 "verdict": execution["verdict"],
+                "workflow_status": execution["workflow_status"],
+                "execution_status": execution["execution_status"],
+                "evidence_status": execution["evidence_status"],
+                "mapping_status": execution["mapping_status"],
+                "reason_code": execution["reason_code"],
                 "reason": execution["reason"],
                 "history_id": history_id,
                 "finished_at": execution["finished_at"],
@@ -3543,6 +4431,9 @@ class CaseTestManager:
                 with self._lock:
                     job = self._jobs[job_id]
                     job["status"] = "interrupted"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "HARDWARE_INFRASTRUCTURE_FAILURE"
                     job["error"] = infrastructure_failure
                     job["interruption_reason"] = interruption_reason
                     job["finished_at"] = _now()
@@ -3562,12 +4453,30 @@ class CaseTestManager:
             job["status"] = "cancelled" if job.get("cancel_requested") else "completed"
             if job["status"] == "completed":
                 job.pop("interruption_reason", None)
+                job.pop("last_interrupted_case", None)
+                job["workflow_status"] = "completed"
+                job["execution_status"] = (
+                    "ERROR" if int(job.get("execution_error_count") or 0) else "OK"
+                )
+                job["evidence_status"] = (
+                    "ERROR" if int(job.get("evidence_error_count") or 0) else "COMPLETE"
+                )
+                job["reason_code"] = (
+                    "CASE_EXECUTION_ERROR"
+                    if int(job.get("execution_error_count") or 0)
+                    else None
+                )
+            else:
+                job["workflow_status"] = "cancelled"
+                job["reason_code"] = "USER_CANCELLED"
             job.pop("process", None)
             self._release_execution_slot_locked(job_id)
             self._persist_batch_locked(job)
 
 
 class JobManager:
+    ACTIVE_STATUSES = {"queued", "running", "finalizing", "orphaned"}
+
     def __init__(self, paths: AppPaths, defects: DefectRepository, history: HistoryStore):
         self.paths = paths
         self.defects = defects
@@ -3575,43 +4484,179 @@ class JobManager:
         self._lock = threading.Lock()
         self._jobs: dict[str, dict[str, Any]] = {}
         self._active_job_id: str | None = None
+        self._load_jobs()
 
-    def start(self, *, defect: str) -> dict[str, Any]:
+    def _job_state_path(self, job_id: str) -> Path:
+        return self.paths.runtime_jobs / job_id / REPAIR_JOB_STATE_FILE
+
+    def _persist_job_locked(self, job: dict[str, Any]) -> None:
+        state = {
+            key: value
+            for key, value in job.items()
+            if key not in {"process", "progress"}
+        }
+        state["state_schema_version"] = 1
+        _write_json(self._job_state_path(str(job["id"])), state)
+
+    def _load_jobs(self) -> None:
+        if not self.paths.runtime_jobs.is_dir():
+            return
+        for state_path in self.paths.runtime_jobs.glob(f"*/{REPAIR_JOB_STATE_FILE}"):
+            state = _read_json(state_path)
+            if not isinstance(state, dict):
+                continue
+            job_id = str(state.get("id") or "")
+            if not SAFE_SEGMENT.fullmatch(job_id) or state_path.parent.name != job_id:
+                continue
+            if state.get("status") in self.ACTIVE_STATUSES:
+                pid = state.get("process_pid")
+                identity = str(state.get("process_identity") or "") or None
+                process_stopped = not _process_is_alive(pid) or _terminate_pid_tree(
+                    pid,
+                    expected_identity=identity,
+                )
+                state["finished_at"] = _now()
+                state["current_node"] = None
+                state["cancel_requested"] = False
+                state["workflow_status"] = "interrupted"
+                state["execution_status"] = "ERROR"
+                if str(state.get("verdict") or "PENDING").upper() == "PENDING":
+                    state["verdict"] = "CANNOT_VERIFY"
+                if process_stopped:
+                    state["status"] = "interrupted"
+                    state["reason_code"] = "SERVICE_RESTART"
+                    state["interruption_reason"] = "前端服务重启，原修复进程已结束"
+                else:
+                    state["status"] = "orphaned"
+                    state["reason_code"] = "ORPHAN_PROCESS"
+                    state["interruption_reason"] = (
+                        "前端服务重启后仍检测到无法安全确认或停止的原修复进程"
+                    )
+                    self._active_job_id = job_id
+                state["error"] = state["interruption_reason"]
+                _write_json(state_path, state)
+            self._jobs[job_id] = state
+
+    def start(self, *, defect: str, project: str = DEFAULT_TEST_PROJECT) -> dict[str, Any]:
         if self.defects.get(defect) is None:
             raise ValueError("缺陷不存在")
+        project_meta = _test_project(project)
 
         with self._lock:
             if self._active_job_id:
                 active = self._jobs.get(self._active_job_id, {})
-                if active.get("status") in {"queued", "running", "finalizing"}:
+                if active.get("status") in self.ACTIVE_STATUSES:
                     raise RuntimeError(f"已有修复任务 {self._active_job_id} 正在运行")
 
             job_id = uuid.uuid4().hex[:12]
             job = {
                 "id": job_id,
                 "defect": defect,
+                **{key: project_meta[key] for key in (
+                    "project", "project_label", "execution_target", "execution_target_label",
+                    "case_map_profile",
+                )},
                 "execution_mode": "agent_generated",
                 "status": "queued",
                 "current_node": None,
                 "nodes": {node: "pending" for node in WORKFLOW_NODES},
                 "verdict": "PENDING",
+                "workflow_status": "queued",
+                "execution_status": "PENDING",
+                "evidence_status": "PENDING",
+                "mapping_status": "NOT_APPLICABLE",
+                "reason_code": None,
                 "created_at": _now(),
                 "started_at": None,
                 "finished_at": None,
                 "history_id": None,
                 "error": None,
+                "cancel_requested": False,
             }
             self._jobs[job_id] = job
             self._active_job_id = job_id
+            self._persist_job_locked(job)
 
         thread = threading.Thread(target=self._run, args=(job_id,), daemon=True, name=f"repair-{job_id}")
-        thread.start()
+        try:
+            thread.start()
+        except BaseException:
+            with self._lock:
+                job = self._jobs[job_id]
+                job["status"] = "failed"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "THREAD_START_FAILED"
+                job["error"] = "修复线程启动失败"
+                job["finished_at"] = _now()
+                if self._active_job_id == job_id:
+                    self._active_job_id = None
+                self._persist_job_locked(job)
+            raise
         return self.get(job_id) or job
+
+    def cancel(self, job_id: str) -> dict[str, Any]:
+        job_id = _safe_segment(job_id, "任务编号")
+        process: Any = None
+        orphan_pid: int | None = None
+        orphan_identity: str | None = None
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None:
+                raise ValueError("修复任务不存在")
+            if job.get("status") == "finalizing":
+                raise ValueError("修复执行已结束，正在保存历史记录，不能再取消")
+            if job.get("status") not in self.ACTIVE_STATUSES:
+                raise ValueError("修复任务已经结束")
+            job["cancel_requested"] = True
+            job["reason_code"] = "USER_CANCELLED"
+            job["interruption_reason"] = "用户取消修复任务"
+            process = job.get("process")
+            if job.get("status") == "orphaned":
+                orphan_pid = job.get("process_pid")
+                orphan_identity = str(job.get("process_identity") or "") or None
+            self._persist_job_locked(job)
+
+        stopped = True
+        if process is not None:
+            stopped = _terminate_process_tree(process)
+        elif orphan_pid is not None:
+            stopped = _terminate_pid_tree(
+                orphan_pid,
+                expected_identity=orphan_identity,
+            )
+
+        if orphan_pid is not None:
+            with self._lock:
+                job = self._jobs[job_id]
+                if stopped:
+                    job["status"] = "cancelled"
+                    job["workflow_status"] = "cancelled"
+                    job["execution_status"] = "ERROR"
+                    if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                        job["verdict"] = "CANNOT_VERIFY"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    if self._active_job_id == job_id:
+                        self._active_job_id = None
+                else:
+                    job["cancel_requested"] = False
+                    job["error"] = "无法确认原修复进程身份或停止进程，任务仍保持隔离"
+                self._persist_job_locked(job)
+            if not stopped:
+                raise RuntimeError("无法安全停止重启前遗留的修复进程")
+        return self.get(job_id) or {}
 
     def get(self, job_id: str) -> dict[str, Any] | None:
         job_id = _safe_segment(job_id, "任务编号")
         with self._lock:
             job = self._jobs.get(job_id)
+            if job is None:
+                state_path = self._job_state_path(job_id)
+                loaded = _read_json(state_path)
+                if isinstance(loaded, dict) and str(loaded.get("id") or "") == job_id:
+                    job = loaded
+                    self._jobs[job_id] = job
             if job is None:
                 return None
             snapshot = {key: value for key, value in job.items() if key not in {"process", "progress"}}
@@ -3623,6 +4668,21 @@ class JobManager:
                     "current_node": progress.get("current_node"),
                     "nodes": progress.get("nodes", snapshot["nodes"]),
                     "verdict": progress.get("verdict", snapshot["verdict"]),
+                    "workflow_status": progress.get(
+                        "workflow_status", snapshot.get("workflow_status")
+                    ),
+                    "execution_status": progress.get(
+                        "execution_status", snapshot.get("execution_status")
+                    ),
+                    "evidence_status": progress.get(
+                        "evidence_status", snapshot.get("evidence_status")
+                    ),
+                    "mapping_status": progress.get(
+                        "mapping_status", snapshot.get("mapping_status")
+                    ),
+                    "reason_code": progress.get(
+                        "reason_code", snapshot.get("reason_code")
+                    ),
                     "attempts": progress.get("attempts", 0),
                     "progress_updated_at": progress.get("updated_at"),
                 }
@@ -3639,13 +4699,74 @@ class JobManager:
         if not job_id:
             return None
         job = self.get(job_id)
-        if job and job.get("status") in {"queued", "running", "finalizing"}:
+        if job and job.get("status") in self.ACTIVE_STATUSES:
             return job
         return None
 
     def _run(self, job_id: str) -> None:
+        try:
+            self._run_body(job_id)
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["status"] = "failed"
+                    job["workflow_status"] = "failed"
+                    job["execution_status"] = "ERROR"
+                    job["reason_code"] = "UNHANDLED_EXCEPTION"
+                    job["error"] = f"{type(exc).__name__}: {exc}"
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    self._persist_job_locked(job)
+        finally:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                process = job.get("process") if job is not None else None
+            _terminate_process_tree(process)
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    if job.get("status") in self.ACTIVE_STATUSES:
+                        if job.get("cancel_requested"):
+                            job["status"] = "cancelled"
+                            job["workflow_status"] = "cancelled"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = "USER_CANCELLED"
+                            if str(job.get("verdict") or "PENDING").upper() == "PENDING":
+                                job["verdict"] = "CANNOT_VERIFY"
+                        else:
+                            job["status"] = "failed"
+                            job["workflow_status"] = "failed"
+                            job["execution_status"] = "ERROR"
+                            job["reason_code"] = (
+                                job.get("reason_code") or "UNHANDLED_EXCEPTION"
+                            )
+                            job["error"] = job.get("error") or "修复任务异常结束"
+                        job["finished_at"] = job.get("finished_at") or _now()
+                        job["current_node"] = None
+                    job.pop("process", None)
+                    if self._active_job_id == job_id:
+                        self._active_job_id = None
+                    self._persist_job_locked(job)
+
+    def _run_body(self, job_id: str) -> None:
         with self._lock:
             job = self._jobs[job_id]
+            if job.get("cancel_requested"):
+                job["status"] = "cancelled"
+                job["workflow_status"] = "cancelled"
+                job["execution_status"] = "ERROR"
+                job["reason_code"] = "USER_CANCELLED"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["finished_at"] = _now()
+                self._persist_job_locked(job)
+                return
+            project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+            for key in (
+                "project", "project_label", "execution_target", "execution_target_label",
+                "case_map_profile",
+            ):
+                job.setdefault(key, project_meta[key])
             job["status"] = "running"
             job["started_at"] = _now()
             job_dir = self.paths.runtime_jobs / job_id
@@ -3654,6 +4775,7 @@ class JobManager:
             result_file = job_dir / "result.json"
             job["progress_file"] = str(progress_file)
             job["result_file"] = str(result_file)
+            self._persist_job_locked(job)
 
         argv = build_child_command(
             "agent",
@@ -3662,6 +4784,12 @@ class JobManager:
                 job["defect"],
                 "--task-id",
                 job["defect"],
+                "--project",
+                job["project"],
+                "--profile",
+                job["case_map_profile"],
+                "--target",
+                job["execution_target"],
                 "--progress-file",
                 str(progress_file),
                 "--result-file",
@@ -3672,10 +4800,13 @@ class JobManager:
         stderr = ""
         return_code: int | None = None
         result: dict[str, Any] = {}
+        process: Any = None
+        timed_out = False
         try:
             process = subprocess.Popen(
                 argv,
                 cwd=self.paths.root,
+                env=_test_process_environment(project_meta),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -3684,15 +4815,82 @@ class JobManager:
             )
             with self._lock:
                 job["process"] = process
-            stdout, stderr = process.communicate()
-            return_code = process.returncode
+                job["process_pid"] = getattr(process, "pid", None)
+                job["process_identity"] = _process_identity(job["process_pid"])
+                self._persist_job_locked(job)
+            try:
+                stdout, stderr = _communicate_process(
+                    process,
+                    REPAIR_JOB_TIMEOUT_SECONDS,
+                )
+                return_code = getattr(process, "returncode", None)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                _terminate_process_tree(process)
+                try:
+                    stdout, stderr = _communicate_process(
+                        process,
+                        PROCESS_TERMINATION_GRACE_SECONDS,
+                    )
+                except (OSError, subprocess.SubprocessError):
+                    stdout, stderr = "", ""
+                return_code = getattr(process, "returncode", None)
+                stderr = (
+                    f"{stderr}\n修复进程执行超时（上限 {REPAIR_JOB_TIMEOUT_SECONDS:g}s）"
+                ).strip()
             loaded = _read_json(result_file, {})
             result = loaded if isinstance(loaded, dict) else {}
             if not result:
-                result = {"verdict": "FAIL", "attempts": 0, "error": stderr.strip() or "修复进程未生成结果文件"}
+                result = {
+                    "verdict": "CANNOT_VERIFY",
+                    "attempts": 0,
+                    "error": stderr.strip() or "修复进程未生成结果文件",
+                    "workflow_status": "failed",
+                    "execution_status": "ERROR",
+                    "reason_code": "RESULT_MISSING",
+                }
         except BaseException as exc:
-            result = {"verdict": "FAIL", "attempts": 0, "error": f"{type(exc).__name__}: {exc}"}
+            _terminate_process_tree(process)
+            result = {
+                "verdict": "CANNOT_VERIFY",
+                "attempts": 0,
+                "error": f"{type(exc).__name__}: {exc}",
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_EXCEPTION",
+            }
             stderr = (stderr + "\n" + result["error"]).strip()
+
+        with self._lock:
+            cancelled = bool(self._jobs[job_id].get("cancel_requested"))
+        if cancelled:
+            result = {
+                **result,
+                "verdict": "CANNOT_VERIFY",
+                "error": "用户取消修复任务",
+                "workflow_status": "cancelled",
+                "execution_status": "ERROR",
+                "reason_code": "USER_CANCELLED",
+            }
+        elif timed_out:
+            result = {
+                **result,
+                "verdict": "CANNOT_VERIFY",
+                "error": f"修复进程执行超时（上限 {REPAIR_JOB_TIMEOUT_SECONDS:g}s）",
+                "workflow_status": "failed",
+                "execution_status": "ERROR",
+                "reason_code": "PROCESS_TIMEOUT",
+            }
+
+        if str(result.get("verdict") or "").upper() == "ERROR":
+            result["verdict"] = "CANNOT_VERIFY"
+            result.setdefault("workflow_status", "failed")
+            result.setdefault("execution_status", "ERROR")
+            result.setdefault("reason_code", "JUDGEMENT_ERROR")
+        result.update(outcome_fields(
+            result,
+            workflow_default="failed" if result.get("error") else "completed",
+        ))
 
         progress = _read_json(progress_file, {})
         with self._lock:
@@ -3701,9 +4899,15 @@ class JobManager:
             job["return_code"] = return_code
             job["progress"] = progress if isinstance(progress, dict) else {}
             job["nodes"] = job["progress"].get("nodes", job["nodes"])
-            job["verdict"] = result.get("verdict", "FAIL")
+            job["verdict"] = result.get("verdict", "CANNOT_VERIFY")
             job["error"] = result.get("error")
+            for key in (
+                "workflow_status", "execution_status", "evidence_status",
+                "mapping_status", "reason_code",
+            ):
+                job[key] = result.get(key)
             job["status"] = "finalizing"
+            self._persist_job_locked(job)
 
         try:
             history_id = self.history.create(
@@ -3718,14 +4922,27 @@ class JobManager:
             with self._lock:
                 job["status"] = "failed"
                 job["error"] = f"历史记录保存失败: {exc}"
+                job["verdict"] = "CANNOT_VERIFY"
+                job["workflow_status"] = "failed"
+                job["execution_status"] = "ERROR"
+                job["evidence_status"] = "ERROR"
+                job["reason_code"] = "HISTORY_WRITE_FAILED"
 
         with self._lock:
             job["history_id"] = history_id
             if history_id is not None:
-                job["status"] = "completed" if result_file.is_file() else "failed"
+                if cancelled:
+                    job["status"] = "cancelled"
+                elif result.get("workflow_status") in {"failed", "interrupted", "orphaned"}:
+                    job["status"] = "failed"
+                else:
+                    job["status"] = "completed"
+            if job["status"] == "failed":
+                job["workflow_status"] = "failed"
             job.pop("process", None)
             if self._active_job_id == job_id:
                 self._active_job_id = None
+            self._persist_job_locked(job)
 
 
 class WebApplication:
@@ -3742,6 +4959,7 @@ class WebApplication:
         self.cases = CaseMapRepository(paths, self.test_history, self.case_store)
         self.jobs = JobManager(paths, self.defects, self.history)
         self.test_jobs = CaseTestManager(paths, self.cases, self.test_history)
+        self.ble_devices = BleDeviceManager(paths)
         self._execution_lock = threading.Lock()
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
@@ -3847,11 +5065,16 @@ class WebApplication:
             "options": options,
         }
 
-    def start_repair(self, *, defect: str) -> dict[str, Any]:
+    def start_repair(
+        self,
+        *,
+        defect: str,
+        project: str = DEFAULT_TEST_PROJECT,
+    ) -> dict[str, Any]:
         with self._execution_lock:
             if self.test_jobs.active():
                 raise RuntimeError("已有 Agent 测试正在运行")
-            return self.jobs.start(defect=defect)
+            return self.jobs.start(defect=defect, project=project)
 
     def start_case_test(
         self,
@@ -3920,9 +5143,226 @@ class WebApplication:
                 raise RuntimeError("已有缺陷修复任务正在运行")
             return self.test_jobs.resume_batch(job_id)
 
+    def check_environment(self, project: str) -> dict[str, Any]:
+        """Run an explicit live probe; page reads never call this method."""
+
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        if (
+            project_meta["execution_target"] != "hardware"
+            or project_meta["platform_id"] != "w30"
+        ):
+            return next(
+                item
+                for item in _get_environments_status(self.paths)
+                if item["project"] == project
+            )
+
+        from agent_loop_system.tools.hardware_preflight import (
+            internal_error_preflight,
+            persist_hardware_preflight,
+            run_hardware_preflight,
+            target_busy_preflight,
+        )
+
+        with self._execution_lock:
+            active = self.test_jobs.active("hardware")
+            if active is None:
+                repair = self.jobs.active()
+                if repair is not None and str(
+                    repair.get("execution_target") or ""
+                ).lower() == "hardware":
+                    active = repair
+            if active is not None:
+                result = target_busy_preflight(
+                    project=project,
+                    job_id=str(active.get("id") or "") or None,
+                )
+            else:
+                try:
+                    hardware_environment = _test_process_environment(project_meta)
+                    result = run_hardware_preflight(
+                        project=project,
+                        evidence_dir=self.paths.environment_checks / project / "probe",
+                        environment=hardware_environment,
+                        llm_scopes=_configured_hardware_llm_scopes(
+                            hardware_environment
+                        ),
+                    )
+                except Exception as exc:
+                    result = internal_error_preflight(exc, project=project)
+            try:
+                persist_hardware_preflight(
+                    result,
+                    _hardware_preflight_path(self.paths, project),
+                )
+            except Exception as exc:
+                result = internal_error_preflight(
+                    f"preflight 结果落盘失败: {exc}",
+                    project=project,
+                )
+        return _hardware_environment_view(project, result)
+
 
 
 # --- 0.4.0 增强业务辅助方法与协议实现 ---
+
+_EXCEL_CHINESE_FONT_NAME = "宋体"
+_EXCEL_LATIN_FONT_NAME = "Times New Roman"
+_EXCEL_HEADER_FILL = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
+_EXCEL_SUMMARY_FILL = openpyxl.styles.PatternFill("solid", fgColor="D9EAF7")
+_EXCEL_ZEBRA_FILL = openpyxl.styles.PatternFill("solid", fgColor="F7F9FC")
+_EXCEL_THIN_BORDER = openpyxl.styles.Border(
+    left=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    right=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    top=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+    bottom=openpyxl.styles.Side(style="thin", color="D9D9D9"),
+)
+_EXCEL_HEADER_FONT = openpyxl.styles.Font(
+    name=_EXCEL_CHINESE_FONT_NAME,
+    size=11,
+    bold=True,
+    color="FFFFFF",
+)
+_EXCEL_SUMMARY_FONT = openpyxl.styles.Font(
+    name=_EXCEL_CHINESE_FONT_NAME,
+    size=11,
+    bold=True,
+)
+_EXCEL_BODY_FONTS = {
+    (True, False): openpyxl.styles.Font(name=_EXCEL_CHINESE_FONT_NAME, size=10),
+    (True, True): openpyxl.styles.Font(name=_EXCEL_CHINESE_FONT_NAME, size=10, bold=True),
+    (False, False): openpyxl.styles.Font(name=_EXCEL_LATIN_FONT_NAME, size=10),
+    (False, True): openpyxl.styles.Font(name=_EXCEL_LATIN_FONT_NAME, size=10, bold=True),
+}
+
+
+def _excel_body_font(value: Any, *, bold: bool = False) -> openpyxl.styles.Font:
+    text = str(value or "")
+    has_chinese = any(
+        "\u3400" <= character <= "\u9fff" or "\uf900" <= character <= "\ufaff"
+        for character in text
+    )
+    return _EXCEL_BODY_FONTS[(has_chinese, bold)]
+
+
+def _excel_display_units(value: Any) -> int:
+    return sum(2 if ord(character) > 127 else 1 for character in str(value or ""))
+
+
+def _excel_wrapped_line_count(value: Any, column_width: float) -> int:
+    usable_width = max(1, int(column_width) - 2)
+    lines = str(value or "").splitlines() or [""]
+    return sum(
+        max(1, (_excel_display_units(line) + usable_width - 1) // usable_width)
+        for line in lines
+    )
+
+
+def _excel_set_adaptive_row_heights(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    wrap_columns: set[int],
+    min_height: float = 22,
+    max_height: float = 96,
+) -> None:
+    for row_index in range(2, sheet.max_row + 1):
+        wrapped_lines = 1
+        for column_index in wrap_columns:
+            column = openpyxl.utils.get_column_letter(column_index)
+            wrapped_lines = max(
+                wrapped_lines,
+                _excel_wrapped_line_count(
+                    sheet.cell(row_index, column_index).value,
+                    widths[column],
+                ),
+            )
+        sheet.row_dimensions[row_index].height = min(
+            max_height,
+            max(min_height, 6 + 15 * wrapped_lines),
+        )
+
+
+def _excel_configure_sheet(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    orientation: str,
+    zoom: int,
+    repeat_header: bool,
+) -> None:
+    sheet.sheet_view.showGridLines = False
+    sheet.sheet_view.zoomScale = zoom
+    for column, width in widths.items():
+        sheet.column_dimensions[column].width = width
+    sheet.page_setup.orientation = orientation
+    sheet.page_setup.paperSize = sheet.PAPERSIZE_A4
+    sheet.page_setup.fitToWidth = 1
+    sheet.page_setup.fitToHeight = 0
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+    sheet.page_margins = openpyxl.worksheet.page.PageMargins(
+        left=0.3,
+        right=0.3,
+        top=0.5,
+        bottom=0.5,
+        header=0.2,
+        footer=0.2,
+    )
+    if repeat_header:
+        sheet.print_title_rows = "1:1"
+
+
+def _excel_style_table(
+    sheet: Any,
+    *,
+    widths: dict[str, float],
+    wrap_columns: set[int],
+    center_columns: set[int],
+    orientation: str = "landscape",
+    zoom: int = 90,
+    max_row_height: float = 96,
+) -> None:
+    _excel_configure_sheet(
+        sheet,
+        widths=widths,
+        orientation=orientation,
+        zoom=zoom,
+        repeat_header=True,
+    )
+    sheet.freeze_panes = "A2"
+    last_column = openpyxl.utils.get_column_letter(len(widths))
+    sheet.auto_filter.ref = f"A1:{last_column}{max(sheet.max_row, 1)}"
+    sheet.row_dimensions[1].height = 28
+    for cell in sheet[1]:
+        cell.fill = _EXCEL_HEADER_FILL
+        cell.font = _EXCEL_HEADER_FONT
+        cell.border = _EXCEL_THIN_BORDER
+        cell.alignment = openpyxl.styles.Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True,
+        )
+    for row_index, row in enumerate(sheet.iter_rows(min_row=2), start=2):
+        for column_index, cell in enumerate(row, start=1):
+            cell.font = _excel_body_font(cell.value)
+            cell.border = _EXCEL_THIN_BORDER
+            if row_index % 2 == 0:
+                cell.fill = _EXCEL_ZEBRA_FILL
+            if column_index in wrap_columns:
+                cell.alignment = openpyxl.styles.Alignment(vertical="top", wrap_text=True)
+            elif column_index in center_columns:
+                cell.alignment = openpyxl.styles.Alignment(
+                    horizontal="center", vertical="center"
+                )
+            else:
+                cell.alignment = openpyxl.styles.Alignment(vertical="center")
+    _excel_set_adaptive_row_heights(
+        sheet,
+        widths=widths,
+        wrap_columns=wrap_columns,
+        max_height=max_row_height,
+    )
 
 def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository | None = None) -> bytes:
     """生成标准 9 列表头的 Excel 测试用例工作簿。"""
@@ -3931,7 +5371,7 @@ def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository |
     ws.title = "自动化测试用例_v1"
     headers = [
         "模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果",
-        "不可自动化", "固化状态", "备注", "适用平台", "用例状态", "当前版本", "来源",
+        "不可自动化", "固化状态", "备注",
     ]
     ws.append(headers)
     
@@ -3955,12 +5395,18 @@ def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository |
             "是" if item.get("unable") else "否",
             str(item.get("mapping_status") or ""),
             str(item.get("note") or ""),
-            ",".join(str(value) for value in item.get("applicable_platforms", []) if str(value)),
-            str(item.get("workflow_state") or "ACTIVE"),
-            int(item.get("current_revision") or 1),
-            str(item.get("source_type") or ""),
         ])
-                
+
+    _excel_style_table(
+        ws,
+        widths={
+            "A": 18, "B": 16, "C": 10, "D": 28, "E": 46,
+            "F": 46, "G": 12, "H": 14, "I": 30,
+        },
+        wrap_columns={4, 5, 6, 9},
+        center_columns={1, 2, 3, 7, 8},
+    )
+
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
@@ -3976,7 +5422,7 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
         wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True)
     except Exception as exc:
         raise ValueError(f"Excel 文件无法解析: {exc}")
-        
+
     target_sheets = ["自动化测试用例_v1"] if "自动化测试用例_v1" in wb.sheetnames else wb.sheetnames
     parsed_cases: list[dict[str, Any]] = []
 
@@ -4071,9 +5517,11 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     llm_configured = bool(
         llm_cfg["api_key"] and llm_cfg["base_url"] and llm_cfg["model"]
     )
+    runtime_paths = RuntimePaths.from_root(paths.root)
+    simulator_root = runtime_paths.firmware_workspaces / "620C_W6830"
     return {
         "llm": {
-            "provider": "builtin",
+            "provider": "environment",
             "api_key": (llm_cfg["api_key"][:3] + "..." + llm_cfg["api_key"][-4:]) if llm_cfg["api_key"] else "",
             "base_url": llm_cfg["base_url"],
             "model": llm_cfg["model"],
@@ -4090,17 +5538,37 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "user_id": os.environ.get("ONES_USER_ID", ""),
         },
         "hardware": {
-            "port": os.environ.get("W30_HARDWARE_PORT", "COM7"),
+            "port": os.environ.get("W30_HARDWARE_PORT", ""),
             "baudrate": int(os.environ.get("W30_HARDWARE_BAUDRATE", 1500000)),
             "transport": os.environ.get("W30_HARDWARE_TRANSPORT", "supercom"),
             "capture_provider": os.environ.get("W30_HARDWARE_CAPTURE_PROVIDER", "mtp"),
+            "ble_address": os.environ.get("W30_HARDWARE_BLE_ADDRESS", ""),
+            "ble_scan_timeout": float(
+                os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")
+            ),
+            "profile_root": str(resolve_config_path(
+                (os.environ.get("W30_HARDWARE_PROFILE_ROOT") or "").strip()
+                or str(paths.root / "profiles"),
+                app_root=paths.root,
+            )),
+            "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
         },
         "simulator": {
-            "source_root": os.environ.get("W30_SIMULATOR_SOURCE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
-            "workspace_root": os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\620C_W6830"),
-            "simulator_path": os.environ.get("W30_SIMULATOR_PATH", r"D:\Agent-loop-workspace\620C_W6830\core\gui\simulator\bin\main.exe"),
-            "hardware_source_root": os.environ.get("W30_HARDWARE_SOURCE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
-            "hardware_workspace_root": os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
+            "source_root": str(resolve_config_path(
+                (os.environ.get("W30_SIMULATOR_SOURCE_ROOT") or "").strip()
+                or simulator_root,
+                app_root=paths.root,
+            )),
+            "workspace_root": str(resolve_config_path(
+                (os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT") or "").strip()
+                or simulator_root,
+                app_root=paths.root,
+            )),
+            "simulator_path": str(resolve_config_path(
+                (os.environ.get("W30_SIMULATOR_PATH") or "").strip()
+                or simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe",
+                app_root=paths.root,
+            )),
         },
         "platform_579": {
             "enabled": os.environ.get("PLATFORM_579_ENABLED", "false").lower() == "true",
@@ -4120,6 +5588,21 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "serial_mode": "read_only",
         },
     }
+
+
+def _config_path_for_storage(value: Any, *, app_root: Path) -> str:
+    """Keep paths inside the unified layout portable in the local .env."""
+
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    resolved = resolve_config_path(raw, app_root=app_root)
+    layout_root = RuntimePaths.from_root(app_root).layout_root.resolve()
+    try:
+        resolved.relative_to(layout_root)
+    except ValueError:
+        return str(resolved)
+    return os.path.relpath(resolved, app_root)
 
 
 def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
@@ -4157,19 +5640,45 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_TRANSPORT"] = str(hw["transport"])
         if "capture_provider" in hw and hw["capture_provider"] is not None:
             env_updates["W30_HARDWARE_CAPTURE_PROVIDER"] = str(hw["capture_provider"])
+        if "ble_address" in hw and hw["ble_address"] is not None:
+            env_updates["W30_HARDWARE_BLE_ADDRESS"] = str(hw["ble_address"])
+        if "ble_scan_timeout" in hw and hw["ble_scan_timeout"] is not None:
+            env_updates["W30_HARDWARE_BLE_SCAN_TIMEOUT"] = str(hw["ble_scan_timeout"])
+        if "profile_root" in hw and hw["profile_root"] is not None:
+            env_updates["W30_HARDWARE_PROFILE_ROOT"] = _config_path_for_storage(
+                hw["profile_root"], app_root=paths.root
+            )
+        if "profile_version" in hw and hw["profile_version"] is not None:
+            env_updates["W30_HARDWARE_PROFILE_VERSION"] = str(hw["profile_version"])
             
     if "simulator" in cfg and isinstance(cfg["simulator"], dict):
         sim = cfg["simulator"]
         if "source_root" in sim and sim["source_root"] is not None:
-            env_updates["W30_SIMULATOR_SOURCE_ROOT"] = str(sim["source_root"])
+            env_updates["W30_SIMULATOR_SOURCE_ROOT"] = _config_path_for_storage(
+                sim["source_root"], app_root=paths.root
+            )
         if "workspace_root" in sim and sim["workspace_root"] is not None:
-            env_updates["W30_SIMULATOR_WORKSPACE_ROOT"] = str(sim["workspace_root"])
+            env_updates["W30_SIMULATOR_WORKSPACE_ROOT"] = _config_path_for_storage(
+                sim["workspace_root"], app_root=paths.root
+            )
         if "simulator_path" in sim and sim["simulator_path"] is not None:
             env_updates["W30_SIMULATOR_PATH"] = str(sim["simulator_path"])
         if "hardware_source_root" in sim and sim["hardware_source_root"] is not None:
             env_updates["W30_HARDWARE_SOURCE_ROOT"] = str(sim["hardware_source_root"])
         if "hardware_workspace_root" in sim and sim["hardware_workspace_root"] is not None:
             env_updates["W30_HARDWARE_WORKSPACE_ROOT"] = str(sim["hardware_workspace_root"])
+
+    if "simulator_6202" in cfg and isinstance(cfg["simulator_6202"], dict):
+        simulator_6202 = cfg["simulator_6202"]
+        for field, environment_key in (
+            ("source_root", "W30_6202_SIMULATOR_SOURCE_ROOT"),
+            ("build_directory", "W30_6202_SIMULATOR_BUILD_DIRECTORY"),
+            ("artifact_path", "W30_6202_SIMULATOR_ARTIFACT_PATH"),
+        ):
+            if field in simulator_6202 and simulator_6202[field] is not None:
+                env_updates[environment_key] = _config_path_for_storage(
+                    simulator_6202[field], app_root=paths.root
+                )
 
     if "platform_579" in cfg and isinstance(cfg["platform_579"], dict):
         platform_579 = cfg["platform_579"]
@@ -4224,8 +5733,297 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
     env_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
 
+class BleDeviceManager:
+    """On-demand BLE discovery, real connection checks, and local device memory."""
+
+    def __init__(self, paths: AppPaths):
+        self.paths = paths
+        self._operation_lock = threading.Lock()
+        self._store_lock = threading.Lock()
+
+    @property
+    def store_path(self) -> Path:
+        return self.paths.root / ".runtime" / BLE_DEVICE_STORE_FILE
+
+    @staticmethod
+    def _timeout(value: Any) -> float:
+        if isinstance(value, bool):
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字")
+        try:
+            timeout = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字") from exc
+        if not math.isfinite(timeout) or not 1 <= timeout <= 60:
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字")
+        return timeout
+
+    @staticmethod
+    def _address(value: Any) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("设备地址不能为空")
+        address = value.strip()
+        if len(address) > 200:
+            raise ValueError("设备地址过长")
+        return address
+
+    @staticmethod
+    def _name(value: Any) -> str | None:
+        if value is None:
+            return None
+        if not isinstance(value, str):
+            raise ValueError("设备名称格式不正确")
+        name = value.strip()
+        if len(name) > 200:
+            raise ValueError("设备名称过长")
+        return name or None
+
+    @staticmethod
+    def _address_key(address: str) -> str:
+        return address.strip().casefold()
+
+    def _load_unlocked(self) -> list[dict[str, Any]]:
+        raw = _read_json(self.store_path, {})
+        values = raw.get("items", []) if isinstance(raw, dict) else []
+        if not isinstance(values, list):
+            return []
+        items: dict[str, dict[str, Any]] = {}
+        for value in values:
+            if not isinstance(value, dict):
+                continue
+            address = value.get("address")
+            if not isinstance(address, str) or not address.strip():
+                continue
+            clean_address = address.strip()
+            key = self._address_key(clean_address)
+            items[key] = {
+                "address": clean_address,
+                "name": str(value.get("name") or "").strip() or None,
+                "first_connected_at": str(value.get("first_connected_at") or ""),
+                "last_connected_at": str(value.get("last_connected_at") or ""),
+            }
+        return sorted(
+            items.values(),
+            key=lambda item: str(item.get("last_connected_at") or ""),
+            reverse=True,
+        )
+
+    def _write_unlocked(self, items: list[dict[str, Any]]) -> None:
+        _write_json(
+            self.store_path,
+            {"schema_version": 1, "items": items},
+        )
+
+    def remembered(self) -> dict[str, Any]:
+        with self._store_lock:
+            items = self._load_unlocked()
+        selected_address = os.environ.get("W30_HARDWARE_BLE_ADDRESS", "").strip()
+        selected_key = self._address_key(selected_address)
+        return {
+            "items": [
+                {
+                    **item,
+                    "status": "verified",
+                    "connected": False,
+                    "selected": bool(
+                        selected_key
+                        and self._address_key(str(item["address"])) == selected_key
+                    ),
+                }
+                for item in items
+            ],
+            "selected_address": selected_address,
+            "connection_mode": "on_demand",
+        }
+
+    def scan(self, *, query: str = "", timeout: Any = 15) -> dict[str, Any]:
+        query = str(query or "").strip()
+        if len(query) > 200:
+            raise ValueError("设备搜索内容过长")
+        scan_timeout = self._timeout(timeout)
+        with self._operation_lock:
+            devices = asyncio.run(discover_ble_devices(timeout=scan_timeout))
+        named_devices = [
+            device for device in devices if str(device.name or "").strip()
+        ]
+        named_devices.sort(
+            key=lambda device: (
+                device.rssi is None,
+                -device.rssi if device.rssi is not None else 0,
+                str(device.name or "").casefold(),
+                device.address.casefold(),
+            )
+        )
+        items = [
+            {
+                "address": device.address,
+                "name": str(device.name or "").strip(),
+                "rssi": device.rssi,
+                "status": "discovered",
+                "connected": False,
+            }
+            for device in named_devices
+        ]
+        if query:
+            needle = query.casefold()
+            items = [
+                item
+                for item in items
+                if needle in str(item["address"]).casefold()
+                or needle in str(item.get("name") or "").casefold()
+            ]
+        return {"items": items, "scanned_at": _now(), "query": query}
+
+    @staticmethod
+    async def _verify_connection(
+        *,
+        address: str,
+        name: str | None,
+        timeout: float,
+    ) -> None:
+        client = WatchBleClient(
+            WatchBleDevice(address=address, name=name),
+            timeout=timeout,
+        )
+        try:
+            await asyncio.wait_for(client.connect(pair=False), timeout=timeout)
+            if not client.connected:
+                raise WatchBleConnectionError("手表连接未成功")
+        finally:
+            try:
+                await asyncio.wait_for(client.close(), timeout=min(timeout, 5.0))
+            except Exception:
+                # The explicit connection probe must not leave cleanup failures unobserved
+                # by holding the HTTP request forever. WatchBleClient.close is itself
+                # idempotent and best-effort.
+                pass
+
+    def connect(
+        self,
+        *,
+        address: Any,
+        name: Any = None,
+        timeout: Any = 15,
+    ) -> dict[str, Any]:
+        clean_address = self._address(address)
+        clean_name = self._name(name)
+        connect_timeout = self._timeout(timeout)
+        with self._operation_lock:
+            asyncio.run(
+                self._verify_connection(
+                    address=clean_address,
+                    name=clean_name,
+                    timeout=connect_timeout,
+                )
+            )
+
+        connected_at = _now()
+        key = self._address_key(clean_address)
+        with self._store_lock:
+            items = self._load_unlocked()
+            existing = next(
+                (
+                    item
+                    for item in items
+                    if self._address_key(str(item["address"])) == key
+                ),
+                None,
+            )
+            item = {
+                "address": clean_address,
+                "name": clean_name or (existing or {}).get("name"),
+                "first_connected_at": (existing or {}).get("first_connected_at")
+                or connected_at,
+                "last_connected_at": connected_at,
+            }
+            remaining = [
+                value
+                for value in items
+                if self._address_key(str(value["address"])) != key
+            ]
+            self._write_unlocked([item, *remaining])
+
+        # A successful explicit connection also selects the device for later
+        # on-demand BLE screenshots. No persistent GATT connection is kept.
+        _save_system_config(
+            self.paths,
+            {"hardware": {"ble_address": clean_address}},
+        )
+        return {
+            **item,
+            "status": "verified",
+            "verified": True,
+            "connected": False,
+            "selected": True,
+            "connection_mode": "on_demand",
+        }
+
+    def forget(self, address: Any) -> dict[str, Any]:
+        clean_address = self._address(address)
+        key = self._address_key(clean_address)
+        with self._store_lock:
+            items = self._load_unlocked()
+            remaining = [
+                item
+                for item in items
+                if self._address_key(str(item["address"])) != key
+            ]
+            deleted = len(remaining) != len(items)
+            if deleted:
+                self._write_unlocked(remaining)
+
+        selected_address = os.environ.get("W30_HARDWARE_BLE_ADDRESS", "").strip()
+        if selected_address and self._address_key(selected_address) == key:
+            _save_system_config(self.paths, {"hardware": {"ble_address": ""}})
+            selected_address = ""
+        return {"deleted": deleted, "selected_address": selected_address}
+
+
+def _hardware_preflight_path(paths: AppPaths, project: str) -> Path:
+    return paths.environment_checks / project / "preflight.json"
+
+
+def _hardware_environment_view(
+    project: str,
+    result: Any,
+) -> dict[str, Any]:
+    project_meta = _test_project(project)
+    readiness = str(result.readiness_status or "unchecked")
+    legacy_status = {
+        "ready": "ready",
+        "needs_user": "error",
+        "blocked": "error",
+        "unchecked": "partial",
+    }.get(readiness, "error")
+    checked_at = result.checked_at
+    return {
+        "id": project,
+        "project": project,
+        "project_label": project_meta["project_label"],
+        "execution_target": project_meta["execution_target"],
+        "execution_target_label": project_meta["execution_target_label"],
+        "ready": bool(result.ready),
+        "status": legacy_status,
+        "readiness_status": readiness,
+        "last_checked_at": checked_at,
+        "checked_at": checked_at,
+        "checks": [check.to_dict() for check in result.checks],
+        "error_code": result.primary_code,
+        "error_message": result.primary_detail if not result.ready else None,
+        "logs": (
+            [{
+                "at": checked_at,
+                "message": (
+                    f"{project_meta['project_label']} 真机环境探测结果: {readiness}"
+                ),
+            }]
+            if checked_at
+            else []
+        ),
+    }
+
+
 def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
-    """生成全量测试目标的环境就绪状态与检查清单。"""
+    """Return static simulator checks and cached hardware probes only."""
     items = []
     cfg = _get_system_config(paths)
     for proj_meta in _test_project_options():
@@ -4246,21 +6044,30 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             continue
         checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
-        
-        # 1. 源码与工作区
+
+        if is_hardware:
+            from agent_loop_system.tools.hardware_preflight import (
+                load_cached_hardware_preflight,
+            )
+
+            cached = load_cached_hardware_preflight(
+                _hardware_preflight_path(paths, proj_key),
+                project=proj_key,
+            )
+            items.append(_hardware_environment_view(proj_key, cached))
+            continue
+
+        # 1. Simulator workspace (hardware returned its cached probe above).
         if proj_key == "620C_W6830":
             src_p = Path(cfg["simulator"]["source_root"])
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-        elif proj_key == "6202_W5230_SIMULATOR":
+            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
+        else:
             src_p = Path(proj_meta.get("simulator_source_root", cfg["simulator"]["source_root"]))
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-        else:
-            src_p = Path(cfg["simulator"]["hardware_source_root"])
-            status = "pass" if src_p.is_dir() else "warning"
-            detail = f"真机工作区就绪: {src_p}" if status == "pass" else f"真机源码目录不存在: {src_p}"
-        checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
+            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
         
         # 2. 项目配置
         case_map_p = _case_catalog_root(paths, proj_meta)
@@ -4269,22 +6076,16 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
         checks.append({"key": "config", "label": "项目配置", "status": c_status, "detail": c_detail})
         
         # 3. 执行产物
-        if is_hardware:
-            port = cfg["hardware"]["port"]
-            checks.append({"key": "artifact", "label": "执行产物", "status": "pass", "detail": f"真机调试端口: {port}"})
-        else:
-            art_p = Path(proj_meta.get("simulator_artifact_path", cfg["simulator"]["simulator_path"]))
-            a_status = "pass" if art_p.is_file() else "warning"
-            a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
-            checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
+        art_p = Path(proj_meta.get("simulator_artifact_path", cfg["simulator"]["simulator_path"]))
+        a_status = "pass" if art_p.is_file() else "warning"
+        a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
+        checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
             
         # 4. 命令接口
-        cmd_label = "SuperCom 命名管道" if is_hardware else "QuickCmd 协议接口"
-        checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": f"{cmd_label} 已启用"})
+        checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": "QuickCmd 协议接口已启用"})
         
         # 5. 截图能力
-        cap_label = "Windows MTP 传输" if is_hardware else "模拟器宿主窗口捕获"
-        checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": f"{cap_label} 已配置"})
+        checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": "模拟器宿主窗口捕获已配置"})
         
         # 6. 大模型服务
         llm_ready = bool(cfg["llm"]["api_key"] and cfg["llm"]["base_url"])
@@ -4400,13 +6201,22 @@ def _report_abnormal_run(
 ) -> dict[str, Any]:
     detail = _report_run_reason(run)
     screenshots = run.get("screenshots")
+    workflow_status = str(run.get("workflow_status") or "").casefold()
+    execution_status = str(run.get("execution_status") or "").upper()
+    reason_code = str(run.get("reason_code") or "").upper()
+    execution_anomaly = reason_code != "USER_CANCELLED" and (
+        execution_status == "ERROR"
+        or workflow_status in {"failed", "interrupted", "orphaned"}
+    )
     return {
         "timestamp": timestamp,
         "sheet": sheet,
         "case_id": _report_cell_text(run.get("case_id")),
         "priority": _report_cell_text(run.get("priority")),
         "verdict": verdict,
-        "verdict_label": REPORT_VERDICT_LABELS[verdict],
+        "verdict_label": (
+            "执行异常" if execution_anomaly else REPORT_VERDICT_LABELS[verdict]
+        ),
         "precondition_text": _report_cell_text(run.get("precondition_text")),
         "steps_text": _report_cell_text(run.get("steps_text")),
         "expected_text": _report_cell_text(run.get("expected_text")),
@@ -4432,31 +6242,65 @@ def _report_excel_datetime(value: Any) -> datetime | str:
     return parsed
 
 
+def _report_timestamp_in_range(
+    value: Any,
+    date_from: str | None,
+    date_to: str | None,
+    period: str | None = None,
+    *,
+    now: datetime | None = None,
+) -> bool:
+    text = str(value or "").strip()
+    if period == "24h":
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        local_now = now or datetime.now().astimezone()
+        if local_now.tzinfo is None:
+            local_now = local_now.astimezone()
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=local_now.tzinfo)
+        else:
+            parsed = parsed.astimezone(local_now.tzinfo)
+        return local_now - timedelta(hours=24) <= parsed <= local_now
+
+    date_str = text[:10] if len(text) >= 10 else ""
+    if date_from and date_str and date_str < date_from:
+        return False
+    if date_to and date_str and date_str > date_to:
+        return False
+    return True
+
+
 def _style_report_overview_sheets(
     summary_sheet: Any,
     module_sheet: Any,
 ) -> None:
-    summary_sheet.sheet_view.showGridLines = False
-    summary_sheet.column_dimensions["A"].width = 20
-    summary_sheet.column_dimensions["B"].width = 30
-    summary_fill = openpyxl.styles.PatternFill("solid", fgColor="D9EAF7")
+    _excel_configure_sheet(
+        summary_sheet,
+        widths={"A": 22, "B": 34},
+        orientation="portrait",
+        zoom=100,
+        repeat_header=False,
+    )
     for row in summary_sheet.iter_rows(min_row=1, max_col=2):
-        row[0].fill = summary_fill
-        row[0].font = openpyxl.styles.Font(bold=True)
+        summary_sheet.row_dimensions[row[0].row].height = 24
         for cell in row:
-            cell.alignment = openpyxl.styles.Alignment(vertical="center")
+            cell.font = _excel_body_font(cell.value)
+            cell.border = _EXCEL_THIN_BORDER
+            cell.alignment = openpyxl.styles.Alignment(vertical="center", wrap_text=True)
+        row[0].fill = _EXCEL_SUMMARY_FILL
+        row[0].font = _EXCEL_SUMMARY_FONT
 
-    module_sheet.sheet_view.showGridLines = False
-    module_sheet.freeze_panes = "A2"
-    module_sheet.auto_filter.ref = f"A1:D{max(module_sheet.max_row, 1)}"
-    for column, width in {"A": 20, "B": 14, "C": 14, "D": 14}.items():
-        module_sheet.column_dimensions[column].width = width
-    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
-    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
-    for cell in module_sheet[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+    _excel_style_table(
+        module_sheet,
+        widths={"A": 22, "B": 14, "C": 14, "D": 14},
+        wrap_columns={1},
+        center_columns={2, 3, 4},
+        orientation="portrait",
+        zoom=100,
+    )
 
 
 def _add_report_abnormal_sheet(
@@ -4484,24 +6328,18 @@ def _add_report_abnormal_sheet(
             item.get("screenshot_count", 0),
         ])
 
-    sheet.freeze_panes = "A2"
-    sheet.auto_filter.ref = f"A1:O{max(sheet.max_row, 1)}"
-    sheet.sheet_view.showGridLines = False
-    sheet.row_dimensions[1].height = 24
     widths = {
         "A": 20, "B": 14, "C": 16, "D": 10, "E": 14, "F": 14,
         "G": 24, "H": 32, "I": 32, "J": 42, "K": 60, "L": 18,
         "M": 24, "N": 60, "O": 14,
     }
-    for column, width in widths.items():
-        sheet.column_dimensions[column].width = width
-
-    header_fill = openpyxl.styles.PatternFill("solid", fgColor="1F4E78")
-    header_font = openpyxl.styles.Font(color="FFFFFF", bold=True)
-    for cell in sheet[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = openpyxl.styles.Alignment(horizontal="center", vertical="center")
+    _excel_style_table(
+        sheet,
+        widths=widths,
+        wrap_columns={2, 6, 7, 8, 9, 10, 11, 14},
+        center_columns={1, 3, 4, 5, 12, 13, 15},
+        max_row_height=120,
+    )
 
     verdict_fills = {
         "FAIL": openpyxl.styles.PatternFill("solid", fgColor="FCE8E6"),
@@ -4509,12 +6347,9 @@ def _add_report_abnormal_sheet(
         "CANNOT_VERIFY": openpyxl.styles.PatternFill("solid", fgColor="E5E7EB"),
     }
     for row in sheet.iter_rows(min_row=2):
-        for cell in row:
-            cell.alignment = openpyxl.styles.Alignment(vertical="top", wrap_text=True)
         row[0].number_format = "yyyy-mm-dd hh:mm:ss"
         row[4].fill = verdict_fills.get(str(row[4].value or ""), verdict_fills["ERROR"])
-        row[4].font = openpyxl.styles.Font(bold=True)
-        row[14].alignment = openpyxl.styles.Alignment(horizontal="center", vertical="top")
+        row[4].font = _excel_body_font(row[4].value, bold=True)
 
 
 def _get_reports_summary_data(
@@ -4524,6 +6359,7 @@ def _get_reports_summary_data(
     date_from: str | None,
     date_to: str | None,
     module_filter: str | None,
+    period: str | None = None,
     *,
     include_abnormal_runs: bool = False,
 ) -> dict[str, Any]:
@@ -4549,22 +6385,21 @@ def _get_reports_summary_data(
                     if isinstance(run_data, dict):
                         all_runs.append(run_data)
                         
-    # Filter by date
+    # Filter by date or an explicit rolling period.
     filtered_runs = []
     for r in all_runs:
         ts = str(r.get("timestamp") or r.get("started_at") or "")
-        date_str = ts[:10] if len(ts) >= 10 else ""
-        if date_from and date_str and date_str < date_from:
-            continue
-        if date_to and date_str and date_str > date_to:
+        if not _report_timestamp_in_range(ts, date_from, date_to, period):
             continue
         filtered_runs.append(r)
         
     dist = {"PASS": 0, "FAIL": 0, "ERROR": 0, "CANNOT_VERIFY": 0}
     by_date: dict[str, dict[str, int]] = {}
     module_fails: dict[str, dict[str, int]] = {}
+    module_execution_errors: dict[str, dict[str, int]] = {}
     recent_fails: list[dict[str, Any]] = []
     abnormal_runs: list[dict[str, Any]] = []
+    execution_error_count = 0
     
     for r in filtered_runs:
         v = str(r.get("verdict") or "ERROR").upper()
@@ -4573,6 +6408,15 @@ def _get_reports_summary_data(
         if v not in dist:
             v = "ERROR"
         dist[v] += 1
+        workflow_status = str(r.get("workflow_status") or "").casefold()
+        execution_status = str(r.get("execution_status") or "").upper()
+        reason_code = str(r.get("reason_code") or "").upper()
+        is_execution_error = reason_code != "USER_CANCELLED" and (
+            execution_status == "ERROR"
+            or workflow_status in {"failed", "interrupted", "orphaned"}
+        )
+        if is_execution_error:
+            execution_error_count += 1
         
         ts = str(r.get("timestamp") or r.get("started_at") or "")
         date_str = ts[:10] if len(ts) >= 10 else "未知"
@@ -4596,21 +6440,29 @@ def _get_reports_summary_data(
                 sheet=sheet,
                 timestamp=ts,
             ))
-        if v in {"FAIL", "ERROR"}:
+        if v == "FAIL":
             if sheet not in module_fails:
                 module_fails[sheet] = {"module": sheet, "fail": 0, "error": 0, "total": 0}
-            if v == "FAIL":
-                module_fails[sheet]["fail"] += 1
-            else:
-                module_fails[sheet]["error"] += 1
+            module_fails[sheet]["fail"] += 1
             module_fails[sheet]["total"] += 1
-            
+
+        if is_execution_error:
+            current = module_execution_errors.setdefault(
+                sheet,
+                {"module": sheet, "execution_error": 0},
+            )
+            current["execution_error"] += 1
+
+        if v == "FAIL" or is_execution_error:
             recent_fails.append({
                 "case_id": str(r.get("case_id") or ""),
                 "sheet": sheet,
                 "module": sheet,
                 "history_id": str(r.get("id") or ""),
                 "verdict": v,
+                "workflow_status": workflow_status or None,
+                "execution_status": execution_status or None,
+                "reason_code": reason_code or None,
                 "at": ts,
                 "timestamp": ts,
                 "message": str(r.get("reason") or r.get("error") or "测试未通过"),
@@ -4631,6 +6483,11 @@ def _get_reports_summary_data(
         })
         
     top_fail_modules = sorted(module_fails.values(), key=lambda m: m["total"], reverse=True)[:8]
+    top_execution_error_modules = sorted(
+        module_execution_errors.values(),
+        key=lambda item: item["execution_error"],
+        reverse=True,
+    )[:8]
     recent_fails.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
     abnormal_runs.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
     
@@ -4644,6 +6501,7 @@ def _get_reports_summary_data(
             "fail": dist["FAIL"],
             "error": dist["ERROR"],
             "cannot_verify": dist["CANNOT_VERIFY"],
+            "execution_error": execution_error_count,
             "pass_rate": pass_rate,
             "batches": sum(1 for r in filtered_runs if r.get("batch_id")),
             "repairs": sum(1 for r in filtered_runs if r.get("execution_mode") == "agent_generated"),
@@ -4651,10 +6509,18 @@ def _get_reports_summary_data(
         "distribution": dist,
         "trend": trend,
         "top_fail_modules": top_fail_modules,
+        "top_execution_error_modules": top_execution_error_modules,
         "recent_failures": recent_fails[:15],
         "insight": {
             "title": "测试稳定性与质量态势",
-            "description": f"已完成 {total_count} 次测试运行，综合通过率为 {pass_rate}%。" + (f" 建议优先关注高频异常模块: {top_fail_modules[0]['module']}。" if top_fail_modules else " 当前运行状态平稳。"),
+            "description": (
+                f"已完成 {total_count} 次测试运行，综合通过率为 {pass_rate}%，"
+                f"其中框架执行异常 {execution_error_count} 次。"
+                + (
+                    f" 建议优先关注高频产品失败模块: {top_fail_modules[0]['module']}。"
+                    if top_fail_modules else " 当前未发现产品失败热点。"
+                )
+            ),
         },
     }
     if include_abnormal_runs:
@@ -4765,6 +6631,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"items": projects, "total": len(projects)})
             return
 
+        if path == "/api/tests/projects":
+            self._json({"items": _test_project_options()})
+            return
+
+        if path == "/api/tests/recent":
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            limit = self._positive_int(query, "limit", 8, maximum=50)
+            self._json(self.app.cases.recent(project=project, limit=limit))
+            return
+
         match = re.fullmatch(r"/api/projects/([^/]+)/execution-options", path)
         if match:
             raw_case_ids = query.get("case_id", [])
@@ -4849,6 +6725,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                 j_proj = str(j.get("project") or DEFAULT_TEST_PROJECT)
                 j_status = str(j.get("status") or "completed")
                 j_verdict = str(j.get("verdict") or "ERROR")
+                j_workflow = str(j.get("workflow_status") or "").casefold()
+                j_execution = str(j.get("execution_status") or "").upper()
+                j_reason_code = str(j.get("reason_code") or "").upper()
 
                 if project and j_proj != project and project != "all":
                     continue
@@ -4859,20 +6738,25 @@ class RequestHandler(BaseHTTPRequestHandler):
                     fin = str(j.get("finished_at") or j.get("created_at") or "")
                     if fin.startswith(today_str):
                         completed_today += 1
-                if j_verdict in {"FAIL", "ERROR"} or j_status == "failed":
+                if j_reason_code != "USER_CANCELLED" and (
+                    j_execution == "ERROR"
+                    or j_workflow in {"failed", "interrupted", "orphaned"}
+                    or j_status in {"failed", "interrupted", "orphaned"}
+                    or int(j.get("execution_error_count") or 0) > 0
+                ):
                     error_cnt += 1
                     
                 if status_filter == "queue":
                     if j_status != "queued":
                         continue
                 elif status_filter == "running":
-                    if j_status not in {"running", "finalizing", "queued"}:
+                    if j_status not in {"running", "finalizing", "queued", "orphaned"}:
                         continue
                 elif status_filter == "completed":
                     if j_status not in {"completed", "done"}:
                         continue
                 elif status_filter == "interrupted":
-                    if j_status not in {"cancelled", "interrupted", "failed"}:
+                    if j_status not in {"cancelled", "interrupted", "failed", "orphaned"}:
                         continue
                         
                 meta = _test_project(j_proj)
@@ -4882,6 +6766,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                     "project_label": meta["project_label"],
                     "status": j_status,
                     "verdict": j_verdict,
+                    "workflow_status": j_workflow or None,
+                    "execution_status": j_execution or None,
+                    "reason_code": j_reason_code or None,
                     "completed": j.get("completed", 1 if j_status in {"completed", "done"} else 0),
                     "total": j.get("total", 1),
                     "started_at": j.get("started_at") or j.get("created_at"),
@@ -5080,6 +6967,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
+            period = query.get("period", [None])[0]
             summary_data = _get_reports_summary_data(
                 self.app.paths,
                 self.app.test_history,
@@ -5087,6 +6975,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 d_from,
                 d_to,
                 module,
+                period,
             )
             self._json(summary_data)
             return
@@ -5096,6 +6985,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             scope = query.get("scope", ["batch"])[0]
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
+            period = query.get("period", [None])[0]
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
             
@@ -5108,10 +6998,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         st = _read_json(j_dir / BATCH_STATE_FILE)
                         if isinstance(st, dict):
                             ts = str(st.get("started_at") or st.get("created_at") or "")
-                            d_str = ts[:10] if len(ts) >= 10 else ""
-                            if d_from and d_str and d_str < d_from:
-                                continue
-                            if d_to and d_str and d_str > d_to:
+                            if not _report_timestamp_in_range(ts, d_from, d_to, period):
                                 continue
                             meta = _test_project(str(st.get("project") or DEFAULT_TEST_PROJECT))
                             items.append({
@@ -5143,10 +7030,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                                 r_json = _read_json(r_dir / "run.json")
                                 if isinstance(r_json, dict):
                                     ts = str(r_json.get("timestamp") or r_json.get("started_at") or "")
-                                    d_str = ts[:10] if len(ts) >= 10 else ""
-                                    if d_from and d_str and d_str < d_from:
-                                        continue
-                                    if d_to and d_str and d_str > d_to:
+                                    if not _report_timestamp_in_range(ts, d_from, d_to, period):
                                         continue
                                     items.append({
                                         "id": r_json.get("id", r_dir.name),
@@ -5170,6 +7054,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             d_from = query.get("from", [None])[0]
             d_to = query.get("to", [None])[0]
             module = query.get("module", [None])[0]
+            period = query.get("period", [None])[0]
             summary_data = _get_reports_summary_data(
                 self.app.paths,
                 self.app.test_history,
@@ -5177,6 +7062,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 d_from,
                 d_to,
                 module,
+                period,
                 include_abnormal_runs=True,
             )
             
@@ -5184,12 +7070,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             ws_summary = wb.active
             ws_summary.title = "测试报告概览"
             ws_summary.append(["测试项目", summary_data.get("project", project)])
-            ws_summary.append(["统计周期", f"{d_from or '全部'} 至 {d_to or '全部'}"])
+            ws_summary.append(["统计周期", "最近24小时" if period == "24h" else f"{d_from or '全部'} 至 {d_to or '全部'}"])
             ws_summary.append(["总执行数", summary_data["metrics"]["total"]])
             ws_summary.append(["通过 (PASS)", summary_data["metrics"]["pass"]])
             ws_summary.append(["失败 (FAIL)", summary_data["metrics"]["fail"]])
             ws_summary.append(["错误 (ERROR)", summary_data["metrics"]["error"]])
             ws_summary.append(["无法验证", summary_data["metrics"]["cannot_verify"]])
+            ws_summary.append(["框架执行异常", summary_data["metrics"]["execution_error"]])
             ws_summary.append(["通过率", f"{summary_data['metrics']['pass_rate']}%"])
             
             ws_fail = wb.create_sheet(title="高频失败模块")
@@ -5219,6 +7106,52 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if path == "/api/config":
             self._json(_get_system_config(self.app.paths))
+            return
+
+        if path == "/api/hardware/serial-ports":
+            configured_port = os.environ.get("W30_HARDWARE_PORT", "")
+            try:
+                from agent_loop_system.tools.hardware_serial_ports import (
+                    get_serial_ports_status,
+                )
+                payload = get_serial_ports_status(configured_port)
+            except Exception as exc:
+                payload = {
+                    "configured_port": configured_port,
+                    "selected_port": configured_port,
+                    "default_port": None,
+                    "active_count": 0,
+                    "items": [],
+                    "available": False,
+                    "error": str(exc),
+                }
+            self._json(payload)
+            return
+
+        if path == "/api/hardware/ble/devices":
+            query_text = query.get("q", [""])[0]
+            timeout = query.get(
+                "timeout",
+                [os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")],
+            )[0]
+            try:
+                result = self.app.ble_devices.scan(
+                    query=query_text,
+                    timeout=timeout,
+                )
+            except ValueError:
+                raise
+            except Exception as exc:
+                self._json(
+                    {"error": f"查找蓝牙设备失败：{exc}"},
+                    HTTPStatus.BAD_GATEWAY,
+                )
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/remembered":
+            self._json(self.app.ble_devices.remembered())
             return
 
         if path == "/api/update-check":
@@ -5420,7 +7353,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         match = re.fullmatch(r"/api/tests/jobs/([^/]+)/cancel", path)
         if match:
-            self._json(self.app.test_jobs.cancel_batch(match.group(1)), HTTPStatus.ACCEPTED)
+            self._json(self.app.test_jobs.cancel(match.group(1)), HTTPStatus.ACCEPTED)
             return
 
         match = re.fullmatch(r"/api/tests/jobs/([^/]+)/resume", path)
@@ -5761,13 +7694,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         match = re.fullmatch(r"/api/environments/([^/]+)/check", path)
         if match:
             proj = match.group(1)
-            envs = _get_environments_status(self.app.paths)
-            target_env = next((
-                e for e in envs
-                if e.get("id") == proj or e.get("project") == proj or e.get("target_id") == proj
-            ), None)
-            if target_env is None:
-                raise ValueError(f"TARGET_NOT_FOUND: {proj}")
+            try:
+                project = self.app.projects.get(proj, include_archived=False)["project_id"]
+            except ValueError:
+                target = self.app.platforms.target(proj)
+                project = next(
+                    (
+                        item["project_id"]
+                        for item in self.app.projects.list()
+                        if target["target_id"] in item["allowed_targets"]
+                    ),
+                    "",
+                )
+                if not project:
+                    raise ValueError(f"TARGET_NOT_FOUND: {proj}")
+            target_env = self.app.check_environment(project)
             self._json({"status": "ok", "result": target_env})
             return
 
@@ -5781,6 +7722,43 @@ class RequestHandler(BaseHTTPRequestHandler):
             body = self._body_json()
             _save_system_config(self.app.paths, body)
             self._json({"status": "ok", "message": "系统设置已保存并生效"})
+            return
+
+        if path == "/api/hardware/ble/connect":
+            body = self._body_json()
+            try:
+                device = self.app.ble_devices.connect(
+                    address=body.get("address"),
+                    name=body.get("name"),
+                    timeout=body.get(
+                        "timeout",
+                        os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15"),
+                    ),
+                )
+            except ValueError:
+                raise
+            except Exception as exc:
+                self._json(
+                    {
+                        "ok": False,
+                        "verified": False,
+                        "connected": False,
+                        "connection_mode": "on_demand",
+                        "error": f"手表连接失败：{exc}",
+                    },
+                    HTTPStatus.BAD_GATEWAY,
+                )
+                return
+            self._json(
+                {
+                    "ok": True,
+                    "verified": True,
+                    "connected": False,
+                    "connection_mode": "on_demand",
+                    "device": device,
+                    "message": "手表连接成功；已断开临时连接，后续按需使用",
+                }
+            )
             return
 
         if path == "/api/defects/import":
@@ -5832,16 +7810,24 @@ class RequestHandler(BaseHTTPRequestHandler):
             body = self._body_json()
             email = str(body.get("email", "")).strip()
             password = str(body.get("password", "")).strip()
-            base_url = str(body.get("base_url", "")).strip() or "https://ones.topstepht.com:8443"
+            base_url = (
+                str(body.get("base_url", "")).strip()
+                or os.environ.get("ONES_BASE_URL", "").strip()
+                or "https://ones.topstepht.com:8443"
+            )
             if not email or not password:
                 raise ValueError("请提供 ONES 账号和密码")
 
             import urllib.request
             import urllib.error
-            import ssl
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
+            parsed_base_url = urlparse(base_url)
+            if parsed_base_url.scheme not in {"http", "https"} or not parsed_base_url.hostname:
+                raise ValueError("ONES 地址必须是有效的 http(s) URL")
+            if parsed_base_url.scheme != "https" and not _is_loopback_host(
+                parsed_base_url.hostname
+            ):
+                raise ValueError("ONES 登录包含密码，非本机地址必须使用 HTTPS")
+            ctx = _ones_ssl_context()
 
             login_url = f"{base_url.rstrip('/')}/project/api/project/auth/login"
             req_data = json.dumps({"email": email, "password": password}).encode("utf-8")
@@ -5871,6 +7857,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise ValueError(f"连接 ONES 服务器失败: {exc}")
             return
 
+        match = re.fullmatch(r"/api/run/([^/]+)/cancel", path)
+        if match:
+            self._json(self.app.jobs.cancel(match.group(1)), HTTPStatus.ACCEPTED)
+            return
+
         if path != "/api/run":
             self._json({"error": "接口不存在"}, HTTPStatus.NOT_FOUND)
             return
@@ -5878,7 +7869,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         body = self._body_json()
         if not isinstance(body.get("defect"), str) or not body["defect"].strip():
             raise ValueError("defect 必填")
-        job = self.app.start_repair(defect=body["defect"].strip())
+        project = _test_project(str(body.get("project") or DEFAULT_TEST_PROJECT))["project"]
+        job = self.app.start_repair(
+            defect=body["defect"].strip(),
+            project=project,
+        )
         self._json(job, HTTPStatus.ACCEPTED)
 
     def _put(self) -> None:
@@ -5911,17 +7906,27 @@ class RequestHandler(BaseHTTPRequestHandler):
             if isinstance(paths_obj, dict):
                 config_update = {"simulator": {}}
                 if target_id == "w30.6202.hardware":
-                    if "source_root" in paths_obj:
-                        config_update["simulator"]["hardware_source_root"] = paths_obj["source_root"]
-                    if "workspace_root" in paths_obj:
-                        config_update["simulator"]["hardware_workspace_root"] = paths_obj["workspace_root"]
+                    hardware_update = {
+                        key: paths_obj[key]
+                        for key in ("profile_root", "profile_version")
+                        if key in paths_obj
+                    }
+                    if hardware_update:
+                        _save_system_config(
+                            self.app.paths,
+                            {"hardware": hardware_update},
+                        )
                 elif target_id == "w30.6202.simulator":
-                    if "source_root" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_SOURCE_ROOT"] = str(paths_obj["source_root"])
-                    if "build_directory" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_BUILD_DIRECTORY"] = str(paths_obj["build_directory"])
-                    if "artifact_path" in paths_obj:
-                        os.environ["W30_6202_SIMULATOR_ARTIFACT_PATH"] = str(paths_obj["artifact_path"])
+                    simulator_6202_update = {
+                        key: paths_obj[key]
+                        for key in ("source_root", "build_directory", "artifact_path")
+                        if key in paths_obj
+                    }
+                    if simulator_6202_update:
+                        _save_system_config(
+                            self.app.paths,
+                            {"simulator_6202": simulator_6202_update},
+                        )
                 else:
                     if "source_root" in paths_obj:
                         config_update["simulator"]["source_root"] = paths_obj["source_root"]
@@ -6027,6 +8032,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
         query = parse_qs(parsed.query)
+        match = re.fullmatch(r"/api/hardware/ble/remembered/([^/]+)", path)
+        if match:
+            result = self.app.ble_devices.forget(match.group(1))
+            self._json(
+                result,
+                HTTPStatus.OK if result["deleted"] else HTTPStatus.NOT_FOUND,
+            )
+            return
         match = re.fullmatch(r"/api/cases/([^/]+)", path)
         if match:
             project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
@@ -6142,16 +8155,74 @@ class FrontendHTTPServer(ThreadingHTTPServer):
         super().server_bind()
 
 
+class FrontendIPv6HTTPServer(FrontendHTTPServer):
+    address_family = socket.AF_INET6
+
+
+def _is_address_in_use_error(exc: OSError) -> bool:
+    return (
+        exc.errno in {errno.EADDRINUSE, 10048}
+        or getattr(exc, "winerror", None) == 10048
+    )
+
+
+def _create_frontend_server(
+    server_class: type[FrontendHTTPServer],
+    host: str,
+    port: int,
+    handler: type[BaseHTTPRequestHandler],
+    *,
+    search_next_port: bool,
+) -> FrontendHTTPServer:
+    candidate_port = port
+    for attempt in range(MAX_PORT_SEARCH_ATTEMPTS):
+        try:
+            server = server_class((host, candidate_port), handler)
+        except OSError as exc:
+            if (
+                not search_next_port
+                or port == 0
+                or not _is_address_in_use_error(exc)
+                or candidate_port >= 65_535
+                or attempt + 1 >= MAX_PORT_SEARCH_ATTEMPTS
+            ):
+                raise
+            candidate_port += 1
+            continue
+        if candidate_port != port:
+            print(f"[系统] 端口 {port} 已被占用，已自动使用 {candidate_port}")
+        return server
+    raise RuntimeError("无法创建本地服务")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="W30 Agent 自闭环前端服务")
     parser.add_argument("--host", default="127.0.0.1", help="监听地址")
-    parser.add_argument("--port", type=int, default=8765, help="监听端口")
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help="监听端口；未指定时从 8765 开始自动选择可用端口",
+    )
     args = parser.parse_args(argv)
+    if not _is_loopback_host(args.host):
+        parser.error("前端接口当前没有远程认证，只允许监听 localhost/127.0.0.1/::1")
 
-    root = Path(__file__).resolve().parent.parent
+    root = resolve_app_root()
+    load_app_env(app_root=root)
+    _reload_runtime_limits()
     app = WebApplication(AppPaths.from_root(root))
-    server = FrontendHTTPServer((args.host, args.port), make_handler(app))
-    print(f"W30 Agent UI: http://{args.host}:{args.port}")
+    server_class = FrontendIPv6HTTPServer if ":" in args.host else FrontendHTTPServer
+    requested_port = DEFAULT_FRONTEND_PORT if args.port is None else args.port
+    server = _create_frontend_server(
+        server_class,
+        args.host,
+        requested_port,
+        make_handler(app),
+        search_next_port=args.port is None,
+    )
+    display_host = f"[{args.host}]" if ":" in args.host else args.host
+    print(f"W30 Agent UI: http://{display_host}:{server.server_address[1]}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

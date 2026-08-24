@@ -37,12 +37,23 @@
       "precondition_text": "1.秒表已重置",
       "steps_text": "1.进入Stopwatch",
       "expected_text": "1.主计时显示00:00.00，计次按钮置灰，开始按钮可用",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:500"
+      ],
+      "actions": [
+        ":ENTER_PAGE:STOPWATCH,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：进入秒表后主计时显示00:00.00，左侧计次按钮置灰，右侧蓝色开始按钮可用；候选等待正式复跑。",
+      "mapping_status": "PROMOTED",
+      "verification_points": [
+        "秒表未开始页主计时显示00:00.00、计次按钮置灰且开始按钮可用"
+      ]
     },
     {
       "case_id": "SW_004",
@@ -88,12 +99,27 @@
       "precondition_text": "1.秒表已开始且总时长少于1小时",
       "steps_text": "1.观察主计时",
       "expected_text": "1.主计时显示MM:SS.cs格式",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:60001"
+      ],
+      "actions": [
+        ":TP_CLICK:297,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:60002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：先重置秒表并记录00:00.00基线，再点击开始；新鲜MTP截图显示主计时为00:06.25且右侧为暂停按钮，候选等待正式复跑。",
+      "verification_points": [
+        "开始前秒表已重置为00:00.00",
+        "秒表总时长少于1小时时主计时显示MM:SS.cs格式且处于运行态"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_007",
@@ -116,12 +142,27 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.页面新增序号1和当前累计时间记录",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:8001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:8002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：运行态基线计次列表为空；点击左侧按钮后新鲜MTP截图新增序号1及累计时间00:18.25，候选等待正式复跑。",
+      "verification_points": [
+        "计次前秒表处于运行态且计次列表为空",
+        "点击计次后页面新增序号1和当前累计时间记录"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_009",
@@ -130,12 +171,29 @@
       "precondition_text": "1.秒表正在计时且已有1条计次",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.序号2记录显示在序号1上方",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:9001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:9002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立运行态与序号1计次；再次点击计次后新鲜MTP截图新增序号2及累计时间00:19.03，并显示在序号1上方，候选等待正式复跑。",
+      "verification_points": [
+        "第二次计次前页面已有序号1记录且秒表处于运行态",
+        "点击计次后新增序号2并显示在序号1上方"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_010",
@@ -144,12 +202,56 @@
       "precondition_text": "1.秒表正在计时且已有28条计次",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.列表新增第29条计次记录",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:10001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:10002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立28条计次；点击后新鲜MTP截图显示列表顶部新增序号29及累计时间00:21.07，序号28顺延至下方，候选等待正式复跑。",
+      "verification_points": [
+        "计次前列表顶部为序号28且秒表处于运行态",
+        "点击计次后列表顶部新增第29条计次记录"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_011",
@@ -158,12 +260,57 @@
       "precondition_text": "1.秒表正在计时且已有29条计次",
       "steps_text": "1.点击计次按钮",
       "expected_text": "1.列表新增第30条计次记录",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:11001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:11002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立29条计次；点击后新鲜MTP截图显示列表顶部新增序号30及累计时间00:21.57，序号29顺延至下方，候选等待正式复跑。",
+      "verification_points": [
+        "计次前列表顶部为序号29且秒表处于运行态",
+        "点击计次后列表顶部新增第30条计次记录"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_012",
@@ -172,12 +319,58 @@
       "precondition_text": "1.秒表已记录30条计次",
       "steps_text": "1.观察计次按钮\n2.点击计次按钮",
       "expected_text": "1.计次按钮显示置灰\n2.列表仍保持30条计次",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:12001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:12002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立30条计次；新鲜MTP截图显示序号30位于顶部且计次按钮置灰，点击后仍无序号31并保持30条，候选等待正式复跑。",
+      "verification_points": [
+        "已有30条计次时列表顶部为序号30且计次按钮置灰",
+        "点击置灰计次按钮后列表仍保持30条且没有序号31"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_013",
@@ -186,12 +379,36 @@
       "precondition_text": "1.计次记录超过一屏",
       "steps_text": "1.在计次区域执行上滑",
       "expected_text": "1.列表显示较旧计次记录",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:13001"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,350,205,200,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:13002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立8条计次；上滑前显示8/7/6/5，上滑后新鲜MTP截图显示更早的4/3/2/1，候选等待正式复跑。",
+      "verification_points": [
+        "上滑前计次记录超过一屏且列表显示较新序号",
+        "在计次区域上滑后列表显示更早的计次序号"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_014",
@@ -200,12 +417,38 @@
       "precondition_text": "1.计次列表已离开顶部",
       "steps_text": "1.在计次区域执行下滑",
       "expected_text": "1.列表显示较新计次记录",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":TP_SWIPE:205,350,205,200,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:14001"
+      ],
+      "actions": [
+        ":TP_SWIPE:205,200,205,350,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:14002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup上滑使列表显示4/3/2/1；下滑后新鲜MTP截图返回显示较新的8/7/6/5，候选等待正式复跑。",
+      "verification_points": [
+        "下滑前计次列表已离开顶部并显示较旧序号",
+        "在计次区域下滑后列表返回显示较新的计次序号"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_015",
@@ -214,12 +457,36 @@
       "precondition_text": "1.计次记录超过一屏",
       "steps_text": "1.旋转编码器",
       "expected_text": "1.计次列表沿旋转方向滚动",
-      "setup": [],
-      "actions": [],
-      "collect": [],
-      "verification_points": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:15001"
+      ],
+      "actions": [
+        ":QDEC_SET:1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:15002"
+      ],
+      "verification_points": [
+        "旋转编码器前计次列表显示顶部的较新序号",
+        "顺时针旋转编码器后计次列表沿下行方向显示更早序号"
+      ],
       "unable": false,
-      "note": ""
+      "note": "2026-08-24 6202真机探索：setup建立8条计次；顺时针旋转编码器后，新鲜MTP截图显示列表从8/7/6/5沿下行方向滚动到7/6/5/4，候选等待正式复跑。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_016",
@@ -256,12 +523,30 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.点击暂停按钮\n2.等待3秒",
       "expected_text": "1.页面显示重置和继续按钮\n2.主计时保持暂停值",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "暂停前秒表处于运行态且右侧显示暂停按钮",
+        "点击暂停后页面显示重置和继续按钮",
+        "等待3秒后主计时保持同一暂停值"
+      ],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:18001"
+      ],
+      "actions": [
+        ":TP_CLICK:297,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:18002",
+        ":HOST_WAIT:3000",
+        ":HOST_SCREENSHOT:18003"
+      ],
       "unable": false,
-      "note": ""
+      "note": "2026-08-24 6202真机探索：setup先主动启动秒表；点击暂停后显示重置和继续按钮，相隔约20秒的两张新鲜MTP截图均保持00:18.32且哈希一致，候选等待正式复跑。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_019",
@@ -270,12 +555,32 @@
       "precondition_text": "1.秒表处于暂停状态",
       "steps_text": "1.点击继续按钮\n2.等待1秒",
       "expected_text": "1.页面显示计次和暂停按钮\n2.主计时从暂停值继续增加",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "继续前秒表处于暂停态且页面显示重置和继续按钮",
+        "点击继续并等待后主计时增加且页面显示计次和暂停按钮",
+        "继续运行期间主计时持续增加"
+      ],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:19001"
+      ],
+      "actions": [
+        ":TP_CLICK:297,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:19002",
+        ":HOST_WAIT:3000",
+        ":HOST_SCREENSHOT:19003"
+      ],
       "unable": false,
-      "note": ""
+      "note": "2026-08-24 6202真机探索：先稳定建立暂停态，再点击继续；新鲜MTP截图显示主计时从00:20.32增至00:26.58并继续增至00:47.48，同时显示计次和暂停按钮，候选等待正式复跑。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_020",
@@ -284,12 +589,31 @@
       "precondition_text": "1.秒表处于暂停状态且已有计次记录",
       "steps_text": "1.点击重置按钮",
       "expected_text": "1.主计时回到00:00.00，计次列表清空，计次按钮置灰",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":TP_CLICK:113,428,1",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:20001"
+      ],
+      "actions": [
+        ":TP_CLICK:113,428,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:20002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：setup建立运行、序号1计次和暂停态；点击重置后新鲜MTP截图显示00:00.00、计次列表清空、计次按钮置灰且开始按钮可用，候选等待正式复跑。",
+      "verification_points": [
+        "重置前秒表处于暂停态且已有序号1计次记录",
+        "点击重置后主计时回到00:00.00、计次列表清空且计次按钮置灰"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_021",
@@ -298,12 +622,32 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.执行右滑\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表退出秒表页\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "右滑前秒表处于运行态并记录主计时基线",
+        "右滑后手表退出秒表页",
+        "等待后重新进入秒表时仍处于运行态且主计时较基线增加"
+      ],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:21001"
+      ],
+      "actions": [
+        ":TP_SWIPE:80,251,330,251,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:21002",
+        ":HOST_WAIT:10000",
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:21003"
+      ],
       "unable": false,
-      "note": ""
+      "note": "2026-08-24 6202真机探索：从复位态建立运行基线，右滑退出到主表盘，等待后重进仍为运行态且主计时增长，候选等待正式复跑。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_022",
@@ -312,12 +656,32 @@
       "precondition_text": "1.秒表正在计时",
       "steps_text": "1.单击编码器\n2.等待10秒\n3.重新进入Stopwatch",
       "expected_text": "1.手表返回主表盘\n2.秒表在后台继续计时\n3.主计时比退出值增加约10秒",
-      "verification_points": [],
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "verification_points": [
+        "按键前秒表处于运行态并记录主计时基线",
+        "单击主编码器后手表返回主表盘",
+        "等待后重新进入秒表时仍处于运行态且主计时较基线增加"
+      ],
+      "setup": [
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:297,428,1",
+        ":HOST_WAIT:1000",
+        ":HOST_SCREENSHOT:22001"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:22002",
+        ":HOST_WAIT:10000",
+        ":ENTER_PAGE:STOPWATCH,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:22003"
+      ],
       "unable": false,
-      "note": ""
+      "note": "2026-08-24 6202真机探索：有效单击主编码器后未返回主表盘，而是在秒表页新增计次；计时随后继续增长，候选按产品FAIL等待正式复跑。",
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "SW_023",

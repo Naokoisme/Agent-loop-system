@@ -60,6 +60,11 @@ class _FakeSession:
 
 
 class CaseMapExecutionTest(unittest.TestCase):
+    def test_default_case_map_root_follows_the_runtime_root(self) -> None:
+        from agent_loop_system.runtime_root import RuntimePaths
+
+        self.assertEqual(case_map.CASE_MAP_DIR, RuntimePaths.from_root().case_map)
+
     def test_target_specific_loader_does_not_fall_back(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -684,6 +689,7 @@ class RunnerSelectionTest(unittest.TestCase):
 
     def test_unsolidified_mapping_uses_agent_exploration_without_replay_flag(self) -> None:
         from agent_loop_system.tools import test as test_tool
+        from agent_loop_system.tools.llm_config import get_llm_api_key
 
         case = CaseEntry(
             case_id="DYNAMIC_001",
@@ -699,12 +705,26 @@ class RunnerSelectionTest(unittest.TestCase):
             expected_text=case.expected_text,
             execution_mode="agent_exploration",
         )
+        selected_keys: list[str] = []
+
+        def explore_with_scoped_key(*args, **kwargs):
+            selected_keys.append(get_llm_api_key())
+            return expected
+
         with (
+            mock.patch.dict(
+                test_tool.os.environ,
+                {
+                    "OPENAI_API_KEY": "shared-key",
+                    "OPENAI_API_KEY_EXPLORATION": "exploration-key",
+                    "OPENAI_API_KEY_FIXED": "fixed-key",
+                },
+            ),
             mock.patch.object(test_tool, "load_case_map", return_value={case.case_id: case}),
             mock.patch.object(
                 test_tool,
                 "_run_agent_exploration",
-                return_value=expected,
+                side_effect=explore_with_scoped_key,
             ) as explore,
             mock.patch.object(test_tool, "SimulatorSession") as simulator,
         ):
@@ -720,24 +740,30 @@ class RunnerSelectionTest(unittest.TestCase):
         self.assertEqual(result.provenance["target"], "simulator")
         self.assertEqual(result.provenance["case_map_profile"], "620C_W6830")
         self.assertEqual(result.provenance["project"], "620C_W6830")
+        self.assertEqual(selected_keys, ["exploration-key"])
         explore.assert_called_once_with(
             case,
             screenshot_path="D:/evidence/dynamic.bmp",
             target="simulator",
+            project="620C_W6830",
+            reset_hardware=True,
         )
         simulator.assert_not_called()
 
     def test_candidate_replay_and_promoted_mappings_use_fixed_runner(self) -> None:
         from agent_loop_system.tools import test as test_tool
+        from agent_loop_system.tools.llm_config import get_llm_api_key
 
         class LifecycleSession(_FakeSession):
             def __init__(self) -> None:
                 super().__init__()
                 self.started = False
                 self.stopped = False
+                self.api_key = ""
 
             def start(self) -> None:
                 self.started = True
+                self.api_key = get_llm_api_key()
 
             def stop(self) -> None:
                 self.stopped = True
@@ -755,6 +781,14 @@ class RunnerSelectionTest(unittest.TestCase):
                 )
                 session = LifecycleSession()
                 with (
+                    mock.patch.dict(
+                        test_tool.os.environ,
+                        {
+                            "OPENAI_API_KEY": "shared-key",
+                            "OPENAI_API_KEY_EXPLORATION": "exploration-key",
+                            "OPENAI_API_KEY_FIXED": "fixed-key",
+                        },
+                    ),
                     mock.patch.object(
                         test_tool,
                         "load_case_map",
@@ -780,6 +814,7 @@ class RunnerSelectionTest(unittest.TestCase):
                 self.assertEqual(result.provenance["project"], "6202_W5230")
                 self.assertTrue(session.started)
                 self.assertTrue(session.stopped)
+                self.assertEqual(session.api_key, "fixed-key")
                 self.assertTrue(any(raw.startswith(":TP_CLICK:") for raw, _ in session.calls))
 
     def test_candidate_replay_fails_before_exploration_or_session_without_candidate(

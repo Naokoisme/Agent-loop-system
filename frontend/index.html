@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
-  <title>Agent自动化测试平台</title>
+  <title>Agent-loop 自动化测试</title>
   <link rel="stylesheet" href="/assets/styles.css">
   <script defer src="/assets/app.js"></script>
 </head>
@@ -19,7 +19,7 @@
       <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
       <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
       <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
-      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>缺陷闭环</a>
+      <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>ONES 缺陷</a>
       <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
     </nav>
     <div class="topbar-actions">
@@ -68,7 +68,19 @@
       <footer class="dialog-actions"><button class="button button-secondary" type="button" data-close-create-project>取消</button><button class="button" type="submit">创建并切换</button></footer>
     </form>
   </dialog>
-  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
+  <dialog id="image-preview-dialog" class="image-preview-dialog" aria-labelledby="image-preview-title">
+    <header class="dialog-head image-preview-head">
+      <div>
+        <p class="eyebrow">图片预览</p>
+        <h2 id="image-preview-title">图片预览</h2>
+      </div>
+      <button id="close-image-preview" class="dialog-close" type="button" aria-label="关闭图片预览">×</button>
+    </header>
+    <div class="image-preview-stage">
+      <img id="image-preview-image" alt="">
+    </div>
+  </dialog>
+  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 960px; width: 94vw;">
     <form id="system-settings-form">
       <header class="dialog-head">
         <div>
@@ -78,48 +90,48 @@
       </header>
 
       <div class="settings-tabs-nav">
-        <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">🤖 大模型</button>
-        <button type="button" class="settings-tab-btn" data-settings-tab="ones">📋 ONES 平台</button>
-        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">⌚ 真机串口</button>
+        <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">模型服务</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="ones">ONES 平台</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="hardware">真机连接</button>
       </div>
 
       <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
-        <!-- Tab 1: LLM (内置统一服务状态卡片与连通性测试) -->
+        <!-- Tab 1: LLM (用户配置服务状态卡片与连通性测试) -->
         <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 14px;">
           <div class="llm-settings-card">
             <div class="llm-settings-heading">
               <span class="llm-settings-title">
                 <span id="llm-engine-dot" class="llm-status-dot" data-tone="neutral"></span>
-                大模型与视觉判定引擎
+                模型服务
               </span>
-              <span class="chip chip-solidified" style="font-size: 11px;">内置服务</span>
+              <span class="chip chip-solidified" style="font-size: 11px;">当前配置</span>
             </div>
 
-            <div class="llm-signal-list" aria-label="大模型服务状态">
+            <div class="llm-signal-list" aria-label="模型服务状态">
               <div class="llm-signal-row">
-                <span>服务已配置</span>
+                <span>配置状态</span>
                 <strong id="llm-config-status" class="llm-signal-value" data-tone="neutral">读取中…</strong>
               </div>
               <div class="llm-signal-row">
-                <span>最近实际调用成功</span>
+                <span>最近调用</span>
                 <strong id="llm-actual-success" class="llm-signal-value" data-tone="neutral">尚无成功记录</strong>
               </div>
               <div class="llm-signal-row">
-                <span>本次快速探测</span>
+                <span>连接测试</span>
                 <strong id="llm-test-status" class="llm-signal-value" data-tone="neutral" role="status" aria-live="polite">尚未执行</strong>
               </div>
             </div>
 
             <div class="llm-config-details">
-              <span style="color: var(--ink-soft);">固定模型:</span>
+              <span style="color: var(--ink-soft);">模型：</span>
               <span id="llm-display-model" style="font-family: monospace; font-weight: 600;">gpt-5.6-sol</span>
-              <span style="color: var(--ink-soft);">服务网关:</span>
+              <span style="color: var(--ink-soft);">服务地址：</span>
               <span id="llm-display-gateway" style="font-family: monospace; font-size: 12px; color: var(--ink-soft);">https://api.onefaka.com/v1</span>
             </div>
 
             <div class="llm-probe-actions">
-              <button id="btn-test-llm" type="button" class="button button-secondary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">⚡ 测试服务连通性</button>
-              <small>快速探测只反映本次请求，不会覆盖真实 Agent 调用状态。</small>
+              <button id="btn-test-llm" type="button" class="button button-secondary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">测试连接</button>
+              <small>只检查当前连接，不影响已有运行记录。</small>
             </div>
           </div>
         </div>
@@ -132,8 +144,8 @@
           </div>
           <div style="display: flex; gap: 12px;">
             <div style="flex: 1;">
-              <label for="cfg-ones-email" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">账号 (邮箱)</label>
-              <input id="cfg-ones-email" type="text" class="input" placeholder="例如: name@topstep-tech.com" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+              <label for="cfg-ones-email" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">账号（邮箱）</label>
+              <input id="cfg-ones-email" type="text" class="input" placeholder="例如：name@topstep-tech.com" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
             </div>
             <div style="flex: 1;">
               <label for="cfg-ones-password" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">密码</label>
@@ -141,12 +153,12 @@
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <button id="btn-ones-login" type="button" class="button button-primary" style="padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;">🔑 一键同步凭据</button>
+            <button id="btn-ones-login" type="button" class="button button-primary" style="padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;">登录并保存</button>
             <span id="ones-login-status" style="font-size: 12px; color: var(--ink-soft);"></span>
           </div>
 
           <details style="margin-top: 4px; padding: 8px 12px; background: var(--surface-soft); border-radius: 6px; border: 1px solid var(--line);">
-            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">▼ 高级选项 (Token / 团队 ID)</summary>
+            <summary style="font-size: 12px; font-weight: bold; cursor: pointer; color: var(--ink-soft);">高级设置</summary>
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
               <div>
                 <label for="cfg-ones-auth-token" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">访问令牌</label>
@@ -169,30 +181,102 @@
         <!-- Tab 3: Hardware -->
         <div class="settings-tab-pane" data-settings-pane="hardware" style="display: none; flex-direction: column; gap: 12px;">
           <div style="display: flex; gap: 12px;">
-            <div style="flex: 1;">
-              <label for="cfg-hw-port" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口号</label>
-              <input id="cfg-hw-port" type="text" class="input" placeholder="COM7" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+            <div style="flex: 1.2;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label for="cfg-hw-port" style="font-size: 12px; font-weight: bold;">SuperCom 端口</label>
+                <button id="btn-refresh-serial-ports" type="button" class="button button-secondary" style="padding: 2px 8px; font-size: 11px; cursor: pointer;" title="刷新串口列表">刷新</button>
+              </div>
+              <select id="cfg-hw-port" class="select" required style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
+                <option value="">正在读取串口…</option>
+              </select>
+              <div id="cfg-hw-port-status" class="serial-port-status-banner" style="margin-top: 6px; font-size: 11px; line-height: 1.4;"></div>
             </div>
-            <div style="flex: 1;">
+            <div style="flex: 0.8;">
               <label for="cfg-hw-baudrate" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">波特率</label>
               <input id="cfg-hw-baudrate" type="number" class="input" placeholder="1500000" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
             </div>
           </div>
           <div style="display: flex; gap: 12px;">
             <div style="flex: 1;">
-              <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">串口管道通信</label>
+              <label for="cfg-hw-transport" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">连接方式</label>
               <select id="cfg-hw-transport" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-                <option value="supercom">SuperCom 命名管道 (推荐)</option>
+                <option value="supercom">SuperCom（推荐）</option>
                 <option value="direct">直接打开串口</option>
               </select>
             </div>
             <div style="flex: 1;">
-              <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">真机截图抓取方式</label>
+              <label for="cfg-hw-capture" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">截图方式</label>
               <select id="cfg-hw-capture" class="select" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line);">
-                <option value="mtp">Windows MTP 传输 (推荐)</option>
-                <option value="serial">串口数据传输</option>
+                <option value="mtp">通过 USB 获取截图（推荐）</option>
+                <option value="ble">通过蓝牙获取截图（实验）</option>
               </select>
             </div>
+          </div>
+          <div id="cfg-hw-ble-options" class="ble-device-manager">
+            <header class="ble-device-manager-head">
+              <div>
+                <strong>手表蓝牙连接</strong>
+                <p>扫描不会连接设备，点击“连接”后才会检查手表。</p>
+              </div>
+              <span class="chip chip-pending">按需连接</span>
+            </header>
+
+            <div class="ble-target-grid">
+              <label for="cfg-hw-ble-address">
+                <span>手表地址（可选）</span>
+                <input id="cfg-hw-ble-address" type="text" class="input" placeholder="留空时自动查找手表" autocomplete="off">
+              </label>
+              <label for="cfg-hw-ble-scan-timeout">
+                <span>查找和连接超时（秒）</span>
+                <input id="cfg-hw-ble-scan-timeout" type="number" class="input" min="1" max="60" step="1" value="15">
+              </label>
+            </div>
+
+            <div class="ble-device-search-row">
+              <label class="ble-device-search" for="ble-device-search">
+                <span aria-hidden="true">⌕</span>
+                <input id="ble-device-search" type="search" placeholder="搜索设备名称或地址" autocomplete="off">
+              </label>
+              <button id="btn-scan-ble" class="button button-secondary" type="button">查找设备</button>
+            </div>
+
+            <div id="ble-connection-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite">
+              <span class="ble-connection-dot" aria-hidden="true"></span>
+              <div>
+                <strong>未选择手表</strong>
+                <small>点击“查找设备”开始</small>
+              </div>
+            </div>
+
+            <div class="ble-device-columns">
+              <section class="ble-device-column" aria-labelledby="ble-discovered-title">
+                <header>
+                  <div>
+                    <strong id="ble-discovered-title">本次找到的设备</strong>
+                    <small>最近一次查找结果</small>
+                  </div>
+                  <span id="ble-discovered-count" class="chip chip-pending">0 个</span>
+                </header>
+                <div id="ble-discovered-list" class="ble-device-list">
+                  <div class="ble-device-empty">点击“查找设备”开始</div>
+                </div>
+              </section>
+
+              <section class="ble-device-column" aria-labelledby="ble-remembered-title">
+                <header>
+                  <div>
+                    <strong id="ble-remembered-title">已连接过的设备</strong>
+                    <small>连接成功后会保存在这里</small>
+                  </div>
+                  <span id="ble-remembered-count" class="chip chip-pending">0 个</span>
+                </header>
+                <div id="ble-remembered-list" class="ble-device-list">
+                  <div class="ble-device-empty">正在读取连接记录…</div>
+                </div>
+              </section>
+            </div>
+
+            <p class="ble-device-note">设备仅在需要时连接。删除这里只会清除连接记录，不会操作手表。</p>
           </div>
         </div>
 

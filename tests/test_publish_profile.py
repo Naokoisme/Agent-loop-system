@@ -52,6 +52,33 @@ class PublishProfileTests(unittest.TestCase):
             published_at="2026-08-20T09:00:00Z",
         )
 
+    def _runtime_assets(self, base: Path) -> tuple[Path, Path]:
+        commands = base / "commands.json"
+        pages = base / "pages.json"
+        commands.write_text(
+            json.dumps({
+                "schema_version": 1,
+                "project": "TEST_TARGET",
+                "capabilities": [{
+                    "name": "GUI_PING",
+                    "handler": "quick_cmd_gui_ping",
+                    "available": True,
+                    "unavailable_reason": None,
+                }],
+                "catalog": "GUI_PING|参数=seq|可用",
+            }),
+            encoding="utf-8",
+        )
+        pages.write_text(
+            json.dumps({
+                "schema_version": 1,
+                "project": "TEST_TARGET",
+                "catalog": "DIAL|完整示例=:ENTER_PAGE:DIAL,0",
+            }),
+            encoding="utf-8",
+        )
+        return commands, pages
+
     def test_publishes_verified_immutable_release_then_latest(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)
@@ -106,6 +133,96 @@ class PublishProfileTests(unittest.TestCase):
                     "profile_manifest.json",
                 },
             )
+
+    def test_publishes_source_free_runtime_assets_bound_to_firmware(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            root = base / "profiles" / "TEST_TARGET"
+            root.mkdir(parents=True)
+            artifact = base / "new.up3"
+            artifact.write_bytes(b"runtime-bound-firmware")
+            commands, pages = self._runtime_assets(base)
+            metadata = self._metadata()
+            firmware_hash = hashlib.sha256(artifact.read_bytes()).hexdigest().upper()
+
+            result = publish_profile(
+                profile_root=root,
+                version="v1.0.0-dev.1",
+                artifact=artifact,
+                staging_root=base / "staging",
+                profile_metadata=metadata["profile"],
+                firmware_metadata=metadata["firmware"],
+                source_metadata=metadata["source"],
+                validation_metadata=metadata["validation"],
+                runtime_assets={"commands": commands, "pages": pages},
+                runtime_metadata={
+                    "project": "TEST_TARGET",
+                    "target": "hardware",
+                    "firmware_version": "T1.2.3",
+                    "firmware_sha256": firmware_hash,
+                    "automation_protocol_version": "w30_test_bridge/1",
+                    "agent_loop_min_version": "0.4.0",
+                    "case_map_version": "case-map-abc123",
+                    "verified_capabilities": ["quick_commands", "page_catalog"],
+                },
+                publish_id="runtimepublish01",
+            )
+
+            release = Path(result.release)
+            manifest = json.loads(
+                (release / "profile_manifest.json").read_text(encoding="utf-8")
+            )
+            runtime = manifest["runtime"]
+            self.assertEqual(runtime["firmware_sha256"], firmware_hash)
+            self.assertEqual(
+                runtime["assets"]["commands"]["path"],
+                "runtime/commands.json",
+            )
+            self.assertEqual(
+                runtime["assets"]["pages"]["path"],
+                "runtime/pages.json",
+            )
+            self.assertEqual(
+                (release / "runtime" / "commands.json").read_bytes(),
+                commands.read_bytes(),
+            )
+            sums = (release / "SHA256SUMS.txt").read_text(encoding="ascii")
+            self.assertIn("  runtime/commands.json\n", sums)
+            self.assertIn("  runtime/pages.json\n", sums)
+
+    def test_rejects_runtime_metadata_for_a_different_firmware(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            root = base / "profile"
+            root.mkdir()
+            artifact = base / "new.up3"
+            artifact.write_bytes(b"firmware")
+            commands, pages = self._runtime_assets(base)
+            metadata = self._metadata()
+
+            with self.assertRaisesRegex(PublishError, "firmware_sha256"):
+                publish_profile(
+                    profile_root=root,
+                    version="v1.0.0-dev.1",
+                    artifact=artifact,
+                    staging_root=base / "staging",
+                    profile_metadata=metadata["profile"],
+                    firmware_metadata=metadata["firmware"],
+                    source_metadata=metadata["source"],
+                    validation_metadata=metadata["validation"],
+                    runtime_assets={"commands": commands, "pages": pages},
+                    runtime_metadata={
+                        "project": "TEST_TARGET",
+                        "target": "hardware",
+                        "firmware_version": "T1.2.3",
+                        "firmware_sha256": "0" * 64,
+                        "automation_protocol_version": "w30_test_bridge/1",
+                        "agent_loop_min_version": "0.4.0",
+                        "case_map_version": "case-map-abc123",
+                        "verified_capabilities": ["quick_commands"],
+                    },
+                    publish_id="mismatchpublish01",
+                )
 
     def test_existing_version_hard_stops_without_touching_latest(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
