@@ -203,12 +203,27 @@
       "precondition_text": "1.数值区显示1.2",
       "steps_text": "1.点击小数点",
       "expected_text": "1.数值区保持1.2",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:253,437,1",
+        ":TP_CLICK:159,365,1"
+      ],
+      "actions": [
+        ":TP_CLICK:253,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：重复点击小数点后仍显示1.2；候选等待正式复跑。",
+      "verification_points": [
+        "再次点击小数点后数值区仍显示1.2"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_009",
@@ -217,12 +232,27 @@
       "precondition_text": "1.数值区显示123",
       "steps_text": "1.点击退格",
       "expected_text": "1.数值区显示12",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:253,365,1"
+      ],
+      "actions": [
+        ":TP_CLICK:360,62,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：输入123后退格显示12；命令与坐标由当前源码和实机验证。",
+      "verification_points": [
+        "点击退格后数值区显示12"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_010",
@@ -231,12 +261,25 @@
       "precondition_text": "1.数值区显示7",
       "steps_text": "1.点击退格",
       "expected_text": "1.数值区显示0",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1",
+        ":TP_CLICK:64,221,1"
+      ],
+      "actions": [
+        ":TP_CLICK:360,62,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：单个数字7退格后显示0；命令与坐标由当前源码和实机验证。",
+      "verification_points": [
+        "单个数字7退格后数值区显示0"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_011",
@@ -331,12 +374,27 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次点击4和×和3和=",
       "expected_text": "1.数值区显示12",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:347,221,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：执行4×3=后显示12；命令与坐标由当前源码和实机验证。",
+      "verification_points": [
+        "输入4乘3等于后数值区显示12"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_016",
@@ -345,12 +403,27 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次点击8和÷和2和=",
       "expected_text": "1.数值区显示4",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,221,1",
+        ":TP_CLICK:347,149,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：执行8÷2=后显示4；命令与坐标由当前源码和实机验证。",
+      "verification_points": [
+        "输入8除以2等于后数值区显示4"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_017",
@@ -359,12 +432,31 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次输入1.2+3.4=",
       "expected_text": "1.数值区显示4.6",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:64,365,1",
+        ":TP_CLICK:253,437,1",
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:253,437,1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：执行1.2+3.4=后显示4.6；命令与坐标由当前源码和实机验证。",
+      "verification_points": [
+        "输入1.2加3.4等于后数值区显示4.6"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_018",
@@ -387,12 +479,33 @@
       "precondition_text": "1.计算器显示0",
       "steps_text": "1.依次输入2+3\n2.点击乘号\n3.输入4=",
       "expected_text": "1.计算器先得到5，等待新右值\n2.数值区显示20\n3.数值区保持20",
-      "setup": [],
-      "actions": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:347,221,1",
+        ":HOST_SCREENSHOT:1",
+        ":TP_CLICK:64,293,1",
+        ":TP_CLICK:347,437,1",
+        ":HOST_SCREENSHOT:2",
+        ":HOST_WAIT:800",
+        ":HOST_SCREENSHOT:3"
+      ],
       "collect": [],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：链式运算三检查点实显3、20、20，第一点与原始预期5不符。",
+      "verification_points": [
+        "输入2加3后点击乘号，计算器先显示5并等待新右值",
+        "继续输入4等于后数值区显示20",
+        "等待后数值区仍保持20"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_020",
@@ -401,12 +514,27 @@
       "precondition_text": "1.准备结果小于10位的运算",
       "steps_text": "1.执行运算，点击等号",
       "expected_text": "1.数值区完整显示结果，不使用科学计数法",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":BUTTON_PRESS:1,1,0",
+        ":ENTER_PAGE:DIAL,0",
+        ":ENTER_PAGE:CALCULATOR,0",
+        ":TP_CLICK:111,149,1"
+      ],
+      "actions": [
+        ":TP_CLICK:159,365,1",
+        ":TP_CLICK:347,293,1",
+        ":TP_CLICK:253,365,1",
+        ":TP_CLICK:347,437,1"
+      ],
+      "collect": [
+        ":HOST_SCREENSHOT:1"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：执行2+3=后完整显示5且未使用科学计数法。",
+      "verification_points": [
+        "小于10位的结果5完整显示且未使用科学计数法"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "CALC_021",

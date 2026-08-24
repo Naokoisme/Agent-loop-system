@@ -19,7 +19,7 @@ TARGETS = {
     },
     "6202_case_map": {
         "profile": "6202_W5230",
-        "solidified": 63,
+        "solidified": 112,
     },
     "6202_simulator_case_map": {
         "profile": "6202_W5230_SIMULATOR",

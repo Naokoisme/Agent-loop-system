@@ -135,12 +135,27 @@
       "precondition_text": "1.手表显示Timer预设页",
       "steps_text": "1.点击加号按钮",
       "expected_text": "1.页面显示时分秒滚轮和确认按钮",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TIMER_LIST,0",
+        ":HOST_WAIT:500",
+        ":TP_SWIPE:205,420,205,100,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:100001"
+      ],
+      "actions": [
+        ":TP_CLICK:205,431,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:100002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从计时器预设页上滑显示加号，点击后新鲜MTP截图显示时分秒滚轮和确认按钮，候选等待正式复跑。",
+      "verification_points": [
+        "点击前仍为计时器预设列表且加号按钮可见",
+        "点击加号按钮后显示时分秒滚轮和确认按钮"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "TIMER_011",
@@ -149,12 +164,27 @@
       "precondition_text": "1.手表显示Timer预设页",
       "steps_text": "1.执行右滑",
       "expected_text": "1.手表返回进入Timer前的页面",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:DIAL,0",
+        ":HOST_WAIT:500",
+        ":ENTER_PAGE:TIMER_LIST,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:110001"
+      ],
+      "actions": [
+        ":TP_SWIPE:80,251,330,251,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:110002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：先从主表盘进入计时器预设页，右滑后新鲜MTP截图返回同一主表盘，候选等待正式复跑。",
+      "verification_points": [
+        "右滑前手表显示计时器预设列表页",
+        "右滑后返回进入Timer前的主表盘"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "TIMER_012",
@@ -163,12 +193,27 @@
       "precondition_text": "1.手表显示Timer预设页",
       "steps_text": "1.点击加号按钮",
       "expected_text": "1.自定义页默认显示00小时01分钟00秒",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TIMER_LIST,0",
+        ":HOST_WAIT:500",
+        ":TP_SWIPE:205,420,205,100,0",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:120001"
+      ],
+      "actions": [
+        ":TP_CLICK:205,431,1"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:120002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从计时器预设页点击加号后，新鲜MTP截图显示自定义计时默认选中00小时01分钟00秒，候选等待正式复跑。",
+      "verification_points": [
+        "点击前仍为计时器预设列表且加号按钮可见",
+        "自定义计时页默认选中00小时01分钟00秒"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "TIMER_013",
@@ -289,12 +334,29 @@
       "precondition_text": "1.手表显示自定义计时页",
       "steps_text": "1.执行右滑",
       "expected_text": "1.手表返回预设列表，不创建计时任务",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TIMER_LIST,0",
+        ":HOST_WAIT:500",
+        ":TP_SWIPE:205,420,205,100,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:205,431,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:210001"
+      ],
+      "actions": [
+        ":TP_SWIPE:80,251,330,251,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:210002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：从自定义计时页右滑后，新鲜MTP截图返回预设列表且未进入倒计时详情页，候选等待正式复跑。",
+      "verification_points": [
+        "右滑前手表显示自定义计时页且尚未确认创建任务",
+        "右滑后返回计时器预设列表且没有进入倒计时详情页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "TIMER_022",
@@ -303,12 +365,29 @@
       "precondition_text": "1.手表显示自定义计时页",
       "steps_text": "1.单击编码器退出键",
       "expected_text": "1.手表返回预设列表，不创建计时任务",
-      "setup": [],
-      "actions": [],
-      "collect": [],
+      "setup": [
+        ":ENTER_PAGE:TIMER_LIST,0",
+        ":HOST_WAIT:500",
+        ":TP_SWIPE:205,420,205,100,0",
+        ":HOST_WAIT:500",
+        ":TP_CLICK:205,431,1",
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:220001"
+      ],
+      "actions": [
+        ":BUTTON_PRESS:1,1,0"
+      ],
+      "collect": [
+        ":HOST_WAIT:500",
+        ":HOST_SCREENSHOT:220002"
+      ],
       "unable": false,
-      "note": "",
-      "verification_points": []
+      "note": "2026-08-24 6202真机探索：有效单击主编码器后直接返回主表盘而非计时器预设列表；未进入倒计时详情，候选按产品FAIL等待正式复跑。",
+      "verification_points": [
+        "按键前手表显示自定义计时页且尚未确认创建任务",
+        "单击主编码器后返回计时器预设列表且没有进入倒计时详情页"
+      ],
+      "mapping_status": "PROMOTED"
     },
     {
       "case_id": "TIMER_023",
