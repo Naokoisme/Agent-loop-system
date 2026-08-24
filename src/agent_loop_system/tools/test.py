@@ -664,6 +664,8 @@ def _run_agent_exploration(
     project: str,
     hardware_runtime_profile=None,
     reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
 
@@ -701,6 +703,8 @@ def _run_agent_exploration(
         build_simulator=False,
         hardware_runtime_profile=hardware_runtime_profile,
         reset_hardware=reset_hardware,
+        hardware_recovery_reboot=hardware_recovery_reboot,
+        hardware_preflight_completed=hardware_preflight_completed,
     )
     result = CaseRunResult(
         case_id=case.case_id,
@@ -829,12 +833,15 @@ def run_single_case(
     candidate_replay: bool = False,
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None,
     reset_hardware: bool = True,
+    hardware_preflight_completed: bool = False,
+    hardware_recovery_reboot: bool = False,
 ) -> CaseRunResult:
     """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
     screenshot_path 不为 None 时，在每个 GUI_TREE 检查点保存一张截图；
     没有 GUI_TREE 时保存最终画面。
-    真机默认先清理到可验证的表盘状态；只有已完成同一清理入口的父流程才可关闭。
+    真机默认先做真实 Preflight，再以无重启方式收敛到可验证的表盘状态；
+    只有已完成同一门禁/准备入口的父流程才可跳过对应阶段。
     """
     load_kwargs = {"target": target}
     if case_map_profile:
@@ -856,14 +863,9 @@ def run_single_case(
         target=target,
         case_map_profile=case_map_profile,
     )
-    hardware_runtime_profile = None
-    if target == "hardware":
-        from agent_loop_system.tools.hardware_runtime_profile import (
-            load_hardware_runtime_profile,
-        )
-
-        hardware_runtime_profile = load_hardware_runtime_profile(
-            project=str(provenance.get("project") or "") or None,
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
         )
     if screenshot_path is None:
         run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
@@ -882,6 +884,40 @@ def run_single_case(
         else LLM_API_KEY_SCOPE_FIXED
     )
     with llm_api_key_scope(scope):
+        evidence_dir = Path(screenshot_path).resolve().parent
+        hardware_project = str(
+            provenance.get("project") or "6202_W5230"
+        )
+        if (
+            target == "hardware"
+            and external_executor is None
+            and not hardware_preflight_completed
+        ):
+            from agent_loop_system.tools.hardware_preflight import (
+                require_hardware_preflight,
+            )
+
+            require_hardware_preflight(
+                project=hardware_project,
+                evidence_dir=evidence_dir / "preflight",
+                persist_paths=(
+                    evidence_dir / "preflight.json",
+                    _RUNTIME_PATHS.environment_checks
+                    / hardware_project
+                    / "preflight.json",
+                ),
+            )
+
+        hardware_runtime_profile = None
+        if target == "hardware":
+            from agent_loop_system.tools.hardware_runtime_profile import (
+                load_hardware_runtime_profile,
+            )
+
+            hardware_runtime_profile = load_hardware_runtime_profile(
+                project=hardware_project or None,
+            )
+
         if external_executor is not None:
             if target != "hardware":
                 raise ValueError("外部真机执行器只能用于 hardware target")
@@ -897,6 +933,11 @@ def run_single_case(
                 "project": str(provenance.get("project") or ""),
                 "reset_hardware": reset_hardware,
             }
+            if target == "hardware":
+                exploration_kwargs.update({
+                    "hardware_recovery_reboot": hardware_recovery_reboot,
+                    "hardware_preflight_completed": True,
+                })
             if hardware_runtime_profile is not None:
                 exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
             return _stamp_result_provenance(
@@ -910,13 +951,18 @@ def run_single_case(
         if target == "hardware":
             from agent_loop_system.tools.real_device import (
                 RealDeviceSession,
+                prepare_hardware_case_state,
                 reset_hardware_case_state,
             )
 
             _validate_hardware_case_commands(case, hardware_runtime_profile)
-            evidence_dir = Path(screenshot_path).resolve().parent
             if reset_hardware:
-                reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=evidence_dir / "hardware-preparation")
             session = RealDeviceSession(evidence_dir=evidence_dir)
         elif target == "simulator":
             session = SimulatorSession(get_simulator_exe())
@@ -967,6 +1013,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help=argparse.SUPPRESS,
     )
+    parser.add_argument(
+        "--hardware-preflight-completed",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--hardware-recovery-reboot",
+        action="store_true",
+        help="显式工程恢复：在 UART 与初始 USB 门禁通过后重启真机",
+    )
     ble_selector = parser.add_mutually_exclusive_group()
     ble_selector.add_argument("--ble-address", help="watch_ble 的目标 BLE 地址")
     ble_selector.add_argument("--ble-name", help="watch_ble 的目标广播名称")
@@ -978,6 +1034,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--execution-adapter cannot be combined with --candidate-replay")
     if args.skip_hardware_reset and args.target != "hardware":
         parser.error("--skip-hardware-reset requires --target hardware")
+    if args.hardware_preflight_completed and args.target != "hardware":
+        parser.error("--hardware-preflight-completed requires --target hardware")
+    if args.hardware_recovery_reboot and args.target != "hardware":
+        parser.error("--hardware-recovery-reboot requires --target hardware")
+    if args.hardware_recovery_reboot and args.skip_hardware_reset:
+        parser.error("--hardware-recovery-reboot cannot be combined with --skip-hardware-reset")
     if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
         parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
 
@@ -1009,6 +1071,8 @@ def main(argv: list[str] | None = None) -> int:
         candidate_replay=args.candidate_replay,
         external_executor=external_executor,
         reset_hardware=not args.skip_hardware_reset,
+        hardware_preflight_completed=args.hardware_preflight_completed,
+        hardware_recovery_reboot=args.hardware_recovery_reboot,
     )
 
     print(

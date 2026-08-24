@@ -211,8 +211,11 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_errors_keep_raw_diagnostics_behind_product_summaries(self) -> None:
         for token in (
             "function issuePresentation(",
+            "function knownIssueSummary(",
             "服务暂时不可用，请稍后重试。",
             "无法连接服务，请检查服务状态后重试。",
+            "手表暂未响应，请确认 SuperCom 已连接并唤醒屏幕后重试。",
+            "暂时无法读取手表截图，请重新连接 USB 后重试。",
             "error.diagnosticMessage = diagnosticMessage;",
             "error.code = 'NETWORK_ERROR';",
             "error.payload = payload;",
@@ -246,6 +249,28 @@ class FrontendAssetsTest(unittest.TestCase):
             "<summary>诊断信息</summary>",
         ):
             self.assertIn(token, self.javascript)
+
+        check_copy_start = self.javascript.index("const ENVIRONMENT_CHECK_COPY")
+        check_copy_end = self.javascript.index("function environmentLogRows(", check_copy_start)
+        check_copy = self.javascript[check_copy_start:check_copy_end]
+        for token in (
+            "label: '手表连接'",
+            "label: 'USB 连接'",
+            "label: '截图读取'",
+            "label: '手表响应'",
+            "knownIssueSummary(item.code) || copy.fail",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, check_copy)
+        for token in (
+            "SuperCom 管道",
+            "MTP 命名空间",
+            "UART/GUI 数据面",
+            "environment-check-code",
+            "item.action ?",
+        ):
+            with self.subTest(token=token):
+                self.assertNotIn(token, check_copy)
         for token in (".environment-check-detail", ".environment-log .inline-diagnostics"):
             self.assertIn(token, self.stylesheet)
 
@@ -300,6 +325,25 @@ class FrontendAssetsTest(unittest.TestCase):
             '.ble-connection-status[data-tone="success"]',
         ):
             self.assertIn(token, self.stylesheet)
+
+    def test_ble_discovery_copy_uses_plain_device_language(self) -> None:
+        for token in (
+            "正在查找附近的蓝牙设备",
+            "查找过程不会连接任何设备",
+            "找到 ${bleDiscoveredDevices.length} 个蓝牙设备",
+            "本次未发现蓝牙设备",
+            "未命名设备",
+            "点击“查找设备”开始",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertIn('id="ble-discovered-count" class="chip chip-pending">0 个', self.index)
+        for token in (
+            "正在查找附近的手表",
+            "发现 ${bleDiscoveredDevices.length} 台手表",
+            "本次扫描未发现匹配手表",
+            "BLE 超时必须",
+        ):
+            self.assertNotIn(token, self.javascript)
 
     def test_hardware_settings_expose_supercom_port_selector(self) -> None:
         self.assertIn("SuperCom 端口", self.index)

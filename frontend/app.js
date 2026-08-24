@@ -114,6 +114,7 @@ const TEST_WORKFLOW_NODES = ['load', 'execute', 'judge', 'record'];
 const TEST_NODE_LABELS = {
   load: '准备测试',
   reset: '准备设备',
+  prepare: '准备设备',
   execute: '执行操作',
   judge: '检查结果',
   record: '保存结果'
@@ -153,13 +154,29 @@ const ISSUE_SUMMARIES = Object.freeze({
   RESULT_MISSING: '任务没有返回有效结果，请重试。',
   HISTORY_WRITE_FAILED: '结果保存失败，请重试。',
   HARDWARE_INFRASTRUCTURE_FAILURE: '设备连接异常，请检查连接后重试。',
-  EVIDENCE_INCOMPLETE: '证据不完整，暂时无法确认结果。'
+  EVIDENCE_INCOMPLETE: '证据不完整，暂时无法确认结果。',
+  PROFILE_INVALID: '测试配置不可用，请联系维护人员。',
+  PORT_NOT_SELECTED: '尚未选择手表连接，请先在系统设置中完成真机连接。',
+  SUPERCOM_PIPE_UNAVAILABLE: '未检测到可用的手表连接，请打开 SuperCom 并重新连接手表。',
+  SUPERCOM_NO_UART: '手表暂未响应，请确认 SuperCom 已连接并唤醒屏幕后重试。',
+  USB_DEVICE_NOT_PRESENT: '未检测到手表的 USB 连接，请重新连接后重试。',
+  USB_TARGET_AMBIGUOUS: '检测到多台手表，请只保留当前要测试的一台。',
+  MTP_NAMESPACE_NOT_READY: '暂时无法读取手表截图，请重新连接 USB 后重试。',
+  LLM_NOT_READY: '结果判定服务暂时不可用，请检查网络和模型服务设置后重试。',
+  TARGET_BUSY: '手表正在执行其他任务，请等待任务结束后再检查。',
+  PREFLIGHT_INTERNAL_ERROR: '环境检查未完成，请重试；如仍失败，请联系维护人员。',
+  HARDWARE_PREPARATION_FAILED: '手表未能回到测试起始状态，请检查连接后重试。'
 });
+
+function knownIssueSummary(reasonCode = '') {
+  return ISSUE_SUMMARIES[String(reasonCode || '').trim().toUpperCase()] || '';
+}
 
 function issuePresentation({fallback = '操作未完成，请重试。', status = 0, reasonCode = '', detail = ''} = {}) {
   const rawDetail = String(detail ?? '').trim();
   const code = String(reasonCode || '').trim().toUpperCase();
-  if (ISSUE_SUMMARIES[code]) return {summary: ISSUE_SUMMARIES[code], detail: rawDetail, code};
+  const knownSummary = knownIssueSummary(code);
+  if (knownSummary) return {summary: knownSummary, detail: rawDetail, code};
   const friendly = friendlyAgentError(rawDetail);
   if (friendly && friendly !== rawDetail) return {summary: friendly, detail: rawDetail, code};
   if (status >= 500 || /Traceback|\b(?:TypeError|ValueError|KeyError|RuntimeError|FileNotFoundError)\b|服务器错误\s*[:：]/i.test(rawDetail)) {
@@ -3541,7 +3558,7 @@ function initSystemSettings() {
   const bleTimeout = () => {
     const value = Number(hwBleScanTimeout?.value || 15);
     if (!Number.isFinite(value) || value < 1 || value > 60) {
-      throw new Error('BLE 超时必须是 1 到 60 秒之间的数字');
+      throw new Error('查找和连接超时必须是 1 到 60 秒之间的数字');
     }
     return value;
   };
@@ -3584,7 +3601,8 @@ function initSystemSettings() {
   };
   const bleDeviceRow = (device, kind) => {
     const address = String(device.address || '').trim();
-    const name = String(device.name || '').trim() || '未命名手表';
+    const rawName = String(device.name || '').trim();
+    const name = rawName || '未命名设备';
     const selected = bleAddressKey(address) === bleAddressKey(hwBleAddress?.value);
     const remembered = bleRememberedDevices.some(item => bleAddressKey(item.address) === bleAddressKey(address));
     const hasRssi = device.rssi !== null && device.rssi !== undefined && Number.isFinite(Number(device.rssi));
@@ -3592,7 +3610,7 @@ function initSystemSettings() {
       ? (hasRssi ? `信号 ${Number(device.rssi)} dBm` : '信号强度未知')
       : `最近连接 ${device.last_connected_at ? formatTime(device.last_connected_at) : '时间未知'}`;
     const actions = kind === 'discovered'
-      ? `<button class="ble-device-action is-primary" type="button" data-ble-action="connect" data-address="${escapeHtml(address)}" data-name="${escapeHtml(name === '未命名手表' ? '' : name)}" ${bleBusy ? 'disabled' : ''}>${remembered ? '重新连接' : '连接'}</button>`
+      ? `<button class="ble-device-action is-primary" type="button" data-ble-action="connect" data-address="${escapeHtml(address)}" data-name="${escapeHtml(rawName)}" ${bleBusy ? 'disabled' : ''}>${remembered ? '重新连接' : '连接'}</button>`
       : `<button class="ble-device-action" type="button" data-ble-action="select" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>${selected ? '当前目标' : '设为目标'}</button><button class="ble-device-action is-danger" type="button" data-ble-action="delete" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>删除</button>`;
     return `<article class="ble-device-card ${selected ? 'is-selected' : ''}">
       <div class="ble-device-card-copy"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(address)}</code><small>${escapeHtml(meta)} · ${kind === 'discovered' ? '未连接' : '已保存'}</small></div>
@@ -3603,12 +3621,12 @@ function initSystemSettings() {
     const query = bleSearchInput?.value || '';
     const discovered = bleDiscoveredDevices.filter(device => bleDeviceMatches(device, query));
     const remembered = bleRememberedDevices.filter(device => bleDeviceMatches(device, query));
-    if (bleDiscoveredCount) bleDiscoveredCount.textContent = `${discovered.length} 台`;
-    if (bleRememberedCount) bleRememberedCount.textContent = `${remembered.length} 台`;
+    if (bleDiscoveredCount) bleDiscoveredCount.textContent = `${discovered.length} 个`;
+    if (bleRememberedCount) bleRememberedCount.textContent = `${remembered.length} 个`;
     if (bleDiscoveredList) {
       const emptyText = !bleHasScanned
-        ? '点击“扫描设备”开始发现'
-        : (bleDiscoveredDevices.length && query ? '没有匹配名称或地址的发现设备' : '本次扫描未发现匹配手表');
+        ? '点击“查找设备”开始'
+        : (bleDiscoveredDevices.length && query ? '没有找到匹配名称或地址的设备' : '本次未发现蓝牙设备');
       bleDiscoveredList.innerHTML = discovered.length
         ? discovered.map(device => bleDeviceRow(device, 'discovered')).join('')
         : `<div class="ble-device-empty">${escapeHtml(emptyText)}</div>`;
@@ -3775,16 +3793,16 @@ function initSystemSettings() {
       const timeout = bleTimeout();
       setBleBusy(true);
       bleScanButton.textContent = '正在查找…';
-      setBleConnectionStatus('pending', '正在查找附近的手表', '查找过程不会连接设备');
+      setBleConnectionStatus('pending', '正在查找附近的蓝牙设备', '查找过程不会连接任何设备');
       const query = String(bleSearchInput?.value || '').trim();
       const data = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(timeout)}&q=${encodeURIComponent(query)}`);
       bleDiscoveredDevices = Array.isArray(data.items) ? data.items : [];
       bleHasScanned = true;
       renderBleDevices();
       refreshSelectedBleStatus();
-      showToast(`发现 ${bleDiscoveredDevices.length} 台手表`);
+      showToast(`找到 ${bleDiscoveredDevices.length} 个蓝牙设备`);
     } catch (error) {
-      setBleConnectionStatus('error', '查找手表失败', error.message);
+      setBleConnectionStatus('error', '查找蓝牙设备失败', error.message);
       showToast(error.message, 'error');
     } finally {
       setBleBusy(false);
@@ -4705,6 +4723,12 @@ function environmentSection() {
 const ENVIRONMENT_CHECK_COPY = Object.freeze({
   source: {label: '项目文件', pass: '项目文件可用', warning: '项目文件需要配置', fail: '项目文件不可用'},
   profile: {label: '真机配置', pass: '真机配置可用', warning: '真机配置需要完善', fail: '真机配置不可用'},
+  supercom_pipe: {label: '手表连接', pass: '手表连接可用', warning: '手表连接需要检查', fail: '手表连接不可用'},
+  usb_pnp: {label: 'USB 连接', pass: '手表已通过 USB 连接', warning: 'USB 连接需要检查', fail: 'USB 连接不可用'},
+  mtp_namespace: {label: '截图读取', pass: '可以读取手表截图', warning: '截图读取需要检查', fail: '暂时无法读取手表截图'},
+  gui_ping: {label: '手表响应', pass: '手表可以接收测试操作', warning: '手表响应需要检查', fail: '手表暂未响应测试操作'},
+  target_busy: {label: '当前手表', pass: '当前手表可用', warning: '当前手表需要检查', fail: '当前手表正在使用中'},
+  internal: {label: '环境检查', pass: '环境检查可用', warning: '环境检查需要重试', fail: '环境检查未完成'},
   config: {label: '用例配置', pass: '用例配置可用', warning: '用例配置需要完善', fail: '用例配置不可用'},
   artifact: {label: '测试程序', pass: '测试程序可用', warning: '测试程序尚未准备好', fail: '测试程序不可用'},
   command: {label: '操作能力', pass: '操作能力可用', warning: '操作能力需要检查', fail: '操作能力不可用'},
@@ -4724,7 +4748,7 @@ function environmentCheckPresentation(item = {}, status = 'unchecked') {
   if (['pass', 'ready'].includes(status)) return {label: copy.label, summary: copy.pass, detail};
   if (status === 'unchecked') return {label: copy.label, summary: '尚未检查', detail: ''};
   if (status === 'warning') return {label: copy.label, summary: copy.warning, detail};
-  return {label: copy.label, summary: copy.fail, detail};
+  return {label: copy.label, summary: knownIssueSummary(item.code) || copy.fail, detail};
 }
 
 function environmentCheckRows(checks = [], isHardware = false) {
@@ -4828,7 +4852,7 @@ function EnvironmentPage(project = currentProject()) {
       });
       root.querySelector('[data-environment-check]')?.addEventListener('click', async event => {
         event.currentTarget.disabled = true;
-        try { await api(`/api/environments/${encodeURIComponent(project)}/check`, {method: 'POST', body: '{}'}); showToast('环境检查已启动'); route(); } catch (error) { event.currentTarget.disabled = false; showToast(error.message, 'error'); }
+        try { await api(`/api/environments/${encodeURIComponent(project)}/check`, {method: 'POST', body: '{}'}); showToast('环境检查已完成'); route(); } catch (error) { event.currentTarget.disabled = false; showToast(error.message, 'error'); }
       });
     },
     destroy() {}

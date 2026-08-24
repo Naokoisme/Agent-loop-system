@@ -44,7 +44,7 @@ class _FakeHardwareSession:
         return True
 
 
-def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
+def test_hardware_single_case_soft_prepares_before_starting_6202_mapping() -> None:
     case = CaseEntry(
         case_id="CALC_001",
         sheet="计算器",
@@ -77,20 +77,21 @@ def test_hardware_single_case_resets_before_starting_6202_mapping() -> None:
             return_value=session,
         ) as session_class,
         mock.patch(
-            "agent_loop_system.tools.real_device.reset_hardware_case_state"
-        ) as reset,
+            "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+        ) as prepare,
     ):
         result = run_single_case(
             "计算器",
             "CALC_001",
             str(Path(temporary) / "capture.bmp"),
             target="hardware",
+            hardware_preflight_completed=True,
         )
 
     loader.assert_called_once_with("计算器", target="hardware")
     profile_loader.assert_called_once_with(project="6202_W5230")
-    reset.assert_called_once_with(
-        evidence_dir=Path(temporary).resolve() / "hardware-reset"
+    prepare.assert_called_once_with(
+        evidence_dir=Path(temporary).resolve() / "hardware-preparation"
     )
     self_kwargs = session_class.call_args.kwargs
     assert "manage_test_session" not in self_kwargs
@@ -121,13 +122,13 @@ def test_hardware_fixed_case_rejects_a_command_missing_from_the_runtime_profile(
         mock.patch(
             "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
             return_value=runtime_profile,
-        ),
+        ) as profile_loader,
         mock.patch(
             "agent_loop_system.tools.real_device.RealDeviceSession"
         ) as session_class,
         mock.patch(
-            "agent_loop_system.tools.real_device.reset_hardware_case_state"
-        ) as reset,
+            "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+        ) as prepare,
     ):
         with pytest.raises(ValueError, match="运行时档案.*NOT_IN_FIRMWARE"):
             run_single_case(
@@ -135,9 +136,10 @@ def test_hardware_fixed_case_rejects_a_command_missing_from_the_runtime_profile(
                 case.case_id,
                 str(Path(temporary) / "capture.bmp"),
                 target="hardware",
+                hardware_preflight_completed=True,
             )
 
-    reset.assert_not_called()
+    prepare.assert_not_called()
     session_class.assert_not_called()
 
 
@@ -234,6 +236,7 @@ def test_hardware_agent_exploration_honors_parent_reset_boundary() -> None:
             target="hardware",
             case_map_profile="6202_W5230",
             reset_hardware=False,
+            hardware_preflight_completed=True,
         )
 
     assert result is expected
@@ -245,7 +248,103 @@ def test_hardware_agent_exploration_honors_parent_reset_boundary() -> None:
         project="6202_W5230",
         hardware_runtime_profile=mock.sentinel.runtime_profile,
         reset_hardware=False,
+        hardware_recovery_reboot=False,
+        hardware_preflight_completed=True,
     )
+
+
+def test_hardware_preflight_failure_starts_no_preparation_or_case_session() -> None:
+    from agent_loop_system.tools.hardware_preflight import (
+        HardwarePreflightFailed,
+        target_busy_preflight,
+    )
+
+    case = CaseEntry(
+        case_id="CALC_001",
+        sheet="计算器",
+        actions=[":ENTER_PAGE:CALCULATOR,0"],
+        mapping_status="PROMOTED",
+    )
+    runtime_profile = mock.Mock(command_capabilities={
+        "ENTER_PAGE": mock.Mock(available=True, unavailable_reason=None)
+    })
+    with (
+        tempfile.TemporaryDirectory() as temporary,
+        mock.patch(
+            "agent_loop_system.tools.test.load_case_map",
+            return_value={case.case_id: case},
+        ),
+        mock.patch(
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=runtime_profile,
+        ) as profile_loader,
+        mock.patch(
+            "agent_loop_system.tools.hardware_preflight.require_hardware_preflight",
+            side_effect=HardwarePreflightFailed(target_busy_preflight()),
+        ),
+        mock.patch(
+            "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+        ) as prepare,
+        mock.patch(
+            "agent_loop_system.tools.real_device.RealDeviceSession"
+        ) as session,
+    ):
+        with pytest.raises(HardwarePreflightFailed):
+            run_single_case(
+                case.sheet,
+                case.case_id,
+                str(Path(temporary) / "capture.bmp"),
+                target="hardware",
+            )
+
+    prepare.assert_not_called()
+    session.assert_not_called()
+    profile_loader.assert_not_called()
+
+
+def test_explicit_recovery_flag_uses_guarded_reboot_instead_of_soft_prepare() -> None:
+    case = CaseEntry(
+        case_id="CALC_001",
+        sheet="计算器",
+        actions=[":ENTER_PAGE:CALCULATOR,0"],
+        mapping_status="PROMOTED",
+    )
+    runtime_profile = mock.Mock(command_capabilities={
+        "ENTER_PAGE": mock.Mock(available=True, unavailable_reason=None)
+    })
+    session = _FakeHardwareSession()
+    with (
+        tempfile.TemporaryDirectory() as temporary,
+        mock.patch(
+            "agent_loop_system.tools.test.load_case_map",
+            return_value={case.case_id: case},
+        ),
+        mock.patch(
+            "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile",
+            return_value=runtime_profile,
+        ),
+        mock.patch(
+            "agent_loop_system.tools.real_device.RealDeviceSession",
+            return_value=session,
+        ),
+        mock.patch(
+            "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+        ) as prepare,
+        mock.patch(
+            "agent_loop_system.tools.real_device.reset_hardware_case_state"
+        ) as recovery,
+    ):
+        run_single_case(
+            case.sheet,
+            case.case_id,
+            str(Path(temporary) / "capture.bmp"),
+            target="hardware",
+            hardware_preflight_completed=True,
+            hardware_recovery_reboot=True,
+        )
+
+    prepare.assert_not_called()
+    recovery.assert_called_once()
 
 
 def test_cli_accepts_parent_hardware_reset_boundary() -> None:
@@ -292,7 +391,48 @@ def test_cli_accepts_parent_hardware_reset_boundary() -> None:
         candidate_replay=False,
         external_executor=None,
         reset_hardware=False,
+        hardware_preflight_completed=False,
+        hardware_recovery_reboot=False,
     )
+
+
+def test_cli_forwards_explicit_hardware_recovery_reboot() -> None:
+    from agent_loop_system.tools import test as test_tool
+
+    result = CaseRunResult(
+        case_id="CALC_001",
+        sheet="计算器",
+        expected_text="显示计算器",
+        execution_mode="fixed_mapping",
+    )
+    decision = mock.Mock(verdict="PASS", reason="符合预期")
+    with (
+        mock.patch("agent_loop_system.main._load_env"),
+        mock.patch.object(test_tool, "run_single_case", return_value=result) as runner,
+        mock.patch.object(test_tool, "judge_case_result", return_value=decision),
+        mock.patch.object(
+            test_tool,
+            "save_evidence",
+            return_value=Path("D:/evidence/test_result.json"),
+        ),
+    ):
+        exit_code = test_tool.main([
+            "--sheet",
+            "计算器",
+            "--case-id",
+            "CALC_001",
+            "--target",
+            "hardware",
+            "--case-map-profile",
+            "6202_W5230",
+            "--screenshot-path",
+            "D:/evidence/capture.bmp",
+            "--hardware-recovery-reboot",
+        ])
+
+    assert exit_code == 0
+    assert runner.call_args.kwargs["reset_hardware"] is True
+    assert runner.call_args.kwargs["hardware_recovery_reboot"] is True
 
 
 def test_graph_case_mode_uses_the_same_single_case_runner() -> None:
@@ -352,8 +492,12 @@ def test_graph_hardware_command_mode_uses_shared_case_reset() -> None:
                 "agent_loop_system.tools.hardware_target.HardwareTargetConfig.from_env"
             ),
             mock.patch(
-                "agent_loop_system.tools.real_device.reset_hardware_case_state"
-            ) as reset,
+                "agent_loop_system.tools.hardware_preflight.require_hardware_preflight",
+                return_value=mock.Mock(),
+            ) as preflight,
+            mock.patch(
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+            ) as prepare,
             mock.patch(
                 "agent_loop_system.tools.real_device.RealDeviceSession",
                 return_value=session,
@@ -371,8 +515,17 @@ def test_graph_hardware_command_mode_uses_shared_case_reset() -> None:
                 "target": "hardware",
             })
 
-        reset.assert_called_once_with(
-            evidence_dir=evidence_root / "graph-hardware" / "hardware-reset"
+        preflight.assert_called_once_with(
+            evidence_dir=evidence_root / "graph-hardware" / "preflight",
+            persist_paths=(
+                evidence_root / "graph-hardware" / "preflight.json",
+                graph_module._RUNTIME_PATHS.environment_checks
+                / "6202_W5230"
+                / "preflight.json",
+            ),
+        )
+        prepare.assert_called_once_with(
+            evidence_dir=evidence_root / "graph-hardware" / "hardware-preparation"
         )
         assert session.started
         assert session.stopped

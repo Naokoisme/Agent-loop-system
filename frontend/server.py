@@ -68,7 +68,7 @@ from agent_loop_system.tools.watch_ble import (
     WatchBleClient,
     WatchBleConnectionError,
     WatchBleDevice,
-    scan_watches,
+    discover_ble_devices,
 )
 
 
@@ -386,6 +386,36 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
     return execution_env
 
 
+def _hardware_case_llm_scope(
+    case: dict[str, Any],
+    *,
+    candidate_replay: bool = False,
+) -> str:
+    promoted = bool(case.get("is_promoted")) or str(
+        case.get("mapping_status") or ""
+    ).strip().upper() == "PROMOTED"
+    return "fixed" if promoted or candidate_replay else "exploration"
+
+
+def _configured_hardware_llm_scopes(
+    environment: dict[str, str],
+) -> tuple[str, ...]:
+    scopes = [
+        scope
+        for scope, key_name, model_name in (
+            ("fixed", "OPENAI_API_KEY_FIXED", "OPENAI_FIXED_MODEL"),
+            (
+                "exploration",
+                "OPENAI_API_KEY_EXPLORATION",
+                "OPENAI_EXPLORATION_MODEL",
+            ),
+        )
+        if str(environment.get(key_name) or "").strip()
+        or str(environment.get(model_name) or "").strip()
+    ]
+    return tuple(scopes)
+
+
 @dataclass(frozen=True)
 class AppPaths:
     root: Path
@@ -397,6 +427,7 @@ class AppPaths:
     evidence: Path
     case_map: Path
     runtime_jobs: Path
+    environment_checks: Path
 
     @classmethod
     def from_root(cls, root: Path) -> "AppPaths":
@@ -411,6 +442,7 @@ class AppPaths:
             evidence=runtime_paths.evidence,
             case_map=runtime_paths.case_map,
             runtime_jobs=runtime_paths.runtime_jobs,
+            environment_checks=runtime_paths.environment_checks,
         )
 
 
@@ -2962,13 +2994,66 @@ class CaseTestManager:
         ), execution.get("execution_reason"))
         return cls._concise_execution_error(matching)
 
+    def _run_job_hardware_preflight(
+        self,
+        *,
+        job_id: str,
+        project_meta: dict[str, str],
+        environment: dict[str, str],
+        llm_scopes: tuple[str, ...],
+    ) -> Any:
+        """Run and persist the execution-owned fresh hardware gate."""
+
+        from agent_loop_system.tools.hardware_preflight import (
+            internal_error_preflight,
+            persist_hardware_preflight,
+            run_hardware_preflight,
+        )
+
+        job_root = self.paths.runtime_jobs / job_id
+        try:
+            result = run_hardware_preflight(
+                project=project_meta["project"],
+                evidence_dir=job_root / "preflight-evidence",
+                environment=environment,
+                llm_scopes=llm_scopes,
+            )
+        except Exception as exc:
+            result = internal_error_preflight(
+                exc,
+                project=project_meta["project"],
+            )
+        persist_paths = (
+            job_root / "preflight.json",
+            _hardware_preflight_path(self.paths, project_meta["project"]),
+        )
+        try:
+            for path in persist_paths:
+                persist_hardware_preflight(result, path)
+        except Exception as exc:
+            result = internal_error_preflight(
+                f"preflight 结果落盘失败: {exc}",
+                project=project_meta["project"],
+            )
+            for path in persist_paths:
+                try:
+                    persist_hardware_preflight(result, path)
+                except Exception:
+                    pass
+        with self._lock:
+            job = self._jobs[job_id]
+            job["preflight"] = result.to_dict()
+            self._persist_test_job_locked(job)
+        return result
+
     def _execute_case(
         self,
         *,
         job_id: str,
         case: dict[str, Any],
         job_dir: Path,
-        hardware_reset_completed: bool = False,
+        hardware_preflight_completed: bool = False,
+        hardware_preparation_completed: bool = False,
     ) -> dict[str, Any]:
         project_meta = _test_project(str(case.get("project") or DEFAULT_TEST_PROJECT))
         job_dir.mkdir(parents=True, exist_ok=True)
@@ -2993,9 +3078,13 @@ class CaseTestManager:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
         if candidate_replay:
             child_args.append("--candidate-replay")
-        if hardware_reset_completed:
+        if hardware_preflight_completed:
             if project_meta["execution_target"] != "hardware":
-                raise ValueError("hardware_reset_completed 只适用于真机用例")
+                raise ValueError("hardware_preflight_completed 只适用于真机用例")
+            child_args.append("--hardware-preflight-completed")
+        if hardware_preparation_completed:
+            if project_meta["execution_target"] != "hardware":
+                raise ValueError("hardware_preparation_completed 只适用于真机用例")
             child_args.append("--skip-hardware-reset")
         argv = build_child_command("test", child_args)
         stdout = ""
@@ -3184,7 +3273,8 @@ class CaseTestManager:
                 job = self._jobs.get(job_id)
                 process = job.get("process") if job is not None else None
                 if job is not None and (
-                    job.get("cancel_requested") or job.get("status") == "failed"
+                    job.get("cancel_requested")
+                    or job.get("status") in {"failed", "interrupted"}
                 ):
                     context = job.get("promotion_context")
                     if isinstance(context, dict) and job.get("promotion_status") not in {
@@ -3269,7 +3359,49 @@ class CaseTestManager:
                 self._persist_promotion_state(job, status="running")
             self._persist_single_test_locked(job)
 
-        execution = self._execute_case(job_id=job_id, case=job["case"], job_dir=job_dir)
+        hardware_preflight_completed = False
+        if project_meta["execution_target"] == "hardware":
+            hardware_environment = _test_process_environment(project_meta)
+            hardware_case = job["case"]
+            hardware_llm_scope = _hardware_case_llm_scope(
+                hardware_case,
+                candidate_replay=bool(job.get("candidate_replay")),
+            )
+            preflight = self._run_job_hardware_preflight(
+                job_id=job_id,
+                project_meta=project_meta,
+                environment=hardware_environment,
+                llm_scopes=(hardware_llm_scope,),
+            )
+            if not preflight.ready:
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "interrupted"
+                    job["workflow_status"] = "interrupted"
+                    job["execution_status"] = "ERROR"
+                    job["evidence_status"] = "PENDING"
+                    job["reason_code"] = (
+                        preflight.primary_code or "PREFLIGHT_INTERNAL_ERROR"
+                    )
+                    job["verdict"] = "CANNOT_VERIFY"
+                    job["reason"] = preflight.primary_detail
+                    job["error"] = preflight.primary_detail
+                    job["interruption_reason"] = preflight.primary_detail
+                    job["completed"] = 0
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    job["nodes"]["execute"] = "fail"
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_single_test_locked(job)
+                return
+            hardware_preflight_completed = True
+
+        execution = self._execute_case(
+            job_id=job_id,
+            case=job["case"],
+            job_dir=job_dir,
+            hardware_preflight_completed=hardware_preflight_completed,
+        )
         result = execution["result"]
         for key, value in outcome_fields(
             result,
@@ -3458,36 +3590,53 @@ class CaseTestManager:
             execution_target = str(job.get("execution_target") or "simulator")
 
         hardware_environment: dict[str, str] | None = None
+        hardware_preflight_completed = False
         if execution_target == "hardware":
-            try:
-                from agent_loop_system.tools.hardware_runtime_profile import (
-                    load_hardware_runtime_profile,
-                )
-
-                project_meta = _test_project(
-                    str(job.get("project") or DEFAULT_TEST_PROJECT)
-                )
-                hardware_environment = _test_process_environment(project_meta)
-                load_hardware_runtime_profile(
-                    project=project_meta["project"],
-                    profiles_root=hardware_environment.get("W30_HARDWARE_PROFILE_ROOT") or None,
-                    version=hardware_environment.get("W30_HARDWARE_PROFILE_VERSION") or None,
-                )
-            except Exception as exc:
+            project_meta = _test_project(
+                str(job.get("project") or DEFAULT_TEST_PROJECT)
+            )
+            hardware_environment = _test_process_environment(project_meta)
+            remaining_start = min(
+                max(int(job.get("completed") or 0), 0),
+                len(job.get("cases", [])),
+            )
+            hardware_llm_scopes = tuple(dict.fromkeys(
+                _hardware_case_llm_scope(case)
+                for case in job.get("cases", [])[remaining_start:]
+            ))
+            preflight = self._run_job_hardware_preflight(
+                job_id=job_id,
+                project_meta=project_meta,
+                environment=hardware_environment,
+                llm_scopes=hardware_llm_scopes,
+            )
+            if not preflight.ready:
                 with self._lock:
                     job = self._jobs[job_id]
-                    job["hardware_reset"] = {
+                    job["hardware_preparation"] = {
                         "checked_at": _now(),
                         "status": "failed",
-                        "error": str(exc),
+                        "error": preflight.primary_detail,
+                        "code": preflight.primary_code,
                     }
-                    job["status"] = "failed"
-                    job["error"] = f"真机运行时档案初始化失败: {exc}"
+                    job["hardware_reset"] = dict(job["hardware_preparation"])
+                    job["status"] = "interrupted"
+                    job["workflow_status"] = "interrupted"
+                    job["execution_status"] = "ERROR"
+                    job["evidence_status"] = "PENDING"
+                    job["reason_code"] = (
+                        preflight.primary_code or "PREFLIGHT_INTERNAL_ERROR"
+                    )
+                    job["verdict"] = "CANNOT_VERIFY"
+                    job["reason"] = preflight.primary_detail
+                    job["error"] = preflight.primary_detail
+                    job["interruption_reason"] = preflight.primary_detail
                     job["finished_at"] = _now()
                     job["current_node"] = None
                     self._release_execution_slot_locked(job_id)
                     self._persist_batch_locked(job)
                 return
+            hardware_preflight_completed = True
 
         with self._lock:
             job = self._jobs[job_id]
@@ -3539,33 +3688,38 @@ class CaseTestManager:
                 job["current_runtime_dir"] = str(case_dir)
                 job["current_runtime_archived"] = False
                 job["current_node"] = (
-                    "reset" if execution_target == "hardware" else "execute"
+                    "prepare" if execution_target == "hardware" else "execute"
                 )
                 self._persist_batch_locked(job)
 
             if execution_target == "hardware":
                 try:
                     from agent_loop_system.tools.real_device import (
-                        reset_hardware_case_state,
+                        prepare_hardware_case_state,
                     )
 
-                    reset = reset_hardware_case_state(
-                        evidence_dir=case_dir / "hardware-reset",
+                    preparation = prepare_hardware_case_state(
+                        evidence_dir=case_dir / "hardware-preparation",
                         environment=hardware_environment,
                     )
                 except Exception as exc:
                     interruption_reason = (
-                        f"真机清理失败，未启动第 {index} 条 {case['case_id']}：{exc}"
+                        f"真机状态准备失败，未启动第 {index} 条 {case['case_id']}：{exc}"
                     )
                     with self._lock:
                         job = self._jobs[job_id]
-                        job["hardware_reset"] = {
+                        job["hardware_preparation"] = {
                             "checked_at": _now(),
                             "status": "failed",
                             "case_id": case["case_id"],
                             "error": str(exc),
                         }
+                        job["hardware_reset"] = dict(job["hardware_preparation"])
                         job["status"] = "interrupted"
+                        job["workflow_status"] = "interrupted"
+                        job["execution_status"] = "ERROR"
+                        job["verdict"] = "CANNOT_VERIFY"
+                        job["reason_code"] = "HARDWARE_PREPARATION_FAILED"
                         job["error"] = str(exc)
                         job["interruption_reason"] = interruption_reason
                         job["finished_at"] = _now()
@@ -3578,20 +3732,24 @@ class CaseTestManager:
                     return
                 with self._lock:
                     job = self._jobs[job_id]
-                    job["hardware_reset"] = {
+                    job["hardware_preparation"] = {
                         "checked_at": _now(),
                         "status": "ready",
                         "case_id": case["case_id"],
-                        "reboot_status": reset.reboot_status,
-                        "lease_seconds": reset.status.lease_seconds,
-                        "gui_ping_attempts": reset.gui_ping_attempts,
-                        "bootstrap_event_seen": reset.bootstrap_event_seen,
-                        "current_page": reset.current_page,
-                        "popup": reset.popup,
+                        "reboot_status": preparation.reboot_status,
+                        "lease_seconds": preparation.status.lease_seconds,
+                        "gui_ping_attempts": preparation.gui_ping_attempts,
+                        "bootstrap_event_seen": preparation.bootstrap_event_seen,
+                        "current_page": preparation.current_page,
+                        "popup": preparation.popup,
                     }
-                    job["hardware_reset_count"] = int(
-                        job.get("hardware_reset_count") or 0
+                    job["hardware_reset"] = dict(job["hardware_preparation"])
+                    job["hardware_preparation_count"] = int(
+                        job.get("hardware_preparation_count")
+                        or job.get("hardware_reset_count")
+                        or 0
                     ) + 1
+                    job["hardware_reset_count"] = job["hardware_preparation_count"]
                     job["current_node"] = "execute"
                     self._persist_batch_locked(job)
 
@@ -3599,7 +3757,8 @@ class CaseTestManager:
                 job_id=job_id,
                 case=case,
                 job_dir=case_dir,
-                hardware_reset_completed=execution_target == "hardware",
+                hardware_preflight_completed=hardware_preflight_completed,
+                hardware_preparation_completed=execution_target == "hardware",
             )
             with self._lock:
                 cancel_requested = bool(self._jobs[job_id].get("cancel_requested"))
@@ -4327,6 +4486,63 @@ class WebApplication:
                 raise RuntimeError("已有缺陷修复任务正在运行")
             return self.test_jobs.resume_batch(job_id)
 
+    def check_environment(self, project: str) -> dict[str, Any]:
+        """Run an explicit live probe; page reads never call this method."""
+
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        if project_meta["execution_target"] != "hardware":
+            return next(
+                item
+                for item in _get_environments_status(self.paths)
+                if item["project"] == project
+            )
+
+        from agent_loop_system.tools.hardware_preflight import (
+            internal_error_preflight,
+            persist_hardware_preflight,
+            run_hardware_preflight,
+            target_busy_preflight,
+        )
+
+        with self._execution_lock:
+            active = self.test_jobs.active("hardware")
+            if active is None:
+                repair = self.jobs.active()
+                if repair is not None and str(
+                    repair.get("execution_target") or ""
+                ).lower() == "hardware":
+                    active = repair
+            if active is not None:
+                result = target_busy_preflight(
+                    project=project,
+                    job_id=str(active.get("id") or "") or None,
+                )
+            else:
+                try:
+                    hardware_environment = _test_process_environment(project_meta)
+                    result = run_hardware_preflight(
+                        project=project,
+                        evidence_dir=self.paths.environment_checks / project / "probe",
+                        environment=hardware_environment,
+                        llm_scopes=_configured_hardware_llm_scopes(
+                            hardware_environment
+                        ),
+                    )
+                except Exception as exc:
+                    result = internal_error_preflight(exc, project=project)
+            try:
+                persist_hardware_preflight(
+                    result,
+                    _hardware_preflight_path(self.paths, project),
+                )
+            except Exception as exc:
+                result = internal_error_preflight(
+                    f"preflight 结果落盘失败: {exc}",
+                    project=project,
+                )
+        return _hardware_environment_view(project, result)
+
 
 
 # --- 0.4.0 增强业务辅助方法与协议实现 ---
@@ -4542,7 +4758,7 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
         wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True)
     except Exception as exc:
         raise ValueError(f"Excel 文件无法解析: {exc}")
-        
+
     target_sheets = ["自动化测试用例_v1"] if "自动化测试用例_v1" in wb.sheetnames else wb.sheetnames
     parsed_cases: list[dict[str, Any]] = []
 
@@ -4824,22 +5040,22 @@ class BleDeviceManager:
     @staticmethod
     def _timeout(value: Any) -> float:
         if isinstance(value, bool):
-            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字")
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字")
         try:
             timeout = float(value)
         except (TypeError, ValueError) as exc:
-            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字") from exc
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字") from exc
         if not math.isfinite(timeout) or not 1 <= timeout <= 60:
-            raise ValueError("BLE 超时必须是 1 到 60 秒之间的数字")
+            raise ValueError("查找和连接超时必须是 1 到 60 秒之间的数字")
         return timeout
 
     @staticmethod
     def _address(value: Any) -> str:
         if not isinstance(value, str) or not value.strip():
-            raise ValueError("BLE 设备地址不能为空")
+            raise ValueError("设备地址不能为空")
         address = value.strip()
         if len(address) > 200:
-            raise ValueError("BLE 设备地址过长")
+            raise ValueError("设备地址过长")
         return address
 
     @staticmethod
@@ -4847,10 +5063,10 @@ class BleDeviceManager:
         if value is None:
             return None
         if not isinstance(value, str):
-            raise ValueError("BLE 设备名称必须是字符串")
+            raise ValueError("设备名称格式不正确")
         name = value.strip()
         if len(name) > 200:
-            raise ValueError("BLE 设备名称过长")
+            raise ValueError("设备名称过长")
         return name or None
 
     @staticmethod
@@ -4914,26 +5130,30 @@ class BleDeviceManager:
     def scan(self, *, query: str = "", timeout: Any = 15) -> dict[str, Any]:
         query = str(query or "").strip()
         if len(query) > 200:
-            raise ValueError("BLE 搜索内容过长")
+            raise ValueError("设备搜索内容过长")
         scan_timeout = self._timeout(timeout)
-        address_hint = (
-            query
-            if re.fullmatch(r"(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}", query)
-            else None
-        )
         with self._operation_lock:
-            devices = asyncio.run(
-                scan_watches(timeout=scan_timeout, address=address_hint)
+            devices = asyncio.run(discover_ble_devices(timeout=scan_timeout))
+        named_devices = [
+            device for device in devices if str(device.name or "").strip()
+        ]
+        named_devices.sort(
+            key=lambda device: (
+                device.rssi is None,
+                -device.rssi if device.rssi is not None else 0,
+                str(device.name or "").casefold(),
+                device.address.casefold(),
             )
+        )
         items = [
             {
                 "address": device.address,
-                "name": device.name,
+                "name": str(device.name or "").strip(),
                 "rssi": device.rssi,
                 "status": "discovered",
                 "connected": False,
             }
-            for device in devices
+            for device in named_devices
         ]
         if query:
             needle = query.casefold()
@@ -4959,7 +5179,7 @@ class BleDeviceManager:
         try:
             await asyncio.wait_for(client.connect(pair=False), timeout=timeout)
             if not client.connected:
-                raise WatchBleConnectionError("BLE GATT 连接未进入已连接状态")
+                raise WatchBleConnectionError("手表连接未成功")
         finally:
             try:
                 await asyncio.wait_for(client.close(), timeout=min(timeout, 5.0))
@@ -5050,42 +5270,72 @@ class BleDeviceManager:
         return {"deleted": deleted, "selected_address": selected_address}
 
 
+def _hardware_preflight_path(paths: AppPaths, project: str) -> Path:
+    return paths.environment_checks / project / "preflight.json"
+
+
+def _hardware_environment_view(
+    project: str,
+    result: Any,
+) -> dict[str, Any]:
+    project_meta = _test_project(project)
+    readiness = str(result.readiness_status or "unchecked")
+    legacy_status = {
+        "ready": "ready",
+        "needs_user": "error",
+        "blocked": "error",
+        "unchecked": "partial",
+    }.get(readiness, "error")
+    checked_at = result.checked_at
+    return {
+        "id": project,
+        "project": project,
+        "project_label": project_meta["project_label"],
+        "execution_target": project_meta["execution_target"],
+        "execution_target_label": project_meta["execution_target_label"],
+        "ready": bool(result.ready),
+        "status": legacy_status,
+        "readiness_status": readiness,
+        "last_checked_at": checked_at,
+        "checked_at": checked_at,
+        "checks": [check.to_dict() for check in result.checks],
+        "error_code": result.primary_code,
+        "error_message": result.primary_detail if not result.ready else None,
+        "logs": (
+            [{
+                "at": checked_at,
+                "message": (
+                    f"{project_meta['project_label']} 真机环境探测结果: {readiness}"
+                ),
+            }]
+            if checked_at
+            else []
+        ),
+    }
+
+
 def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
-    """生成全量测试目标的环境就绪状态与检查清单。"""
+    """Return static simulator checks and cached hardware probes only."""
     items = []
     cfg = _get_system_config(paths)
     for proj_key, proj_meta in TEST_PROJECTS.items():
         checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
-        
-        # 1. 普通真机运行只校验版本绑定档案；模拟器仍校验工程工作区。
-        if is_hardware:
-            try:
-                from agent_loop_system.tools.hardware_runtime_profile import (
-                    load_hardware_runtime_profile,
-                )
 
-                runtime_profile = load_hardware_runtime_profile(
-                    project=proj_key,
-                    profiles_root=cfg["hardware"]["profile_root"],
-                    version=cfg["hardware"]["profile_version"] or None,
-                )
-            except Exception as exc:
-                status = "error"
-                detail = f"运行时档案不可用: {exc}"
-            else:
-                status = "pass"
-                detail = (
-                    f"档案 {runtime_profile.version} · 固件 "
-                    f"{runtime_profile.firmware_version} · {runtime_profile.project}"
-                )
-            checks.append({
-                "key": "profile",
-                "label": "真机运行时档案",
-                "status": status,
-                "detail": detail,
-            })
-        elif proj_key == "620C_W6830":
+        if is_hardware:
+            from agent_loop_system.tools.hardware_preflight import (
+                load_cached_hardware_preflight,
+            )
+
+            cached = load_cached_hardware_preflight(
+                _hardware_preflight_path(paths, proj_key),
+                project=proj_key,
+            )
+            items.append(_hardware_environment_view(proj_key, cached))
+            continue
+
+        # 1. Simulator workspace (hardware returned its cached probe above).
+        if proj_key == "620C_W6830":
             src_p = Path(cfg["simulator"]["source_root"])
             status = "pass" if src_p.is_dir() else "warning"
             detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
@@ -5103,22 +5353,16 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
         checks.append({"key": "config", "label": "项目配置", "status": c_status, "detail": c_detail})
         
         # 3. 执行产物
-        if is_hardware:
-            port = cfg["hardware"]["port"]
-            checks.append({"key": "artifact", "label": "执行产物", "status": "pass", "detail": f"真机调试端口: {port}"})
-        else:
-            art_p = Path(proj_meta.get("simulator_artifact_path", cfg["simulator"]["simulator_path"]))
-            a_status = "pass" if art_p.is_file() else "warning"
-            a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
-            checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
+        art_p = Path(proj_meta.get("simulator_artifact_path", cfg["simulator"]["simulator_path"]))
+        a_status = "pass" if art_p.is_file() else "warning"
+        a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
+        checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
             
         # 4. 命令接口
-        cmd_label = "SuperCom 命名管道" if is_hardware else "QuickCmd 协议接口"
-        checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": f"{cmd_label} 已启用"})
+        checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": "QuickCmd 协议接口已启用"})
         
         # 5. 截图能力
-        cap_label = "Windows MTP 传输" if is_hardware else "模拟器宿主窗口捕获"
-        checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": f"{cap_label} 已配置"})
+        checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": "模拟器宿主窗口捕获已配置"})
         
         # 6. 大模型服务
         llm_ready = bool(cfg["llm"]["api_key"] and cfg["llm"]["base_url"])
@@ -6034,7 +6278,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise
             except Exception as exc:
                 self._json(
-                    {"error": f"BLE 扫描失败: {exc}"},
+                    {"error": f"查找蓝牙设备失败：{exc}"},
                     HTTPStatus.BAD_GATEWAY,
                 )
                 return
@@ -6539,8 +6783,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         match = re.fullmatch(r"/api/environments/([^/]+)/check", path)
         if match:
             proj = match.group(1)
-            envs = _get_environments_status(self.app.paths)
-            target_env = next((e for e in envs if e["id"] == proj or e["project"] == proj), envs[0] if envs else {})
+            target_env = self.app.check_environment(proj)
             self._json({"status": "ok", "result": target_env})
             return
 
@@ -6576,7 +6819,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         "verified": False,
                         "connected": False,
                         "connection_mode": "on_demand",
-                        "error": f"BLE 连接验证失败: {exc}",
+                        "error": f"手表连接失败：{exc}",
                     },
                     HTTPStatus.BAD_GATEWAY,
                 )
@@ -6588,7 +6831,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     "connected": False,
                     "connection_mode": "on_demand",
                     "device": device,
-                    "message": "真实 BLE 连接验证成功；连接已释放，后续按需使用",
+                    "message": "手表连接成功；已断开临时连接，后续按需使用",
                 }
             )
             return

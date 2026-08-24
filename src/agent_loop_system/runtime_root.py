@@ -217,6 +217,10 @@ class RuntimePaths:
         return self.root / ".runtime" / "jobs"
 
     @property
+    def environment_checks(self) -> Path:
+        return self.root / ".runtime" / "environment-checks"
+
+    @property
     def env_file(self) -> Path:
         return self.root / ".env"
 

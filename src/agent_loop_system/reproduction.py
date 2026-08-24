@@ -14,6 +14,7 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel, Field, model_validator
 
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.command_protocol import (
     collect_command_json,
     load_current_command_capabilities,
@@ -458,12 +459,14 @@ def interactive_reproduce(
     build_simulator: bool = True,
     hardware_runtime_profile=None,
     reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> ReproductionTrace:
     """在选定目标上按“观察→一个动作→再观察”完成缺陷复现或普通测试。
 
     simulator 保持原有的一次构建、一次会话；hardware 跳过构建，直接使用
     当前已烧录的目标固件，并从版本绑定的运行时档案加载命令与页面能力；
-    默认在首次观察前调用统一真机状态清理入口。
+    默认在首次观察前执行真实 Preflight，并调用无重启真机状态准备入口。
     """
     from agent_loop_system.tools.agent import decide_reproduction_action
     from agent_loop_system.tools.build import BuildConfig, run_build
@@ -477,6 +480,10 @@ def interactive_reproduce(
         raise ValueError("max_actions 必须大于 0")
     if target not in {"simulator", "hardware"}:
         raise ValueError(f"未知执行目标: {target}")
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
+        )
 
     output_dir = Path(evidence_dir).resolve()
     trace = ReproductionTrace(
@@ -495,21 +502,53 @@ def interactive_reproduce(
     capability_knowledge: str | None = None
     try:
         if target == "hardware":
+            hardware_project = str(
+                (test_case or {}).get("project")
+                or os.environ.get("W30_HARDWARE_PROJECT")
+                or "6202_W5230"
+            )
+            if not hardware_preflight_completed:
+                from agent_loop_system.tools.hardware_preflight import (
+                    require_hardware_preflight,
+                )
+                from agent_loop_system.tools.llm_config import (
+                    LLM_API_KEY_SCOPE_EXPLORATION,
+                    llm_api_key_scope,
+                )
+
+                runtime_paths = RuntimePaths.from_root()
+                with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                    require_hardware_preflight(
+                        project=hardware_project,
+                        evidence_dir=output_dir / "preflight",
+                        persist_paths=(
+                            output_dir / "preflight.json",
+                            runtime_paths.environment_checks
+                            / hardware_project
+                            / "preflight.json",
+                        ),
+                    )
             from agent_loop_system.tools.hardware_runtime_profile import (
                 load_hardware_runtime_profile,
             )
             from agent_loop_system.tools.real_device import (
                 RealDeviceSession,
+                prepare_hardware_case_state,
                 reset_hardware_case_state,
             )
 
             runtime_profile = hardware_runtime_profile or load_hardware_runtime_profile(
-                project=str((test_case or {}).get("project") or "") or None,
+                project=hardware_project,
             )
             capabilities = runtime_profile.command_capabilities
             capability_knowledge = runtime_profile.agent_knowledge
             if reset_hardware:
-                reset_hardware_case_state(evidence_dir=output_dir / "hardware-reset")
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=output_dir / "hardware-preparation")
             session: DeviceSession = RealDeviceSession(evidence_dir=output_dir)
         else:
             capabilities = load_current_command_capabilities()

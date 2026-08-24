@@ -36,6 +36,7 @@ from agent_loop_system.tools.watch_ble import (
     _build_parser,
     _error_payload,
     _run_cli,
+    discover_ble_devices,
     scan_watches,
     select_watch,
 )
@@ -183,6 +184,31 @@ class WatchBleScanTest(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
         FakeScanner.calls = []
         FakeScanner.discovered = {}
+
+    async def test_discovery_returns_devices_without_watch_compatibility_filter(self) -> None:
+        watch = SimpleNamespace(address="AA:01", name="fallback")
+        other = SimpleNamespace(address="AA:02", name=None)
+        FakeScanner.discovered = {
+            "watch": (
+                watch,
+                SimpleNamespace(
+                    local_name="oraimo Watch Pro X_1215",
+                    rssi=-52,
+                    service_uuids=[],
+                ),
+            ),
+            "other": (
+                other,
+                SimpleNamespace(local_name=None, rssi=-70, service_uuids=[]),
+            ),
+        }
+
+        devices = await discover_ble_devices(timeout=1.5, scanner=FakeScanner)
+
+        self.assertEqual([item.address for item in devices], ["AA:01", "AA:02"])
+        self.assertEqual(devices[0].name, "oraimo Watch Pro X_1215")
+        self.assertIsNone(devices[1].name)
+        self.assertEqual(FakeScanner.calls, [{"timeout": 1.5, "return_adv": True}])
 
     async def test_scan_accepts_name_when_advertised_services_are_empty(self) -> None:
         named = SimpleNamespace(address="AA:01", name="fallback")

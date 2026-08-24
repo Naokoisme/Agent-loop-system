@@ -598,8 +598,8 @@ class InteractiveReproduceTest(unittest.TestCase):
                     return_value=session,
                 ) as real_session,
                 mock.patch(
-                    "agent_loop_system.tools.real_device.reset_hardware_case_state"
-                ) as reset,
+                    "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+                ) as prepare,
                 mock.patch(
                     "agent_loop_system.tools.agent.decide_reproduction_action",
                     return_value=decision,
@@ -616,14 +616,15 @@ class InteractiveReproduceTest(unittest.TestCase):
                     defect_image_paths=[],
                     evidence_dir=tempdir,
                     target="hardware",
+                    hardware_preflight_completed=True,
                 )
 
             self.assertEqual(trace.outcome, ReproductionOutcome.CURRENT_CONFORMS)
             build_config.assert_not_called()
             run_build.assert_not_called()
-            profile_loader.assert_called_once_with(project=None)
-            reset.assert_called_once_with(
-                evidence_dir=Path(tempdir).resolve() / "hardware-reset"
+            profile_loader.assert_called_once_with(project="6202_W5230")
+            prepare.assert_called_once_with(
+                evidence_dir=Path(tempdir).resolve() / "hardware-preparation"
             )
             real_session.assert_called_once_with(evidence_dir=Path(tempdir).resolve())
             self.assertEqual(session.system_commands, [])
@@ -637,6 +638,39 @@ class InteractiveReproduceTest(unittest.TestCase):
             self.assertFalse(
                 decide.call_args.kwargs["navigation_source_enabled"]
             )
+
+    def test_hardware_preflight_failure_stops_before_state_preparation(self) -> None:
+        with (
+            tempfile.TemporaryDirectory() as tempdir,
+            mock.patch(
+                "agent_loop_system.tools.hardware_preflight.require_hardware_preflight",
+                side_effect=RuntimeError("SUPERCOM_NO_UART: zero UART bytes"),
+            ) as preflight,
+            mock.patch(
+                "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"
+            ) as profile_loader,
+            mock.patch(
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+            ) as prepare,
+            mock.patch(
+                "agent_loop_system.tools.real_device.RealDeviceSession"
+            ) as real_session,
+        ):
+            trace = interactive_reproduce(
+                task_id="6202-preflight-blocked",
+                objective="执行真机用例",
+                source_files=[],
+                defect_image_paths=[],
+                evidence_dir=tempdir,
+                target="hardware",
+            )
+
+        self.assertEqual(trace.outcome, ReproductionOutcome.SYSTEM_ERROR)
+        self.assertIn("SUPERCOM_NO_UART", trace.reason)
+        preflight.assert_called_once()
+        profile_loader.assert_not_called()
+        prepare.assert_not_called()
+        real_session.assert_not_called()
 
     def test_two_unchanged_steps_stop_as_target_not_reached(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

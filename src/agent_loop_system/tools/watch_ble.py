@@ -255,6 +255,33 @@ def _to_scan_result(device: object, advertisement: object | None) -> WatchBleDev
     )
 
 
+async def discover_ble_devices(
+    *,
+    timeout: float = 5.0,
+    scanner: object | None = None,
+) -> list[WatchBleDevice]:
+    """Discover every nearby BLE device without assuming watch compatibility."""
+
+    if timeout <= 0:
+        raise ValueError("timeout must be positive")
+    if scanner is None:
+        scanner_type, _ = _load_bleak()
+        scanner = scanner_type
+    discover = getattr(scanner, "discover", None)
+    if not callable(discover):
+        raise TypeError("scanner must provide an async discover method")
+    try:
+        discovered = await discover(timeout=timeout, return_adv=True)
+    except Exception as exc:
+        raise WatchBleDiscoveryError(f"BLE scan failed: {exc}") from exc
+
+    found: dict[str, WatchBleDevice] = {}
+    for device, advertisement in _advertisement_values(discovered):
+        result = _to_scan_result(device, advertisement)
+        found[_normalise_address(result.address)] = result
+    return sorted(found.values(), key=lambda item: item.address.lower())
+
+
 async def scan_watches(
     *,
     timeout: float = 5.0,
@@ -270,31 +297,18 @@ async def scan_watches(
     that expose neither a local name nor the service UUID.
     """
 
-    if timeout <= 0:
-        raise ValueError("timeout must be positive")
-    if scanner is None:
-        scanner_type, _ = _load_bleak()
-        scanner = scanner_type
-    discover = getattr(scanner, "discover", None)
-    if not callable(discover):
-        raise TypeError("scanner must provide an async discover method")
-    try:
-        discovered = await discover(timeout=timeout, return_adv=True)
-    except Exception as exc:
-        raise WatchBleDiscoveryError(f"BLE scan failed: {exc}") from exc
-
     service_uuid = _normalise_uuid(service_uuid)
     wanted_address = _normalise_address(address) if address else None
-    found: dict[str, WatchBleDevice] = {}
-    for device, advertisement in _advertisement_values(discovered):
-        result = _to_scan_result(device, advertisement)
+    discovered = await discover_ble_devices(timeout=timeout, scanner=scanner)
+    found: list[WatchBleDevice] = []
+    for result in discovered:
         result_address = _normalise_address(result.address)
         address_match = bool(wanted_address and result_address == wanted_address)
         name_match = bool(result.name and result.name.startswith(name_prefix))
         service_match = service_uuid in result.service_uuids
         if address_match or name_match or service_match:
-            found[result_address] = result
-    return sorted(found.values(), key=lambda item: item.address.lower())
+            found.append(result)
+    return found
 
 
 def select_watch(

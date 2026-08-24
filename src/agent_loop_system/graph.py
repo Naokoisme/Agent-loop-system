@@ -36,7 +36,8 @@ from agent_loop_system.tools.source_context import (
 )
 from agent_loop_system.tools.workspace import WorkspaceConflictError, resolve_source_root
 
-EVIDENCE_ROOT = RuntimePaths.from_root().evidence
+_RUNTIME_PATHS = RuntimePaths.from_root()
+EVIDENCE_ROOT = _RUNTIME_PATHS.evidence
 _TASK_ID_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
@@ -761,24 +762,38 @@ def test(state: LoopState) -> dict:
         }
 
     if target == "hardware":
+        from agent_loop_system.tools.hardware_preflight import (
+            require_hardware_preflight,
+        )
         from agent_loop_system.tools.hardware_target import HardwareTargetConfig
         from agent_loop_system.tools.real_device import (
             RealDeviceSession,
-            reset_hardware_case_state,
+            prepare_hardware_case_state,
         )
 
         try:
             HardwareTargetConfig.from_env()
             with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
-                reset_hardware_case_state(evidence_dir=shot_dir / "hardware-reset")
+                require_hardware_preflight(
+                    evidence_dir=shot_dir / "preflight",
+                    persist_paths=(
+                        shot_dir / "preflight.json",
+                        _RUNTIME_PATHS.environment_checks
+                        / "6202_W5230"
+                        / "preflight.json",
+                    ),
+                )
+                prepare_hardware_case_state(
+                    evidence_dir=shot_dir / "hardware-preparation"
+                )
             session = RealDeviceSession(evidence_dir=shot_dir)
         except Exception as exc:
             return {
                 "verdict": "CANNOT_VERIFY",
-                "error": f"真机环境配置或状态清理失败: {exc}",
+                "error": f"真机环境配置、探测或状态准备失败: {exc}",
                 "test_output": {
                     "results": [],
-                    "evidence_issue": "真机环境配置或状态清理失败",
+                    "evidence_issue": "真机环境配置、探测或状态准备失败",
                 },
             }
     else:

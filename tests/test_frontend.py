@@ -11,11 +11,15 @@ import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, call, patch
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
+from agent_loop_system.tools.hardware_preflight import (
+    HardwarePreflightCheck,
+    HardwarePreflightResult,
+)
 from frontend.server import (
     AppPaths,
     BATCH_STATE_FILE,
@@ -38,6 +42,47 @@ from frontend.server import (
     main as frontend_main,
     make_handler,
 )
+
+
+def _ready_hardware_preflight() -> HardwarePreflightResult:
+    return HardwarePreflightResult(
+        project="6202_W5230",
+        ready=True,
+        readiness_status="ready",
+        checked_at="2026-08-24T12:00:00+08:00",
+        checks=(
+            HardwarePreflightCheck(
+                key="gui_ping",
+                label="UART/GUI 数据面",
+                status="pass",
+                blocking=True,
+                code=None,
+                detail="GUI_PING 收到匹配序号的 gui_ack/processed",
+            ),
+        ),
+    )
+
+
+def _failed_hardware_preflight(
+    code: str = "SUPERCOM_NO_UART",
+) -> HardwarePreflightResult:
+    return HardwarePreflightResult(
+        project="6202_W5230",
+        ready=False,
+        readiness_status="needs_user",
+        checked_at="2026-08-24T12:00:00+08:00",
+        checks=(
+            HardwarePreflightCheck(
+                key="gui_ping",
+                label="UART/GUI 数据面",
+                status="error",
+                blocking=True,
+                code=code,
+                detail="SuperCom 管道存在，但 UART/GUI 无有效回包",
+                action="确认正确 COM、SuperCom 已打开串口并唤醒手表",
+            ),
+        ),
+    )
 
 
 def _external_ledger_record(
@@ -1852,6 +1897,91 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(snapshot["nodes"], {"load": "pass", "execute": "pass", "judge": "pass", "record": "pass"})
         self.assertIsNotNone(snapshot["history_id"])
 
+    def test_hardware_single_preflight_failure_starts_no_child_process(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        with patch("frontend.server.threading.Thread.start"):
+            queued = manager.start(
+                sheet="计算器",
+                case_id="CALC_001",
+                project="6202_W5230",
+            )
+
+        failed = _failed_hardware_preflight()
+        with (
+            patch("agent_loop_system.main._load_env"),
+            patch(
+                "agent_loop_system.tools.hardware_preflight.run_hardware_preflight",
+                return_value=failed,
+            ) as preflight,
+            patch("frontend.server.subprocess.Popen") as popen,
+            patch(
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+            ) as prepare,
+        ):
+            manager._run(queued["id"])
+
+        snapshot = manager.get(queued["id"])
+        preflight.assert_called_once()
+        self.assertEqual(
+            preflight.call_args.kwargs["llm_scopes"],
+            ("exploration",),
+        )
+        popen.assert_not_called()
+        prepare.assert_not_called()
+        self.assertEqual(snapshot["status"], "interrupted")
+        self.assertEqual(snapshot["workflow_status"], "interrupted")
+        self.assertEqual(snapshot["execution_status"], "ERROR")
+        self.assertEqual(snapshot["verdict"], "CANNOT_VERIFY")
+        self.assertEqual(snapshot["completed"], 0)
+        self.assertEqual(snapshot["reason_code"], "SUPERCOM_NO_UART")
+        self.assertNotIn("hardware", manager._active_job_ids)
+        persisted = json.loads(
+            (
+                self.paths.runtime_jobs
+                / queued["id"]
+                / "preflight.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertFalse(persisted["ready"])
+
+    def test_hardware_batch_preflight_failure_starts_no_case_or_preparation(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        with patch("frontend.server.threading.Thread.start"):
+            queued = manager.start_batch(
+                case_refs=[{"sheet": "计算器", "case_id": "CALC_001"}],
+                project="6202_W5230",
+            )
+
+        failed = _failed_hardware_preflight("USB_DEVICE_NOT_PRESENT")
+        with (
+            patch("agent_loop_system.main._load_env"),
+            patch(
+                "agent_loop_system.tools.hardware_preflight.run_hardware_preflight",
+                return_value=failed,
+            ) as preflight,
+            patch("frontend.server.subprocess.Popen") as popen,
+            patch(
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state"
+            ) as prepare,
+        ):
+            manager._run_batch(queued["id"])
+
+        snapshot = manager.get(queued["id"])
+        preflight.assert_called_once()
+        self.assertEqual(
+            preflight.call_args.kwargs["llm_scopes"],
+            ("exploration",),
+        )
+        popen.assert_not_called()
+        prepare.assert_not_called()
+        self.assertEqual(snapshot["status"], "interrupted")
+        self.assertEqual(snapshot["workflow_status"], "interrupted")
+        self.assertEqual(snapshot["execution_status"], "ERROR")
+        self.assertEqual(snapshot["verdict"], "CANNOT_VERIFY")
+        self.assertEqual(snapshot["completed"], 0)
+        self.assertEqual(snapshot["reason_code"], "USB_DEVICE_NOT_PRESENT")
+        self.assertNotIn("hardware", manager._active_job_ids)
+
     def test_case_test_manager_uses_hardware_target_for_6202(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
@@ -2045,7 +2175,14 @@ class FrontendDataTest(unittest.TestCase):
             "screenshot": self.paths.runtime_jobs / job_id / "single" / "screenshot.bmp",
         }
 
-        with patch.object(manager, "_execute_case", return_value=execution):
+        with (
+            patch.object(
+                manager,
+                "_run_job_hardware_preflight",
+                return_value=_ready_hardware_preflight(),
+            ),
+            patch.object(manager, "_execute_case", return_value=execution),
+        ):
             manager._run(job_id)
 
         snapshot = manager.get(job_id)
@@ -2371,24 +2508,28 @@ class FrontendDataTest(unittest.TestCase):
 
         with (
             patch("agent_loop_system.main._load_env") as load_env,
+            patch.object(
+                manager,
+                "_run_job_hardware_preflight",
+                return_value=_ready_hardware_preflight(),
+            ) as preflight,
             patch(
-                "agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"
-            ),
-            patch(
-                "agent_loop_system.tools.real_device.reset_hardware_case_state",
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state",
                 side_effect=RuntimeError("GUI_STATE popup is CHARGING"),
-            ) as reset,
+            ) as prepare,
             patch("frontend.server.subprocess.Popen") as popen,
         ):
             manager._run_batch(job_id)
 
         snapshot = manager.get(job_id)
         load_env.assert_called_once_with()
-        reset.assert_called_once()
+        preflight.assert_called_once()
+        prepare.assert_called_once()
         popen.assert_not_called()
         self.assertEqual(snapshot["status"], "interrupted")
         self.assertEqual(snapshot["completed"], 0)
         self.assertIn("GUI_STATE popup is CHARGING", snapshot["error"])
+        self.assertEqual(snapshot["hardware_preparation"]["status"], "failed")
         self.assertEqual(snapshot["hardware_reset"]["status"], "failed")
         self.assertNotIn("hardware", manager._active_job_ids)
 
@@ -2428,21 +2569,24 @@ class FrontendDataTest(unittest.TestCase):
         }
         manager._active_job_ids["hardware"] = job_id
         executed_cases: list[str] = []
-        parent_reset_flags: list[bool] = []
+        parent_preparation_flags: list[tuple[bool, bool]] = []
 
         class BrokenProcess:
             returncode = 1
 
             def __init__(self, argv: list[str]):
                 executed_cases.append(argv[argv.index("--case-id") + 1])
-                parent_reset_flags.append("--skip-hardware-reset" in argv)
+                parent_preparation_flags.append((
+                    "--skip-hardware-reset" in argv,
+                    "--hardware-preflight-completed" in argv,
+                ))
 
             def communicate(self) -> tuple[str, str]:
                 return "", "HardwareSerialTimeoutError: no result for :GUI_PING:1"
 
-        case_reset = SimpleNamespace(
+        case_preparation = SimpleNamespace(
             status=SimpleNamespace(active=True, lease_seconds=86000),
-            reboot_status="accepted",
+            reboot_status="not_requested",
             gui_ping_attempts=1,
             bootstrap_event_seen=False,
             current_page="DIAL",
@@ -2450,11 +2594,15 @@ class FrontendDataTest(unittest.TestCase):
         )
         with (
             patch("agent_loop_system.main._load_env"),
-            patch("agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"),
+            patch.object(
+                manager,
+                "_run_job_hardware_preflight",
+                return_value=_ready_hardware_preflight(),
+            ) as preflight,
             patch(
-                "agent_loop_system.tools.real_device.reset_hardware_case_state",
-                return_value=case_reset,
-            ) as reset,
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state",
+                return_value=case_preparation,
+            ) as prepare,
             patch(
                 "frontend.server.subprocess.Popen",
                 side_effect=lambda argv, **_: BrokenProcess(argv),
@@ -2463,10 +2611,11 @@ class FrontendDataTest(unittest.TestCase):
             manager._run_batch(job_id)
 
         interrupted = manager.get(job_id)
-        self.assertEqual(reset.call_count, 1)
+        preflight.assert_called_once()
+        self.assertEqual(prepare.call_count, 1)
         self.assertEqual(popen.call_count, 1)
         self.assertEqual(executed_cases, ["CALC_001"])
-        self.assertEqual(parent_reset_flags, [True])
+        self.assertEqual(parent_preparation_flags, [(True, True)])
         self.assertEqual(interrupted["status"], "interrupted")
         self.assertEqual(interrupted["workflow_status"], "failed")
         self.assertEqual(interrupted["execution_status"], "ERROR")
@@ -2499,7 +2648,10 @@ class FrontendDataTest(unittest.TestCase):
                 self.case_id = argv[argv.index("--case-id") + 1]
                 self.returncode = 1 if self.case_id == "CALC_001" else 0
                 executed_cases.append(self.case_id)
-                parent_reset_flags.append("--skip-hardware-reset" in argv)
+                parent_preparation_flags.append((
+                    "--skip-hardware-reset" in argv,
+                    "--hardware-preflight-completed" in argv,
+                ))
 
             def communicate(self) -> tuple[str, str]:
                 result_file = Path(self.argv[self.argv.index("--result-file") + 1])
@@ -2519,11 +2671,15 @@ class FrontendDataTest(unittest.TestCase):
 
         with (
             patch("agent_loop_system.main._load_env"),
-            patch("agent_loop_system.tools.hardware_runtime_profile.load_hardware_runtime_profile"),
+            patch.object(
+                manager,
+                "_run_job_hardware_preflight",
+                return_value=_ready_hardware_preflight(),
+            ) as preflight,
             patch(
-                "agent_loop_system.tools.real_device.reset_hardware_case_state",
-                return_value=case_reset,
-            ) as reset,
+                "agent_loop_system.tools.real_device.prepare_hardware_case_state",
+                return_value=case_preparation,
+            ) as prepare,
             patch(
                 "frontend.server.subprocess.Popen",
                 side_effect=lambda argv, **_: CompletedProcess(argv),
@@ -2532,9 +2688,13 @@ class FrontendDataTest(unittest.TestCase):
             manager._run_batch(job_id)
 
         completed = manager.get(job_id)
-        self.assertEqual(reset.call_count, 2)
+        preflight.assert_called_once()
+        self.assertEqual(prepare.call_count, 2)
         self.assertEqual(executed_cases, ["CALC_001", "CALC_001", "CALC_002"])
-        self.assertEqual(parent_reset_flags, [True, True, True])
+        self.assertEqual(
+            parent_preparation_flags,
+            [(True, True), (True, True), (True, True)],
+        )
         self.assertEqual(completed["status"], "completed")
         self.assertEqual(completed["completed"], 2)
         self.assertEqual(completed["verdict_counts"]["FAIL"], 1)
@@ -3549,23 +3709,85 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(detail.page_setup.orientation, "landscape")
 
     def test_environments_and_config_endpoints(self) -> None:
-        _, base = self._server()
+        application, base = self._server()
         
         # 1. Environments list
-        with urlopen(base + "/api/environments", timeout=3) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(resp.status, 200)
-            self.assertIn("items", data)
-            self.assertTrue(len(data["items"]) >= 3)
-            hardware = next(item for item in data["items"] if item["id"] == "6202_W5230")
-            self.assertEqual(hardware["checks"][0]["key"], "profile")
-            self.assertEqual(hardware["checks"][0]["label"], "真机运行时档案")
+        with patch(
+            "agent_loop_system.tools.hardware_preflight.run_hardware_preflight"
+        ) as live_probe:
+            with urlopen(base + "/api/environments", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertIn("items", data)
+                self.assertTrue(len(data["items"]) >= 3)
+                hardware = next(
+                    item for item in data["items"] if item["id"] == "6202_W5230"
+                )
+                self.assertEqual(hardware["readiness_status"], "unchecked")
+                self.assertEqual(hardware["checks"][0]["key"], "profile")
+                self.assertEqual(hardware["checks"][0]["label"], "真机运行时档案")
+            live_probe.assert_not_called()
             
         # 2. Environment check
         with self._post_json(base + "/api/environments/620C_W6830/check", {}) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("result", data)
+
+        ready = _ready_hardware_preflight()
+        with patch(
+            "agent_loop_system.tools.hardware_preflight.run_hardware_preflight",
+            return_value=ready,
+        ) as live_probe:
+            with self._post_json(
+                base + "/api/environments/6202_W5230/check", {}
+            ) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertTrue(data["result"]["ready"])
+                self.assertEqual(data["result"]["readiness_status"], "ready")
+            live_probe.assert_called_once()
+        cached = json.loads(
+            (
+                self.paths.environment_checks
+                / "6202_W5230"
+                / "preflight.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertTrue(cached["ready"])
+
+        with (
+            patch.object(
+                application.test_jobs,
+                "active",
+                return_value={"id": "busy-hardware"},
+            ),
+            patch(
+                "agent_loop_system.tools.hardware_preflight.run_hardware_preflight"
+            ) as live_probe,
+        ):
+            with self._post_json(
+                base + "/api/environments/6202_W5230/check", {}
+            ) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertFalse(data["result"]["ready"])
+                self.assertEqual(data["result"]["error_code"], "TARGET_BUSY")
+            live_probe.assert_not_called()
+
+        with patch(
+            "agent_loop_system.tools.hardware_preflight.run_hardware_preflight",
+            side_effect=RuntimeError("unexpected probe failure"),
+        ):
+            with self._post_json(
+                base + "/api/environments/6202_W5230/check", {}
+            ) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertEqual(
+                    data["result"]["error_code"],
+                    "PREFLIGHT_INTERNAL_ERROR",
+                )
             
         # 3. Environment PUT
         put_payload = {
@@ -3718,21 +3940,34 @@ class FrontendDataTest(unittest.TestCase):
         _, base = self._server()
         discovered = [
             SimpleNamespace(
-                address="42:74:DC:C8:0A:02",
-                name="oraimo Watch Tank N",
-                rssi=-48,
-            ),
-            SimpleNamespace(
                 address="11:22:33:44:55:66",
                 name="oraimo Watch Tank N Pro",
                 rssi=-71,
             ),
+            SimpleNamespace(
+                address="C8:0A:00:00:00:00",
+                name=None,
+                rssi=-30,
+            ),
+            SimpleNamespace(
+                address="42:74:DC:C8:0A:02",
+                name="oraimo Watch Tank N",
+                rssi=-48,
+            ),
         ]
         scan_mock = AsyncMock(return_value=discovered)
         with (
-            patch("frontend.server.scan_watches", scan_mock),
+            patch("frontend.server.discover_ble_devices", scan_mock),
             patch("frontend.server.WatchBleClient") as client_type,
         ):
+            with urlopen(base + "/api/hardware/ble/devices?timeout=3", timeout=3) as resp:
+                all_data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(
+                [item["address"] for item in all_data["items"]],
+                ["42:74:DC:C8:0A:02", "11:22:33:44:55:66"],
+            )
+            self.assertTrue(all(item["name"] for item in all_data["items"]))
+
             query = urlencode({"q": "c8:0a", "timeout": "3"})
             with urlopen(base + f"/api/hardware/ble/devices?{query}", timeout=3) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
@@ -3741,7 +3976,10 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(data["items"][0]["address"], "42:74:DC:C8:0A:02")
             self.assertEqual(data["items"][0]["status"], "discovered")
             self.assertFalse(data["items"][0]["connected"])
-            scan_mock.assert_awaited_once_with(timeout=3.0, address=None)
+            self.assertEqual(
+                scan_mock.await_args_list,
+                [call(timeout=3.0), call(timeout=3.0)],
+            )
             client_type.assert_not_called()
 
         fake_client = SimpleNamespace(
@@ -3782,7 +4020,7 @@ class FrontendDataTest(unittest.TestCase):
         )
 
         with (
-            patch("frontend.server.scan_watches", new=AsyncMock()) as scan_again,
+            patch("frontend.server.discover_ble_devices", new=AsyncMock()) as scan_again,
             patch("frontend.server.WatchBleClient") as client_again,
         ):
             with urlopen(base + "/api/hardware/ble/remembered", timeout=3) as resp:
@@ -3818,7 +4056,7 @@ class FrontendDataTest(unittest.TestCase):
 
         address = quote("42:74:DC:C8:0A:02", safe="")
         with (
-            patch("frontend.server.scan_watches", new=AsyncMock()) as passive_scan,
+            patch("frontend.server.discover_ble_devices", new=AsyncMock()) as passive_scan,
             patch("frontend.server.WatchBleClient") as passive_client,
         ):
             with self._delete_json(base + f"/api/hardware/ble/remembered/{address}") as resp:
