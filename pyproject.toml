@@ -12,6 +12,9 @@ dependencies = [
     "langchain-openai>=0.2",
     "pydantic>=2.7",
     "pillow>=12.3.0",
+    "pyserial>=3.5",
+    "numpy>=1.24",
+    "openpyxl>=3.1",
     "bleak>=2.0,<4",
     "protobuf>=6.31,<7",
     "winrt-windows-devices-bluetooth-rfcomm>=3.2,<4",
@@ -19,7 +22,13 @@ dependencies = [
     "winrt-windows-networking-sockets>=3.2,<4",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=9,<10",
+]
+
 [project.scripts]
+agent-exploration = "agent_loop_system.exploration_core.cli:entrypoint"
 watch-mtp-screenshot = "agent_loop_system.tools.mtp_screenshot:main"
 
 [tool.hatch.build.targets.wheel]

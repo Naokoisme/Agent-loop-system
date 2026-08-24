@@ -1,0 +1,647 @@
+{
+  "kind": "first_batch_state_restore_registry",
+  "version": 1,
+  "interface": "snapshot -> apply_target -> verify_target -> restore -> verify_restore",
+  "case_count": 99,
+  "adapters": [
+    {
+      "adapter_id": "state_restore_1733f2c2f2",
+      "module": "久坐提醒",
+      "source_case_nos": [
+        "AUTO-DETAIL-0001",
+        "AUTO-DETAIL-0002",
+        "AUTO-DETAIL-0003",
+        "AUTO-DETAIL-0004",
+        "AUTO-SMOKE-0158"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_ed248f209b",
+      "module": "低电提醒",
+      "source_case_nos": [
+        "AUTO-DETAIL-0009",
+        "AUTO-DETAIL-0010",
+        "AUTO-DETAIL-0011",
+        "AUTO-DETAIL-0012",
+        "AUTO-SMOKE-0070",
+        "AUTO-SMOKE-0071"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_94d1ca0a54",
+      "module": "佩戴提醒",
+      "source_case_nos": [
+        "AUTO-DETAIL-0013",
+        "AUTO-DETAIL-0014",
+        "AUTO-DETAIL-0015",
+        "AUTO-DETAIL-0016",
+        "AUTO-SMOKE-0072"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_00188fe7a9",
+      "module": "勿扰模式",
+      "source_case_nos": [
+        "AUTO-DETAIL-0037",
+        "AUTO-DETAIL-0038",
+        "AUTO-DETAIL-0039",
+        "AUTO-DETAIL-0040",
+        "AUTO-SMOKE-0159",
+        "AUTO-SMOKE-0160",
+        "AUTO-SMOKE-0161",
+        "AUTO-SMOKE-0163",
+        "AUTO-SMOKE-0164",
+        "AUTO-SMOKE-0165"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_cd2ff969f2",
+      "module": "喝水提醒",
+      "source_case_nos": [
+        "AUTO-DETAIL-0061",
+        "AUTO-DETAIL-0062",
+        "AUTO-DETAIL-0063",
+        "AUTO-DETAIL-0064",
+        "AUTO-SMOKE-0157"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_9775f3402b",
+      "module": "多语言UI适配",
+      "source_case_nos": [
+        "AUTO-DETAIL-0065",
+        "AUTO-DETAIL-0066",
+        "AUTO-DETAIL-0067",
+        "AUTO-DETAIL-0068",
+        "AUTO-SMOKE-0093",
+        "AUTO-SMOKE-0094",
+        "AUTO-SMOKE-0095"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_c85880ed87",
+      "module": "心率预警提醒",
+      "source_case_nos": [
+        "AUTO-DETAIL-0089",
+        "AUTO-DETAIL-0090",
+        "AUTO-DETAIL-0091",
+        "AUTO-DETAIL-0092",
+        "AUTO-SMOKE-0145",
+        "AUTO-SMOKE-0146",
+        "AUTO-SMOKE-0147",
+        "AUTO-SMOKE-0148",
+        "AUTO-SMOKE-0149",
+        "AUTO-SMOKE-0150"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_ddbe41e500",
+      "module": "时间/星期显示",
+      "source_case_nos": [
+        "AUTO-DETAIL-0137",
+        "AUTO-DETAIL-0138",
+        "AUTO-DETAIL-0139",
+        "AUTO-DETAIL-0140",
+        "AUTO-SMOKE-0090",
+        "AUTO-SMOKE-0091",
+        "AUTO-SMOKE-0092"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_d09fd7e6a6",
+      "module": "时间准确性",
+      "source_case_nos": [
+        "AUTO-DETAIL-0141",
+        "AUTO-DETAIL-0142",
+        "AUTO-DETAIL-0143",
+        "AUTO-DETAIL-0144",
+        "AUTO-SMOKE-0100",
+        "AUTO-SMOKE-0101",
+        "AUTO-SMOKE-0103"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_a7cd29f5a6",
+      "module": "时间制式",
+      "source_case_nos": [
+        "AUTO-DETAIL-0145",
+        "AUTO-DETAIL-0146",
+        "AUTO-DETAIL-0147",
+        "AUTO-DETAIL-0148",
+        "AUTO-SMOKE-0039",
+        "AUTO-SMOKE-0040",
+        "AUTO-SMOKE-0041"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_2117c70346",
+      "module": "设置- 亮度设置",
+      "source_case_nos": [
+        "AUTO-DETAIL-0231",
+        "AUTO-DETAIL-0232",
+        "AUTO-SMOKE-0025",
+        "AUTO-SMOKE-0026",
+        "AUTO-SMOKE-0027",
+        "AUTO-SMOKE-0028"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_429d409522",
+      "module": "设置- 抬手亮屏",
+      "source_case_nos": [
+        "AUTO-DETAIL-0233",
+        "AUTO-DETAIL-0234",
+        "AUTO-DETAIL-0235",
+        "AUTO-DETAIL-0236",
+        "AUTO-SMOKE-0033"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_bd8c3394a7",
+      "module": "设置- 抬手亮屏设置",
+      "source_case_nos": [
+        "AUTO-DETAIL-0237",
+        "AUTO-DETAIL-0238",
+        "AUTO-DETAIL-0239",
+        "AUTO-DETAIL-0240",
+        "AUTO-SMOKE-0031",
+        "AUTO-SMOKE-0032"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_3342e3576a",
+      "module": "设置- 翻腕亮屏",
+      "source_case_nos": [
+        "AUTO-DETAIL-0241",
+        "AUTO-DETAIL-0242",
+        "AUTO-DETAIL-0243",
+        "AUTO-DETAIL-0244",
+        "AUTO-SMOKE-0036",
+        "AUTO-SMOKE-0037",
+        "AUTO-SMOKE-0038"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    },
+    {
+      "adapter_id": "state_restore_fc7858f773",
+      "module": "设置- 翻腕亮屏设置",
+      "source_case_nos": [
+        "AUTO-DETAIL-0245",
+        "AUTO-DETAIL-0246",
+        "AUTO-DETAIL-0247",
+        "AUTO-DETAIL-0248",
+        "AUTO-SMOKE-0034",
+        "AUTO-SMOKE-0035"
+      ],
+      "status": "blocked",
+      "snapshot": {
+        "status": "missing",
+        "action": "",
+        "output_key": "original_state"
+      },
+      "apply_target": {
+        "status": "missing",
+        "action": "",
+        "args": {}
+      },
+      "verify_target": {
+        "status": "missing",
+        "assertions": []
+      },
+      "restore": {
+        "status": "missing",
+        "teardown_actions": []
+      },
+      "verify_restore": {
+        "status": "missing",
+        "assertions": []
+      },
+      "failure_result_code": "CLEANUP_REQUIRED",
+      "stop_batch_on_restore_failure": true,
+      "blockers": [
+        "state_read_missing",
+        "state_write_missing",
+        "restore_verification_missing"
+      ]
+    }
+  ]
+}

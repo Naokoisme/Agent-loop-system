@@ -1,0 +1,4 @@
+{
+  "schema_version": 1,
+  "note": "579 资产通过 import_manifest.json 的 SHA256 审计；公共 API 不返回 raw payload。"
+}

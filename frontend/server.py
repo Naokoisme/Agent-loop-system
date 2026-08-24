@@ -34,7 +34,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
+from agent_loop_system.case_management import CaseManagementRepository
 from agent_loop_system.internal_dispatcher import build_child_command
+from agent_loop_system.platforms.registry import PlatformRegistry
+from agent_loop_system.projects.registry import ProjectRegistry
 from agent_loop_system.tools.case_map import (
     OBSERVATION_ONLY_COMMANDS,
     validated_case_entries,
@@ -60,45 +63,8 @@ BATCH_STATE_FILE = "batch-state.json"
 BATCH_CASES_FILE = "batch-cases.json"
 PROMOTION_STATE_FILE = "promotion-state.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
-TEST_PROJECTS: dict[str, dict[str, str]] = {
-    "620C_W6830": {
-        "project": "620C_W6830",
-        "project_label": "620C W6830",
-        "execution_target": "simulator",
-        "execution_target_label": "模拟器",
-        "case_map_dir": "620C_simulator_case_map",
-        "case_map_profile": "620C_W6830",
-    },
-    "6202_W5230": {
-        "project": "6202_W5230",
-        "project_label": "6202 W5230",
-        "execution_target": "hardware",
-        "execution_target_label": "真机",
-        "case_map_dir": "6202_case_map",
-        "case_map_profile": "6202_W5230",
-    },
-    "6202_W5230_SIMULATOR": {
-        "project": "6202_W5230_SIMULATOR",
-        "project_label": "6202 W5230",
-        "execution_target": "simulator",
-        "execution_target_label": "模拟器",
-        "case_map_dir": "6202_simulator_case_map",
-        "case_map_profile": "6202_W5230_SIMULATOR",
-        "simulator_source_root": os.environ.get(
-            "W30_6202_SIMULATOR_SOURCE_ROOT",
-            r"D:\Agent-loop-workspace\6202_W5230",
-        ),
-        "simulator_project": "6202_W5230",
-        "simulator_build_directory": os.environ.get(
-            "W30_6202_SIMULATOR_BUILD_DIRECTORY",
-            r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\out\build\6202_W5230",
-        ),
-        "simulator_artifact_path": os.environ.get(
-            "W30_6202_SIMULATOR_ARTIFACT_PATH",
-            r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\bin\main.exe",
-        ),
-    },
-}
+_PLATFORM_REGISTRY = PlatformRegistry()
+_PROJECT_REGISTRY: ProjectRegistry | None = None
 
 
 def _now() -> str:
@@ -246,18 +212,56 @@ def _safe_segment(value: str, label: str) -> str:
     return value
 
 
-def _test_project(value: str | None = None) -> dict[str, str]:
-    """返回前端允许选择的项目；项目同时决定映射目录与执行目标。"""
+def _activate_project_registry(root: Path) -> ProjectRegistry:
+    global _PROJECT_REGISTRY
+    _PROJECT_REGISTRY = ProjectRegistry(root, _PLATFORM_REGISTRY)
+    return _PROJECT_REGISTRY
+
+
+def _project_registry() -> ProjectRegistry:
+    if _PROJECT_REGISTRY is None:
+        return _activate_project_registry(Path.cwd())
+    return _PROJECT_REGISTRY
+
+
+def _test_project(
+    value: str | None = None,
+    *,
+    platform_id: str | None = None,
+    target_id: str | None = None,
+) -> dict[str, Any]:
+    """Resolve Project + Platform + Target without any silent fallback."""
 
     project = str(value or DEFAULT_TEST_PROJECT).strip()
-    try:
-        return dict(TEST_PROJECTS[project])
-    except KeyError as exc:
-        raise ValueError(f"测试项目不存在: {project or '空'}") from exc
+    result = _project_registry().resolve(
+        project,
+        platform_id=platform_id,
+        target_id=target_id,
+    )
+    if result.get("target_id") == "w30.6202.simulator":
+        result.update({
+            "simulator_source_root": os.environ.get(
+                "W30_6202_SIMULATOR_SOURCE_ROOT",
+                r"D:\Agent-loop-workspace\6202_W5230",
+            ),
+            "simulator_project": "6202_W5230",
+            "simulator_build_directory": os.environ.get(
+                "W30_6202_SIMULATOR_BUILD_DIRECTORY",
+                r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\out\build\6202_W5230",
+            ),
+            "simulator_artifact_path": os.environ.get(
+                "W30_6202_SIMULATOR_ARTIFACT_PATH",
+                r"D:\Agent-loop-workspace\6202_W5230\core\gui\simulator\bin\main.exe",
+            ),
+        })
+    return result
 
 
-def _test_project_options() -> list[dict[str, str]]:
-    return [_test_project(project) for project in TEST_PROJECTS]
+def _test_project_options() -> list[dict[str, Any]]:
+    return [
+        _test_project(str(project["project_id"]))
+        for project in _project_registry().list()
+    ]
 
 
 def _load_test_runtime_environment() -> None:
@@ -314,10 +318,13 @@ class AppPaths:
     evidence: Path
     case_map: Path
     runtime_jobs: Path
+    config: Path
+    project_data: Path
 
     @classmethod
     def from_root(cls, root: Path) -> "AppPaths":
         root = root.resolve()
+        _activate_project_registry(root)
         return cls(
             root=root,
             frontend=root / "frontend",
@@ -328,7 +335,76 @@ class AppPaths:
             evidence=root / "evidence",
             case_map=root / "case_map",
             runtime_jobs=root / ".runtime" / "jobs",
+            config=root / "config",
+            project_data=root / "project_data",
         )
+
+
+def _case_catalog_root(paths: AppPaths, project_meta: dict[str, Any]) -> Path:
+    catalog_root = (paths.root / str(project_meta["case_catalog_path"])).resolve()
+    catalog_root.relative_to(paths.root)
+    return catalog_root
+
+
+def _require_mutable_case_catalog(project_meta: dict[str, Any]) -> None:
+    """Frozen 579 manifests are imported artifacts, never Web-editable case files."""
+
+    catalog = project_meta.get("case_catalog") or {}
+    if isinstance(catalog, dict) and catalog.get("type") == "manifest_579":
+        raise ValueError("CASE_CATALOG_READ_ONLY: 579 冻结用例目录不能在网页中直接修改")
+
+
+def _new_case_envelope(project_meta: dict[str, Any], sheet: str) -> dict[str, Any]:
+    return {
+        "profile": str(project_meta["case_map_profile"]),
+        "sheet": sheet,
+        "cases": [],
+    }
+
+
+def _write_unified_compat_shadow(
+    paths: AppPaths,
+    project_meta: dict[str, Any],
+    case: dict[str, Any],
+) -> None:
+    """Keep the pre-SQLite JSON view for user-created unified projects.
+
+    The SQLite store is authoritative.  This shadow only preserves compatibility
+    with older portable builds and does not apply to frozen 579 or built-in W30
+    source catalogs.
+    """
+
+    catalog = project_meta.get("case_catalog") or {}
+    if catalog.get("type") != "unified":
+        return
+    sheet = str(case.get("sheet") or "").strip()
+    case_id = str(case.get("case_id") or "").strip()
+    root = _case_catalog_root(paths, project_meta)
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / f"{sheet}.json"
+    raw = _read_json(path, _new_case_envelope(project_meta, sheet))
+    entries = raw.get("cases") if isinstance(raw, dict) else None
+    if not isinstance(entries, list):
+        raw = _new_case_envelope(project_meta, sheet)
+        entries = raw["cases"]
+    payload = {
+        key: copy.deepcopy(value)
+        for key, value in case.items()
+        if key in {
+            "case_id", "sheet", "priority", "precondition_text", "steps_text",
+            "expected_text", "verification_points", "setup", "actions", "collect",
+            "unable", "mapping_status", "note", "automation_maturity", "blockers",
+            "platform_automation", "source_ref", "execution_ref",
+            "applicable_platforms", "workflow_state",
+        }
+    }
+    existing = next((item for item in entries if isinstance(item, dict) and item.get("case_id") == case_id), None)
+    if existing is None:
+        entries.append(payload)
+    else:
+        existing.clear()
+        existing.update(payload)
+    _write_json(path, raw)
 
 
 def _case_map_path(
@@ -342,7 +418,7 @@ def _case_map_path(
     sheet = str(sheet or "").strip()
     if not sheet or Path(sheet).name != sheet or "/" in sheet or "\\" in sheet:
         raise ValueError("测试模块格式不合法")
-    case_map_root = (paths.case_map / project_meta["case_map_dir"]).resolve()
+    case_map_root = _case_catalog_root(paths, project_meta)
     path = (case_map_root / f"{sheet}.json").resolve()
     if path.parent != case_map_root or not path.is_file():
         raise ValueError("测试模块不存在")
@@ -374,7 +450,9 @@ def _external_explored_ids(
     """外部探索事实只来自目标目录自己的 JSONL 账本。"""
 
     project_meta = _test_project(project)
-    ledger = paths.case_map / project_meta["case_map_dir"] / "external_execution_history.jsonl"
+    ledger = _case_catalog_root(paths, project_meta) / "external_execution_history.jsonl"
+    if not ledger.is_file() and project_meta.get("case_catalog_adapter") != "w30_case_map":
+        return set()
     records = read_external_execution_history(
         ledger,
         expected_target=project_meta["case_map_profile"],
@@ -651,7 +729,7 @@ class DefectRepository:
         ]
 
     def _case_sheets(self, defect: dict[str, Any]) -> list[dict[str, Any]]:
-        case_map_root = self.paths.case_map / _test_project()["case_map_dir"]
+        case_map_root = _case_catalog_root(self.paths, _test_project())
         files = sorted(case_map_root.glob("*.json"), key=lambda path: path.stem)
         haystack = " ".join(
             [str(defect.get("title", "")), str(defect.get("description", ""))]
@@ -757,7 +835,11 @@ class TestHistoryStore:
     ) -> str:
         sheet = str(job["sheet"])
         case_id = str(job["case_id"])
-        project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
+        project_meta = _test_project(
+            str(job.get("project") or DEFAULT_TEST_PROJECT),
+            platform_id=str(job.get("requested_platform_id") or job.get("platform_id") or "") or None,
+            target_id=str(job.get("target_id") or "") or None,
+        )
         project = project_meta["project"]
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(sheet, case_id, run_id, project=project)
@@ -769,8 +851,16 @@ class TestHistoryStore:
             "sheet": sheet,
             "case_id": case_id,
             **{key: project_meta[key] for key in (
-                "project", "project_label", "execution_target", "execution_target_label"
+                "project", "project_label", "platform_id", "target_id",
+                "execution_target", "execution_target_label", "execution_adapter",
+                "execution_resource", "profile_version",
             )},
+            "requested_platform_id": str(
+                job.get("requested_platform_id") or project_meta["platform_id"]
+            ),
+            "resolved_execution_adapter": str(
+                job.get("resolved_execution_adapter") or project_meta["execution_adapter"]
+            ),
             "timestamp": job.get("finished_at") or _now(),
             "started_at": job.get("started_at"),
             "finished_at": job.get("finished_at"),
@@ -780,6 +870,11 @@ class TestHistoryStore:
             "result_schema_version": result.get("schema_version"),
             "provenance": result.get("provenance", {}),
             "execution_status": result.get("execution_status"),
+            "product_verdict": result.get("product_verdict"),
+            "automation_maturity": result.get("automation_maturity"),
+            "infrastructure_status": result.get("infrastructure_status"),
+            "delivery_feedback": result.get("delivery_feedback", []),
+            "observations": result.get("observations", []),
             "priority": case.get("priority", ""),
             "precondition_text": case.get("precondition_text", ""),
             "steps_text": case.get("steps_text", ""),
@@ -1111,7 +1206,7 @@ class TestHistoryStore:
 
 
 class CaseMapRepository:
-    """case_map 查询视图，以及显式候选复跑所需的最小写入事务。"""
+    """统一用例查询视图，并保留现有 W30 候选复跑兼容事务。"""
 
     FILTERS = {
         "all", "unexplored", "externally_explored",
@@ -1124,10 +1219,69 @@ class CaseMapRepository:
         "setup", "actions", "collect", "verification_points", "note",
     )
 
-    def __init__(self, paths: AppPaths, history: TestHistoryStore):
+    def __init__(
+        self,
+        paths: AppPaths,
+        history: TestHistoryStore,
+        managed: CaseManagementRepository | None = None,
+    ):
         self.paths = paths
         self.history = history
+        self.managed = managed or CaseManagementRepository(
+            paths.project_data / "case_management.sqlite3"
+        )
         self._write_lock = threading.RLock()
+        self._source_sync_lock = threading.RLock()
+        self._source_sync_fingerprints: dict[str, tuple[tuple[str, int, int], ...]] = {}
+
+    def _source_catalog_fingerprint(self, project_meta: dict[str, Any]) -> tuple[tuple[str, int, int], ...]:
+        root = _case_catalog_root(self.paths, project_meta)
+        return tuple(
+            (str(path.relative_to(root)).replace("\\", "/"), path.stat().st_size, path.stat().st_mtime_ns)
+            for path in sorted(root.glob("*.json"), key=lambda item: item.name)
+            if path.is_file()
+        )
+
+    @staticmethod
+    def _source_catalog_signature(
+        fingerprint: tuple[tuple[str, int, int], ...],
+    ) -> str:
+        encoded = json.dumps(
+            fingerprint,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest().upper()
+
+    def _ensure_source_synced(self, project_meta: dict[str, Any]) -> None:
+        project_id = str(project_meta["project"])
+        fingerprint = self._source_catalog_fingerprint(project_meta)
+        if self._source_sync_fingerprints.get(project_id) == fingerprint:
+            return
+        signature = self._source_catalog_signature(fingerprint)
+        with self._source_sync_lock:
+            if self._source_sync_fingerprints.get(project_id) == fingerprint:
+                return
+            if not self.managed.source_sync_matches(project_id, signature):
+                source_rows = self._source_rows(project_id)
+                stable_fields = {
+                    "case_id", "sheet", "file_sheet", "title", "priority",
+                    "precondition_text", "steps_text", "expected_text",
+                    "verification_points", "setup", "actions", "collect", "unable",
+                    "mapping_status", "note", "automation_maturity", "blockers",
+                    "platform_automation", "source_ref", "execution_ref",
+                    "applicable_platforms", "workflow_state", "_source_file",
+                    "_source_file_sha256",
+                }
+                self.managed.sync_source_cases(
+                    project_meta,
+                    [
+                        {key: copy.deepcopy(value) for key, value in row.items() if key in stable_fields}
+                        for row in source_rows
+                    ],
+                    source_fingerprint=signature,
+                )
+            self._source_sync_fingerprints[project_id] = fingerprint
 
     @staticmethod
     def _command_name(command: str) -> str:
@@ -1369,6 +1523,45 @@ class CaseMapRepository:
             project=project_meta["project"],
             source_history=source_history,
         )
+        managed_current = self.managed.get_case(project_meta["project"], case_id)
+        if managed_current and (
+            not managed_current.get("source_locked")
+            or managed_current.get("has_managed_override")
+        ):
+            if managed_current.get("mapping_status") == "PROMOTED":
+                raise ValueError("该用例已经是 PROMOTED")
+            occupied = [
+                field for field in self.CANDIDATE_FIELDS
+                if managed_current.get(field) not in (None, "", [])
+            ]
+            if occupied:
+                raise RuntimeError("统一用例库已存在未完成候选，拒绝覆盖: " + ", ".join(occupied))
+            original_fields = {
+                field: {
+                    "present": field in managed_current,
+                    "value": copy.deepcopy(managed_current.get(field)),
+                }
+                for field in (*self.CANDIDATE_FIELDS, "mapping_status")
+            }
+            changes = {field: copy.deepcopy(candidate[field]) for field in self.CANDIDATE_FIELDS}
+            changes["mapping_status"] = ""
+            staged = self.managed.create_revision(
+                project_meta,
+                case_id,
+                changes,
+                change_type="AUTOMATION_CANDIDATE",
+                change_summary=f"自主探索候选 {source_history.get('id') or ''}",
+            )
+            return {
+                "storage_backend": "sqlite",
+                "project": project_meta["project"],
+                "sheet": sheet,
+                "case_id": case_id,
+                "source_history_id": str(source_history.get("id") or ""),
+                "candidate_fields": copy.deepcopy(candidate),
+                "original_fields": original_fields,
+                "staged_revision": staged["revision"],
+            }
         with self._write_lock:
             path, source_text, raw, _entries, current = self._load_writable_case(
                 sheet=sheet,
@@ -1426,6 +1619,39 @@ class CaseMapRepository:
         context: dict[str, Any],
     ) -> dict[str, Any]:
         """只在当前 case 仍等于本次候选时恢复写入前字段。"""
+
+        if context.get("storage_backend") == "sqlite":
+            project_id = str(context.get("project") or "")
+            case_id = str(context.get("case_id") or "")
+            current = self.managed.get_case(project_id, case_id)
+            if current is None:
+                return {"status": "rollback_conflict", "issues": ["统一用例库中的候选已不存在"]}
+            if current.get("mapping_status") == "PROMOTED":
+                return {"status": "promoted", "issues": []}
+            if (
+                int(current.get("current_revision") or 0) != int(context.get("staged_revision") or -1)
+                or not self._candidate_matches(current, context)
+            ):
+                return {
+                    "status": "rollback_conflict",
+                    "issues": ["候选复跑期间当前用例已被其他操作修改，未自动覆盖"],
+                }
+            original = context.get("original_fields")
+            if not isinstance(original, dict):
+                return {"status": "rollback_conflict", "issues": ["缺少候选写入前快照，未自动覆盖"]}
+            restored: dict[str, Any] = {}
+            for field in (*self.CANDIDATE_FIELDS, "mapping_status"):
+                state = original.get(field)
+                if isinstance(state, dict) and state.get("present") is True:
+                    restored[field] = copy.deepcopy(state.get("value"))
+                else:
+                    restored[field] = [] if field in {"setup", "actions", "collect", "verification_points"} else ""
+            self.managed.create_revision(
+                _test_project(project_id), case_id, restored,
+                change_type="AUTOMATION_CANDIDATE_ROLLBACK",
+                change_summary="候选复跑未通过，恢复候选前内容",
+            )
+            return {"status": "rolled_back", "issues": []}
 
         with self._write_lock:
             path, source_text, raw, _entries, current = self._load_writable_case(
@@ -1690,6 +1916,31 @@ class CaseMapRepository:
         """审计候选复跑并晋升；任一门禁失败都尝试精确回滚。"""
 
         issues = self._audit_candidate_result(context=context, result=result)
+        if context.get("storage_backend") == "sqlite":
+            project_id = str(context.get("project") or "")
+            case_id = str(context.get("case_id") or "")
+            current = self.managed.get_case(project_id, case_id)
+            if current is None:
+                issues.append("统一用例库中的候选已不存在")
+            elif int(current.get("current_revision") or 0) != int(context.get("staged_revision") or -1):
+                issues.append("统一用例库中的候选在复跑期间发生变化")
+            elif not self._candidate_matches(current, context):
+                issues.append("统一用例库当前候选与本次复跑上下文不一致")
+            issues = self._unique_issues(issues)
+            if not issues:
+                self.managed.create_revision(
+                    _test_project(project_id), case_id,
+                    {"mapping_status": "PROMOTED", "automation_maturity": "PROMOTED"},
+                    change_type="AUTOMATION_PROMOTE",
+                    change_summary="候选复跑与证据门禁通过",
+                )
+                return {"status": "promoted", "issues": []}
+            rollback = self.rollback_agent_candidate(context)
+            rollback_issues = rollback.get("issues") if isinstance(rollback, dict) else []
+            return {
+                "status": "rolled_back" if rollback.get("status") == "rolled_back" else "rollback_conflict",
+                "issues": self._unique_issues(issues + list(rollback_issues or [])),
+            }
         with self._write_lock:
             path, source_text, raw, _entries, current = self._load_writable_case(
                 sheet=str(context.get("sheet") or ""),
@@ -1718,7 +1969,7 @@ class CaseMapRepository:
             "issues": self._unique_issues(issues + list(rollback_issues or [])),
         }
 
-    def _all(
+    def _source_rows(
         self,
         project: str = DEFAULT_TEST_PROJECT,
     ) -> list[dict[str, Any]]:
@@ -1726,9 +1977,10 @@ class CaseMapRepository:
         project = project_meta["project"]
         rows: list[dict[str, Any]] = []
         history_index = self.history.summary_index(project=project)
-        case_map_root = self.paths.case_map / project_meta["case_map_dir"]
+        case_map_root = _case_catalog_root(self.paths, project_meta)
         externally_explored_ids = _external_explored_ids(self.paths, project)
         for path in sorted(case_map_root.glob("*.json"), key=lambda item: item.stem):
+            source_file_sha256 = hashlib.sha256(path.read_bytes()).hexdigest().upper()
             for item in _case_entries(self.paths, path.stem, project):
                 case_id = str(item.get("case_id") or "").strip()
                 if not case_id:
@@ -1755,8 +2007,25 @@ class CaseMapRepository:
                         else ""
                     ),
                     "note": str(item.get("note") or ""),
+                    "automation_maturity": str(
+                        item.get("automation_maturity")
+                        or (item.get("mapping_status") if item.get("mapping_status") in {"PROMOTED", "AUTO_READY"} else "")
+                        or "UNMAPPED"
+                    ),
+                    "blockers": [
+                        str(value) for value in item.get("blockers", []) if str(value).strip()
+                    ] if isinstance(item.get("blockers"), list) else [],
+                    "platform_automation": copy.deepcopy(item.get("platform_automation", {}))
+                    if isinstance(item.get("platform_automation"), dict) else {},
+                    "source_ref": copy.deepcopy(item.get("source_ref", {}))
+                    if isinstance(item.get("source_ref"), dict) else {},
+                    "execution_ref": copy.deepcopy(item.get("execution_ref", {}))
+                    if isinstance(item.get("execution_ref"), dict) else {},
+                    "_source_file": str(path.relative_to(self.paths.root)).replace("\\", "/"),
+                    "_source_file_sha256": source_file_sha256,
                     **{key: project_meta[key] for key in (
-                        "project", "project_label", "execution_target", "execution_target_label"
+                        "project", "project_label", "platform_id", "target_id",
+                        "execution_target", "execution_target_label",
                     )},
                 }
                 history = history_index.get((path.stem, case_id))
@@ -1764,6 +2033,29 @@ class CaseMapRepository:
                 row["last_run_at"] = latest.get("timestamp") if latest else None
                 row["history_count"] = int(history.get("history_count") or 0) if history else 0
                 latest_verdict = str(latest.get("verdict") or "").upper() if latest else ""
+                row["last_platform_id"] = str(
+                    (latest or {}).get("requested_platform_id")
+                    or (latest or {}).get("platform_id")
+                    or row.get("platform_id")
+                    or ""
+                )
+                row["last_execution_adapter"] = str(
+                    (latest or {}).get("resolved_execution_adapter")
+                    or (latest or {}).get("execution_adapter")
+                    or ""
+                )
+                row["last_product_verdict"] = str(
+                    (latest or {}).get("product_verdict") or latest_verdict or "PENDING"
+                ).upper()
+                row["last_automation_maturity"] = str(
+                    (latest or {}).get("automation_maturity")
+                    or row.get("automation_maturity")
+                    or row.get("mapping_status")
+                    or "UNMAPPED"
+                ).upper()
+                row["last_infrastructure_status"] = str(
+                    (latest or {}).get("infrastructure_status") or "UNKNOWN"
+                ).upper()
                 if row["history_count"] == 0:
                     row["latest_verdict"] = "PENDING"
                 elif latest_verdict == "SKIP":
@@ -1775,7 +2067,7 @@ class CaseMapRepository:
                 row["external_explored"] = case_id in externally_explored_ids
                 # 外部探索账本与映射固化是两条独立事实轴。显式的站内候选
                 # 复跑也能形成 PROMOTED，但绝不能伪造一条“外部探索”记录。
-                row["is_promoted"] = row["mapping_status"] == "PROMOTED"
+                row["is_promoted"] = row["mapping_status"] in {"PROMOTED", "AUTO_READY"}
                 row["maturity_state"] = (
                     "solidified"
                     if row["is_promoted"]
@@ -1786,6 +2078,76 @@ class CaseMapRepository:
                 rows.append(row)
         return rows
 
+    def _all(
+        self,
+        project: str = DEFAULT_TEST_PROJECT,
+    ) -> list[dict[str, Any]]:
+        """合并冻结/Case Map 基线与人员新增、导入和版本覆盖。"""
+
+        project_meta = _test_project(project)
+        project_id = str(project_meta["project"])
+        self._ensure_source_synced(project_meta)
+        rows = self.managed.list_cases(project_id)
+        history_index = self.history.summary_index(project=project_id)
+        externally_explored_ids = _external_explored_ids(self.paths, project_id)
+        for row in rows:
+            row.update({key: project_meta[key] for key in (
+                "project", "project_label", "platform_id", "target_id",
+                "execution_target", "execution_target_label",
+            )})
+            sheet = str(row.get("file_sheet") or row.get("sheet") or "")
+            case_id = str(row.get("case_id") or "")
+            history = history_index.get((sheet, case_id))
+            latest = history.get("latest") if history else None
+            row["last_run_at"] = latest.get("timestamp") if latest else None
+            row["history_count"] = int(history.get("history_count") or 0) if history else 0
+            latest_verdict = str(latest.get("verdict") or "").upper() if latest else ""
+            row["last_platform_id"] = str(
+                (latest or {}).get("requested_platform_id")
+                or (latest or {}).get("platform_id")
+                or row.get("platform_id") or ""
+            )
+            row["last_execution_adapter"] = str(
+                (latest or {}).get("resolved_execution_adapter")
+                or (latest or {}).get("execution_adapter") or ""
+            )
+            row["last_product_verdict"] = str(
+                (latest or {}).get("product_verdict") or latest_verdict or "PENDING"
+            ).upper()
+            row["last_automation_maturity"] = str(
+                (latest or {}).get("automation_maturity")
+                or row.get("automation_maturity")
+                or row.get("mapping_status") or "UNMAPPED"
+            ).upper()
+            row["last_infrastructure_status"] = str(
+                (latest or {}).get("infrastructure_status") or "UNKNOWN"
+            ).upper()
+            if row["history_count"] == 0:
+                row["latest_verdict"] = "PENDING"
+            elif latest_verdict == "SKIP":
+                row["latest_verdict"] = "CANNOT_VERIFY"
+            elif latest_verdict in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
+                row["latest_verdict"] = latest_verdict
+            else:
+                row["latest_verdict"] = "ERROR"
+            row["external_explored"] = case_id in externally_explored_ids
+            binding_promoted = any(
+                isinstance(binding, dict)
+                and binding.get("runnable") is True
+                and str(binding.get("maturity") or "") in {"PROMOTED", "AUTO_READY"}
+                for binding in (row.get("platform_automation") or {}).values()
+            )
+            row["is_promoted"] = (
+                str(row.get("mapping_status") or "") in {"PROMOTED", "AUTO_READY"}
+                or binding_promoted
+            )
+            row["maturity_state"] = (
+                "solidified" if row["is_promoted"]
+                else "explored_unsolidified" if row["external_explored"]
+                else "unexplored"
+            )
+        return rows
+
     def list(
         self,
         *,
@@ -1794,6 +2156,7 @@ class CaseMapRepository:
         page_size: int = 20,
         state_filter: str = "all",
         project: str = DEFAULT_TEST_PROJECT,
+        modules: set[str] | None = None,
     ) -> dict[str, Any]:
         project_meta = _test_project(project)
         project = project_meta["project"]
@@ -1801,18 +2164,13 @@ class CaseMapRepository:
         if state_filter not in self.FILTERS:
             raise ValueError("state 参数不合法")
         rows = self._all(project)
+        module_counts: dict[str, int] = {}
+        for row in rows:
+            module_name = str(row.get("file_sheet") or row.get("sheet") or "未分类")
+            module_counts[module_name] = module_counts.get(module_name, 0) + 1
         batch_summary = {
             category: sum(self.run_category(row) == category for row in rows)
             for category in self.RUN_CATEGORIES
-        }
-        summary = {
-            "all": len(rows),
-            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
-            "externally_explored": sum(row["external_explored"] for row in rows),
-            "explored_unsolidified": sum(
-                row["maturity_state"] == "explored_unsolidified" for row in rows
-            ),
-            "solidified": sum(row["is_promoted"] for row in rows),
         }
         keywords = [word.casefold() for word in query.strip().split() if word]
         if keywords:
@@ -1830,6 +2188,24 @@ class CaseMapRepository:
                     for word in keywords
                 )
             ]
+        if modules:
+            rows = [
+                row for row in rows
+                if str(row.get("file_sheet") or row.get("sheet") or "") in modules
+            ]
+        summary = {
+            "all": len(rows),
+            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
+            "externally_explored": sum(row["external_explored"] for row in rows),
+            "explored_unsolidified": sum(
+                row["maturity_state"] == "explored_unsolidified" for row in rows
+            ),
+            "solidified": sum(row["is_promoted"] for row in rows),
+        }
+        maturity_counts: dict[str, int] = {}
+        for row in rows:
+            maturity = str(row.get("automation_maturity") or "UNMAPPED").upper()
+            maturity_counts[maturity] = maturity_counts.get(maturity, 0) + 1
         if state_filter == "unexplored":
             rows = [row for row in rows if row["maturity_state"] == "unexplored"]
         elif state_filter == "externally_explored":
@@ -1850,12 +2226,73 @@ class CaseMapRepository:
             "total": total,
             "total_pages": total_pages,
             "summary": summary,
+            "automation_maturity_counts": maturity_counts,
             "batch_summary": batch_summary,
+            "module_counts": module_counts,
             "state_filter": state_filter,
             **{key: project_meta[key] for key in (
                 "project", "project_label", "execution_target", "execution_target_label"
             )},
             "projects": _test_project_options(),
+        }
+
+    def overview(
+        self,
+        *,
+        project: str = DEFAULT_TEST_PROJECT,
+        limit: int = 20,
+    ) -> dict[str, Any]:
+        """Return the small aggregate needed by the overview page in one request."""
+
+        project_meta = _test_project(project)
+        project = project_meta["project"]
+        rows = self._all(project)
+        summary = {
+            "all": len(rows),
+            "unexplored": sum(row["maturity_state"] == "unexplored" for row in rows),
+            "externally_explored": sum(row["external_explored"] for row in rows),
+            "explored_unsolidified": sum(
+                row["maturity_state"] == "explored_unsolidified" for row in rows
+            ),
+            "solidified": sum(row["is_promoted"] for row in rows),
+        }
+        maturity_counts: dict[str, int] = {}
+        verdict_counts: dict[str, int] = {
+            "PASS": 0,
+            "FAIL": 0,
+            "ERROR": 0,
+            "CANNOT_VERIFY": 0,
+            "SKIP": 0,
+        }
+        for row in rows:
+            maturity = str(row.get("automation_maturity") or "UNMAPPED").upper()
+            maturity_counts[maturity] = maturity_counts.get(maturity, 0) + 1
+            verdict = str(row.get("latest_verdict") or "").upper()
+            if verdict:
+                verdict_counts[verdict] = verdict_counts.get(verdict, 0) + 1
+        recent_cases = sorted(
+            (row for row in rows if row.get("last_run_at")),
+            key=lambda row: str(row.get("last_run_at") or ""),
+            reverse=True,
+        )[:limit]
+        recent_exceptions = sorted(
+            (
+                row for row in rows
+                if str(row.get("latest_verdict") or "").upper()
+                in {"FAIL", "ERROR", "CANNOT_VERIFY", "SKIP"}
+            ),
+            key=lambda row: str(row.get("last_run_at") or ""),
+            reverse=True,
+        )[:limit]
+        return {
+            "summary": summary,
+            "automation_maturity_counts": maturity_counts,
+            "verdict_counts": verdict_counts,
+            "recent_cases": recent_cases,
+            "recent_exceptions": recent_exceptions,
+            **{key: project_meta[key] for key in (
+                "project", "project_label", "execution_target", "execution_target_label"
+            )},
         }
 
     def get(
@@ -1939,10 +2376,21 @@ class CaseTestManager:
         "no result for",
     )
 
-    def __init__(self, paths: AppPaths, cases: CaseMapRepository, history: TestHistoryStore):
+    def __init__(
+        self,
+        paths: AppPaths,
+        cases: CaseMapRepository,
+        history: TestHistoryStore,
+        *,
+        platform_gateways: dict[str, Any] | None = None,
+    ):
         self.paths = paths
         self.cases = cases
         self.history = history
+        if platform_gateways is None:
+            from agent_loop_system.platforms.platform_579 import Platform579Gateway
+            platform_gateways = {"579": Platform579Gateway()}
+        self.platform_gateways = dict(platform_gateways)
         self._lock = threading.Lock()
         self._jobs: dict[str, dict[str, Any]] = {}
         self._active_job_ids: dict[str, str] = {}
@@ -1951,14 +2399,19 @@ class CaseTestManager:
 
     @staticmethod
     def _execution_slot(job: dict[str, Any]) -> str:
-        target = str(job.get("execution_target") or "simulator").strip().lower()
-        if target not in {"hardware", "simulator"}:
-            raise ValueError(f"未知测试目标: {target or '空'}")
-        return target
+        resource = str(job.get("execution_resource") or "").strip().lower()
+        if not resource:
+            target = str(job.get("execution_target") or "simulator").strip().lower()
+            if target not in {"hardware", "simulator"}:
+                raise ValueError(f"未知测试目标: {target or '空'}")
+            resource = f"w30.{target}"
+        return resource
 
     @staticmethod
     def _execution_slot_label(slot: str) -> str:
-        return "真机" if slot == "hardware" else "模拟器"
+        if slot == "579.hardware":
+            return "579 O2 真机"
+        return "真机" if "hardware" in slot else "模拟器"
 
     def _active_job_id_for_slot_locked(self, slot: str) -> str | None:
         job_id = self._active_job_ids.get(slot)
@@ -2090,6 +2543,8 @@ class CaseTestManager:
                 "case_id": str(run.get("case_id") or case.get("case_id") or ""),
                 "project": str(run.get("project") or case.get("project") or job.get("project") or DEFAULT_TEST_PROJECT),
                 "project_label": str(run.get("project_label") or case.get("project_label") or job.get("project_label") or ""),
+                "platform_id": str(run.get("platform_id") or case.get("platform_id") or job.get("platform_id") or "w30"),
+                "target_id": str(run.get("target_id") or case.get("target_id") or job.get("target_id") or ""),
                 "execution_target": str(run.get("execution_target") or case.get("execution_target") or job.get("execution_target") or "simulator"),
                 "execution_target_label": str(run.get("execution_target_label") or case.get("execution_target_label") or job.get("execution_target_label") or "模拟器"),
                 "verdict": verdict,
@@ -2123,7 +2578,9 @@ class CaseTestManager:
             job = {**state, "cases": cases}
             project_meta = _test_project(str(job.get("project") or DEFAULT_TEST_PROJECT))
             for key in (
-                "project", "project_label", "execution_target", "execution_target_label"
+                "project", "project_label", "platform_id", "target_id",
+                "execution_target", "execution_target_label", "execution_adapter",
+                "execution_resource", "profile_version",
             ):
                 job.setdefault(key, project_meta[key])
             job.setdefault("verdict_counts", {key: 0 for key in ("PASS", "FAIL", "ERROR", "CANNOT_VERIFY")})
@@ -2157,24 +2614,64 @@ class CaseTestManager:
         sheet: str,
         case_id: str,
         project: str = DEFAULT_TEST_PROJECT,
+        platform_id: str | None = None,
+        target_id: str | None = None,
         candidate_replay: bool = False,
         promotion_source: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        project_meta = _test_project(project)
+        project_meta = _test_project(
+            project,
+            platform_id=platform_id,
+            target_id=target_id,
+        )
         project = project_meta["project"]
         case = self.cases.get(sheet, case_id, project=project)
         if case is None:
             raise ValueError("测试用例不存在")
         if candidate_replay and not isinstance(promotion_source, dict):
             raise ValueError("候选复跑缺少自主探索来源记录")
+        if project_meta["platform_id"] == "579":
+            automation = (case.get("platform_automation") or {}).get("579", {})
+            if not automation.get("runnable"):
+                raise ValueError(
+                    f"CASE_NOT_RUNNABLE: {case_id} "
+                    f"{automation.get('blocker') or case.get('note') or '579 映射不可执行'}"
+                )
+            gateway = self.platform_gateways.get("579")
+            if gateway is None:
+                raise ValueError("CAPABILITY_MISSING: 579 执行网关未安装")
+            from agent_loop_system.platforms.contracts import RunRequest
+            preflight = gateway.preflight(RunRequest(
+                project_id=project,
+                platform_id="579",
+                target_id=project_meta["target_id"],
+                case_ids=(case_id,),
+            ))
+            if not preflight.ready:
+                raise ValueError(
+                    "ENV_BLOCKED: " + "; ".join(preflight.blockers)
+                )
+        case = {
+            **case,
+            **{key: project_meta[key] for key in (
+                "project", "project_label", "platform_id", "target_id",
+                "execution_target", "execution_target_label", "execution_adapter",
+                "execution_resource", "profile_version",
+            )},
+            "requested_platform_id": project_meta["platform_id"],
+        }
         promotion_context: dict[str, Any] | None = None
         with self._lock:
             job_id = uuid.uuid4().hex[:12]
             slot_claim = {
                 "id": job_id,
                 **{key: project_meta[key] for key in (
-                    "project", "project_label", "execution_target", "execution_target_label"
+                    "project", "project_label", "platform_id", "target_id",
+                    "execution_target", "execution_target_label", "execution_adapter",
+                    "execution_resource", "profile_version",
                 )},
+                "requested_platform_id": project_meta["platform_id"],
+                "resolved_execution_adapter": project_meta["execution_adapter"],
             }
             self._claim_execution_slot_locked(slot_claim)
             try:
@@ -2253,8 +2750,14 @@ class CaseTestManager:
         case_refs: list[dict[str, str]] | None = None,
         categories: set[str] | None = None,
         project: str = DEFAULT_TEST_PROJECT,
+        platform_id: str | None = None,
+        target_id: str | None = None,
     ) -> dict[str, Any]:
-        project_meta = _test_project(project)
+        project_meta = _test_project(
+            project,
+            platform_id=platform_id,
+            target_id=target_id,
+        )
         project = project_meta["project"]
         if case_refs is not None and categories is not None:
             raise ValueError("cases 和 categories 不能同时使用")
@@ -2280,14 +2783,52 @@ class CaseTestManager:
             cases = cases[:limit]
         if not cases:
             raise ValueError("没有可执行测试用例")
+        if project_meta["platform_id"] == "579":
+            blocked = []
+            for case in cases:
+                automation = (case.get("platform_automation") or {}).get("579", {})
+                if not automation.get("runnable"):
+                    blocked.append(
+                        f"{case['case_id']}: {automation.get('blocker') or case.get('note') or '579 映射不可执行'}"
+                    )
+            if blocked:
+                raise ValueError("CASE_NOT_RUNNABLE: " + "; ".join(blocked))
+            gateway = self.platform_gateways.get("579")
+            if gateway is None:
+                raise ValueError("CAPABILITY_MISSING: 579 执行网关未安装")
+            from agent_loop_system.platforms.contracts import RunRequest
+            preflight = gateway.preflight(RunRequest(
+                project_id=project,
+                platform_id="579",
+                target_id=project_meta["target_id"],
+                case_ids=tuple(str(case["case_id"]) for case in cases),
+            ))
+            if not preflight.ready:
+                raise ValueError("ENV_BLOCKED: " + "; ".join(preflight.blockers))
+        cases = [
+            {
+                **case,
+                **{key: project_meta[key] for key in (
+                    "project", "project_label", "platform_id", "target_id",
+                    "execution_target", "execution_target_label", "execution_adapter",
+                    "execution_resource", "profile_version",
+                )},
+                "requested_platform_id": project_meta["platform_id"],
+            }
+            for case in cases
+        ]
         with self._lock:
             job_id = uuid.uuid4().hex[:12]
             job = {
                 "id": job_id,
                 "type": "batch",
                 **{key: project_meta[key] for key in (
-                    "project", "project_label", "execution_target", "execution_target_label"
+                    "project", "project_label", "platform_id", "target_id",
+                    "execution_target", "execution_target_label", "execution_adapter",
+                    "execution_resource", "profile_version",
                 )},
+                "requested_platform_id": project_meta["platform_id"],
+                "resolved_execution_adapter": project_meta["execution_adapter"],
                 "status": "queued",
                 "created_at": _now(),
                 "started_at": None,
@@ -2323,6 +2864,7 @@ class CaseTestManager:
 
     def cancel_batch(self, job_id: str) -> dict[str, Any]:
         job_id = _safe_segment(job_id, "任务编号")
+        gateway = None
         with self._lock:
             job = self._jobs.get(job_id)
             if job is None:
@@ -2333,7 +2875,11 @@ class CaseTestManager:
                 raise ValueError("批次测试已经结束")
             job["cancel_requested"] = True
             job["interruption_reason"] = "用户请求在当前用例结束后暂停"
+            if job.get("platform_id") == "579":
+                gateway = self.platform_gateways.get("579")
             self._persist_batch_locked(job)
+        if gateway is not None:
+            gateway.cancel(job_id)
         return self.get(job_id) or {}
 
     def resume_batch(self, job_id: str) -> dict[str, Any]:
@@ -2361,6 +2907,20 @@ class CaseTestManager:
                 raise RuntimeError(
                     f"已有测试任务 {active_job_id} 正在运行（{label}资源已占用）"
                 )
+            if job.get("platform_id") == "579":
+                gateway = self.platform_gateways.get("579")
+                if gateway is None:
+                    raise ValueError("CAPABILITY_MISSING: 579 执行网关未安装")
+                from agent_loop_system.platforms.contracts import RunRequest
+                remaining = job.get("cases", [])[int(job.get("completed") or 0):]
+                preflight = gateway.preflight(RunRequest(
+                    project_id=str(job.get("project") or ""),
+                    platform_id="579",
+                    target_id=str(job.get("target_id") or ""),
+                    case_ids=tuple(str(case.get("case_id") or "") for case in remaining),
+                ))
+                if not preflight.ready:
+                    raise ValueError("ENV_BLOCKED: " + "; ".join(preflight.blockers))
             job["status"] = "queued"
             job["cancel_requested"] = False
             job["finished_at"] = None
@@ -2444,7 +3004,7 @@ class CaseTestManager:
         with self._lock:
             job_ids = [
                 job_id
-                for slot in ("hardware", "simulator")
+                for slot in list(self._active_job_ids)
                 if (job_id := self._active_job_id_for_slot_locked(slot))
             ]
         jobs = [self.get(job_id) for job_id in job_ids]
@@ -2503,11 +3063,73 @@ class CaseTestManager:
         case: dict[str, Any],
         job_dir: Path,
     ) -> dict[str, Any]:
-        project_meta = _test_project(str(case.get("project") or DEFAULT_TEST_PROJECT))
+        project_meta = _test_project(
+            str(case.get("project") or DEFAULT_TEST_PROJECT),
+            platform_id=str(case.get("requested_platform_id") or case.get("platform_id") or "") or None,
+            target_id=str(case.get("target_id") or "") or None,
+        )
         job_dir.mkdir(parents=True, exist_ok=True)
         result_file = job_dir / "test_result.json"
         screenshot = job_dir / "screenshot.bmp"
         started_at = _now()
+        if project_meta["execution_adapter"] == "platform_579":
+            gateway = self.platform_gateways.get("579")
+            if gateway is None:
+                result = {
+                    "verdict": "ERROR",
+                    "reason": "CAPABILITY_MISSING: 579 执行网关未安装",
+                    "infrastructure_status": "CAPABILITY_MISSING",
+                    "evidence_contract": {
+                        "complete": False,
+                        "issues": [{"message": "579 执行网关未安装"}],
+                    },
+                }
+            else:
+                try:
+                    result = gateway.run_case(
+                        case=case,
+                        artifact_dir=job_dir,
+                        run_id=job_id,
+                    )
+                except BaseException as exc:
+                    result = {
+                        "verdict": "ERROR",
+                        "reason": f"579 Runner 异常: {exc}",
+                        "infrastructure_status": "RUNNER_ERROR",
+                        "evidence_contract": {
+                            "complete": False,
+                            "issues": [{"message": f"579 Runner 异常: {exc}"}],
+                        },
+                        "setup_errors": [],
+                        "action_errors": [str(exc)],
+                        "collect_errors": [],
+                        "screenshots": [],
+                    }
+            _write_json(result_file, result)
+            verdict = str(result.get("verdict") or "ERROR").upper()
+            if verdict not in {"PASS", "FAIL", "CANNOT_VERIFY", "ERROR"}:
+                verdict = "ERROR"
+            execution_status = str(result.get("infrastructure_status") or "RUNNER_ERROR")
+            execute_failed = bool(
+                execution_status != "READY"
+                or result.get("aborted")
+                or result.get("setup_errors")
+                or result.get("action_errors")
+                or result.get("collect_errors")
+            )
+            return {
+                "result": result,
+                "stdout": "",
+                "stderr": "",
+                "return_code": 0 if not execute_failed else 1,
+                "verdict": verdict,
+                "reason": str(result.get("reason") or "579 Runner 未提供理由"),
+                "execution_reason": str(result.get("reason") or execution_status),
+                "execute_failed": execute_failed,
+                "started_at": started_at,
+                "finished_at": _now(),
+                "screenshot": screenshot,
+            }
         child_args = [
             "--sheet",
             str(case["file_sheet"]),
@@ -2635,6 +3257,11 @@ class CaseTestManager:
             job["finished_at"] = execution["finished_at"]
             job["verdict"] = verdict
             job["reason"] = reason
+            job["product_verdict"] = result.get("product_verdict")
+            job["automation_maturity"] = result.get("automation_maturity")
+            job["infrastructure_status"] = result.get("infrastructure_status")
+            job["delivery_feedback"] = result.get("delivery_feedback", [])
+            job["observations"] = result.get("observations", [])
             job["error"] = (
                 execution["execution_reason"] if execute_failed else None
             )
@@ -2722,8 +3349,9 @@ class CaseTestManager:
         with self._lock:
             job = self._jobs[job_id]
             execution_target = str(job.get("execution_target") or "simulator")
+            platform_id = str(job.get("platform_id") or "w30")
 
-        if execution_target == "hardware":
+        if execution_target == "hardware" and platform_id == "w30":
             try:
                 from agent_loop_system.tools.hardware_target import HardwareTargetConfig
                 from agent_loop_system.tools.real_device import query_test_session_status
@@ -2799,6 +3427,10 @@ class CaseTestManager:
                 "case_id": case["case_id"],
                 "project": case.get("project", DEFAULT_TEST_PROJECT),
                 "project_label": case.get("project_label", ""),
+                "platform_id": case.get("platform_id", "w30"),
+                "target_id": case.get("target_id", ""),
+                "execution_adapter": case.get("execution_adapter", "w30_cli"),
+                "execution_resource": case.get("execution_resource", ""),
                 "execution_target": case.get("execution_target", "simulator"),
                 "execution_target_label": case.get("execution_target_label", "模拟器"),
                 "priority": case.get("priority", ""),
@@ -2820,32 +3452,32 @@ class CaseTestManager:
                 self._persist_batch_locked(job)
 
             execution = self._execute_case(job_id=job_id, case=case, job_dir=case_dir)
-            infrastructure_failure = (
-                self._hardware_infrastructure_failure(execution)
-                if execution_target == "hardware"
-                else None
-            )
-            if infrastructure_failure:
-                interruption_reason = (
-                    f"真机链路异常，已在第 {index} 条 {case['case_id']} 中断："
-                    f"{infrastructure_failure}"
+            if platform_id == "579":
+                infrastructure_status = str(
+                    (execution.get("result") or {}).get("infrastructure_status") or ""
                 )
-                with self._lock:
-                    job = self._jobs[job_id]
-                    job["status"] = "interrupted"
-                    job["error"] = infrastructure_failure
-                    job["interruption_reason"] = interruption_reason
-                    job["finished_at"] = _now()
-                    job["current_node"] = None
-                    job["current_runtime_archived"] = False
-                    job.pop("process", None)
-                    self._release_execution_slot_locked(job_id)
-                    self._persist_batch_locked(job)
-                return
+                infrastructure_failure = (
+                    str(execution.get("execution_reason") or infrastructure_status)
+                    if infrastructure_status in {
+                        "CLEANUP_REQUIRED", "TRANSPORT_ERROR", "CAPABILITY_MISSING",
+                        "ENV_BLOCKED", "RUNNER_ERROR",
+                    }
+                    else None
+                )
+            else:
+                infrastructure_failure = (
+                    self._hardware_infrastructure_failure(execution)
+                    if execution_target == "hardware"
+                    else None
+                )
             history_job = {
                 "sheet": case["file_sheet"],
                 "case_id": case["case_id"],
                 "project": case.get("project", job.get("project", DEFAULT_TEST_PROJECT)),
+                "requested_platform_id": case.get("requested_platform_id", job.get("requested_platform_id")),
+                "platform_id": case.get("platform_id", job.get("platform_id")),
+                "target_id": case.get("target_id", job.get("target_id")),
+                "resolved_execution_adapter": case.get("execution_adapter", job.get("resolved_execution_adapter")),
                 "case": case,
                 "started_at": execution["started_at"],
                 "finished_at": execution["finished_at"],
@@ -2855,9 +3487,10 @@ class CaseTestManager:
                     if execution["execute_failed"]
                     else None
                 ),
-                "batch_id": job_id,
-                "batch_token": token,
             }
+            if not infrastructure_failure:
+                history_job["batch_id"] = job_id
+                history_job["batch_token"] = token
             with self._lock:
                 self._jobs[job_id]["current_node"] = "record"
             try:
@@ -2882,6 +3515,8 @@ class CaseTestManager:
                 "case_id": case["case_id"],
                 "project": case.get("project", job.get("project", DEFAULT_TEST_PROJECT)),
                 "project_label": case.get("project_label", job.get("project_label", "")),
+                "platform_id": case.get("platform_id", job.get("platform_id", "w30")),
+                "target_id": case.get("target_id", job.get("target_id", "")),
                 "execution_target": case.get("execution_target", job.get("execution_target", "simulator")),
                 "execution_target_label": case.get("execution_target_label", job.get("execution_target_label", "模拟器")),
                 "verdict": execution["verdict"],
@@ -2892,13 +3527,30 @@ class CaseTestManager:
             }
             with self._lock:
                 job = self._jobs[job_id]
-                job["completed"] = index
-                job["verdict_counts"][execution["verdict"]] += 1
+                job["completed"] = offset if infrastructure_failure else index
+                if not infrastructure_failure:
+                    job["verdict_counts"][execution["verdict"]] += 1
                 job["recent_results"] = ([record] + job["recent_results"])[:30]
                 job["current_runtime_archived"] = history_id is not None
                 job.pop("process", None)
                 cancel_requested = bool(job.get("cancel_requested"))
                 self._persist_batch_locked(job)
+            if infrastructure_failure:
+                interruption_reason = (
+                    f"{platform_id} 平台链路异常，已在第 {index} 条 {case['case_id']} 中断："
+                    f"{infrastructure_failure}"
+                )
+                with self._lock:
+                    job = self._jobs[job_id]
+                    job["status"] = "interrupted"
+                    job["error"] = infrastructure_failure
+                    job["interruption_reason"] = interruption_reason
+                    job["finished_at"] = _now()
+                    job["current_node"] = None
+                    job.pop("process", None)
+                    self._release_execution_slot_locked(job_id)
+                    self._persist_batch_locked(job)
+                return
             if cancel_requested:
                 break
 
@@ -3079,15 +3731,121 @@ class JobManager:
 class WebApplication:
     def __init__(self, paths: AppPaths):
         self.paths = paths
+        self.platforms = _PLATFORM_REGISTRY
+        self.projects = _activate_project_registry(paths.root)
         self.history = HistoryStore(paths)
         self.test_history = TestHistoryStore(paths)
         self.defects = DefectRepository(paths, self.history)
-        self.cases = CaseMapRepository(paths, self.test_history)
+        self.case_store = CaseManagementRepository(
+            paths.project_data / "case_management.sqlite3"
+        )
+        self.cases = CaseMapRepository(paths, self.test_history, self.case_store)
         self.jobs = JobManager(paths, self.defects, self.history)
         self.test_jobs = CaseTestManager(paths, self.cases, self.test_history)
         self._execution_lock = threading.Lock()
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
+
+    def execution_options(
+        self,
+        project_id: str,
+        *,
+        case_ids: list[str] | None = None,
+    ) -> dict[str, Any]:
+        project = self.projects.get(project_id, include_archived=False)
+        rows = self.cases._all(project=project_id)
+        wanted = {str(value).strip() for value in (case_ids or []) if str(value).strip()}
+        selected = [row for row in rows if not wanted or row["case_id"] in wanted]
+        options: list[dict[str, Any]] = []
+        for platform_id in project["allowed_platforms"]:
+            targets = [
+                self.platforms.target(target_id)
+                for target_id in project["allowed_targets"]
+                if self.platforms.target(target_id)["platform_id"] == platform_id
+            ]
+            blockers: list[dict[str, str]] = []
+            runnable_count = 0
+            case_results: list[dict[str, Any]] = []
+            environment_status = "READY"
+            environment_reason_code = ""
+            environment_reason_label = ""
+            if not targets:
+                environment_status = "BLOCKED"
+                environment_reason_code = "CAPABILITY_MISSING"
+                environment_reason_label = "当前平台没有可用测试目标"
+            if platform_id == "579" and targets:
+                gateway = self.test_jobs.platform_gateways.get("579")
+                config = getattr(getattr(gateway, "transport", None), "config", None)
+                if not bool(getattr(config, "enabled", False)):
+                    environment_status = "BLOCKED"
+                    environment_reason_code = "ENVIRONMENT_BLOCKED"
+                    environment_reason_label = "579 运行环境尚未启用，请先在环境中心完成配置与受控验收"
+                elif not bool(getattr(config, "device_actions_enabled", False)):
+                    environment_status = "BLOCKED"
+                    environment_reason_code = "DEVICE_ACTIONS_DISABLED"
+                    environment_reason_label = "579 实机动作默认关闭，需完成只读健康检查并单独授权 Canary"
+            for row in selected:
+                automation = (row.get("platform_automation") or {}).get(platform_id, {})
+                applicable = platform_id in (row.get("applicable_platforms") or [])
+                runnable = applicable and bool(automation.get("runnable"))
+                if applicable and platform_id == "w30" and not automation:
+                    runnable = not bool(row.get("unable"))
+                reason_code = ""
+                reason_label = "可执行"
+                if not applicable:
+                    reason_code = "PLATFORM_NOT_APPLICABLE"
+                    reason_label = "该用例未声明适用于当前平台"
+                elif not runnable:
+                    reason_code = "BINDING_NOT_READY"
+                    reason_label = str(
+                        automation.get("blocker_label")
+                        or row.get("note")
+                        or "尚未完成平台自动化绑定"
+                    )
+                elif environment_status != "READY":
+                    runnable = False
+                    reason_code = environment_reason_code
+                    reason_label = environment_reason_label
+                if runnable:
+                    runnable_count += 1
+                else:
+                    legacy_reason = str(
+                        automation.get("blocker")
+                        or row.get("note")
+                        or reason_code
+                    )
+                    blockers.append({
+                        "case_id": str(row["case_id"]),
+                        "reason": legacy_reason,
+                        "reason_code": reason_code,
+                        "reason_label": reason_label,
+                    })
+                case_results.append({
+                    "case_id": str(row["case_id"]),
+                    "runnable": runnable,
+                    "reason_code": reason_code,
+                    "reason_label": reason_label,
+                    "automation_maturity": str(automation.get("maturity") or "UNMAPPED"),
+                    "environment_status": environment_status,
+                    "binding_version": int(automation.get("binding_version") or 0),
+                })
+            options.append({
+                "platform_id": platform_id,
+                "platform_label": self.platforms.platform(platform_id).get("platform_label", platform_id),
+                "targets": targets,
+                "selected_count": len(selected),
+                "runnable_count": runnable_count,
+                "blocked_count": len(blockers),
+                "runnable": bool(selected) and not blockers and bool(targets),
+                "blockers": blockers,
+                "cases": case_results,
+                "environment_status": environment_status,
+            })
+        return {
+            "project_id": project_id,
+            "case_ids": sorted(wanted),
+            "options": options,
+        }
 
     def start_repair(self, *, defect: str) -> dict[str, Any]:
         with self._execution_lock:
@@ -3101,11 +3859,19 @@ class WebApplication:
         sheet: str,
         case_id: str,
         project: str = DEFAULT_TEST_PROJECT,
+        platform_id: str | None = None,
+        target_id: str | None = None,
     ) -> dict[str, Any]:
         with self._execution_lock:
             if self.jobs.active():
                 raise RuntimeError("已有缺陷修复任务正在运行")
-            return self.test_jobs.start(sheet=sheet, case_id=case_id, project=project)
+            return self.test_jobs.start(
+                sheet=sheet,
+                case_id=case_id,
+                project=project,
+                platform_id=platform_id,
+                target_id=target_id,
+            )
 
     def start_candidate_replay(
         self,
@@ -3133,6 +3899,8 @@ class WebApplication:
         case_refs: list[dict[str, str]] | None = None,
         categories: set[str] | None = None,
         project: str = DEFAULT_TEST_PROJECT,
+        platform_id: str | None = None,
+        target_id: str | None = None,
     ) -> dict[str, Any]:
         with self._execution_lock:
             if self.jobs.active():
@@ -3142,6 +3910,8 @@ class WebApplication:
                 case_refs=case_refs,
                 categories=categories,
                 project=project,
+                platform_id=platform_id,
+                target_id=target_id,
             )
 
     def resume_batch_test(self, job_id: str) -> dict[str, Any]:
@@ -3154,33 +3924,42 @@ class WebApplication:
 
 # --- 0.4.0 增强业务辅助方法与协议实现 ---
 
-def _export_cases_xlsx(paths: AppPaths, project: str) -> bytes:
+def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository | None = None) -> bytes:
     """生成标准 9 列表头的 Excel 测试用例工作簿。"""
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "自动化测试用例_v1"
-    headers = ["模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果", "不可自动化", "固化状态", "备注"]
+    headers = [
+        "模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果",
+        "不可自动化", "固化状态", "备注", "适用平台", "用例状态", "当前版本", "来源",
+    ]
     ws.append(headers)
     
-    project_meta = _test_project(project)
-    case_map_root = paths.case_map / project_meta["case_map_dir"]
-    if case_map_root.is_dir():
+    rows = cases._all(project=project) if cases is not None else []
+    if cases is None:
+        project_meta = _test_project(project)
+        case_map_root = _case_catalog_root(paths, project_meta)
         for path in sorted(case_map_root.glob("*.json"), key=lambda p: p.stem):
-            for item in _case_entries(paths, path.stem, project):
-                case_id = str(item.get("case_id") or "").strip()
-                if not case_id:
-                    continue
-                ws.append([
-                    str(item.get("sheet") or path.stem),
-                    case_id,
-                    str(item.get("priority") or ""),
-                    str(item.get("precondition_text") or ""),
-                    str(item.get("steps_text") or ""),
-                    str(item.get("expected_text") or ""),
-                    "是" if item.get("unable") else "否",
-                    str(item.get("mapping_status") or ""),
-                    str(item.get("note") or ""),
-                ])
+            rows.extend(_case_entries(paths, path.stem, project))
+    for item in rows:
+        case_id = str(item.get("case_id") or "").strip()
+        if not case_id:
+            continue
+        ws.append([
+            str(item.get("sheet") or item.get("file_sheet") or ""),
+            case_id,
+            str(item.get("priority") or ""),
+            str(item.get("precondition_text") or ""),
+            str(item.get("steps_text") or ""),
+            str(item.get("expected_text") or ""),
+            "是" if item.get("unable") else "否",
+            str(item.get("mapping_status") or ""),
+            str(item.get("note") or ""),
+            ",".join(str(value) for value in item.get("applicable_platforms", []) if str(value)),
+            str(item.get("workflow_state") or "ACTIVE"),
+            int(item.get("current_revision") or 1),
+            str(item.get("source_type") or ""),
+        ])
                 
     buf = io.BytesIO()
     wb.save(buf)
@@ -3323,6 +4102,23 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             "hardware_source_root": os.environ.get("W30_HARDWARE_SOURCE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
             "hardware_workspace_root": os.environ.get("W30_HARDWARE_WORKSPACE_ROOT", r"D:\Agent-loop-workspace\6202_W5230"),
         },
+        "platform_579": {
+            "enabled": os.environ.get("PLATFORM_579_ENABLED", "false").lower() == "true",
+            "device_actions_enabled": os.environ.get("PLATFORM_579_DEVICE_ACTIONS_ENABLED", "false").lower() == "true",
+            "adb_path": os.environ.get("PLATFORM_579_ADB_PATH", ""),
+            "adb_serial": (
+                "***" + os.environ.get("PLATFORM_579_ADB_SERIAL", "")[-4:]
+                if len(os.environ.get("PLATFORM_579_ADB_SERIAL", "")) > 4
+                else os.environ.get("PLATFORM_579_ADB_SERIAL", "")
+            ),
+            "app_package": os.environ.get("PLATFORM_579_APP_PACKAGE", ""),
+            "bridge_component": os.environ.get("PLATFORM_579_BRIDGE_COMPONENT", ""),
+            "bridge_action": os.environ.get("PLATFORM_579_BRIDGE_ACTION", ""),
+            "com_port": os.environ.get("PLATFORM_579_COM_PORT", "COM3"),
+            "com_baudrate": int(os.environ.get("PLATFORM_579_COM_BAUDRATE", "1500000")),
+            "artifact_root": os.environ.get("PLATFORM_579_ARTIFACT_ROOT", ""),
+            "serial_mode": "read_only",
+        },
     }
 
 
@@ -3374,6 +4170,31 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             env_updates["W30_HARDWARE_SOURCE_ROOT"] = str(sim["hardware_source_root"])
         if "hardware_workspace_root" in sim and sim["hardware_workspace_root"] is not None:
             env_updates["W30_HARDWARE_WORKSPACE_ROOT"] = str(sim["hardware_workspace_root"])
+
+    if "platform_579" in cfg and isinstance(cfg["platform_579"], dict):
+        platform_579 = cfg["platform_579"]
+        if "device_actions_enabled" in platform_579:
+            raise ValueError("网页普通配置不能修改 PLATFORM_579_DEVICE_ACTIONS_ENABLED")
+        field_map = {
+            "enabled": "PLATFORM_579_ENABLED",
+            "adb_path": "PLATFORM_579_ADB_PATH",
+            "adb_serial": "PLATFORM_579_ADB_SERIAL",
+            "app_package": "PLATFORM_579_APP_PACKAGE",
+            "bridge_component": "PLATFORM_579_BRIDGE_COMPONENT",
+            "bridge_action": "PLATFORM_579_BRIDGE_ACTION",
+            "com_port": "PLATFORM_579_COM_PORT",
+            "com_baudrate": "PLATFORM_579_COM_BAUDRATE",
+            "artifact_root": "PLATFORM_579_ARTIFACT_ROOT",
+        }
+        unknown = set(platform_579) - set(field_map)
+        if unknown:
+            raise ValueError(f"579 配置字段不允许: {', '.join(sorted(unknown))}")
+        for key, env_key in field_map.items():
+            if key in platform_579 and platform_579[key] is not None:
+                value = platform_579[key]
+                env_updates[env_key] = (
+                    "true" if value is True else "false" if value is False else str(value)
+                )
             
     for k, v in env_updates.items():
         os.environ[k] = v
@@ -3407,7 +4228,22 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
     """生成全量测试目标的环境就绪状态与检查清单。"""
     items = []
     cfg = _get_system_config(paths)
-    for proj_key, proj_meta in TEST_PROJECTS.items():
+    for proj_meta in _test_project_options():
+        proj_key = str(proj_meta["project"])
+        if proj_meta["platform_id"] == "579":
+            from agent_loop_system.platforms.platform_579 import Platform579HealthProvider
+            item = Platform579HealthProvider().inspect()
+            item.update({
+                "project": proj_key,
+                "project_label": proj_meta["project_label"],
+                "last_checked_at": _now(),
+                "logs": [{
+                    "at": _now(),
+                    "message": f"{proj_meta['project_label']} 只读环境自检完成，状态: {item['status']}",
+                }],
+            })
+            items.append(item)
+            continue
         checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
         
@@ -3427,7 +4263,7 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
         checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
         
         # 2. 项目配置
-        case_map_p = paths.case_map / proj_meta["case_map_dir"]
+        case_map_p = _case_catalog_root(paths, proj_meta)
         c_status = "pass" if case_map_p.is_dir() else "warning"
         c_detail = f"用例库已加载 ({len(list(case_map_p.glob('*.json')))} 个模块)" if c_status == "pass" else "用例库目录未找到"
         checks.append({"key": "config", "label": "项目配置", "status": c_status, "detail": c_detail})
@@ -3467,8 +4303,14 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             "id": proj_key,
             "project": proj_key,
             "project_label": proj_meta["project_label"],
+            "platform_id": proj_meta["platform_id"],
+            "target_id": proj_meta["target_id"],
             "execution_target": proj_meta["execution_target"],
             "execution_target_label": proj_meta["execution_target_label"],
+            "transport": proj_meta.get("transport"),
+            "transport_label": proj_meta.get("transport_label"),
+            "capture_provider": proj_meta.get("capture_provider"),
+            "capture_label": proj_meta.get("capture_label"),
             "status": overall_status,
             "readiness_status": overall_status,
             "last_checked_at": _now(),
@@ -3828,39 +4670,47 @@ class RequestHandler(BaseHTTPRequestHandler):
         timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         sys.stderr.write(f"[{timestamp}] {self.address_string()} {format % args}\n")
 
+    @staticmethod
+    def _error_payload(exc: BaseException, *, fallback: str = "REQUEST_FAILED") -> dict[str, str]:
+        message = str(exc)
+        match = re.match(r"^([A-Z][A-Z0-9_]+)(?::|$)", message)
+        return {"error": message, "error_code": match.group(1) if match else fallback}
+
     def do_GET(self) -> None:
         try:
             self._get()
         except ValueError as exc:
-            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            self._json(self._error_payload(exc, fallback="INVALID_REQUEST"), HTTPStatus.BAD_REQUEST)
         except BaseException as exc:
-            self._json({"error": f"服务器错误: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            self._json({"error": f"服务器错误: {exc}", "error_code": "INTERNAL_ERROR"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def do_POST(self) -> None:
         try:
             self._post()
         except ValueError as exc:
-            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            self._json(self._error_payload(exc, fallback="INVALID_REQUEST"), HTTPStatus.BAD_REQUEST)
         except RuntimeError as exc:
-            self._json({"error": str(exc)}, HTTPStatus.CONFLICT)
+            self._json(self._error_payload(exc, fallback="RESOURCE_CONFLICT"), HTTPStatus.CONFLICT)
         except BaseException as exc:
-            self._json({"error": f"服务器错误: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            self._json({"error": f"服务器错误: {exc}", "error_code": "INTERNAL_ERROR"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def do_PUT(self) -> None:
         try:
             self._put()
         except ValueError as exc:
-            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            self._json(self._error_payload(exc, fallback="INVALID_REQUEST"), HTTPStatus.BAD_REQUEST)
+        except RuntimeError as exc:
+            self._json(self._error_payload(exc, fallback="RESOURCE_CONFLICT"), HTTPStatus.CONFLICT)
         except BaseException as exc:
-            self._json({"error": f"服务器错误: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            self._json({"error": f"服务器错误: {exc}", "error_code": "INTERNAL_ERROR"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def do_DELETE(self) -> None:
         try:
             self._delete()
         except ValueError as exc:
-            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            self._json(self._error_payload(exc, fallback="INVALID_REQUEST"), HTTPStatus.BAD_REQUEST)
         except BaseException as exc:
-            self._json({"error": f"服务器错误: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            self._json({"error": f"服务器错误: {exc}", "error_code": "INTERNAL_ERROR"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def _get(self) -> None:
         parsed = urlparse(self.path)
@@ -3874,21 +4724,100 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"status": "ok"})
             return
 
-        if path == "/api/tests":
+        if path == "/api/platforms":
+            self._json(self.app.platforms.public_payload())
+            return
+
+        match = re.fullmatch(r"/api/platforms/([^/]+)/capabilities", path)
+        if match:
+            platform_id = match.group(1)
+            platform = self.app.platforms.platform(platform_id)
+            targets = self.app.platforms.targets_for(platform_id)
+            projects = [
+                project for project in self.app.projects.list()
+                if platform_id in project["allowed_platforms"]
+            ]
+            cases = [
+                case
+                for project in projects
+                for case in self.app.cases._all(project=project["project_id"])
+            ]
+            maturities: dict[str, int] = {}
+            for case in cases:
+                value = (case.get("platform_automation") or {}).get(platform_id, {})
+                maturity = str(value.get("maturity") or "UNMAPPED")
+                maturities[maturity] = maturities.get(maturity, 0) + 1
+            self._json({
+                "platform": platform,
+                "targets": targets,
+                "project_count": len(projects),
+                "maturity_counts": maturities,
+            })
+            return
+
+        if path == "/api/projects":
+            include_archived = query.get("include_archived", ["false"])[0].lower() == "true"
+            keyword = query.get("q", [""])[0]
+            projects = self.app.projects.list(
+                include_archived=include_archived,
+                query=keyword,
+            )
+            self._json({"items": projects, "total": len(projects)})
+            return
+
+        match = re.fullmatch(r"/api/projects/([^/]+)/execution-options", path)
+        if match:
+            raw_case_ids = query.get("case_id", [])
+            if not raw_case_ids:
+                comma_values = query.get("case_ids", [""])[0]
+                raw_case_ids = [value for value in comma_values.split(",") if value]
+            self._json(self.app.execution_options(match.group(1), case_ids=raw_case_ids))
+            return
+
+        match = re.fullmatch(r"/api/projects/([^/]+)", path)
+        if match:
+            project = self.app.projects.get(match.group(1))
+            project["execution_options"] = self.app.execution_options(match.group(1))["options"]
+            self._json(project)
+            return
+
+        if path == "/api/tests/overview":
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            platform_id = query.get("platform_id", [None])[0]
+            if platform_id:
+                _test_project(project, platform_id=platform_id)
+            limit = self._positive_int(query, "limit", 20, maximum=100)
+            payload = self.app.cases.overview(project=project, limit=limit)
+            if platform_id:
+                payload["platform_id"] = platform_id
+            self._json(payload)
+            return
+
+        if path in {"/api/tests", "/api/cases"}:
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
             keyword = query.get("q", [""])[0]
             state_filter = query.get("state", ["all"])[0]
-            project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
-            self._json(
-                self.app.cases.list(
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            platform_id = query.get("platform_id", [None])[0]
+            modules = {
+                str(value).strip()
+                for value in query.get("module", [])
+                if str(value).strip()
+            }
+            if platform_id:
+                _test_project(project, platform_id=platform_id)
+            payload = self.app.cases.list(
                     query=keyword,
                     page=page,
                     page_size=page_size,
                     state_filter=state_filter,
                     project=project,
+                    modules=modules or None,
                 )
-            )
+            if platform_id:
+                payload["platform_id"] = platform_id
+            self._json(payload)
             return
 
         if path == "/api/tests/active":
@@ -3920,7 +4849,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 j_proj = str(j.get("project") or DEFAULT_TEST_PROJECT)
                 j_status = str(j.get("status") or "completed")
                 j_verdict = str(j.get("verdict") or "ERROR")
-                
+
+                if project and j_proj != project and project != "all":
+                    continue
+
                 if j_status in {"queued", "running", "finalizing"}:
                     queued_cnt += 1
                 if j_status in {"completed", "done"}:
@@ -3929,9 +4861,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                         completed_today += 1
                 if j_verdict in {"FAIL", "ERROR"} or j_status == "failed":
                     error_cnt += 1
-                    
-                if project and j_proj != project and project != "all":
-                    continue
                     
                 if status_filter == "queue":
                     if j_status != "queued":
@@ -3957,6 +4886,17 @@ class RequestHandler(BaseHTTPRequestHandler):
                     "total": j.get("total", 1),
                     "started_at": j.get("started_at") or j.get("created_at"),
                     "finished_at": j.get("finished_at"),
+                    "requested_platform_id": str(
+                        j.get("requested_platform_id") or j.get("platform_id") or meta["platform_id"]
+                    ),
+                    "target_id": str(j.get("target_id") or meta["target_id"]),
+                    "resolved_execution_adapter": str(
+                        j.get("resolved_execution_adapter")
+                        or j.get("execution_adapter")
+                        or meta["execution_adapter"]
+                    ),
+                    "automation_maturity": str(j.get("automation_maturity") or "UNKNOWN"),
+                    "infrastructure_status": str(j.get("infrastructure_status") or "UNKNOWN"),
                 })
                 
             items.sort(key=lambda x: str(x.get("finished_at") or x.get("started_at") or ""), reverse=True)
@@ -3994,7 +4934,11 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         match = re.fullmatch(r"/api/tests/([^/]+)/([^/]+)", path)
         if match:
-            project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            platform_id = query.get("platform_id", [None])[0]
+            target_id = query.get("target_id", [None])[0]
+            if platform_id or target_id:
+                _test_project(project, platform_id=platform_id, target_id=target_id)
             data = self.app.cases.get(match.group(1), match.group(2), project=project)
             self._json(data if data is not None else {"error": "测试用例不存在"}, HTTPStatus.OK if data else HTTPStatus.NOT_FOUND)
             return
@@ -4032,8 +4976,58 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if path == "/api/cases/export":
             project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
-            data = _export_cases_xlsx(self.app.paths, project)
+            data = _export_cases_xlsx(self.app.paths, project, self.app.cases)
             self._serve_binary(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"test_cases_{project}.xlsx")
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/revisions", path)
+        if match:
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            self._json({
+                "project_id": project,
+                "case_id": match.group(1),
+                "items": self.app.case_store.revisions(project, match.group(1)),
+            })
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/bindings", path)
+        if match:
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            case = self.app.case_store.get_case(project, match.group(1))
+            self._json(
+                {"project_id": project, "case_id": match.group(1), "bindings": case.get("platform_automation", {})}
+                if case else {"error": "CASE_NOT_FOUND"},
+                HTTPStatus.OK if case else HTTPStatus.NOT_FOUND,
+            )
+            return
+
+        match = re.fullmatch(r"/api/cases/import/([^/]+)/errors", path)
+        if match:
+            self._json({"batch_id": match.group(1), "items": self.app.case_store.import_errors(match.group(1))})
+            return
+
+        match = re.fullmatch(r"/api/cases/import/([^/]+)", path)
+        if match:
+            batch = self.app.case_store.import_batch(match.group(1))
+            self._json(batch if batch else {"error": "IMPORT_BATCH_NOT_FOUND"}, HTTPStatus.OK if batch else HTTPStatus.NOT_FOUND)
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/audit", path)
+        if match:
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            self._json({
+                "project_id": project,
+                "case_id": match.group(1),
+                "items": self.app.case_store.audit_events(project, match.group(1)),
+            })
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)", path)
+        if match and match.group(1) not in {"migration-candidates"}:
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            self.app.cases._all(project=project)
+            case = self.app.case_store.get_case(project, match.group(1))
+            self._json(case if case else {"error": "CASE_NOT_FOUND"}, HTTPStatus.OK if case else HTTPStatus.NOT_FOUND)
             return
 
         if path == "/api/cases/migration-candidates":
@@ -4344,9 +5338,35 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _post(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/projects":
+            body = self._body_json()
+            project = self.app.projects.create(body)
+            self._json(project, HTTPStatus.CREATED)
+            return
+
+        match = re.fullmatch(r"/api/projects/([^/]+)/archive", path)
+        if match:
+            self._json(self.app.projects.archive(match.group(1)))
+            return
+
         if path == "/api/tests/run-batch":
             body = self._body_json()
-            project = _test_project(str(body.get("project") or DEFAULT_TEST_PROJECT))["project"]
+            has_explicit_routing = "platform_id" in body or "target_id" in body
+            project_value = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            platform_id = str(body.get("platform_id") or "").strip() or None
+            target_id = str(body.get("target_id") or "").strip() or None
+            resolved = _test_project(
+                project_value,
+                platform_id=platform_id,
+                target_id=target_id,
+            )
+            project = resolved["project"]
+            platform_id = resolved["platform_id"]
+            target_id = resolved["target_id"]
+            routing_kwargs = (
+                {"platform_id": platform_id, "target_id": target_id}
+                if has_explicit_routing else {}
+            )
             limit = body.get("limit", 0)
             if isinstance(limit, bool) or not isinstance(limit, int) or limit < 0 or limit > 5000:
                 raise ValueError("limit 必须是 0 到 5000 的整数")
@@ -4382,14 +5402,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             if case_refs is not None and categories is not None:
                 raise ValueError("cases 和 categories 不能同时使用")
             if case_refs is None and categories is None:
-                job = self.app.start_batch_test(limit=limit, project=project)
+                job = self.app.start_batch_test(
+                    limit=limit, project=project, **routing_kwargs,
+                )
             elif categories is not None:
                 job = self.app.start_batch_test(
-                    limit=limit, categories=categories, project=project
+                    limit=limit, categories=categories, project=project,
+                    **routing_kwargs,
                 )
             else:
                 job = self.app.start_batch_test(
-                    limit=limit, case_refs=case_refs, project=project
+                    limit=limit, case_refs=case_refs, project=project,
+                    **routing_kwargs,
                 )
             self._json(job, HTTPStatus.ACCEPTED)
             return
@@ -4404,129 +5428,150 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json(self.app.resume_batch_test(match.group(1)), HTTPStatus.ACCEPTED)
             return
 
+        if path == "/api/cases/execution-options":
+            body = self._body_json()
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            raw_case_ids = body.get("case_ids") or body.get("case_id") or []
+            if isinstance(raw_case_ids, str):
+                raw_case_ids = [raw_case_ids]
+            if not isinstance(raw_case_ids, list):
+                raise ValueError("case_ids 必须为数组")
+            self._json(self.app.execution_options(project, case_ids=raw_case_ids))
+            return
+
         if path == "/api/tests/run":
             body = self._body_json()
-            project = _test_project(str(body.get("project") or DEFAULT_TEST_PROJECT))["project"]
+            has_explicit_routing = "platform_id" in body or "target_id" in body
+            project_value = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            platform_id = str(body.get("platform_id") or "").strip() or None
+            target_id = str(body.get("target_id") or "").strip() or None
+            resolved = _test_project(
+                project_value,
+                platform_id=platform_id,
+                target_id=target_id,
+            )
+            project = resolved["project"]
             sheet = body.get("sheet")
             case_id = body.get("case_id")
             if not isinstance(sheet, str) or not sheet.strip():
                 raise ValueError("sheet 必填")
             if not isinstance(case_id, str) or not case_id.strip():
                 raise ValueError("case_id 必填")
+            routing_kwargs = (
+                {
+                    "platform_id": resolved["platform_id"],
+                    "target_id": resolved["target_id"],
+                }
+                if has_explicit_routing else {}
+            )
             job = self.app.start_case_test(
-                sheet=sheet.strip(), case_id=case_id.strip(), project=project
+                sheet=sheet.strip(), case_id=case_id.strip(), project=project,
+                **routing_kwargs,
             )
             self._json(job, HTTPStatus.ACCEPTED)
             return
 
-        if path == "/api/cases/create":
+        if path in {"/api/cases", "/api/cases/create"}:
             body = self._body_json()
-            project = str(body.get("project") or DEFAULT_TEST_PROJECT)
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
             case_obj = body.get("case")
+            if case_obj is None and path == "/api/cases":
+                case_obj = body
             if not isinstance(case_obj, dict):
                 raise ValueError("case 字段必填且必须为对象")
-            case_id = str(case_obj.get("case_id") or "").strip()
-            sheet = str(case_obj.get("sheet") or "").strip()
-            if not case_id:
-                raise ValueError("用例编号 case_id 必填")
-            if not sheet:
-                raise ValueError("模块 sheet 必填")
-                
             project_meta = _test_project(project)
-            case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
-            case_map_root.mkdir(parents=True, exist_ok=True)
-            sheet_file = case_map_root / f"{sheet}.json"
-            
-            entries = _case_entries(self.app.paths, sheet, project=project)
-            for item in entries:
-                if isinstance(item, dict) and item.get("case_id") == case_id:
-                    raise ValueError(f"用例编号 {case_id} 在模块 {sheet} 中已存在")
-                    
-            new_entry = {
-                "case_id": case_id,
-                "sheet": sheet,
-                "priority": str(case_obj.get("priority") or "P1").strip(),
-                "precondition_text": str(case_obj.get("precondition_text") or "").strip(),
-                "steps_text": str(case_obj.get("steps_text") or "").strip(),
-                "expected_text": str(case_obj.get("expected_text") or "").strip(),
-                "verification_points": [str(case_obj.get("expected_text")).strip()] if case_obj.get("expected_text") else [],
-                "setup": [],
-                "actions": [],
-                "collect": ["srv_quick_cmd send TOP5STEP:GUI_TREE:1;"],
-                "unable": bool(case_obj.get("unable", False)),
-                "mapping_status": str(case_obj.get("mapping_status") or ""),
-                "note": str(case_obj.get("note") or "").strip(),
-            }
-            
-            raw = _read_json(sheet_file, [])
-            if isinstance(raw, dict) and "cases" in raw:
-                raw["cases"].append(new_entry)
-                _write_json(sheet_file, raw)
-            else:
-                if not isinstance(raw, list):
-                    raw = []
-                raw.append(new_entry)
-                _write_json(sheet_file, raw)
-                
-            self._json({"status": "ok", "case_id": case_id})
+            created = self.app.case_store.create_case(project_meta, case_obj)
+            managed_case = self.app.case_store.get_case(project, created["case_id"])
+            if managed_case and path == "/api/cases/create":
+                _write_unified_compat_shadow(self.app.paths, project_meta, managed_case)
+            self._json({"status": "ok", **created}, HTTPStatus.CREATED if path == "/api/cases" else HTTPStatus.OK)
             return
 
         if path == "/api/cases/update":
             body = self._body_json()
-            project = str(body.get("project") or DEFAULT_TEST_PROJECT)
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
             orig_case_id = str(body.get("orig_case_id") or "").strip()
             case_obj = body.get("case")
             if not isinstance(case_obj, dict):
                 raise ValueError("case 字段必填且必须为对象")
-            case_id = str(case_obj.get("case_id") or orig_case_id).strip()
-            sheet = str(case_obj.get("sheet") or "").strip()
             if not orig_case_id:
                 raise ValueError("原用例编号 orig_case_id 必填")
-            if not sheet:
-                raise ValueError("模块 sheet 必填")
-                
             project_meta = _test_project(project)
-            case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
-            sheet_file = case_map_root / f"{sheet}.json"
-            if not sheet_file.is_file():
-                raise ValueError(f"模块文件 {sheet}.json 不存在")
-                
-            raw = _read_json(sheet_file, [])
-            case_list = raw.get("cases") if isinstance(raw, dict) and isinstance(raw.get("cases"), list) else (raw if isinstance(raw, list) else [])
-            
-            target_idx = None
-            for idx, item in enumerate(case_list):
-                if isinstance(item, dict) and item.get("case_id") == orig_case_id:
-                    target_idx = idx
-                    break
-            if target_idx is None:
-                raise ValueError(f"未找到原用例 {orig_case_id}")
-                
-            if case_id != orig_case_id:
-                for idx, item in enumerate(case_list):
-                    if idx != target_idx and isinstance(item, dict) and item.get("case_id") == case_id:
-                        raise ValueError(f"目标编号 {case_id} 已被其他用例占用")
-                        
-            item = case_list[target_idx]
-            item["case_id"] = case_id
-            item["sheet"] = sheet
-            if "priority" in case_obj:
-                item["priority"] = str(case_obj["priority"]).strip()
-            if "precondition_text" in case_obj:
-                item["precondition_text"] = str(case_obj["precondition_text"]).strip()
-            if "steps_text" in case_obj:
-                item["steps_text"] = str(case_obj["steps_text"]).strip()
-            if "expected_text" in case_obj:
-                item["expected_text"] = str(case_obj["expected_text"]).strip()
-                if not item.get("verification_points") or item["verification_points"] == [item.get("expected_text")]:
-                    item["verification_points"] = [item["expected_text"]] if item["expected_text"] else []
-            if "note" in case_obj:
-                item["note"] = str(case_obj["note"]).strip()
-            if "unable" in case_obj:
-                item["unable"] = bool(case_obj["unable"])
-                
-            _write_json(sheet_file, raw)
-            self._json({"status": "ok", "case_id": case_id})
+            updated = self.app.case_store.create_revision(
+                project_meta, orig_case_id, case_obj,
+                change_summary=str(body.get("change_summary") or "网页编辑"),
+            )
+            managed_case = self.app.case_store.get_case(project, orig_case_id)
+            if managed_case:
+                _write_unified_compat_shadow(self.app.paths, project_meta, managed_case)
+            self._json({"status": "ok", **updated})
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/revisions", path)
+        if match:
+            body = self._body_json()
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            project_meta = _test_project(project)
+            changes = body.get("case") if isinstance(body.get("case"), dict) else body.get("changes")
+            if not isinstance(changes, dict):
+                raise ValueError("case 或 changes 字段必填")
+            result = self.app.case_store.create_revision(
+                project_meta, match.group(1), changes,
+                change_summary=str(body.get("change_summary") or "创建新版本"),
+            )
+            self._json({"status": "ok", **result}, HTTPStatus.CREATED)
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/(archive|restore)", path)
+        if match:
+            body = self._body_json() if self.headers.get("Content-Length") else {}
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            result = self.app.case_store.set_workflow_state(
+                _test_project(project), match.group(1),
+                "ARCHIVED" if match.group(2) == "archive" else "ACTIVE",
+            )
+            self._json({"status": "ok", **result})
+            return
+
+        match = re.fullmatch(r"/api/cases/([^/]+)/clone", path)
+        if match:
+            body = self._body_json()
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            result = self.app.case_store.clone_case(
+                _test_project(project), match.group(1), str(body.get("new_case_id") or ""),
+            )
+            self._json({"status": "ok", **result}, HTTPStatus.CREATED)
+            return
+
+        match = re.fullmatch(
+            r"/api/cases/([^/]+)/bindings/([^/]+)/(candidate|review|promote|rollback)",
+            path,
+        )
+        if match:
+            body = self._body_json()
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
+            case_id, platform_id, action = match.groups()
+            self.app.cases._all(project=project)
+            if action == "promote" and platform_id == "579":
+                case = self.app.case_store.get_case(project, case_id)
+                binding = ((case or {}).get("platform_automation") or {}).get("579", {})
+                candidate = binding.get("candidate") if isinstance(binding, dict) else None
+                gateway = self.app.test_jobs.platform_gateways.get("579")
+                catalog = getattr(gateway, "catalog", None)
+                if not isinstance(candidate, dict) or catalog is None:
+                    raise ValueError("CAPABILITY_MISSING: 579 正式动作注册表尚未绑定")
+                plan = catalog.private_plan(case_id)
+                if (
+                    str(candidate.get("binding_ref") or "") != str(plan.get("automation_case_id") or "")
+                    or str(candidate.get("plan_sha256") or "").upper() != str(plan.get("_plan_sha256") or "").upper()
+                ):
+                    raise ValueError("CAPABILITY_MISSING: 候选引用与受保护动作注册表不一致")
+            result = self.app.case_store.transition_binding(
+                _test_project(project), case_id, platform_id, action,
+                body.get("binding") if isinstance(body.get("binding"), dict)
+                else {key: value for key, value in body.items() if key not in {"project", "project_id"}},
+            )
+            self._json({"status": "ok", **result}, HTTPStatus.CREATED if action == "candidate" else HTTPStatus.OK)
             return
 
         if path == "/api/cases/migrate":
@@ -4544,7 +5589,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not src_case:
                 raise ValueError(f"在源项目 {src_prof} 中未找到用例 {case_id}")
                 
-            tgt_root = self.app.paths.case_map / tgt_meta["case_map_dir"]
+            tgt_root = _case_catalog_root(self.app.paths, tgt_meta)
             tgt_root.mkdir(parents=True, exist_ok=True)
             tgt_sheet_f = tgt_root / f"{sheet}.json"
             tgt_raw = _read_json(tgt_sheet_f, [])
@@ -4631,98 +5676,98 @@ class RequestHandler(BaseHTTPRequestHandler):
             }, HTTPStatus.ACCEPTED)
             return
 
-        if path == "/api/excel/preview":
+        if path in {"/api/excel/preview", "/api/cases/import/preview"}:
             body = self._body_json()
-            project = str(body.get("project") or DEFAULT_TEST_PROJECT)
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
             b64_data = str(body.get("file_base64") or "").strip()
             if not b64_data:
                 raise ValueError("未提供 Excel 文件内容 (file_base64)")
-                
+
+            project_meta = _test_project(project)
+            # 导入冲突判断必须同时覆盖尚未写入业务库的冻结/Case Map 基线。
+            self.app.cases._all(project=project)
             parsed = _parse_excel_cases(b64_data)
-            existing_cases = {c["case_id"] for c in self.app.cases._all(project=project)}
-            new_cases = [c for c in parsed if c["case_id"] not in existing_cases]
-            existing_count = len(parsed) - len(new_cases)
-            modules = sorted({c["sheet"] for c in parsed})
-            
-            self._json({
-                "new_count": len(new_cases),
-                "existing_count": existing_count,
-                "total_parsed": len(parsed),
-                "modules": modules,
-                "new_cases": [
-                    {"case_id": c["case_id"], "sheet": c["sheet"], "expected_text": c["expected_text"]}
-                    for c in new_cases
-                ]
-            })
+            applicable_platforms = body.get("applicable_platforms")
+            if not isinstance(applicable_platforms, list) or not applicable_platforms:
+                if path == "/api/cases/import/preview":
+                    raise ValueError("IMPORT_PLATFORM_REQUIRED: 导入前必须明确选择适用平台")
+                applicable_platforms = list(project_meta.get("allowed_platforms") or [])
+            for case in parsed:
+                case["applicable_platforms"] = applicable_platforms
+            try:
+                file_bytes = base64.b64decode(b64_data, validate=True)
+            except ValueError as exc:
+                raise ValueError("EXCEL_BASE64_INVALID") from exc
+            source_sha256 = hashlib.sha256(file_bytes).hexdigest().upper()
+            conflict_strategy = str(body.get("conflict_strategy") or "").strip().upper()
+            if not conflict_strategy:
+                conflict_strategy = "NEW_REVISION" if bool(body.get("overwrite_existing")) else "SKIP"
+            preview = self.app.case_store.preview_import(
+                project_meta,
+                parsed,
+                source_filename=str(body.get("filename") or body.get("file_name") or "import.xlsx"),
+                source_sha256=source_sha256,
+                conflict_strategy=conflict_strategy,
+            )
+            self._json(preview)
             return
 
-        if path == "/api/excel/confirm":
+        if path in {"/api/excel/confirm", "/api/cases/import/commit"}:
             body = self._body_json()
-            project = str(body.get("project") or DEFAULT_TEST_PROJECT)
-            b64_data = str(body.get("file_base64") or "").strip()
-            overwrite_existing = bool(body.get("overwrite_existing", False))
-            if not b64_data:
-                raise ValueError("未提供 Excel 文件内容 (file_base64)")
-                
-            parsed = _parse_excel_cases(b64_data)
+            project = str(body.get("project_id") or body.get("project") or DEFAULT_TEST_PROJECT)
             project_meta = _test_project(project)
-            case_map_root = self.app.paths.case_map / project_meta["case_map_dir"]
-            case_map_root.mkdir(parents=True, exist_ok=True)
-            
-            by_sheet: dict[str, list[dict[str, Any]]] = {}
-            for c in parsed:
-                by_sheet.setdefault(c["sheet"], []).append(c)
-                
-            imported_count = 0
-            overwritten_count = 0
-            skipped_count = 0
-            modules_updated = set()
-            
-            for sheet_name, sheet_cases in by_sheet.items():
-                sheet_file = case_map_root / f"{sheet_name}.json"
-                raw = _read_json(sheet_file, [])
-                is_dict_envelope = isinstance(raw, dict) and "cases" in raw
-                existing_list = raw.get("cases") if is_dict_envelope else (raw if isinstance(raw, list) else [])
-                existing_map = {item["case_id"]: item for item in existing_list if isinstance(item, dict) and item.get("case_id")}
-                
-                updated = False
-                for c in sheet_cases:
-                    cid = c["case_id"]
-                    clean_c = {k: v for k, v in c.items() if not k.startswith("_")}
-                    if cid in existing_map:
-                        if overwrite_existing:
-                            existing_map[cid].update(clean_c)
-                            overwritten_count += 1
-                            updated = True
-                        else:
-                            skipped_count += 1
-                    else:
-                        existing_list.append(clean_c)
-                        existing_map[cid] = clean_c
-                        imported_count += 1
-                        updated = True
-                        
-                if updated:
-                    modules_updated.add(sheet_name)
-                    if is_dict_envelope:
-                        raw["cases"] = existing_list
-                        _write_json(sheet_file, raw)
-                    else:
-                        _write_json(sheet_file, existing_list)
-                        
-            self._json({
-                "imported_count": imported_count,
-                "overwritten_count": overwritten_count,
-                "skipped_count": skipped_count,
-                "modules_updated": sorted(modules_updated),
-            })
+            self.app.cases._all(project=project)
+            batch_id = str(body.get("batch_id") or "").strip()
+            preview_token = str(body.get("preview_token") or "").strip()
+            source_sha256 = str(body.get("source_sha256") or "").strip()
+
+            # 保留旧客户端兼容：未携带预览令牌时，先在服务端重新生成一次预览，
+            # 但仍只提交 SQLite 业务库，绝不覆盖冻结 Manifest / Case Map。
+            if not batch_id or not preview_token or not source_sha256:
+                b64_data = str(body.get("file_base64") or "").strip()
+                if not b64_data:
+                    raise ValueError("IMPORT_PREVIEW_REQUIRED: 请先完成导入预览")
+                applicable_platforms = body.get("applicable_platforms")
+                if not isinstance(applicable_platforms, list) or not applicable_platforms:
+                    applicable_platforms = list(project_meta.get("allowed_platforms") or [])
+                parsed = _parse_excel_cases(b64_data)
+                for case in parsed:
+                    case["applicable_platforms"] = applicable_platforms
+                try:
+                    file_bytes = base64.b64decode(b64_data, validate=True)
+                except ValueError as exc:
+                    raise ValueError("EXCEL_BASE64_INVALID") from exc
+                source_sha256 = hashlib.sha256(file_bytes).hexdigest().upper()
+                strategy = "NEW_REVISION" if bool(body.get("overwrite_existing")) else "SKIP"
+                preview = self.app.case_store.preview_import(
+                    project_meta,
+                    parsed,
+                    source_filename=str(body.get("filename") or body.get("file_name") or "import.xlsx"),
+                    source_sha256=source_sha256,
+                    conflict_strategy=str(body.get("conflict_strategy") or strategy),
+                )
+                batch_id = preview["batch_id"]
+                preview_token = preview["preview_token"]
+
+            result = self.app.case_store.commit_import(
+                project_meta,
+                batch_id=batch_id,
+                preview_token=preview_token,
+                source_sha256=source_sha256,
+            )
+            self._json(result)
             return
 
         match = re.fullmatch(r"/api/environments/([^/]+)/check", path)
         if match:
             proj = match.group(1)
             envs = _get_environments_status(self.app.paths)
-            target_env = next((e for e in envs if e["id"] == proj or e["project"] == proj), envs[0] if envs else {})
+            target_env = next((
+                e for e in envs
+                if e.get("id") == proj or e.get("project") == proj or e.get("target_id") == proj
+            ), None)
+            if target_env is None:
+                raise ValueError(f"TARGET_NOT_FOUND: {proj}")
             self._json({"status": "ok", "result": target_env})
             return
 
@@ -4838,19 +5883,39 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _put(self) -> None:
         path = urlparse(self.path).path
+        project_match = re.fullmatch(r"/api/projects/([^/]+)", path)
+        if project_match:
+            self._json(
+                self.app.projects.update(project_match.group(1), self._body_json())
+            )
+            return
         match = re.fullmatch(r"/api/environments/([^/]+)", path)
         if match:
-            project = match.group(1)
+            requested_environment = match.group(1)
+            try:
+                target_id = self.app.platforms.target(requested_environment)["target_id"]
+            except ValueError:
+                target_id = _test_project(requested_environment)["target_id"]
             body = self._body_json()
+            if target_id == "579.o2":
+                payload = body.get("platform_579", body)
+                if not isinstance(payload, dict):
+                    raise ValueError("platform_579 配置必须是对象")
+                _save_system_config(self.app.paths, {"platform_579": payload})
+                self._json({
+                    "status": "ok",
+                    "message": "579 环境配置已保存；实机动作总开关未改变",
+                })
+                return
             paths_obj = body.get("paths", {})
             if isinstance(paths_obj, dict):
                 config_update = {"simulator": {}}
-                if project == "6202_W5230":
+                if target_id == "w30.6202.hardware":
                     if "source_root" in paths_obj:
                         config_update["simulator"]["hardware_source_root"] = paths_obj["source_root"]
                     if "workspace_root" in paths_obj:
                         config_update["simulator"]["hardware_workspace_root"] = paths_obj["workspace_root"]
-                elif project == "6202_W5230_SIMULATOR":
+                elif target_id == "w30.6202.simulator":
                     if "source_root" in paths_obj:
                         os.environ["W30_6202_SIMULATOR_SOURCE_ROOT"] = str(paths_obj["source_root"])
                     if "build_directory" in paths_obj:
@@ -4962,6 +6027,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
         query = parse_qs(parsed.query)
+        match = re.fullmatch(r"/api/cases/([^/]+)", path)
+        if match:
+            project = query.get("project_id", query.get("project", [DEFAULT_TEST_PROJECT]))[0]
+            result = self.app.case_store.set_workflow_state(
+                _test_project(project), match.group(1), "ARCHIVED"
+            )
+            self._json({"status": "ok", **result})
+            return
         match = re.fullmatch(r"/api/test-history/([^/]+)/([^/]+)/([^/]+)", path)
         if match:
             project = query.get("project", [DEFAULT_TEST_PROJECT])[0]

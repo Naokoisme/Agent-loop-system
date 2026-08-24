@@ -130,6 +130,38 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("body.search-active", self.stylesheet)
         self.assertIn(".pagination", self.stylesheet)
 
+    def test_case_management_uses_one_server_paginated_request(self) -> None:
+        for token in (
+            "async function loadCasePage(project",
+            "page_size: String(PAGE_SIZE)",
+            "modules.forEach(name => params.append('module', name))",
+            "const payload = await loadCasePage(project",
+            "renderModuleSidebar(payload.module_counts",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_case_management_requires_platform_selection_before_loading_cases(self) -> None:
+        for token in (
+            "async function renderCasePlatformLanding()",
+            "if (!['w30', '579'].includes(requestedPlatform)) return renderCasePlatformLanding();",
+            'data-case-platform="w30"',
+            'data-case-platform="579"',
+            "进入 W30 用例管理",
+            "进入 579 用例管理",
+            "caseProjectsForPlatform(initialPlatform).map",
+            "切换平台后，只加载该平台下的项目与用例",
+        ):
+            self.assertIn(token, self.javascript)
+        for selector in (
+            ".case-platform-gateway-grid",
+            ".case-platform-entry",
+            ".case-platform-context",
+        ):
+            self.assertIn(selector, self.stylesheet)
+        self.assertIn('<a class="case-platform-entry is-w30"', self.javascript)
+        self.assertIn('<a class="case-platform-entry is-579"', self.javascript)
+        self.assertNotIn('<button type="button" class="case-platform-entry', self.javascript)
+
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (
             'data-result-filter="${result}"',
@@ -270,6 +302,19 @@ class FrontendAssetsTest(unittest.TestCase):
             "? rawVerdict : 'ERROR'",
         ):
             self.assertIn(token, self.javascript)
+        self.assertIn("适用平台：${platforms}", self.javascript)
+        self.assertIn("<th>自动化成熟度</th><th>最近结果</th>", self.javascript)
+        for duplicated_label in (
+            "579 · 自动化就绪",
+            "579 · 待评审",
+            "579 · 需人工",
+            "579 · 不支持",
+        ):
+            self.assertNotIn(duplicated_label, self.javascript)
+        status_function = self.javascript.split("function caseStatusChip(row = {})", 1)[1].split(
+            "function testExecutionModeLabel", 1
+        )[0]
+        self.assertNotIn("return maturityChip(row);", status_function)
         for token in (
             "PASS: 'PASS'",
             "FAIL: 'FAIL'",
@@ -306,7 +351,7 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "const historyId = item.history_id || item.run_id || '';",
             "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
-            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module});",
+            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module, platform_id: filters.platform, result: filters.result, maturity: filters.maturity, infrastructure: filters.infrastructure});",
             "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
             "function testReportReturnUrl()",
             "const backHref = reportReturnTo || testDetailHref(project, sheet, caseId, returnTo);",
@@ -324,7 +369,9 @@ class FrontendAssetsTest(unittest.TestCase):
             "error: '最近执行异常'",
             "latestBatchCandidateSummary.pass",
             "最新结果已通过的用例不会重跑",
-            "JSON.stringify({limit: 0, categories, project: projectSelect.value})",
+            "project_id: projectSelect.value",
+            "platform_id: platformId",
+            "target_id: targetId",
             "batch-resume-button",
             "/resume",
             "继续运行剩余",
@@ -343,6 +390,28 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.javascript)
         self.assertIn(".batch-active-row", self.stylesheet)
+
+    def test_environment_tabs_have_real_links_and_do_not_depend_on_click_handlers(self) -> None:
+        for token in (
+            "if (item.href)",
+            "environmentTabHref('llm')",
+            "environmentTabHref('ones')",
+            "environmentTabHref('updates')",
+            'aria-current="page"',
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertIn(".workspace-subtabs a", self.stylesheet)
+
+    def test_automation_maturity_is_shown_in_chinese(self) -> None:
+        for text in ("自动化就绪", "待评审", "需人工执行", "暂不支持", "未绑定"):
+            self.assertIn(text, self.javascript)
+        for raw_label in (
+            "<span>AUTO_READY</span>",
+            "<span>NEED_REVIEW</span>",
+            "<span>MANUAL_REQUIRED</span>",
+            "<span>UNSUPPORTED</span>",
+        ):
+            self.assertNotIn(raw_label, self.javascript)
 
 
 if __name__ == "__main__":

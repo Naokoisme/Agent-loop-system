@@ -172,6 +172,8 @@ def decide_reproduction_action(
     capability_knowledge: str | None = None,
     navigation_source_root: str | None = None,
     test_case: dict[str, str] | None = None,
+    target_label: str | None = None,
+    platform_guidance: str | None = None,
 ) -> "ReproductionDecision | None":
     """根据当前观察只决定下一步，不生成整套命令。"""
     from agent_loop_system.reproduction import ReproductionDecision
@@ -236,15 +238,28 @@ def decide_reproduction_action(
         for item in navigation_sources
     )
 
-    target_label = "当前真机项目" if execution_target == "hardware" else "模拟器"
-    target_knowledge = capability_knowledge or load_simulator_knowledge()
-    target_rule = (
-        "7. 当前是真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"
-        "关机、重启或批量删除类命令。\n"
-        if execution_target == "hardware"
-        else "7. Windows 模拟器不得选择能力目录中注明仅供非 Windows 真机兼容的旧命令，"
-        "必须使用目录给出的模拟器替代命令。\n"
+    resolved_target_label = (
+        str(target_label or "").strip()
+        or ("当前真机项目" if execution_target == "hardware" else "模拟器")
     )
+    target_knowledge = capability_knowledge or load_simulator_knowledge()
+    if platform_guidance:
+        navigation_rule = (
+            "6. 只能从当前平台能力目录选择业务动作；不得编造平台命令、协议值、坐标或能力别名。\n"
+        )
+        target_rule = f"7. {str(platform_guidance).strip()}\n"
+    else:
+        navigation_rule = (
+            "6. 优先使用注册窗口的 ENTER_PAGE；目标窗口本身能展示文案、排版或图片时，不得额外读取"
+            " BUSINESS_GET 或注入无关业务数据。\n"
+        )
+        target_rule = (
+            "7. 当前是真机：不得选择任何 SIM_* 命令，也不得选择清空、恢复出厂、"
+            "关机、重启或批量删除类命令。\n"
+            if execution_target == "hardware"
+            else "7. Windows 模拟器不得选择能力目录中注明仅供非 Windows 真机兼容的旧命令，"
+            "必须使用目录给出的模拟器替代命令。\n"
+        )
     if test_case is None:
         role_text = (
             "你是嵌入式手表缺陷复现 Agent。你要根据当前截图和历史观察，只决定下一步一个动作，"
@@ -279,7 +294,7 @@ def decide_reproduction_action(
         f"{source_title}：\n{files_text}\n\n"
         "运行时页面入口源码（系统根据目标窗口与实际落点自动补充，用于判断重定向和前置状态）：\n"
         f"{navigation_text or '本轮没有发生需要补充源码的页面重定向'}\n\n"
-        f"{target_label}能力目录（命令和窗口只能从这里选择，禁止编造）：\n"
+        f"{resolved_target_label}能力目录（命令和窗口只能从这里选择，禁止编造）：\n"
         f"{target_knowledge}\n\n"
         "历史观察：\n"
         f"{json.dumps(observations, ensure_ascii=False, indent=2)}\n\n"
@@ -289,8 +304,7 @@ def decide_reproduction_action(
         f"3. READY_TO_JUDGE：{ready_rule}\n"
         "4. BLOCKED：真实能力目录明确缺少到达目标所需能力时停止；不要因为暂时没找到入口就阻塞。\n"
         "5. GUI_PING、GUI_TREE、GUI_STATE、SCREENSHOT_PRINT 由系统自动执行，禁止放进 command。\n"
-        "6. 优先使用注册窗口的 ENTER_PAGE；目标窗口本身能展示文案、排版或图片时，不得额外读取"
-        " BUSINESS_GET 或注入无关业务数据。\n"
+        f"{navigation_rule}"
         f"{target_rule}"
         "8. reason 用一句话说明为什么选择这个动作。\n\n"
         f"{completion_rule}"
@@ -309,7 +323,7 @@ def decide_reproduction_action(
             encoded = _bmp_to_png_b64(current.screenshot_path)
             if encoded:
                 labeled_images.append(
-                    (f"当前{target_label}截图（step {current.step}）：", encoded, "image/png")
+                    (f"当前{resolved_target_label}截图（step {current.step}）：", encoded, "image/png")
                 )
 
     try:

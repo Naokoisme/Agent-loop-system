@@ -32,14 +32,37 @@ result.json + 新截图 + 日志
 | `620C_W6830` | Windows Simulator | `D:\Agent-loop-workspace\620C_W6830` | `case_map/620C_simulator_case_map` |
 | `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_simulator_case_map` |
 | `6202_W5230` | 真实手表 | `D:\Agent-loop-workspace\6202_W5230` | `case_map/6202_case_map` |
+| `579_O2` | 579 O2 真机 | APP Bridge / COM3 只读 | `case_map/579_case_map` |
 
 三套映射相互隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。6204 真机源码位于
 `D:\Agent-loop-workspace\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
 它不是可执行 Runner 目标。`D:\TOPSTEP\shenju_w30` 只作上游参考，不在其中开发、构建或
 打补丁。
 
-部分路径和模型选择仍由环境变量及显式 Python 配置提供。在数据化 profile 迁移真正完成前，
-不要把计划中的接口当成已交付能力。
+项目、平台、执行目标与用例目录均由注册表和统一用例库解析；前端不会通过 579 的冻结
+Manifest 类型来禁用人员新增或 Excel 导入。
+
+## 统一用例管理
+
+`case_map/*` 与 579 Manifest 是可追溯的源基线。服务首次读取项目时将其幂等同步到
+`project_data/case_management.sqlite3`；人员新增、Excel 导入、编辑版本、归档、恢复和审计都写入
+SQLite，不直接覆盖冻结源文件。冻结来源用例在网页中的编辑动作显示为“创建新版本”，历史版本和
+源 SHA 会继续保留。
+
+- W30 新增用例可以继续进入现有探索、候选复跑和 `PROMOTED` 固化流程。
+- 579 新增/导入用例默认是“未绑定”，必须完成 579 动作注册表和环境门禁后才可运行。
+- Excel 导入必须先选择适用平台并预览；冲突只能显式选择“跳过”或“创建新版本”。
+- 批量运行前由后端 `execution-options` 逐条返回可运行状态、中文原因、成熟度和绑定版本。
+
+迁移和源文件完整性审计：
+
+```powershell
+uv run python tools/migrate_case_store.py --output project_data/migration-audit.json
+```
+
+该工具检查源用例数、统一库来源身份、重复同步幂等性和迁移前后 JSON SHA。`project_data/` 是本机
+业务数据，不进入 Git。Agent-loop Web 服务直接由 `frontend/server.py` 启动，不需要也不会启动
+`desktop_qt.py`。
 
 ## 快速开始
 
@@ -70,6 +93,9 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 
 case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_map/README.md)。
 
+W30/579 统一平台的项目创建、快捷切换、运行平台选择与 579 安全门禁见
+[W30-579 统一平台使用说明](W30-579统一平台使用说明.md)。
+
 ## 仓库与基线边界
 
 - `D:\Agent-loop-system` 保存编排器、Runner、前端、测试、case map 和文档。
@@ -98,7 +124,7 @@ case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_ma
 
 ## 文档入口
 
-- [Agent 工作边界](AGENTS.md)：必须遵守的安全和目标隔离政策。
+- [W30/579 双平台当前整改说明](README-W30-579-当前整改说明.md)：本轮全部改动、当前验证结果、真机计算器证据和待处理项总览。
 - [case map 数据合同](case_map/README.md)：映射成熟度、外部探索账本与 Runner 选择规则。
 - [6202 Simulator 当前链路](docs/6202-simulator-current.md)：Simulator 配置与已验证事实快照。
 - [6202 真机截图概览](docs/6202-hardware-screenshot-current.md)：默认链路、已验证边界和开放阻塞。

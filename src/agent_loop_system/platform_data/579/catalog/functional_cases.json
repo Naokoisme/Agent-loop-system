@@ -1,0 +1,2883 @@
+{
+  "kind": "AgentLoop579FunctionalCatalog",
+  "schema_version": 1,
+  "manifests": [
+    {
+      "kind": "FunctionalCaseManifest",
+      "schema_version": 1,
+      "manifest_id": "FCM-2D59A13BE586C4AD99F6",
+      "created_at": "2026-07-22T15:08:06+09:00",
+      "module": "秒表",
+      "stage": "03",
+      "source_path": "首批秒表完整测试用例_已评审冻结版_20260722.xlsx",
+      "source_sha256": "23ED95B28D2A6F2399DE67E98C795A793CC431C608D4FFE260103499415136A0",
+      "sheet_name": "测试用例",
+      "headers": [
+        "功能点",
+        "测试项",
+        "测试点",
+        "前置条件",
+        "操作步骤",
+        "预期结果",
+        "实际结果",
+        "优先级",
+        "备注"
+      ],
+      "required_headers": [
+        "功能点",
+        "测试项",
+        "测试点",
+        "前置条件",
+        "操作步骤",
+        "预期结果",
+        "实际结果",
+        "优先级",
+        "备注"
+      ],
+      "review_status": "FROZEN_APPROVED",
+      "case_count": 39,
+      "mapped_requirement_count": 12,
+      "applicable_requirement_count": 11,
+      "uncovered_requirement_ids": [],
+      "cases": [
+        {
+          "functional_case_id": "STOPWATCH-FC-001",
+          "case_no": "STOPWATCH-001",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "入口",
+          "test_point": "应用列表显示秒表入口",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于表盘。"
+            },
+            {
+              "index": "2",
+              "text": "应用列表可正常打开。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "打开手表应用列表。"
+            },
+            {
+              "index": "2",
+              "text": "滑动到包含秒表的应用列表位置。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "应用列表按当前菜单风格显示应用项。"
+            },
+            {
+              "index": "2",
+              "text": "列表中显示秒表图标和名称，文字完整且无遮挡。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-001；稳定ID:STOPWATCH-FC-001；需求ID:STOPWATCH-REQ-001；源用例:AUTO-DETAIL-0189|AUTO-SMOKE-0126；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-001"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-002",
+          "case_no": "STOPWATCH-002",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "入口",
+          "test_point": "点击入口进入秒表页面",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "应用列表已显示秒表入口。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击秒表入口。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "进入秒表页面，页面内容与计时器页面可明确区分。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-002；稳定ID:STOPWATCH-FC-002；需求ID:STOPWATCH-REQ-001；源用例:AUTO-DETAIL-0189；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-001"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-003",
+          "case_no": "STOPWATCH-003",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "页面显示",
+          "test_point": "秒表初始页面控件布局",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于零值且无计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "进入秒表页面。"
+            },
+            {
+              "index": "2",
+              "text": "检查计时区域、开始键和重置区域。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "页面加载完成，无黑屏、花屏、乱码或异常弹窗。"
+            },
+            {
+              "index": "2",
+              "text": "计时数字和可操作控件完整显示，彼此不遮挡。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-003；稳定ID:STOPWATCH-FC-003；需求ID:STOPWATCH-REQ-002；源用例:AUTO-DETAIL-0190|AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-002"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-004",
+          "case_no": "STOPWATCH-004",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "页面显示",
+          "test_point": "秒表初始值显示为零",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表当前时间和计次历史均已清零。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "进入秒表页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "主计时值显示00:00.00，数字位数、分隔符和对齐方式正确。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-004；稳定ID:STOPWATCH-FC-004；需求ID:STOPWATCH-REQ-002；源用例:AUTO-SMOKE-0126|AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-002"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-005",
+          "case_no": "STOPWATCH-005",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计时",
+          "test_point": "点击开始后时间持续递增",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击开始。"
+            },
+            {
+              "index": "2",
+              "text": "等待3秒。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "秒表进入运行态，控制按钮切换为运行态样式。"
+            },
+            {
+              "index": "2",
+              "text": "主计时值大于00:00.00并持续递增。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-005；稳定ID:STOPWATCH-FC-005；需求ID:STOPWATCH-REQ-003；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-003"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-006",
+          "case_no": "STOPWATCH-006",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计时",
+          "test_point": "开始操作产生短振反馈",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00。"
+            },
+            {
+              "index": "2",
+              "text": "COM3只读日志可观察振动事件。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "开始观察串口振动日志。"
+            },
+            {
+              "index": "2",
+              "text": "点击开始。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "日志观察窗口建立且不向串口写入数据。"
+            },
+            {
+              "index": "2",
+              "text": "日志出现与开始操作对应的短振反馈，秒表进入运行态。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-006；稳定ID:STOPWATCH-FC-006；需求ID:STOPWATCH-REQ-003|STOPWATCH-REQ-009；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-003",
+            "STOPWATCH-REQ-009"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-007",
+          "case_no": "STOPWATCH-007",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计时",
+          "test_point": "十秒计时误差不超过0.5秒",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00。"
+            },
+            {
+              "index": "2",
+              "text": "标准单调时钟可记录起止时间。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "同时启动秒表和标准计时。"
+            },
+            {
+              "index": "2",
+              "text": "标准计时达到10秒时采集秒表值。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "两端均进入计时状态。"
+            },
+            {
+              "index": "2",
+              "text": "秒表显示值与10秒的差值不超过0.5秒。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-007；稳定ID:STOPWATCH-FC-007；需求ID:STOPWATCH-REQ-003；源用例:AUTO-DETAIL-0192|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-003"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-008",
+          "case_no": "STOPWATCH-008",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计时",
+          "test_point": "六十秒计时误差不超过1秒",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00。"
+            },
+            {
+              "index": "2",
+              "text": "标准单调时钟可记录起止时间。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "同时启动秒表和标准计时。"
+            },
+            {
+              "index": "2",
+              "text": "标准计时达到60秒时采集秒表值。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "两端均进入计时状态。"
+            },
+            {
+              "index": "2",
+              "text": "秒表显示值与60秒的差值不超过1秒。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-008；稳定ID:STOPWATCH-FC-008；需求ID:STOPWATCH-REQ-003；源用例:AUTO-DETAIL-0192|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-003"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-009",
+          "case_no": "STOPWATCH-009",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "暂停与继续",
+          "test_point": "点击暂停后计时停止",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表已运行至少3秒。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录当前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "点击暂停。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "记录值为非零时间。"
+            },
+            {
+              "index": "2",
+              "text": "秒表进入暂停态并保留该非零时间。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-009；稳定ID:STOPWATCH-FC-009；需求ID:STOPWATCH-REQ-004；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-004"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-010",
+          "case_no": "STOPWATCH-010",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "暂停与继续",
+          "test_point": "暂停五秒后计时值不漂移",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "采集暂停时的第一张截图。"
+            },
+            {
+              "index": "2",
+              "text": "等待5秒后采集第二张截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "第一张截图清晰显示暂停值。"
+            },
+            {
+              "index": "2",
+              "text": "两张截图的主计时值一致，页面仍为暂停态。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-010；稳定ID:STOPWATCH-FC-010；需求ID:STOPWATCH-REQ-004；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-004"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-011",
+          "case_no": "STOPWATCH-011",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "暂停与继续",
+          "test_point": "暂停操作产生短振反馈",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "COM3只读日志可观察振动事件。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "开始观察串口振动日志。"
+            },
+            {
+              "index": "2",
+              "text": "点击暂停。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "日志观察窗口建立且不向串口写入数据。"
+            },
+            {
+              "index": "2",
+              "text": "日志出现与暂停操作对应的短振反馈，秒表进入暂停态。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-011；稳定ID:STOPWATCH-FC-011；需求ID:STOPWATCH-REQ-004|STOPWATCH-REQ-009；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-004",
+            "STOPWATCH-REQ-009"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-012",
+          "case_no": "STOPWATCH-012",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "暂停与继续",
+          "test_point": "继续后从暂停值递增",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录暂停值。"
+            },
+            {
+              "index": "2",
+              "text": "点击继续。"
+            },
+            {
+              "index": "3",
+              "text": "等待3秒。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "暂停值记录完整。"
+            },
+            {
+              "index": "2",
+              "text": "秒表恢复运行且未归零。"
+            },
+            {
+              "index": "3",
+              "text": "新计时值大于暂停值并持续递增。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-012；稳定ID:STOPWATCH-FC-012；需求ID:STOPWATCH-REQ-004；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-004"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-013",
+          "case_no": "STOPWATCH-013",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "暂停与继续",
+          "test_point": "连续开始暂停二十轮状态稳定",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00且无计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "连续执行20轮开始和暂停。"
+            },
+            {
+              "index": "2",
+              "text": "检查最终页面和计时值。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "每轮操作均有明确状态切换，无连续触发丢失。"
+            },
+            {
+              "index": "2",
+              "text": "页面无卡死、错页或控件错乱，最终值为可解析时间。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-013；稳定ID:STOPWATCH-FC-013；需求ID:STOPWATCH-REQ-004|STOPWATCH-REQ-012；源用例:AUTO-DETAIL-0192；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-004",
+            "STOPWATCH-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-014",
+          "case_no": "STOPWATCH-014",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "运行态交互",
+          "test_point": "运行中右滑不退出秒表",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录右滑前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "在秒表页面执行右滑。"
+            },
+            {
+              "index": "3",
+              "text": "等待2秒后采集页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "右滑前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "页面不退出到应用列表或表盘。"
+            },
+            {
+              "index": "3",
+              "text": "仍停留秒表且计时值大于右滑前数值。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-014；稳定ID:STOPWATCH-FC-014；需求ID:STOPWATCH-REQ-006；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-006"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-015",
+          "case_no": "STOPWATCH-015",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次",
+          "test_point": "运行中记录第一条计次",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态且计次记录为空。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击计次。"
+            },
+            {
+              "index": "2",
+              "text": "检查计次区域。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "新增第1条计次记录且主计时继续。"
+            },
+            {
+              "index": "2",
+              "text": "记录序号和时间值清晰可读。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-015；稳定ID:STOPWATCH-FC-015；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-016",
+          "case_no": "STOPWATCH-016",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次",
+          "test_point": "连续三次计次均被记录",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态且计次记录为空。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "间隔1秒连续执行3次计次。"
+            },
+            {
+              "index": "2",
+              "text": "检查计次记录数量。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "每次计次均新增一条记录且主计时不中断。"
+            },
+            {
+              "index": "2",
+              "text": "计次记录总数为3。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-016；稳定ID:STOPWATCH-FC-016；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-017",
+          "case_no": "STOPWATCH-017",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次",
+          "test_point": "计次序号与时间按先后递增",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表已有至少3条计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "读取全部计次序号。"
+            },
+            {
+              "index": "2",
+              "text": "比较相邻计次时间。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "计次序号从1连续递增且无重复。"
+            },
+            {
+              "index": "2",
+              "text": "后一次计次时间不小于前一次时间。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-017；稳定ID:STOPWATCH-FC-017；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-018",
+          "case_no": "STOPWATCH-018",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次历史",
+          "test_point": "多条计次记录可上下浏览",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表已有超过一屏的计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "进入计次记录列表。"
+            },
+            {
+              "index": "2",
+              "text": "向上和向下滑动列表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "列表显示已有计次记录且序号可识别。"
+            },
+            {
+              "index": "2",
+              "text": "列表可双向浏览，记录无跳号、重叠或丢失。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-018；稳定ID:STOPWATCH-FC-018；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-019",
+          "case_no": "STOPWATCH-019",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次历史",
+          "test_point": "暂停后点击计次数量进入历史",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表已暂停且存在计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击计次数量或历史入口。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "进入计次历史页面并显示本轮计次数据。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-019；稳定ID:STOPWATCH-FC-019；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-020",
+          "case_no": "STOPWATCH-020",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次历史",
+          "test_point": "历史页返回后数据保持",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "计次历史页面已打开。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录历史条数和暂停值。"
+            },
+            {
+              "index": "2",
+              "text": "返回秒表主页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "历史条数和暂停值记录完整。"
+            },
+            {
+              "index": "2",
+              "text": "秒表仍保留相同暂停值和计次记录。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-020；稳定ID:STOPWATCH-FC-020；需求ID:STOPWATCH-REQ-005|STOPWATCH-REQ-008；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005",
+            "STOPWATCH-REQ-008"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-021",
+          "case_no": "STOPWATCH-021",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次",
+          "test_point": "计次达到九十九条后数量封顶",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态且可通过受控脚本生成计次。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "连续生成99条计次记录。"
+            },
+            {
+              "index": "2",
+              "text": "检查记录总数和最后序号。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "生成过程无卡死且主计时继续。"
+            },
+            {
+              "index": "2",
+              "text": "记录总数为99，最后序号为99。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-021；稳定ID:STOPWATCH-FC-021；需求ID:STOPWATCH-REQ-005；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-022",
+          "case_no": "STOPWATCH-022",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "计次",
+          "test_point": "第一百次计次不新增记录",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态且已有99条计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "再次点击计次。"
+            },
+            {
+              "index": "2",
+              "text": "检查记录总数和页面响应。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "系统不新增第100条记录。"
+            },
+            {
+              "index": "2",
+              "text": "记录总数保持99，页面无卡死、溢出或异常弹窗。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-022；稳定ID:STOPWATCH-FC-022；需求ID:STOPWATCH-REQ-005|STOPWATCH-REQ-010；源用例:AUTO-DETAIL-0191|AUTO-DETAIL-0192；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-005",
+            "STOPWATCH-REQ-010"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-023",
+          "case_no": "STOPWATCH-023",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "重置",
+          "test_point": "暂停后重置主计时归零",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击重置。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "主计时值恢复为00:00.00，页面回到可开始状态。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-023；稳定ID:STOPWATCH-FC-023；需求ID:STOPWATCH-REQ-007；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-007"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-024",
+          "case_no": "STOPWATCH-024",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "重置",
+          "test_point": "重置同时清除计次历史",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于暂停态且存在计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录重置前计次条数。"
+            },
+            {
+              "index": "2",
+              "text": "点击重置。"
+            },
+            {
+              "index": "3",
+              "text": "打开计次历史入口。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "重置前存在至少1条计次记录。"
+            },
+            {
+              "index": "2",
+              "text": "主计时值归零。"
+            },
+            {
+              "index": "3",
+              "text": "计次历史为空或历史入口不再显示本轮记录。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-024；稳定ID:STOPWATCH-FC-024；需求ID:STOPWATCH-REQ-007；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-007"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-025",
+          "case_no": "STOPWATCH-025",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "重置",
+          "test_point": "重置操作产生短振反馈",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态。"
+            },
+            {
+              "index": "2",
+              "text": "COM3只读日志可观察振动事件。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "开始观察串口振动日志。"
+            },
+            {
+              "index": "2",
+              "text": "点击重置。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "日志观察窗口建立且不向串口写入数据。"
+            },
+            {
+              "index": "2",
+              "text": "日志出现与重置操作对应的短振反馈，主计时值归零。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-025；稳定ID:STOPWATCH-FC-025；需求ID:STOPWATCH-REQ-007|STOPWATCH-REQ-009；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-007",
+            "STOPWATCH-REQ-009"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-026",
+          "case_no": "STOPWATCH-026",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "重置",
+          "test_point": "零值状态重复重置不改变页面",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00且计次历史为空。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "连续点击重置3次。"
+            },
+            {
+              "index": "2",
+              "text": "检查主计时值和控件状态。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "每次点击均不产生错误状态或异常弹窗。"
+            },
+            {
+              "index": "2",
+              "text": "主计时值保持00:00.00，控件仍可操作。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P2",
+          "remark": "用例编号:STOPWATCH-026；稳定ID:STOPWATCH-FC-026；需求ID:STOPWATCH-REQ-007|STOPWATCH-REQ-012；源用例:AUTO-DETAIL-0192；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-007",
+            "STOPWATCH-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-027",
+          "case_no": "STOPWATCH-027",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "状态保持",
+          "test_point": "运行中退出重进后计时继续",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表已运行至少3秒。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录退出前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "单击侧键退出到应用列表或表盘。"
+            },
+            {
+              "index": "3",
+              "text": "等待3秒后重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "退出前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "系统离开秒表页面且无异常弹窗。"
+            },
+            {
+              "index": "3",
+              "text": "重进后计时值大于退出前数值，计时未被清零。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-027；稳定ID:STOPWATCH-FC-027；需求ID:STOPWATCH-REQ-008；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-008"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-028",
+          "case_no": "STOPWATCH-028",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "状态保持",
+          "test_point": "暂停退出重进后数值保持",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态且存在计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录暂停值和计次条数。"
+            },
+            {
+              "index": "2",
+              "text": "单击侧键退出并重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "暂停值和计次条数记录完整。"
+            },
+            {
+              "index": "2",
+              "text": "重进后仍为相同暂停值和计次条数，未自动继续或清零。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-028；稳定ID:STOPWATCH-FC-028；需求ID:STOPWATCH-REQ-008；源用例:AUTO-DETAIL-0191|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-008"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-029",
+          "case_no": "STOPWATCH-029",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "运行中熄屏亮屏后计时继续",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "亮灭屏指令链路可用。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录熄屏前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "执行灭屏并等待5秒。"
+            },
+            {
+              "index": "3",
+              "text": "执行亮屏并重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "熄屏前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "手表进入灭屏状态且无异常唤醒。"
+            },
+            {
+              "index": "3",
+              "text": "亮屏后计时值大于熄屏前数值，计时未被清除。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-029；稳定ID:STOPWATCH-FC-029；需求ID:STOPWATCH-REQ-008|STOPWATCH-REQ-011；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-008",
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-030",
+          "case_no": "STOPWATCH-030",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "暂停熄屏亮屏后数值保持",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于非零暂停态。"
+            },
+            {
+              "index": "2",
+              "text": "亮灭屏指令链路可用。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录暂停值。"
+            },
+            {
+              "index": "2",
+              "text": "执行灭屏并等待5秒。"
+            },
+            {
+              "index": "3",
+              "text": "执行亮屏并重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "暂停值记录完整。"
+            },
+            {
+              "index": "2",
+              "text": "手表进入灭屏状态。"
+            },
+            {
+              "index": "3",
+              "text": "亮屏后仍显示相同暂停值，未自动继续或清零。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-030；稳定ID:STOPWATCH-FC-030；需求ID:STOPWATCH-REQ-008|STOPWATCH-REQ-011；源用例:AUTO-DETAIL-0191；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-008",
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-031",
+          "case_no": "STOPWATCH-031",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "闹钟提醒结束后秒表继续",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "已准备一分钟内触发的受控闹钟。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录闹钟触发前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "等待闹钟提醒并关闭提醒。"
+            },
+            {
+              "index": "3",
+              "text": "返回或重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "触发前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "闹钟提醒页面可操作且关闭后无残留弹窗。"
+            },
+            {
+              "index": "3",
+              "text": "秒表计时值大于触发前数值，计次数据未清除。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-031；稳定ID:STOPWATCH-FC-031；需求ID:STOPWATCH-REQ-011；源用例:场景完整度补充；自动化候选:MANUAL_FIXTURE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-032",
+          "case_no": "STOPWATCH-032",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "消息提醒结束后秒表状态保持",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "手机具备受控消息提醒源和对应权限。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录消息触发前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "触发一条受控消息提醒并关闭提醒。"
+            },
+            {
+              "index": "3",
+              "text": "返回或重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "触发前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "消息提醒正确显示且关闭后无残留弹窗。"
+            },
+            {
+              "index": "3",
+              "text": "秒表仍在计时且计次数据未清除。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-032；稳定ID:STOPWATCH-FC-032；需求ID:STOPWATCH-REQ-011；源用例:场景完整度补充；自动化候选:MANUAL_FIXTURE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-033",
+          "case_no": "STOPWATCH-033",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "断开重连后秒表计时不丢失",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "具备受控BLE断开和重连条件。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录断链前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "断开手机与手表BLE连接并等待5秒。"
+            },
+            {
+              "index": "3",
+              "text": "恢复BLE连接后进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "断链前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "断链期间手表本地秒表任务不退出。"
+            },
+            {
+              "index": "3",
+              "text": "重连后计时值大于断链前数值，计次数据未清除。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-033；稳定ID:STOPWATCH-FC-033；需求ID:STOPWATCH-REQ-011；源用例:场景完整度补充；自动化候选:MANUAL_FIXTURE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-034",
+          "case_no": "STOPWATCH-034",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "中断恢复",
+          "test_point": "插拔充电后秒表状态恢复",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表处于运行态。"
+            },
+            {
+              "index": "2",
+              "text": "具备安全插拔充电器的人工夹具。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "记录插入充电前计时值。"
+            },
+            {
+              "index": "2",
+              "text": "插入充电器并等待充电提示。"
+            },
+            {
+              "index": "3",
+              "text": "拔出充电器后返回秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "插入前计时值为非零。"
+            },
+            {
+              "index": "2",
+              "text": "充电提示按系统规则显示且未清除秒表任务。"
+            },
+            {
+              "index": "3",
+              "text": "返回秒表后计时值大于插入前数值，计次数据未清除。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P2",
+          "remark": "用例编号:STOPWATCH-034；稳定ID:STOPWATCH-FC-034；需求ID:STOPWATCH-REQ-011；源用例:场景完整度补充；自动化候选:MANUAL_FIXTURE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-035",
+          "case_no": "STOPWATCH-035",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "时间边界",
+          "test_point": "小于一小时使用分秒百分秒格式",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表运行时间小于1小时。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "采集运行中的主计时显示。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "主计时使用分:秒.百分秒格式，分隔符和位数稳定且持续递增。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-035；稳定ID:STOPWATCH-FC-035；需求ID:STOPWATCH-REQ-010；源用例:AUTO-DETAIL-0192；自动化候选:AUTO_CANDIDATE；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-010"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-036",
+          "case_no": "STOPWATCH-036",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "时间边界",
+          "test_point": "超过一小时切换为小时格式",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "具备长时运行或固件已验证的时间推进方式。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "使秒表运行时间跨过1小时边界。"
+            },
+            {
+              "index": "2",
+              "text": "采集边界前后主计时显示。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "秒表持续运行且未在边界处归零。"
+            },
+            {
+              "index": "2",
+              "text": "超过1小时后显示小时维度，数值连续且无错位、截断或乱码。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-036；稳定ID:STOPWATCH-FC-036；需求ID:STOPWATCH-REQ-010；源用例:AUTO-DETAIL-0192；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-010"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-037",
+          "case_no": "STOPWATCH-037",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "时间边界",
+          "test_point": "最大时长到达后不溢出",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "当前固件最大秒表时长已通过专项探针确认。"
+            },
+            {
+              "index": "2",
+              "text": "具备安全的时间推进或长时运行环境。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "运行秒表直至项目定义的最大时长。"
+            },
+            {
+              "index": "2",
+              "text": "继续观察最大时长后的页面状态。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "最大时长前计时值连续且可解析。"
+            },
+            {
+              "index": "2",
+              "text": "达到上限后按项目定义停止或封顶，不出现负数、回绕、乱码、卡死或重启。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P2",
+          "remark": "用例编号:STOPWATCH-037；稳定ID:STOPWATCH-FC-037；需求ID:STOPWATCH-REQ-010；源用例:AUTO-DETAIL-0192；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-010"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-038",
+          "case_no": "STOPWATCH-038",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "稳定性",
+          "test_point": "快速交替操作不造成状态错乱",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表显示00:00.00。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "快速交替执行开始、暂停和继续共20次。"
+            },
+            {
+              "index": "2",
+              "text": "检查最终计时值、按钮和页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "系统对每次有效操作给出唯一状态变化，不出现重复触发。"
+            },
+            {
+              "index": "2",
+              "text": "最终页面可操作，计时值可解析，无卡死、错页或控件重叠。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:STOPWATCH-038；稳定ID:STOPWATCH-FC-038；需求ID:STOPWATCH-REQ-012；源用例:AUTO-DETAIL-0192；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "STOPWATCH-FC-039",
+          "case_no": "STOPWATCH-039",
+          "module": "秒表",
+          "feature": "秒表",
+          "test_item": "环境清理",
+          "test_point": "模块结束后无残留秒表任务",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "秒表可能处于运行态、暂停态或存在计次记录。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "若秒表正在运行则点击暂停。"
+            },
+            {
+              "index": "2",
+              "text": "点击重置并确认主计时归零。"
+            },
+            {
+              "index": "3",
+              "text": "退出并重新进入秒表。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "秒表进入可重置的暂停态。"
+            },
+            {
+              "index": "2",
+              "text": "主计时显示00:00.00且本轮计次历史为空。"
+            },
+            {
+              "index": "3",
+              "text": "重进后仍为零值，无活动秒表任务或异常弹窗。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:STOPWATCH-039；稳定ID:STOPWATCH-FC-039；需求ID:STOPWATCH-REQ-007|STOPWATCH-REQ-012；源用例:AUTO-DETAIL-0191|AUTO-DETAIL-0192|AUTO-SMOKE-0127；自动化候选:AUTO_CANDIDATE；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "STOPWATCH-REQ-007",
+            "STOPWATCH-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        }
+      ],
+      "freeze_record": {
+        "path": "cases/stage03_stopwatch_freeze_record_20260722.json",
+        "sha256": "28CAD9E49100B6417FC7DF023B71242F7755C3CCE07915BDCEBF1D56994ABD49",
+        "pending_review_source_sha256": "E0799608D2A14D1C4BB1D4D7DC9207253D17F48F395708F37DF84335512C2519"
+      },
+      "skill_snapshot": {
+        "runtime_policy": "local_snapshot_only",
+        "manifest_path": "integrations/qatest_skill_snapshot/SNAPSHOT_MANIFEST.json",
+        "manifest_sha256": "D2D01BD2F9AF87C2718630758B1B857FBD62E620B5F4C78995C814357EE4D96C",
+        "checked_file_count": 356
+      }
+    },
+    {
+      "kind": "FunctionalCaseManifest",
+      "schema_version": 1,
+      "manifest_id": "FCM-4113312B6D52DC0DFEB1",
+      "created_at": "2026-07-27T17:52:30+09:00",
+      "module": "手电筒",
+      "stage": "04",
+      "source_path": "首批手电筒完整测试用例_探针后冻结版_20260727.xlsx",
+      "source_sha256": "B340FC0354399935FFF5C896CFF55F820DA22A8BE2D2FCE15A3C26251AC09324",
+      "sheet_name": "测试用例",
+      "headers": [
+        "功能点",
+        "测试项",
+        "测试点",
+        "前置条件",
+        "操作步骤",
+        "预期结果",
+        "实际结果",
+        "优先级",
+        "备注"
+      ],
+      "required_headers": [
+        "功能点",
+        "测试项",
+        "测试点",
+        "前置条件",
+        "操作步骤",
+        "预期结果",
+        "实际结果",
+        "优先级",
+        "备注"
+      ],
+      "review_status": "FROZEN_APPROVED",
+      "case_count": 20,
+      "mapped_requirement_count": 12,
+      "applicable_requirement_count": 0,
+      "uncovered_requirement_ids": [],
+      "cases": [
+        {
+          "functional_case_id": "FLASHLIGHT-FC-001",
+          "case_no": "FLASHLIGHT-001",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "入口",
+          "test_point": "控制中心显示手电筒入口",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于正常表盘。"
+            },
+            {
+              "index": "2",
+              "text": "控制中心可正常打开。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "从表盘打开控制中心。"
+            },
+            {
+              "index": "2",
+              "text": "检查手电筒图标、名称和可点击区域。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "控制中心页面正常显示，无黑屏、花屏或异常弹窗。"
+            },
+            {
+              "index": "2",
+              "text": "手电筒入口完整可见，图标、名称和点击区域无遮挡。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-001；稳定ID:FLASHLIGHT-FC-001；需求ID:FLASHLIGHT-REQ-001；源用例:AUTO-DETAIL-0107；自动化候选:AUTO_READY；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-001"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-002",
+          "case_no": "FLASHLIGHT-002",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "入口",
+          "test_point": "点击入口进入手电筒白光页",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "控制中心已显示手电筒入口。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "点击手电筒入口。"
+            },
+            {
+              "index": "2",
+              "text": "等待页面加载并采集截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "点击被设备接收且页面开始切换。"
+            },
+            {
+              "index": "2",
+              "text": "进入手电筒全屏白光页，不是控制中心、表盘或其他功能页。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-002；稳定ID:FLASHLIGHT-FC-002；需求ID:FLASHLIGHT-REQ-001|FLASHLIGHT-REQ-002；源用例:AUTO-DETAIL-0107；自动化候选:AUTO_READY；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-001",
+            "FLASHLIGHT-REQ-002"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-003",
+          "case_no": "FLASHLIGHT-003",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "页面显示",
+          "test_point": "手电筒页面为完整白光",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表已进入手电筒页面。"
+            },
+            {
+              "index": "2",
+              "text": "O2 截图链路可返回可解码 PNG。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "采集手电筒页面原始截图。"
+            },
+            {
+              "index": "2",
+              "text": "计算截图白色像素比例和平均亮度。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "截图尺寸和解码结果有效，画面无黑边、花屏或异常元素。"
+            },
+            {
+              "index": "2",
+              "text": "白色像素比例不低于98%，平均亮度不低于248。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-003；稳定ID:FLASHLIGHT-FC-003；需求ID:FLASHLIGHT-REQ-002；源用例:AUTO-DETAIL-0107|AUTO-SMOKE-0020；自动化候选:AUTO_READY；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-002"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-004",
+          "case_no": "FLASHLIGHT-004",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "页面显示",
+          "test_point": "退出后再次进入仍显示白光页",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "已完成一次手电筒进入和安全退出。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "从控制中心再次点击手电筒入口。"
+            },
+            {
+              "index": "2",
+              "text": "采集第二次进入后的页面截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "入口仍可点击且页面能再次打开。"
+            },
+            {
+              "index": "2",
+              "text": "第二次仍为完整白光页，无入口失效、残留弹窗或错页。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-004；稳定ID:FLASHLIGHT-FC-004；需求ID:FLASHLIGHT-REQ-002|FLASHLIGHT-REQ-007；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:AUTO_READY；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-002",
+            "FLASHLIGHT-REQ-007"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-005",
+          "case_no": "FLASHLIGHT-005",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "亮度",
+          "test_point": "进入后背光达到项目最大值",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "亮度状态读取能力或校准光照夹具已就绪。"
+            },
+            {
+              "index": "2",
+              "text": "已记录进入手电筒前亮度状态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "进入手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "读取固件亮度状态或光照夹具测量值。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "页面进入白光状态。"
+            },
+            {
+              "index": "2",
+              "text": "读数达到当前项目定义的最大亮度；不得仅以截图白色作为最大背光证据。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-005；稳定ID:FLASHLIGHT-FC-005；需求ID:FLASHLIGHT-REQ-003；源用例:AUTO-DETAIL-0107；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:deterministic_brightness_snapshot_restore_contract_missing",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-003"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-006",
+          "case_no": "FLASHLIGHT-006",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "退出",
+          "test_point": "右滑退出返回控制中心",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "在白光页执行右滑。"
+            },
+            {
+              "index": "2",
+              "text": "采集退出后的页面截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "右滑手势被设备接收。"
+            },
+            {
+              "index": "2",
+              "text": "页面返回控制中心且不再保持全白，无卡死或异常弹窗。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-006；稳定ID:FLASHLIGHT-FC-006；需求ID:FLASHLIGHT-REQ-004；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:AUTO_READY；执行策略:CONTINUOUS_HANDOFF；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-004"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-007",
+          "case_no": "FLASHLIGHT-007",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "亮度",
+          "test_point": "右滑退出后恢复原亮度",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "已完成进入前亮度 snapshot。"
+            },
+            {
+              "index": "2",
+              "text": "手表处于手电筒白光页。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "右滑退出到控制中心。"
+            },
+            {
+              "index": "2",
+              "text": "读取退出后的亮度状态并与 snapshot 比较。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "成功退出手电筒。"
+            },
+            {
+              "index": "2",
+              "text": "退出后亮度与进入前状态一致，restore 和 verify_restore 均成功。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-007；稳定ID:FLASHLIGHT-FC-007；需求ID:FLASHLIGHT-REQ-004|FLASHLIGHT-REQ-006；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:deterministic_brightness_snapshot_restore_contract_missing",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-004",
+            "FLASHLIGHT-REQ-006"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-008",
+          "case_no": "FLASHLIGHT-008",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "退出",
+          "test_point": "侧键退出返回控制中心",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "当前固件侧键键值已经两次探针确认。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "发送已确认的单击侧键语义动作。"
+            },
+            {
+              "index": "2",
+              "text": "采集侧键后的页面截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "O1 日志确认设备收到目标侧键事件。"
+            },
+            {
+              "index": "2",
+              "text": "页面返回控制中心且不再保持全白；不得用右滑结果替代侧键证据。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-008；稳定ID:FLASHLIGHT-FC-008；需求ID:FLASHLIGHT-REQ-005；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:side_key_two_pass_probe_not_passed",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-005"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-009",
+          "case_no": "FLASHLIGHT-009",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "亮度",
+          "test_point": "侧键退出后恢复原亮度",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "已完成进入前亮度 snapshot。"
+            },
+            {
+              "index": "2",
+              "text": "侧键动作和亮度状态读取能力均已确认。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "在手电筒白光页单击侧键退出。"
+            },
+            {
+              "index": "2",
+              "text": "读取退出后的亮度状态并与 snapshot 比较。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "页面返回控制中心。"
+            },
+            {
+              "index": "2",
+              "text": "退出后亮度与进入前状态一致，未停留最大亮度。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-009；稳定ID:FLASHLIGHT-FC-009；需求ID:FLASHLIGHT-REQ-005|FLASHLIGHT-REQ-006；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:deterministic_brightness_snapshot_restore_contract_missing",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-005",
+            "FLASHLIGHT-REQ-006"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-010",
+          "case_no": "FLASHLIGHT-010",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "状态保持",
+          "test_point": "侧键退出后可再次进入",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "已通过侧键退出到控制中心。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "再次点击控制中心手电筒入口。"
+            },
+            {
+              "index": "2",
+              "text": "采集重新进入后的页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "入口仍可操作。"
+            },
+            {
+              "index": "2",
+              "text": "重新进入完整白光页，无状态残留、错页或入口失效。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-010；稳定ID:FLASHLIGHT-FC-010；需求ID:FLASHLIGHT-REQ-005|FLASHLIGHT-REQ-007；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:side_key_two_pass_probe_not_passed",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-005",
+            "FLASHLIGHT-REQ-007"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-011",
+          "case_no": "FLASHLIGHT-011",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "熄屏恢复",
+          "test_point": "第一次熄屏亮屏后的页面行为",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "亮灭屏指令链路可用。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "发送灭屏指令并确认屏幕关闭。"
+            },
+            {
+              "index": "2",
+              "text": "等待5秒后发送亮屏指令。"
+            },
+            {
+              "index": "3",
+              "text": "采集亮屏后的页面和状态。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "屏幕进入关闭状态且未误触其他页面。"
+            },
+            {
+              "index": "2",
+              "text": "屏幕重新点亮。"
+            },
+            {
+              "index": "3",
+              "text": "记录实际落点和亮度，不预设返回手电筒或控制中心。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-011；稳定ID:FLASHLIGHT-FC-011；需求ID:FLASHLIGHT-REQ-008；源用例:AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:screen_cycle_two_pass_consistency_not_passed",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-008"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-012",
+          "case_no": "FLASHLIGHT-012",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "熄屏恢复",
+          "test_point": "第二次熄屏亮屏结果与第一次一致",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "第一次熄屏亮屏探针已完成并记录结果。"
+            },
+            {
+              "index": "2",
+              "text": "已恢复到同一手电筒起始状态。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "按相同步骤再次执行灭屏、等待5秒和亮屏。"
+            },
+            {
+              "index": "2",
+              "text": "比较两次亮屏后的页面与亮度状态。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "第二次过程无异常。"
+            },
+            {
+              "index": "2",
+              "text": "两次结果一致；一致后才允许冻结正式预期，不一致则保持NEED_REVIEW。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-012；稳定ID:FLASHLIGHT-FC-012；需求ID:FLASHLIGHT-REQ-008；源用例:AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:screen_cycle_two_pass_consistency_not_passed",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-008"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-013",
+          "case_no": "FLASHLIGHT-013",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "中断恢复",
+          "test_point": "手电筒页收到唯一消息提醒",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "APP 消息注入能力可用。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "通过 APP Bridge 发送唯一标题 STAGE04_FLASHLIGHT_MSG 的测试消息。"
+            },
+            {
+              "index": "2",
+              "text": "在触发窗口内采集消息提醒页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "消息动作由 APP 正式桥接成功下发。"
+            },
+            {
+              "index": "2",
+              "text": "手表显示该唯一标题对应的消息提醒，不得误识别为闹钟或来电。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-013；稳定ID:FLASHLIGHT-FC-013；需求ID:FLASHLIGHT-REQ-009；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108|AUTO-SMOKE-0020；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-009"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-014",
+          "case_no": "FLASHLIGHT-014",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "中断恢复",
+          "test_point": "关闭消息后返回手电筒白光页",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "消息提醒已覆盖手电筒页面。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "关闭或滑走测试消息提醒。"
+            },
+            {
+              "index": "2",
+              "text": "采集提醒消失后的页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "测试消息被关闭且不残留半弹窗。"
+            },
+            {
+              "index": "2",
+              "text": "页面返回完整手电筒白光页，未跳到表盘、控制中心或其他应用。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-014；稳定ID:FLASHLIGHT-FC-014；需求ID:FLASHLIGHT-REQ-009；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108|AUTO-SMOKE-0020；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-009"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-015",
+          "case_no": "FLASHLIGHT-015",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "中断恢复",
+          "test_point": "闹钟结束后返回手电筒白光页",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "APP 可创建一分钟内触发的唯一测试闹钟。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "APP 创建并启用唯一测试闹钟。"
+            },
+            {
+              "index": "2",
+              "text": "等待到点并在触发窗口内采集闹钟提醒。"
+            },
+            {
+              "index": "3",
+              "text": "关闭提醒并采集回退页面。"
+            },
+            {
+              "index": "4",
+              "text": "删除测试闹钟并回读确认。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "APP 回读确认测试闹钟已创建并开启。"
+            },
+            {
+              "index": "2",
+              "text": "手表显示与测试时间一致的闹钟提醒。"
+            },
+            {
+              "index": "3",
+              "text": "提醒结束后返回手电筒白光页。"
+            },
+            {
+              "index": "4",
+              "text": "测试闹钟被准确删除，无残留。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-015；稳定ID:FLASHLIGHT-FC-015；需求ID:FLASHLIGHT-REQ-010；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108|AUTO-SMOKE-0020；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-010"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-016",
+          "case_no": "FLASHLIGHT-016",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "中断恢复",
+          "test_point": "真实来电结束后返回手电筒白光页",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表处于手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "受控真实呼入源或可信来电生命周期协议闭环已就绪。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "触发受控真实来电。"
+            },
+            {
+              "index": "2",
+              "text": "采集手表来电提醒页面。"
+            },
+            {
+              "index": "3",
+              "text": "结束来电并采集回退页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "真实来电生命周期开始，不能使用标题为来电的普通通知替代。"
+            },
+            {
+              "index": "2",
+              "text": "手表显示真实来电 UI，来源和图标符合来电语义。"
+            },
+            {
+              "index": "3",
+              "text": "来电结束后返回手电筒白光页且无通话状态残留。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-016；稳定ID:FLASHLIGHT-FC-016；需求ID:FLASHLIGHT-REQ-011；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108|AUTO-SMOKE-0020；自动化候选:MANUAL_REQUIRED；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:controlled_incoming_call_fixture_missing",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-011"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-017",
+          "case_no": "FLASHLIGHT-017",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "中断恢复",
+          "test_point": "消息和闹钟连续触发后状态稳定",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "消息与闹钟单项中断用例均已通过。"
+            },
+            {
+              "index": "2",
+              "text": "手表已恢复手电筒白光页。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "触发并关闭唯一测试消息。"
+            },
+            {
+              "index": "2",
+              "text": "确认返回手电筒后触发并关闭唯一测试闹钟。"
+            },
+            {
+              "index": "3",
+              "text": "采集最终页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "消息提醒正常且关闭后返回手电筒。"
+            },
+            {
+              "index": "2",
+              "text": "闹钟提醒正常且关闭后返回手电筒。"
+            },
+            {
+              "index": "3",
+              "text": "最终仍为完整白光页，无卡死、错页或提醒残留。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-017；稳定ID:FLASHLIGHT-FC-017；需求ID:FLASHLIGHT-REQ-009|FLASHLIGHT-REQ-010|FLASHLIGHT-REQ-012；源用例:AUTO-DETAIL-0108；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-009",
+            "FLASHLIGHT-REQ-010",
+            "FLASHLIGHT-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-018",
+          "case_no": "FLASHLIGHT-018",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "稳定性",
+          "test_point": "手电筒持续点亮六十秒无异常",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "手表电量满足测试要求。"
+            },
+            {
+              "index": "2",
+              "text": "手表处于手电筒白光页。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "采集持续点亮开始截图。"
+            },
+            {
+              "index": "2",
+              "text": "保持60秒后采集结束截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "开始截图为完整白光页。"
+            },
+            {
+              "index": "2",
+              "text": "60秒后仍为完整白光页，无自动退出、花屏、闪屏、卡死或异常弹窗。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-018；稳定ID:FLASHLIGHT-FC-018；需求ID:FLASHLIGHT-REQ-002|FLASHLIGHT-REQ-012；源用例:AUTO-DETAIL-0108；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-002",
+            "FLASHLIGHT-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-019",
+          "case_no": "FLASHLIGHT-019",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "稳定性",
+          "test_point": "连续进入退出二十次稳定",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "控制中心和手电筒入口均可用。"
+            },
+            {
+              "index": "2",
+              "text": "使用右滑作为已验证退出路径。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "连续执行20轮进入手电筒、确认白光、右滑退出。"
+            },
+            {
+              "index": "2",
+              "text": "检查第20轮退出后的控制中心页面。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "20轮均可进入和退出，无丢触发、卡死、错页或白屏残留。"
+            },
+            {
+              "index": "2",
+              "text": "最终控制中心正常可操作，手电筒入口仍存在。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P1",
+          "remark": "用例编号:FLASHLIGHT-019；稳定ID:FLASHLIGHT-FC-019；需求ID:FLASHLIGHT-REQ-004|FLASHLIGHT-REQ-007|FLASHLIGHT-REQ-012；源用例:AUTO-DETAIL-0108；自动化候选:AUTO_READY；执行策略:ISOLATED；评审状态:FROZEN_APPROVED",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-004",
+            "FLASHLIGHT-REQ-007",
+            "FLASHLIGHT-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        },
+        {
+          "functional_case_id": "FLASHLIGHT-FC-020",
+          "case_no": "FLASHLIGHT-020",
+          "module": "手电筒",
+          "feature": "手电筒",
+          "test_item": "环境清理",
+          "test_point": "最终退出并恢复测试环境",
+          "preconditions": [
+            {
+              "index": "1",
+              "text": "Stage 04 当前批次所有可执行用例已结束。"
+            },
+            {
+              "index": "2",
+              "text": "已保存进入模块前亮度 snapshot。"
+            }
+          ],
+          "steps": [
+            {
+              "index": "1",
+              "text": "确认手电筒页面已退出；若仍在白光页则使用已验证右滑路径退出。"
+            },
+            {
+              "index": "2",
+              "text": "恢复进入模块前亮度设置。"
+            },
+            {
+              "index": "3",
+              "text": "确认无测试消息、闹钟、来电或白屏残留。"
+            },
+            {
+              "index": "4",
+              "text": "返回表盘并采集最终截图。"
+            }
+          ],
+          "expected_results": [
+            {
+              "index": "1",
+              "text": "手表不再停留手电筒白光页。"
+            },
+            {
+              "index": "2",
+              "text": "亮度 restore 和 verify_restore 成功。"
+            },
+            {
+              "index": "3",
+              "text": "APP 与手表均无测试提醒残留。"
+            },
+            {
+              "index": "4",
+              "text": "表盘正常显示，环境可供下一模块使用。"
+            }
+          ],
+          "actual_result": "",
+          "priority": "P0",
+          "remark": "用例编号:FLASHLIGHT-020；稳定ID:FLASHLIGHT-FC-020；需求ID:FLASHLIGHT-REQ-006|FLASHLIGHT-REQ-012；源用例:AUTO-DETAIL-0107|AUTO-DETAIL-0108；自动化候选:NEED_REVIEW；执行策略:ISOLATED；评审状态:FROZEN_APPROVED；解锁条件:deterministic_brightness_snapshot_restore_contract_missing",
+          "requirement_ids": [
+            "FLASHLIGHT-REQ-006",
+            "FLASHLIGHT-REQ-012"
+          ],
+          "traceability_valid": true,
+          "step_expected_alignment": true,
+          "review_status": "FROZEN_APPROVED"
+        }
+      ],
+      "freeze_record": {
+        "path": "cases/stage04_flashlight_freeze_record_20260727.json",
+        "review_baseline_xlsx_sha256": "CBB8D9AF0210BD2CED3928FF41186425AC322B6B01FFE4CBD75FF7A963A36C16",
+        "frozen_workbook_sha256": "B340FC0354399935FFF5C896CFF55F820DA22A8BE2D2FCE15A3C26251AC09324",
+        "binding_policy": "FreezeRecord binds FunctionalManifest; FunctionalManifest does not self-bind final FreezeRecord SHA."
+      },
+      "skill_snapshot": {
+        "runtime_policy": "local_snapshot_only",
+        "manifest_path": "integrations/qatest_skill_snapshot/SNAPSHOT_MANIFEST.json",
+        "manifest_sha256": "D2D01BD2F9AF87C2718630758B1B857FBD62E620B5F4C78995C814357EE4D96C",
+        "checked_file_count": 356
+      }
+    }
+  ]
+}

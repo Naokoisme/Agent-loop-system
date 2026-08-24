@@ -24,15 +24,11 @@
     </nav>
     <div class="topbar-actions">
       <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
-      <label class="global-target-picker" for="global-target-select">
-        <span class="sr-only">当前测试目标</span>
-        <select id="global-target-select" aria-label="切换全局测试目标">
-          <option value="620C_W6830">620C 模拟器</option>
-          <option value="6202_W5230_SIMULATOR">6202 模拟器</option>
-          <option value="6202_W5230">6202 真机</option>
-        </select>
+      <div class="global-target-picker" aria-label="当前项目与快捷切换">
+        <button id="global-project-switch" class="global-project-switch" type="button" aria-haspopup="dialog">当前项目：读取中… ▾</button>
         <span id="global-target-status" class="target-health-inline"><i></i><span>尚未检查</span></span>
-      </label>
+      </div>
+      <button id="open-create-project" class="button button-secondary topbar-create-project" type="button">＋ 新增项目</button>
       <button id="open-system-settings" class="icon-button settings-nav-btn" type="button" aria-label="打开系统设置" title="系统设置">⚙</button>
     </div>
   </header>
@@ -43,6 +39,35 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="project-switch-dialog" class="import-dialog project-switch-dialog" aria-labelledby="project-switch-title">
+    <header class="dialog-head">
+      <div><p class="eyebrow">快捷切换</p><h2 id="project-switch-title">选择项目</h2></div>
+      <button class="dialog-close" type="button" data-close-project-switch aria-label="关闭">×</button>
+    </header>
+    <div class="dialog-body">
+      <label class="project-search"><span class="sr-only">搜索项目</span><input id="project-switch-search" type="search" placeholder="搜索项目名称或 ID" autocomplete="off"></label>
+      <div id="project-switch-list" class="project-switch-list"></div>
+    </div>
+    <footer class="dialog-foot"><button id="project-switch-create" class="button" type="button">＋ 新增项目</button></footer>
+  </dialog>
+  <dialog id="create-project-dialog" class="import-dialog create-project-dialog" aria-labelledby="create-project-title">
+    <form id="create-project-form">
+      <header class="dialog-head">
+        <div><p class="eyebrow">项目注册表</p><h2 id="create-project-title">新增项目</h2></div>
+        <button class="dialog-close" type="button" data-close-create-project aria-label="关闭">×</button>
+      </header>
+      <div class="dialog-body project-create-fields">
+        <label><span>项目名称</span><input name="project_name" required placeholder="例如：579 回归项目"></label>
+        <label><span>项目 ID</span><input name="project_id" required pattern="[A-Za-z0-9_.-]+" placeholder="例如：watch_579_regression"></label>
+        <fieldset><legend>允许运行平台</legend><div id="create-project-platforms" class="platform-checkboxes"></div></fieldset>
+        <label><span>默认运行平台</span><select name="default_platform" id="create-project-default-platform" required></select></label>
+        <fieldset><legend>允许执行目标</legend><div id="create-project-targets" class="target-checkboxes"></div></fieldset>
+        <label><span>默认执行目标</span><select name="default_target" id="create-project-default-target" required></select></label>
+        <p id="create-project-error" class="error-banner" hidden></p>
+      </div>
+      <footer class="dialog-actions"><button class="button button-secondary" type="button" data-close-create-project>取消</button><button class="button" type="submit">创建并切换</button></footer>
+    </form>
+  </dialog>
   <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 660px; width: 90vw;">
     <form id="system-settings-form">
       <header class="dialog-head">
