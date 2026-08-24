@@ -10,6 +10,7 @@ from scripts.build_exe import (
     find_embedded_release_secrets,
     find_release_case_map_local_paths,
     sanitize_supercom_release_db,
+    write_internal_hardware_env,
     write_release_env_example,
 )
 
@@ -151,6 +152,68 @@ def test_release_env_without_source_is_still_portable(tmp_path: Path) -> None:
     assert values["W30_HARDWARE_SOURCE_ROOT"] == ""
     assert values["W30_HARDWARE_WORKSPACE_ROOT"] == ""
     assert values["W30_HARDWARE_PROFILE_ROOT"] == "profiles"
+
+
+def test_internal_hardware_env_copies_model_keys_but_clears_machine_state(
+    tmp_path: Path,
+) -> None:
+    template = tmp_path / ".env.example.template"
+    template.write_text(
+        "\n".join(
+            [
+                "OPENAI_API_KEY=",
+                "OPENAI_API_KEY_EXPLORATION=",
+                "OPENAI_API_KEY_FIXED=",
+                "OPENAI_MODEL=shared-template-model",
+                "OPENAI_EXPLORATION_MODEL=",
+                "OPENAI_FIXED_MODEL=",
+                "ONES_AUTH_TOKEN=",
+                "W30_HARDWARE_PORT=",
+                "W30_HARDWARE_BLE_ADDRESS=",
+                r"W30_HARDWARE_SOURCE_ROOT=D:\\firmware",
+                r"W30_HARDWARE_WORKSPACE_ROOT=D:\\workspace",
+                r"W30_HARDWARE_PROFILE_ROOT=D:\\profiles",
+                "W30_HARDWARE_PROFILE_VERSION=",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    source = tmp_path / ".env.source"
+    source.write_text(
+        "\n".join(
+            [
+                "OPENAI_API_KEY_EXPLORATION=exploration-secret",
+                "OPENAI_API_KEY_FIXED=fixed-secret",
+                "OPENAI_EXPLORATION_MODEL=exploration-model",
+                "OPENAI_FIXED_MODEL=fixed-model",
+                "ONES_AUTH_TOKEN=ones-secret",
+                "W30_HARDWARE_PORT=COM19",
+                "W30_HARDWARE_BLE_ADDRESS=AA:BB:CC:DD:EE:FF",
+                r"W30_HARDWARE_SOURCE_ROOT=D:\\local-firmware",
+                r"W30_HARDWARE_WORKSPACE_ROOT=D:\\local-workspace",
+                "W30_HARDWARE_PROFILE_VERSION=v1.2.0-dev.3",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    destination = tmp_path / ".env"
+
+    write_internal_hardware_env(template, source, destination)
+
+    values = _assignments(destination)
+    assert values["OPENAI_API_KEY"] == "exploration-secret"
+    assert values["OPENAI_API_KEY_EXPLORATION"] == "exploration-secret"
+    assert values["OPENAI_API_KEY_FIXED"] == "fixed-secret"
+    assert values["OPENAI_MODEL"] == "exploration-model"
+    assert values["ONES_AUTH_TOKEN"] == ""
+    assert values["W30_HARDWARE_PORT"] == ""
+    assert values["W30_HARDWARE_BLE_ADDRESS"] == ""
+    assert values["W30_HARDWARE_SOURCE_ROOT"] == ""
+    assert values["W30_HARDWARE_WORKSPACE_ROOT"] == ""
+    assert values["W30_HARDWARE_PROFILE_ROOT"] == "profiles"
+    assert values["W30_HARDWARE_PROFILE_VERSION"] == "v1.2.0-dev.3"
 
 
 def test_release_source_rejects_embedded_api_key_literals(tmp_path: Path) -> None:

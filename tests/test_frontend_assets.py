@@ -266,6 +266,12 @@ class FrontendAssetsTest(unittest.TestCase):
             "删除这里只会清除连接记录",
         ):
             self.assertIn(token, self.index)
+        self.assertIn(
+            '<div id="cfg-hw-ble-options" class="ble-device-manager">',
+            self.index,
+        )
+        self.assertIn(".ble-device-manager {\n  display: grid;", self.stylesheet)
+        self.assertNotIn("hwBleOptions.style.display", self.javascript)
         for token in (
             "async function loadRememberedBleDevices()",
             "api('/api/hardware/ble/remembered')",

@@ -248,6 +248,14 @@ foreach ($name in $whitelist) {{
     }}
 }}
 
+# 内部真机测试包可携带预配置 .env；仅在目标机器尚无配置时初始化，绝不覆盖已有配置。
+$configSrc = Join-Path $payloadDir ".env"
+$configDst = Join-Path $AppRoot ".env"
+if ((Test-Path $configSrc -PathType Leaf) -and -not (Test-Path $configDst)) {{
+    Copy-Item -Path $configSrc -Destination $configDst -Force
+    Log-Msg "初始化内部真机测试配置: .env"
+}}
+
 # 5. 清理暂存区
 $curStaging = Join-Path (Join-Path $AppRoot ".runtime") "update_staging"
 if (Test-Path $curStaging) {{

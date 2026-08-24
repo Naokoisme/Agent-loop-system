@@ -705,6 +705,7 @@ a { color: inherit; }
 .dialog-body { display: grid; gap: 18px; padding: 20px 22px; }
 
 .ble-device-manager {
+  display: grid;
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--line);

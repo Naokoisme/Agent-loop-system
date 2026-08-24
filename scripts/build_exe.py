@@ -72,6 +72,12 @@ RELEASE_ENV_LOCAL_STATE_KEYS = {
 
 RELEASE_ENV_CLEAR_KEYS = RELEASE_ENV_SECRET_KEYS | RELEASE_ENV_LOCAL_STATE_KEYS
 
+INTERNAL_HARDWARE_ENV_SECRET_KEYS = {
+    "OPENAI_API_KEY",
+    "OPENAI_API_KEY_EXPLORATION",
+    "OPENAI_API_KEY_FIXED",
+}
+
 OPENAI_STYLE_API_KEY_PATTERN = re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")
 WINDOWS_VALUE_DRIVE_PREFIX_PATTERN = re.compile(
     r"(?<![A-Za-z])[A-Za-z]:[\\/]+"
@@ -95,6 +101,36 @@ def read_dotenv_assignments(path: Path) -> dict[str, str]:
     return assignments
 
 
+def _first_configured_value(*values: str) -> str:
+    for value in values:
+        if value.strip().strip('"').strip("'"):
+            return value
+    return ""
+
+
+def _write_release_env(
+    template: Path,
+    destination: Path,
+    replacements: dict[str, str],
+) -> None:
+    rendered: list[str] = []
+    seen: set[str] = set()
+    for line in template.read_text(encoding="utf-8-sig").splitlines():
+        if line.strip() and not line.lstrip().startswith("#") and "=" in line:
+            key, _ = line.split("=", 1)
+            key = key.strip()
+            if key in replacements:
+                line = f"{key}={replacements[key]}"
+                seen.add(key)
+        rendered.append(line)
+
+    missing = sorted(set(replacements) - seen)
+    if missing:
+        rendered.extend(["", "# Release-specific settings"])
+        rendered.extend(f"{key}={replacements[key]}" for key in missing)
+    destination.write_text("\n".join(rendered) + "\n", encoding="utf-8")
+
+
 def write_release_env_example(
     template: Path,
     source: Path | None,
@@ -114,22 +150,41 @@ def write_release_env_example(
         template_values.get("W30_HARDWARE_PROFILE_VERSION", ""),
     )
 
-    rendered: list[str] = []
-    seen: set[str] = set()
-    for line in template.read_text(encoding="utf-8-sig").splitlines():
-        if line.strip() and not line.lstrip().startswith("#") and "=" in line:
-            key, _ = line.split("=", 1)
-            key = key.strip()
-            if key in replacements:
-                line = f"{key}={replacements[key]}"
-                seen.add(key)
-        rendered.append(line)
+    _write_release_env(template, destination, replacements)
 
-    missing = sorted(set(replacements) - seen)
-    if missing:
-        rendered.extend(["", "# Release-specific settings"])
-        rendered.extend(f"{key}={replacements[key]}" for key in missing)
-    destination.write_text("\n".join(rendered) + "\n", encoding="utf-8")
+
+def write_internal_hardware_env(
+    template: Path,
+    source: Path,
+    destination: Path,
+) -> None:
+    """Render a portable, preconfigured env for the internal hardware package."""
+    template_values = read_dotenv_assignments(template)
+    source_values = read_dotenv_assignments(source)
+    replacements = {
+        key: source_values.get(key, template_values.get(key, ""))
+        for key in RELEASE_ENV_SAFE_COPY_KEYS
+    }
+    replacements.update({key: "" for key in RELEASE_ENV_CLEAR_KEYS})
+    for key in INTERNAL_HARDWARE_ENV_SECRET_KEYS:
+        replacements[key] = source_values.get(key, "")
+    replacements["OPENAI_API_KEY"] = _first_configured_value(
+        source_values.get("OPENAI_API_KEY", ""),
+        source_values.get("OPENAI_API_KEY_EXPLORATION", ""),
+        source_values.get("OPENAI_API_KEY_FIXED", ""),
+    )
+    replacements["OPENAI_MODEL"] = _first_configured_value(
+        source_values.get("OPENAI_MODEL", ""),
+        source_values.get("OPENAI_EXPLORATION_MODEL", ""),
+        source_values.get("OPENAI_FIXED_MODEL", ""),
+        template_values.get("OPENAI_MODEL", ""),
+    )
+    replacements["W30_HARDWARE_PROFILE_ROOT"] = "profiles"
+    replacements["W30_HARDWARE_PROFILE_VERSION"] = source_values.get(
+        "W30_HARDWARE_PROFILE_VERSION",
+        template_values.get("W30_HARDWARE_PROFILE_VERSION", ""),
+    )
+    _write_release_env(template, destination, replacements)
 
 
 def find_embedded_release_secrets(root: Path) -> list[str]:
@@ -290,6 +345,7 @@ def build_exe(
     output_dir: Path | None = None,
     profile_source: Path | None = None,
     release_env_source: Path | None = None,
+    configured_env: bool = False,
     clean: bool = True,
 ) -> dict[str, object]:
     root = (workspace_root or Path(__file__).resolve().parents[1]).resolve()
@@ -307,6 +363,8 @@ def build_exe(
         raise FileNotFoundError(f"Runtime Profile directory not found: {profile_source}")
     if release_env_source is not None and not release_env_source.resolve().is_file():
         raise FileNotFoundError(f"Release env source not found: {release_env_source}")
+    if configured_env and release_env_source is None:
+        raise ValueError("--configured-env requires --release-env-source")
 
     if clean:
         if target_dir.exists():
@@ -489,14 +547,22 @@ def build_exe(
             shutil.copy2(user_data_db, supercom_dst / "user_data.sqlite")
             sanitize_supercom_release_db(supercom_dst / "user_data.sqlite")
 
-    # Root files: only .env.example
+    # Root configuration: public/template builds get .env.example; the internal
+    # hardware package gets one portable preconfigured .env and no example file.
     env_example = root / ".env.example"
     if env_example.is_file():
-        write_release_env_example(
-            env_example,
-            release_env_source.resolve() if release_env_source is not None else None,
-            target_dir / ".env.example",
-        )
+        if configured_env:
+            write_internal_hardware_env(
+                env_example,
+                release_env_source.resolve(),
+                target_dir / ".env",
+            )
+        else:
+            write_release_env_example(
+                env_example,
+                release_env_source.resolve() if release_env_source is not None else None,
+                target_dir / ".env.example",
+            )
 
     # Empty runtime directories
     for runtime_dir in ["history", "history/tests", "evidence", "defects", "defects_img", ".runtime/jobs"]:
@@ -504,7 +570,7 @@ def build_exe(
 
     # Audit for leaks in outer distribution directory
     sensitive_leaks = []
-    if (target_dir / ".env").is_file():
+    if (target_dir / ".env").is_file() and not configured_env:
         sensitive_leaks.append(".env")
     if (target_dir / ".git").exists():
         sensitive_leaks.append(".git")
@@ -519,10 +585,10 @@ def build_exe(
     if (target_dir / "frontend" / "server.py").exists():
         sensitive_leaks.append("frontend/server.py (should be bundled in _internal)")
 
-    packaged_env = target_dir / ".env.example"
+    packaged_env = target_dir / (".env" if configured_env else ".env.example")
     if packaged_env.is_file():
         packaged_values = read_dotenv_assignments(packaged_env)
-        leaked_secrets = sorted(
+        leaked_secrets = [] if configured_env else sorted(
             key
             for key in RELEASE_ENV_SECRET_KEYS
             if packaged_values.get(key, "").strip()
@@ -534,12 +600,18 @@ def build_exe(
         )
         if leaked_secrets:
             sensitive_leaks.append(
-                f".env.example contains credentials: {leaked_secrets}"
+                f"{packaged_env.name} contains credentials: {leaked_secrets}"
             )
         if leaked_local_state:
             sensitive_leaks.append(
-                f".env.example contains machine-local settings: {leaked_local_state}"
+                f"{packaged_env.name} contains machine-local settings: {leaked_local_state}"
             )
+        if configured_env and not _first_configured_value(
+            packaged_values.get("OPENAI_API_KEY", "")
+        ):
+            sensitive_leaks.append(".env does not contain a configured shared model key")
+    elif configured_env:
+        sensitive_leaks.append("configured internal package is missing .env")
 
     case_map_local_paths = find_release_case_map_local_paths(target_dir / "case_map")
     if case_map_local_paths:
@@ -556,7 +628,20 @@ def build_exe(
         raise RuntimeError(f"Package contains forbidden files/leaks: {sensitive_leaks}")
 
     # Write user-friendly README
-    readme_content = (
+    env_readme = (
+        "## 2. 内部真机测试配置（.env）\n\n"
+        "本包已携带可直接使用的大模型配置，无需复制或重命名 `.env.example`。\n"
+        "串口号与 BLE 设备仍按每台电脑的实际情况在系统设置中选择；已有 `.env` 的升级安装不会被覆盖。\n\n"
+        if configured_env
+        else
+        "## 2. 首次大模型环境配置（.env）\n\n"
+        "发布包不会携带开发机的 API 密钥、ONES 身份、串口号、BLE 地址或本机路径：\n"
+        "1. 将本目录下的 `.env.example` 复制一份并重命名为 `.env`。\n"
+        "2. 在 `.env` 中填写大模型凭据；ONES 与设备连接也可在系统设置中配置。\n"
+        "3. 6202 真机探索和固化用例使用包内相对路径 `profiles`，不需要固件源码工作区。\n"
+        "4. 串口和 BLE 设备由系统设置中的实时枚举/扫描选择，不应复制开发机设备标识。\n\n"
+    )
+    readme_prefix = (
         "# Agent-loop 自动化测试平台（Windows x64 便携版）\n\n"
         "无需安装 Python、开发环境或编译工具链，解压后双击 `Agent-loop.exe` 即可使用。\n"
         "已内置 6202 真机 Runtime Profile、用例库、标准模板及配套串口助手 `tools/SuperCom`。\n\n"
@@ -576,12 +661,8 @@ def build_exe(
         "3. **第三步（启动测试平台）**：\n"
         "   - 双击运行 `Agent-loop.exe`，在 Web 界面选择 `6202_W5230`，勾选需要测试的用例点击「执行用例」即可。\n\n"
         "---\n\n"
-        "## 2. 首次大模型环境配置（.env）\n\n"
-        "发布包不会携带开发机的 API 密钥、ONES 身份、串口号、BLE 地址或本机路径：\n"
-        "1. 将本目录下的 `.env.example` 复制一份并重命名为 `.env`。\n"
-        "2. 在 `.env` 中填写大模型凭据；ONES 与设备连接也可在系统设置中配置。\n"
-        "3. 6202 真机探索和固化用例使用包内相对路径 `profiles`，不需要固件源码工作区。\n"
-        "4. 串口和 BLE 设备由系统设置中的实时枚举/扫描选择，不应复制开发机设备标识。\n\n"
+    )
+    readme_suffix = (
         "---\n\n"
         "## 3. 功能使用指南\n\n"
         "### ① 导入 Excel 测试用例（支持拖拽）\n"
@@ -599,6 +680,7 @@ def build_exe(
         "## 4. 停止服务\n\n"
         "- 在启动控制台窗口中按下 `Ctrl + C`，或直接关闭控制台窗口即可安全退出。\n"
     )
+    readme_content = readme_prefix + env_readme + readme_suffix
     (target_dir / "README.md").write_text(readme_content, encoding="utf-8")
 
     # Generate Manifest
@@ -658,7 +740,8 @@ def build_exe(
                 rel_p = f_path.relative_to(target_dir).as_posix()
                 # Exclude specific project case_maps, project profiles, and project firmware patches
                 if (
-                    rel_p.startswith("case_map/6202_")
+                    rel_p == ".env"
+                    or rel_p.startswith("case_map/6202_")
                     or rel_p.startswith("case_map/620C_")
                     or rel_p.startswith("profiles/6202_")
                     or rel_p.startswith("profiles/620C_")
@@ -734,6 +817,11 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--profile-source", type=Path, default=None)
     parser.add_argument("--release-env-source", type=Path, default=None)
+    parser.add_argument(
+        "--configured-env",
+        action="store_true",
+        help="Build the internal hardware package with a portable preconfigured .env",
+    )
     parser.add_argument("--no-clean", dest="clean", action="store_false", default=True)
     args = parser.parse_args()
 
@@ -741,6 +829,7 @@ if __name__ == "__main__":
         output_dir=args.output_dir,
         profile_source=args.profile_source,
         release_env_source=args.release_env_source,
+        configured_env=args.configured_env,
         clean=args.clean,
     )
     print(f"EXE Distribution successfully built at: {res['target_dir']}")

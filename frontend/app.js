@@ -3638,17 +3638,6 @@ function initSystemSettings() {
         setBleConnectionStatus('error', '无法读取蓝牙设备记录', error.message);
     }
   }
-  const syncBleOptions = () => {
-    if (hwBleOptions) {
-      hwBleOptions.style.display = hwCaptureSelect?.value === 'ble' ? 'grid' : 'none';
-    }
-  };
-  hwCaptureSelect?.addEventListener('change', () => {
-    syncBleOptions();
-    if (hwCaptureSelect.value === 'ble' && !bleRememberedLoaded) {
-      void loadRememberedBleDevices();
-    }
-  });
   bleSearchInput?.addEventListener('input', renderBleDevices);
   hwBleAddress?.addEventListener('input', () => {
     renderBleDevices();
@@ -3946,7 +3935,6 @@ function initSystemSettings() {
       if (hwBleAddress) hwBleAddress.value = cfg.hardware?.ble_address || '';
       if (hwBleScanTimeout) hwBleScanTimeout.value = cfg.hardware?.ble_scan_timeout || 15;
       await loadSerialPorts();
-      syncBleOptions();
       await loadRememberedBleDevices();
     } catch (err) {
       if (errorBox) {
