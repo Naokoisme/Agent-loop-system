@@ -3669,6 +3669,51 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
 
+    def test_blank_optional_simulator_paths_keep_settings_page_available(self) -> None:
+        _, base = self._server()
+        with patch.dict(
+            os.environ,
+            {
+                "AGENT_LOOP_ROOT": str(self.paths.root),
+                "AGENT_LOOP_LAYOUT_ROOT": "",
+                "W30_HARDWARE_PROFILE_ROOT": "",
+                "W30_SIMULATOR_SOURCE_ROOT": "",
+                "W30_SIMULATOR_WORKSPACE_ROOT": "",
+                "W30_SIMULATOR_PATH": "",
+                "W30_6202_SIMULATOR_SOURCE_ROOT": "",
+                "W30_6202_SIMULATOR_BUILD_DIRECTORY": "",
+                "W30_6202_SIMULATOR_ARTIFACT_PATH": "",
+            },
+            clear=False,
+        ):
+            with urlopen(base + "/api/config", timeout=3) as resp:
+                config = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+            with urlopen(base + "/api/tests/projects", timeout=3) as resp:
+                projects = json.loads(resp.read().decode("utf-8"))["items"]
+                self.assertEqual(resp.status, 200)
+
+        simulator_root = self.paths.root / "workspaces" / "firmware" / "620C_W6830"
+        self.assertEqual(
+            config["hardware"]["profile_root"],
+            str(self.paths.root / "profiles"),
+        )
+        self.assertEqual(config["simulator"]["source_root"], str(simulator_root))
+        simulator_6202 = next(
+            item for item in projects if item["project"] == "6202_W5230_SIMULATOR"
+        )
+        self.assertEqual(
+            simulator_6202["simulator_source_root"],
+            str(
+                (
+                    self.paths.root.parent
+                    / "workspaces"
+                    / "firmware"
+                    / "6202_W5230"
+                ).resolve()
+            ),
+        )
+
     def test_ble_device_manager_scans_connects_remembers_and_forgets(self) -> None:
         _, base = self._server()
         discovered = [

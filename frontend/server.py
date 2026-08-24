@@ -333,7 +333,7 @@ def _test_project(value: str | None = None) -> dict[str, str]:
             ("simulator_artifact_path", "W30_6202_SIMULATOR_ARTIFACT_PATH"),
         ):
             metadata[field] = str(resolve_config_path(
-                os.environ.get(environment_key, metadata[field])
+                (os.environ.get(environment_key) or "").strip() or metadata[field]
             ))
     return metadata
 
@@ -4667,28 +4667,26 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
                 os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15")
             ),
             "profile_root": str(resolve_config_path(
-                os.environ.get(
-                    "W30_HARDWARE_PROFILE_ROOT",
-                    str(paths.root / "profiles"),
-                ),
+                (os.environ.get("W30_HARDWARE_PROFILE_ROOT") or "").strip()
+                or str(paths.root / "profiles"),
                 app_root=paths.root,
             )),
             "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
         },
         "simulator": {
             "source_root": str(resolve_config_path(
-                os.environ.get("W30_SIMULATOR_SOURCE_ROOT", simulator_root),
+                (os.environ.get("W30_SIMULATOR_SOURCE_ROOT") or "").strip()
+                or simulator_root,
                 app_root=paths.root,
             )),
             "workspace_root": str(resolve_config_path(
-                os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT", simulator_root),
+                (os.environ.get("W30_SIMULATOR_WORKSPACE_ROOT") or "").strip()
+                or simulator_root,
                 app_root=paths.root,
             )),
             "simulator_path": str(resolve_config_path(
-                os.environ.get(
-                    "W30_SIMULATOR_PATH",
-                    simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe",
-                ),
+                (os.environ.get("W30_SIMULATOR_PATH") or "").strip()
+                or simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe",
                 app_root=paths.root,
             )),
         },
