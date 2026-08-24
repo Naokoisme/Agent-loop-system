@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import errno
 import json
 import os
 import subprocess
@@ -309,6 +310,61 @@ class FrontendDataTest(unittest.TestCase):
         paths = application_class.call_args.args[0]
         self.assertEqual(paths.root, runtime_root.resolve())
         self.assertEqual(paths.frontend, runtime_root.resolve() / "frontend")
+
+    def test_frontend_main_advances_from_an_occupied_default_port(self) -> None:
+        fake_server = SimpleNamespace(
+            server_address=("127.0.0.1", 8766),
+            serve_forever=lambda: None,
+            server_close=lambda: None,
+        )
+        occupied = OSError(errno.EADDRINUSE, "address already in use")
+
+        with (
+            patch("frontend.server.resolve_app_root", return_value=self.paths.root),
+            patch("frontend.server.WebApplication"),
+            patch(
+                "frontend.server.FrontendHTTPServer",
+                side_effect=[occupied, fake_server],
+            ) as server_class,
+        ):
+            self.assertEqual(frontend_main(["--host", "127.0.0.1"]), 0)
+
+        self.assertEqual(
+            [item.args[0] for item in server_class.call_args_list],
+            [("127.0.0.1", 8765), ("127.0.0.1", 8766)],
+        )
+
+    def test_frontend_main_keeps_an_explicit_port_strict(self) -> None:
+        occupied = OSError(errno.EADDRINUSE, "address already in use")
+        with (
+            patch("frontend.server.resolve_app_root", return_value=self.paths.root),
+            patch("frontend.server.WebApplication"),
+            patch(
+                "frontend.server.FrontendHTTPServer",
+                side_effect=occupied,
+            ) as server_class,
+            self.assertRaises(OSError) as raised,
+        ):
+            frontend_main(["--host", "127.0.0.1", "--port", "8765"])
+
+        self.assertIs(raised.exception, occupied)
+        server_class.assert_called_once()
+
+    def test_frontend_main_does_not_hide_other_bind_errors(self) -> None:
+        denied = OSError(errno.EACCES, "permission denied")
+        with (
+            patch("frontend.server.resolve_app_root", return_value=self.paths.root),
+            patch("frontend.server.WebApplication"),
+            patch(
+                "frontend.server.FrontendHTTPServer",
+                side_effect=denied,
+            ) as server_class,
+            self.assertRaises(OSError) as raised,
+        ):
+            frontend_main(["--host", "127.0.0.1"])
+
+        self.assertIs(raised.exception, denied)
+        server_class.assert_called_once()
 
     def test_frontend_main_rejects_non_loopback_binding_without_authentication(self) -> None:
         with self.assertRaises(SystemExit) as raised:

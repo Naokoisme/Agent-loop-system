@@ -9,6 +9,7 @@ import asyncio
 import base64
 import copy
 from contextlib import contextmanager
+import errno
 import hashlib
 import ipaddress
 import io
@@ -82,7 +83,8 @@ LIVE_TEST_SCREENSHOT_FILE = re.compile(
     r"^(?:screenshot(?:-\d{2,3})?|step_\d{2,3})\.bmp$"
 )
 MAX_BODY_BYTES = 50 * 1024 * 1024  # 50 MB 支持大容量 Excel/用例数据上传
-MAX_PORT_SEARCH_ATTEMPTS = 500_000
+DEFAULT_FRONTEND_PORT = 8765
+MAX_PORT_SEARCH_ATTEMPTS = 100
 MAX_LOG_CHARS = 200_000
 HISTORY_SCHEMA_VERSION = 2
 DEFECT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
@@ -7206,10 +7208,51 @@ class FrontendIPv6HTTPServer(FrontendHTTPServer):
     address_family = socket.AF_INET6
 
 
+def _is_address_in_use_error(exc: OSError) -> bool:
+    return (
+        exc.errno in {errno.EADDRINUSE, 10048}
+        or getattr(exc, "winerror", None) == 10048
+    )
+
+
+def _create_frontend_server(
+    server_class: type[FrontendHTTPServer],
+    host: str,
+    port: int,
+    handler: type[BaseHTTPRequestHandler],
+    *,
+    search_next_port: bool,
+) -> FrontendHTTPServer:
+    candidate_port = port
+    for attempt in range(MAX_PORT_SEARCH_ATTEMPTS):
+        try:
+            server = server_class((host, candidate_port), handler)
+        except OSError as exc:
+            if (
+                not search_next_port
+                or port == 0
+                or not _is_address_in_use_error(exc)
+                or candidate_port >= 65_535
+                or attempt + 1 >= MAX_PORT_SEARCH_ATTEMPTS
+            ):
+                raise
+            candidate_port += 1
+            continue
+        if candidate_port != port:
+            print(f"[系统] 端口 {port} 已被占用，已自动使用 {candidate_port}")
+        return server
+    raise RuntimeError("无法创建本地服务")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="W30 Agent 自闭环前端服务")
     parser.add_argument("--host", default="127.0.0.1", help="监听地址")
-    parser.add_argument("--port", type=int, default=8765, help="监听端口")
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help="监听端口；未指定时从 8765 开始自动选择可用端口",
+    )
     args = parser.parse_args(argv)
     if not _is_loopback_host(args.host):
         parser.error("前端接口当前没有远程认证，只允许监听 localhost/127.0.0.1/::1")
@@ -7219,7 +7262,14 @@ def main(argv: list[str] | None = None) -> int:
     _reload_runtime_limits()
     app = WebApplication(AppPaths.from_root(root))
     server_class = FrontendIPv6HTTPServer if ":" in args.host else FrontendHTTPServer
-    server = server_class((args.host, args.port), make_handler(app))
+    requested_port = DEFAULT_FRONTEND_PORT if args.port is None else args.port
+    server = _create_frontend_server(
+        server_class,
+        args.host,
+        requested_port,
+        make_handler(app),
+        search_next_port=args.port is None,
+    )
     display_host = f"[{args.host}]" if ":" in args.host else args.host
     print(f"W30 Agent UI: http://{display_host}:{server.server_address[1]}")
     try:
