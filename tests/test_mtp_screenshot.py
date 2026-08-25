@@ -675,6 +675,47 @@ class MtpCaptureProviderTest(unittest.TestCase):
         self.assertEqual(len(devices), 1)
         self.assertEqual(namespace["folder"], "download")
 
+    def test_windows_namespace_probe_falls_back_to_volume_containing_download(
+        self,
+    ) -> None:
+        system = WindowsMtpSystem()
+        with mock.patch.object(
+            system,
+            "_run",
+            return_value=json.dumps({
+                "device": "ZORA",
+                "storage": "ZORA MTP Storage Volume",
+                "folder": "download",
+            }),
+        ) as run:
+            namespace = system.probe_namespace()
+
+        script = run.call_args.args[0]
+        self.assertIn("$storageItems", script)
+        self.assertIn("$env:WATCH_MTP_FOLDER", script)
+        self.assertEqual(namespace["storage"], "ZORA MTP Storage Volume")
+
+    def test_windows_copy_uses_mtp_filename_when_shell_hides_extension(
+        self,
+    ) -> None:
+        system = WindowsMtpSystem()
+        with tempfile.TemporaryDirectory() as root:
+            target = Path(root) / "agent_capture_7.bmp"
+
+            def fake_run(script, **_kwargs):
+                self.assertIn("System.FileName", script)
+                target.write_bytes(b"BM" + bytes(52))
+                return ""
+
+            with mock.patch.object(system, "_run", side_effect=fake_run):
+                copied = system.copy_capture(
+                    Path(root),
+                    file_name="agent_capture_7.bmp",
+                    timeout=0.1,
+                )
+
+        self.assertEqual(copied.name, "agent_capture_7.bmp")
+
     def test_restore_usb_retries_once_and_records_pnp_stage(self) -> None:
         from agent_loop_system.tools.mtp_screenshot import restore_usb_device
 

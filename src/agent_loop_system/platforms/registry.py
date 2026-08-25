@@ -54,6 +54,14 @@ class PlatformRegistry:
             ):
                 if not str(target.get(field) or "").strip():
                     raise PlatformRegistryError(f"执行目标 {target_id} 缺少 {field}")
+            if (
+                platform_id == "w30"
+                and target.get("execution_target") == "hardware"
+                and not str(target.get("runtime_profile_id") or "").strip()
+            ):
+                raise PlatformRegistryError(
+                    f"W30 真机执行目标 {target_id} 缺少 runtime_profile_id"
+                )
             if platform_id == "579":
                 if target.get("transport") != "app_ble":
                     raise PlatformRegistryError("579 transport 必须为 app_ble")

@@ -395,7 +395,14 @@ ConvertTo-Json -InputObject $items -Compress -Depth 3
         return [dict(item) for item in payload if isinstance(item, dict)]
 
     def probe_namespace(self, *, timeout: float = 10.0) -> dict[str, Any]:
-        """Read ``ZORA -> storage -> download`` through a fresh Shell namespace."""
+        """Read ``ZORA -> <storage volume> -> download`` via a fresh Shell namespace.
+
+        Older firmware exposed the volume as ``storage``.  Current 6202 builds
+        use a product label such as ``ZORA MTP Storage Volume`` instead.  Keep
+        the legacy exact-name preference, then accept the single volume that
+        contains the expected folder so a firmware label change does not make
+        an otherwise healthy MTP link fail preflight.
+        """
 
         script = r"""
 $deadline = (Get-Date).AddMilliseconds([double]$env:WATCH_MTP_TIMEOUT_MS)
@@ -411,9 +418,24 @@ do {
             $lastError = "MTP device count was $($devices.Count), expected 1"
         } else {
             $device = $devices[0]
-            $storages = @($device.GetFolder.Items() | Where-Object { $_.Name -eq $env:WATCH_MTP_STORAGE })
+            $storageItems = @($device.GetFolder.Items())
+            $storages = @($storageItems | Where-Object { $_.Name -eq $env:WATCH_MTP_STORAGE })
+            if ($storages.Count -eq 0) {
+                $storages = @(
+                    $storageItems | Where-Object {
+                        try {
+                            @($_.GetFolder.Items() | Where-Object {
+                                $_.Name -eq $env:WATCH_MTP_FOLDER
+                            }).Count -eq 1
+                        } catch {
+                            $false
+                        }
+                    }
+                )
+            }
             if ($storages.Count -ne 1) {
-                $lastError = "MTP storage count was $($storages.Count), expected 1"
+                $names = @($storageItems | ForEach-Object { [string]$_.Name }) -join ', '
+                $lastError = "MTP storage count was $($storages.Count), expected 1; available=[$names]"
             } else {
                 $storage = $storages[0]
                 $folders = @($storage.GetFolder.Items() | Where-Object { $_.Name -eq $env:WATCH_MTP_FOLDER })
@@ -505,9 +527,23 @@ do {
         Start-Sleep -Milliseconds 500
         continue
     }
-    $storage = @($device.GetFolder.Items()) |
+    $storageItems = @($device.GetFolder.Items())
+    $storage = @($storageItems) |
         Where-Object { $_.Name -eq $env:WATCH_MTP_STORAGE } |
         Select-Object -First 1
+    if (-not $storage) {
+        $storage = @(
+            $storageItems | Where-Object {
+                try {
+                    @($_.GetFolder.Items() | Where-Object {
+                        $_.Name -eq $env:WATCH_MTP_FOLDER
+                    }).Count -eq 1
+                } catch {
+                    $false
+                }
+            }
+        ) | Select-Object -First 1
+    }
     if (-not $storage) {
         $lastDiscoveryError = 'MTP storage not found'
         Start-Sleep -Milliseconds 500
@@ -522,7 +558,10 @@ do {
         continue
     }
     $capture = @($folder.GetFolder.Items()) |
-        Where-Object { $_.Name -eq $env:WATCH_MTP_FILE } |
+        Where-Object {
+            $_.Name -eq $env:WATCH_MTP_FILE -or
+            $_.ExtendedProperty('System.FileName') -eq $env:WATCH_MTP_FILE
+        } |
         Select-Object -First 1
     if (-not $capture) {
         $lastDiscoveryError = 'MTP capture not found'

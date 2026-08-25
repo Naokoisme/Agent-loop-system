@@ -22,6 +22,20 @@ class SimulatorCompletionTest(unittest.TestCase):
         self.assertNotIn("app init done", READY_MARKERS)
         self.assertNotIn("shell> ", READY_MARKERS)
 
+    def test_explicit_environment_is_scoped_to_the_session(self) -> None:
+        session = SimulatorSession(
+            "fake.exe",
+            environment={
+                "W30_PROJECT": "6202_W5230",
+                "SIMULATOR_SHELL_READY_MARKER": "shell-ready",
+                "SIMULATOR_GUI_COMMAND_READY_MARKER": "gui-ready",
+            },
+        )
+
+        self.assertEqual(session.environment["W30_PROJECT"], "6202_W5230")
+        self.assertEqual(session._automation_ready_marker, "shell-ready")
+        self.assertEqual(session._gui_command_ready_marker, "gui-ready")
+
     def _session_with_lines(self, *objects: dict) -> SimulatorSession:
         session = SimulatorSession("fake.exe", cmd_timeout=0.2)
         session.process = object()  # send() 只要求会话已经启动

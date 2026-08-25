@@ -61,6 +61,7 @@
       "execution_adapter": "w30_cli",
       "case_catalog_adapter": "w30_case_map",
       "health_adapter": "w30_hardware",
+      "runtime_profile_id": "6202_W5230",
       "execution_resource": "w30.hardware",
       "transport": "supercom",
       "transport_label": "SuperCom 命名管道",

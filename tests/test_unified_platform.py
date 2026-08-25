@@ -26,6 +26,29 @@ def test_platform_registry_declares_579_read_only_observation() -> None:
     assert target["capture_provider"] == "o2"
 
 
+def test_w30_hardware_target_owns_a_reusable_runtime_profile() -> None:
+    target = PlatformRegistry().target("w30.6202.hardware")
+    assert target["runtime_profile_id"] == "6202_W5230"
+
+
+def test_new_logical_project_inherits_runtime_profile_from_target(
+    tmp_path: Path,
+) -> None:
+    registry = ProjectRegistry(tmp_path, PlatformRegistry())
+    registry.create({
+        "project_id": "new_6202_project",
+        "project_name": "新 6202 项目",
+        "allowed_platforms": ["w30"],
+        "default_platform": "w30",
+        "allowed_targets": ["w30.6202.hardware"],
+        "default_target": "w30.6202.hardware",
+    })
+
+    resolved = registry.resolve("new_6202_project")
+    assert resolved["project"] == "new_6202_project"
+    assert resolved["runtime_profile_id"] == "6202_W5230"
+
+
 def test_project_registry_creates_atomically_and_archives_without_deleting(tmp_path: Path) -> None:
     registry = ProjectRegistry(tmp_path, PlatformRegistry())
     project = registry.create({

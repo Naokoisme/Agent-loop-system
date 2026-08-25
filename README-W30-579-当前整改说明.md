@@ -1,6 +1,6 @@
 # Agent-loop W30/579 双平台当前整改说明
 
-> 文档快照：2026-08-24
+> 文档快照：2026-08-25
 > 代码目录：`D:\我的\agent测试平台\Agent-loop-system`
 > 整改依据：`W30-579统一探索式自动化兼容方案.md`、`Agent-loop-W30-579统一平台一次性整改计划.md`、`Agent-loop统一用例管理与W30-579双平台整改方案.md`
 
@@ -17,11 +17,12 @@
 | 用例平台入口 | 已完成 | 进入用例管理后先选择 W30 或 579，再加载对应项目与用例 |
 | 统一用例管理 | 已完成 | 支持新增、编辑版本、Excel 导入/导出、复制、归档、恢复和审计 |
 | W30 原执行链兼容 | 已完成 | Simulator、SuperCom、MTP 和原 W30 Case Map 继续保留 |
+| W30 换机自适应 | 已完成 | 自动继承/安装运行时档案、识别唯一 SuperCom 串口及真实 MTP 存储卷 |
 | 579 平台适配框架 | 已完成 | 已接入 Catalog、动作注册表、APP Bridge、COM3 只读观察、O2 证据和门禁 |
 | 579 实机动作 | 默认关闭 | 必须完成受控 Canary 并由授权人员显式开启 |
 | W30 计算器探索式真机链路 | 已验证 | 已按“表盘 → 菜单 → 滚动查找 → 点击计算器”走通 |
 | W30 计算器正式 Runner | 当前受阻 | 缺少真机隔离工作区配置；现有 `CALC_001` 仍是直接进入页面的固化映射 |
-| 自动化回归 | 已通过 | `580 passed, 16 skipped, 9632 subtests passed` |
+| 自动化回归 | 已通过 | `764 passed, 16 skipped, 9702 subtests passed` |
 
 ## 2. 整改后的统一执行流程
 
@@ -118,6 +119,10 @@ APP Bridge ACK 或命令 ACK 只证明动作已交付，不能单独作为产品
 - 测试目标支持 W30/579 平台视图。
 - “大模型”“ONES”“系统更新”均为可进入的独立页签。
 - 环境就绪状态只应来自真实检查结果，没有检查结果时显示“尚未检查”。
+- 点击“立即检查”会重置按钮状态并执行一次全新检查，完成后使用本次返回结果刷新状态和提示。
+- Simulator 只有真实启动、GUI 命令和截图探测通过后才显示相应能力可用；检查结果按配置签名缓存。
+- W30 真机会独立收集档案、SuperCom、USB/PnP、MTP、GUI_PING 和模型服务六项结果，单项失败
+  不再遮蔽其他设备状态。
 - 系统设置弹窗保留大模型、ONES 和设备配置入口，敏感信息不在页面回显。
 
 ## 6. 统一用例库
@@ -297,7 +302,8 @@ POST /api/tests/jobs/{job_id}/resume
 
 关键环境变量见 `.env.example`。其中：
 
-- W30 真机默认示例为 `COM7`，实际运行必须按设备管理器和 SuperCom 当前端口修改。
+- W30 真机默认示例为 `COM7`。运行时会枚举 SuperCom AgentBridge；恰好一个活动串口时自动采用
+  实际端口，因此换电脑后无需因为 COM 编号变化修改项目。零个或多个活动串口会明确阻断，避免误连。
 - 579 使用 `PLATFORM_579_COM_PORT=COM3`，该端口在代码中保持只读。
 - `PLATFORM_579_ENABLED=false`、`PLATFORM_579_DEVICE_ACTIONS_ENABLED=false` 默认关闭 579 实机动作。
 - API Key、Token、BLE 地址、COM 口和本机绝对路径不得提交 Git。
@@ -349,13 +355,25 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-2026-08-24 当前结果：
+2026-08-25 当前结果：
 
 ```text
-580 passed, 16 skipped, 9632 subtests passed in 35.21s
+764 passed, 16 skipped, 9702 subtests passed in 44.58s
 ```
 
-覆盖范围包括前端页面与静态资源、项目/平台路由、579 动作注册表、探索 CLI、平台运行时、统一用例仓库、Excel 导入、Wheel 构建审计和双平台集成逻辑。
+覆盖范围包括前端页面与静态资源、项目/平台路由、579 动作注册表、探索 CLI、平台运行时、统一用例仓库、Excel 导入、Wheel 构建审计、双平台集成逻辑、运行时档案自动安装、SuperCom 端口自动发现、独立环境检查及 Windows MTP 卷标/文件名兼容。
+
+同日 6202 真机验证结果：
+
+| 检查 | 结果 |
+| --- | --- |
+| 真机运行时档案 | `v1.2.0-dev.3` / 固件 `v2.1.8.0`，通过 |
+| SuperCom | 自动使用当前唯一活动的 COM6 共享管道，通过 |
+| Windows USB/PnP | 唯一 ZORA WPD 实例在线，通过 |
+| Windows MTP | `ZORA → ZORA MTP Storage Volume → download` 可浏览，通过 |
+| UART/GUI | `GUI_PING` 返回匹配序号的 `processed`，通过 |
+| 模型服务 | `gpt-5.6-sol` 实际连通，通过 |
+| 新鲜截图 | 410×502、618,518 bytes、固件回执校验通过 |
 
 ## 14. W30 计算器真机验证
 
@@ -381,15 +399,14 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 
 ## 15. 当前已知阻塞与下一步
 
-### P0：补齐 W30 正式真机配置
+### 已解决：W30 真机档案与端口手动绑定
 
-正式任务在动作前被以下门禁阻断：
-
-```text
-HARDWARE_WORKSPACE_NOT_FOUND
-```
-
-需要在本机 `.env` 配置有效的 `W30_HARDWARE_WORKSPACE` 或 `W30_HARDWARE_WORKSPACE_ROOT`，并把 `W30_HARDWARE_PORT` 改为当前 SuperCom 实际端口。真机批量执行前还需由外部批次控制者建立有效 `TEST_SESSION`。
+- W30 真机目标现在显式拥有 `runtime_profile_id=6202_W5230`；逻辑项目复用目标档案，不按项目名
+  伪造能力数据。
+- 项目创建和执行前会从发布包、本机档案库或兼容发行目录寻找经过清单与哈希校验的档案，并原子
+  安装到托管 `.runtime/profiles`。找不到真实档案时仍然阻断，不会生成假档案。
+- SuperCom 端口由当前活动 AgentBridge 管道自动发现，旧电脑保存的 COM7 不会覆盖新电脑实际的
+  COM6；多设备歧义时保持失败关闭。
 
 ### P0：把计算器入口改为正式探索循环
 
@@ -401,22 +418,28 @@ HARDWARE_WORKSPACE_NOT_FOUND
 
 正式探索模式应改为：表盘 → 菜单 → 截图判断 → 未找到则滚动 → 再截图判断 → 找到后点击 → 结果截图。直接进入页面的命令可保留为调试或已固化快速复跑能力，但不能替代探索式转换流程。
 
-### P0：处理 MTP 连续取证副作用
+### 已解决：MTP 发现和文件匹配兼容
 
-当前通过 Windows MTP 每次取图时可能触发 USB 重新枚举并使手表进入充电页，导致“动作后立即截图”改变设备状态。本轮逐步证据采用独立前缀重放取得。正式方案需二选一：
+程序原先把中间存储卷写死为 `storage`，并只比较 Shell 显示名；实际设备在当前 Windows 中暴露
+`ZORA MTP Storage Volume`，BMP 扩展名只存在于 `System.FileName`，因此被误报为 MTP 未就绪或
+截图不存在。现在已改为：
 
-1. 支持每个检查点从稳定前置状态做前缀重放；或
-2. 提供不会改变页面状态的截图通道。
+1. 优先匹配历史标准卷名；未命中时选择唯一包含 `download` 的存储卷。
+2. 截图同时按显示名和 `System.FileName` 匹配，仍严格限定本次请求序号。
+3. 真实截图仍遵循 `关闭 USB → 固件生成文件 → 恢复 USB/PnP/MTP → 下载并校验 BMP`。
 
-同时应让 MTP 文件匹配兼容 Windows Shell 隐藏 `.bmp` 扩展名的情况，并在每个动作后校验仍位于期望页面，异常时恢复而不是继续盲点。
+USB 重新枚举可能影响前台页面的产品行为仍由 Runner 的状态重置和动作后页面校验负责，不能用旧图
+或跳过页面检查规避。
 
 ### P1：完成 579 受控 Canary
 
 579 工程链和全 fake 离线链已完成，但实机业务动作仍默认关闭。后续需要在受控设备上逐项验证 ADB、APP Bridge、BLE、COM3/O1、O2、状态恢复和证据合同，通过后再由授权人员开启总门禁。
 
-### P1：环境中心状态必须以深度检查为准
+### 已解决：环境中心状态以深度检查为准
 
-环境卡片不能只因注册表存在就显示“就绪”。W30 真机至少要检查工作区、SuperCom 管道、实际 COM 口、截图通道和测试会话；579 至少要检查 ADB、APP Bridge、COM3 只读观察、O2 证据目录和实机动作总门禁。
+环境列表只读取带配置签名的缓存，不因注册表存在而主动宣称就绪；“立即检查”才触发真实探测。
+W30 真机六项检查会完整返回，Simulator 真实启动失败时命令和截图明确显示未检查或失败。579 继续
+按 APP Bridge、BLE、COM3/O1、O2 与实机动作门禁返回平台专属状态。
 
 ## 16. 当前代码改动清单
 
@@ -440,6 +463,10 @@ HARDWARE_WORKSPACE_NOT_FOUND
 | `src/agent_loop_system/reproduction.py` | 执行复现流程的双平台兼容 |
 | `src/agent_loop_system/tools/agent.py` | Agent 工具侧的平台解析与门禁 |
 | `src/agent_loop_system/tools/case_map.py` | 多项目 Case Map 与统一映射读取 |
+| `src/agent_loop_system/tools/hardware_runtime_profile.py` | 已验证真机档案的自动查找、校验和原子安装 |
+| `src/agent_loop_system/tools/hardware_preflight.py` | 六项独立真机检查、SuperCom 端口自动发现与真实 MTP 路径展示 |
+| `src/agent_loop_system/tools/mtp_screenshot.py` | MTP 卷标自适应与 Windows 隐藏扩展名兼容 |
+| `src/agent_loop_system/tools/simulator.py` | Simulator 会话使用显式进程环境，避免跨项目配置污染 |
 | `case_map/579_case_map/` | 579 冻结来源映射 |
 | `case_map/6202_case_map/` | 6202 真机映射 |
 | `case_map/6202_simulator_case_map/` | 6202 模拟器映射 |

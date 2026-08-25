@@ -123,7 +123,7 @@ const ISSUE_SUMMARIES = Object.freeze({
   HARDWARE_INFRASTRUCTURE_FAILURE: '设备连接异常，请检查连接后重试。',
   EVIDENCE_INCOMPLETE: '证据不完整，暂时无法确认结果。',
   PROFILE_INVALID: '测试配置不可用，请联系维护人员。',
-  PORT_NOT_SELECTED: '尚未选择手表连接，请先在系统设置中完成真机连接。',
+  PORT_NOT_SELECTED: '未自动发现可用的手表连接，请确认 SuperCom 已打开手表串口。',
   SUPERCOM_PIPE_UNAVAILABLE: '未检测到可用的手表连接，请打开 SuperCom 并重新连接手表。',
   SUPERCOM_NO_UART: '手表暂未响应，请确认 SuperCom 已连接并唤醒屏幕后重试。',
   USB_DEVICE_NOT_PRESENT: '未检测到手表的 USB 连接，请重新连接后重试。',
@@ -5566,9 +5566,23 @@ function EnvironmentPage(project = currentProject()) {
         } catch (error) { button.disabled = false; showToast(error.message, 'error'); }
       });
       root.querySelector('[data-environment-check]')?.addEventListener('click', async event => {
-        event.currentTarget.disabled = true;
+        const button = event.currentTarget;
+        const idleMarkup = button.innerHTML;
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.innerHTML = `${icon('refresh', 16)} 正在检查…`;
         const environmentId = profile.target_id;
-        try { await api(`/api/environments/${encodeURIComponent(environmentId)}/check`, {method: 'POST', body: '{}'}); showToast(`环境检查完成：${health.label}`); route(); } catch (error) { event.currentTarget.disabled = false; showToast(error.message, 'error'); }
+        try {
+          const response = await api(`/api/environments/${encodeURIComponent(environmentId)}/check`, {method: 'POST', body: '{}'});
+          const refreshedHealth = environmentHealth(response?.result);
+          await route();
+          showToast(`环境检查完成：${refreshedHealth.label}`, refreshedHealth.status === 'ready' ? 'success' : 'warning');
+        } catch (error) {
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          button.innerHTML = idleMarkup;
+          showToast(error.message, 'error');
+        }
       });
     },
     destroy() {}

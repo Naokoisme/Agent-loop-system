@@ -10,6 +10,8 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -98,6 +100,14 @@ class HardwareRuntimeProfile:
             "case_map_version": self.case_map_version,
             "verified_capabilities": list(self.verified_capabilities),
         }
+
+
+@dataclass(frozen=True, slots=True)
+class HardwareRuntimeProfileProvision:
+    profile: HardwareRuntimeProfile
+    profiles_root: Path
+    source_root: Path
+    installed: bool
 
 
 def _sha256(path: Path) -> str:
@@ -412,9 +422,145 @@ def load_hardware_runtime_profile(
     )
 
 
+def _automatic_profile_library_roots(
+    app_root: Path,
+    extra_roots: tuple[Path, ...],
+) -> list[Path]:
+    candidates: list[Path] = list(extra_roots)
+    configured = os.environ.get("AGENT_LOOP_PROFILE_LIBRARY_ROOTS", "")
+    candidates.extend(
+        Path(value).expanduser()
+        for value in configured.split(os.pathsep)
+        if value.strip()
+    )
+
+    search_bases = [app_root.parent, app_root.parent.parent]
+    drive_root = Path(app_root.anchor) if app_root.anchor else None
+    if drive_root is not None:
+        search_bases.append(drive_root / "agent")
+    for base in search_bases:
+        if not base.is_dir():
+            continue
+        direct_profiles = base / "profiles"
+        if direct_profiles.is_dir():
+            candidates.append(direct_profiles)
+        candidates.extend(
+            distribution / "profiles"
+            for distribution in sorted(
+                base.glob("Agent-loop-system-*-windows-x64"),
+                reverse=True,
+            )
+            if (distribution / "profiles").is_dir()
+        )
+
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve(strict=False)
+        key = os.path.normcase(str(resolved))
+        if key not in seen:
+            seen.add(key)
+            unique.append(resolved)
+    return unique
+
+
+def ensure_hardware_runtime_profile(
+    *,
+    project: str,
+    profiles_root: Path | str | None = None,
+    version: str | None = None,
+    app_root: Path | str | None = None,
+    search_roots: tuple[Path | str, ...] = (),
+) -> HardwareRuntimeProfileProvision:
+    """Resolve or atomically install one verified hardware runtime profile.
+
+    Logical test projects reuse the immutable profile owned by their execution
+    target.  The function never fabricates capability data: every source is
+    loaded and hash-verified before it can be selected or installed.
+    """
+
+    selected_project = _safe_segment(project, "真机项目")
+    root = resolve_config_path(
+        profiles_root or RuntimePaths.from_root(app_root).profiles,
+        app_root=app_root,
+    )
+    current_error: HardwareRuntimeProfileError | None = None
+    try:
+        profile = load_hardware_runtime_profile(
+            project=selected_project,
+            version=version,
+            profiles_root=root,
+        )
+        return HardwareRuntimeProfileProvision(
+            profile=profile,
+            profiles_root=root,
+            source_root=root,
+            installed=False,
+        )
+    except HardwareRuntimeProfileError as exc:
+        current_error = exc
+
+    libraries = _automatic_profile_library_roots(
+        RuntimePaths.from_root(app_root).root,
+        tuple(Path(value) for value in search_roots),
+    )
+    destination = root / selected_project
+    for library in libraries:
+        if os.path.normcase(str(library)) == os.path.normcase(str(root)):
+            continue
+        try:
+            source_profile = load_hardware_runtime_profile(
+                project=selected_project,
+                version=version,
+                profiles_root=library,
+            )
+        except HardwareRuntimeProfileError:
+            continue
+
+        source_directory = library / selected_project
+        if any(path.is_symlink() for path in source_directory.rglob("*")):
+            continue
+        if destination.exists():
+            return HardwareRuntimeProfileProvision(
+                profile=source_profile,
+                profiles_root=library,
+                source_root=library,
+                installed=False,
+            )
+
+        root.mkdir(parents=True, exist_ok=True)
+        staging = root / f".{selected_project}.install-{uuid.uuid4().hex[:12]}"
+        try:
+            shutil.copytree(source_directory, staging)
+            os.replace(staging, destination)
+            installed_profile = load_hardware_runtime_profile(
+                project=selected_project,
+                version=version,
+                profiles_root=root,
+            )
+        except BaseException:
+            if staging.exists():
+                shutil.rmtree(staging)
+            raise
+        return HardwareRuntimeProfileProvision(
+            profile=installed_profile,
+            profiles_root=root,
+            source_root=library,
+            installed=True,
+        )
+
+    searched = ", ".join(str(path) for path in libraries) or "未发现本地档案库"
+    assert current_error is not None
+    raise HardwareRuntimeProfileError(
+        f"{current_error}；自动查找已验证档案失败，已检查: {searched}"
+    ) from current_error
+
+
 __all__ = [
     "HardwareRuntimeProfile",
     "HardwareRuntimeProfileError",
+    "HardwareRuntimeProfileProvision",
     "RuntimeCommandCapability",
+    "ensure_hardware_runtime_profile",
     "load_hardware_runtime_profile",
 ]

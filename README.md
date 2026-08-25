@@ -90,6 +90,32 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 浏览器入口默认为 <http://127.0.0.1:8765>。`.env.example` 只描述配置字段；复制后在本机填写
 `.env`。API key、token、账号标识、BLE 地址、COM 口和开发机绝对路径不得提交。
 
+## 换机自适应与真实环境检查
+
+W30 真机项目不再要求用户为每台电脑重复填写固定 COM 口或 MTP 存储卷名称。创建或读取项目时，
+平台会从执行目标取得 `runtime_profile_id`，校验并按需安装已发布的不可变运行时档案；环境检查会
+枚举当前 SuperCom AgentBridge 管道，并在恰好只有一个活动手表串口时自动选择实际 COM 口。
+
+6202 USB/MTP 链路按真实 Windows 对象发现：
+
+```text
+SuperCom 活动串口
+  → ZORA USB/PnP
+  → 自动识别包含 download 的 MTP 存储卷
+  → 按 System.FileName 或显示名匹配本轮 agent_capture_<seq>.bmp
+```
+
+这兼容了不同电脑上的 COM 编号变化、`storage` 与 `ZORA MTP Storage Volume` 等卷标差异，以及
+资源管理器隐藏 `.bmp` 扩展名的情况。程序不会伪造档案或在多个活动串口之间猜测：未安装 USB/MTP
+驱动、SuperCom 未运行、连接零台或多台设备、固件未暴露 `download` 时，环境中心会保留其余检查
+结果并给出具体阻断项。
+
+2026-08-25 已在 6202 真机验证：环境检查 6/6 通过；通过 COM6 的 SuperCom 共享管道完成
+`dal_usb close → SCREENSHOT_CAPTURE_FILE → dal_usb open → MTP 下载`，取得 410×502、
+618,518-byte BMP，固件回执校验通过。换机仍需安装项目依赖、SuperCom AgentBridge 和正常的
+Windows USB/MTP 驱动；把包含本修复的提交或发布包部署到新电脑后，无需再手工绑定固定卷标或 COM
+编号。
+
 ## 验证层级
 
 以下事实彼此独立，不能互相代替：

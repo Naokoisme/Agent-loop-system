@@ -68,6 +68,11 @@ from agent_loop_system.tools.command_protocol import normalize_command
 from agent_loop_system.tools.external_execution_history import (
     read_external_execution_history,
 )
+from agent_loop_system.tools.hardware_runtime_profile import (
+    HardwareRuntimeProfileError,
+    HardwareRuntimeProfileProvision,
+    ensure_hardware_runtime_profile,
+)
 from agent_loop_system.tools.watch_ble import (
     WatchBleClient,
     WatchBleConnectionError,
@@ -360,12 +365,46 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
     _load_test_runtime_environment()
     execution_env = dict(os.environ)
     execution_env["W30_PROJECT"] = str(project_meta["project"])
-    if project_meta.get("execution_target") == "hardware":
-        hardware_project = str(project_meta["project"])
+    if (
+        project_meta.get("execution_target") == "hardware"
+        and project_meta.get("platform_id") == "w30"
+    ):
+        hardware_project = _hardware_runtime_profile_id(project_meta)
         execution_env.update({
             "W30_PROJECT": hardware_project,
             "W30_HARDWARE_PROJECT": hardware_project,
         })
+        try:
+            provision = _ensure_test_hardware_profile(
+                project_meta,
+                execution_env,
+            )
+            execution_env["W30_HARDWARE_PROFILE_ROOT"] = str(
+                provision.profiles_root
+            )
+            execution_env.pop("AGENT_LOOP_PROFILE_PROVISION_ERROR", None)
+        except HardwareRuntimeProfileError as exc:
+            # Keep the normal preflight path authoritative. It will report
+            # PROFILE_INVALID and skip every device-changing operation.
+            execution_env["W30_HARDWARE_PROFILE_ROOT"] = str(
+                _managed_hardware_profiles_root(project_meta, execution_env)
+            )
+            execution_env["AGENT_LOOP_PROFILE_PROVISION_ERROR"] = str(exc)
+        try:
+            from agent_loop_system.tools.hardware_serial_ports import (
+                get_serial_ports_status,
+            )
+
+            serial_status = get_serial_ports_status(
+                execution_env.get("W30_HARDWARE_PORT", "")
+            )
+            selected_port = str(serial_status.get("selected_port") or "").strip()
+            if selected_port and int(serial_status.get("active_count") or 0) == 1:
+                execution_env["W30_HARDWARE_PORT"] = selected_port
+                execution_env["W30_HARDWARE_PORT_SOURCE"] = "auto_discovered"
+        except Exception:
+            # Preflight owns the user-facing diagnostic when discovery fails.
+            pass
         for source_key in (
             "W30_SOURCE_ROOT",
             "W30_AGENT_WORKSPACE_ROOT",
@@ -388,6 +427,50 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
     else:
         execution_env.pop("W30_HARDWARE_PROJECT", None)
     return execution_env
+
+
+def _hardware_runtime_profile_id(project_meta: dict[str, Any]) -> str:
+    """Return the immutable hardware profile owned by an execution target."""
+
+    profile_id = str(project_meta.get("runtime_profile_id") or "").strip()
+    if not profile_id:
+        raise HardwareRuntimeProfileError(
+            f"执行目标 {project_meta.get('target_id') or '未知'} 未绑定真机运行时档案"
+        )
+    return profile_id
+
+
+def _managed_hardware_profiles_root(
+    project_meta: dict[str, Any],
+    environment: dict[str, str],
+) -> Path:
+    """Choose a writable runtime cache without polluting the source tree."""
+
+    configured = str(environment.get("W30_HARDWARE_PROFILE_ROOT") or "").strip()
+    if configured:
+        return resolve_config_path(configured, app_root=_project_registry().root)
+    bundled = RuntimePaths.from_root(_project_registry().root).profiles
+    profile_id = _hardware_runtime_profile_id(project_meta)
+    if (bundled / profile_id).is_dir():
+        return bundled
+    return _project_registry().root / ".runtime" / "profiles"
+
+
+def _ensure_test_hardware_profile(
+    project_meta: dict[str, Any],
+    environment: dict[str, str] | None = None,
+) -> HardwareRuntimeProfileProvision:
+    """Load or auto-install the verified profile for one W30 hardware target."""
+
+    selected_environment = environment if environment is not None else dict(os.environ)
+    return ensure_hardware_runtime_profile(
+        project=_hardware_runtime_profile_id(project_meta),
+        profiles_root=_managed_hardware_profiles_root(
+            project_meta,
+            selected_environment,
+        ),
+        app_root=_project_registry().root,
+    )
 
 
 def _hardware_case_llm_scope(
@@ -3504,9 +3587,10 @@ class CaseTestManager:
         )
 
         job_root = self.paths.runtime_jobs / job_id
+        runtime_profile_id = _hardware_runtime_profile_id(project_meta)
         try:
             result = run_hardware_preflight(
-                project=project_meta["project"],
+                project=runtime_profile_id,
                 evidence_dir=job_root / "preflight-evidence",
                 environment=environment,
                 llm_scopes=llm_scopes,
@@ -3514,7 +3598,7 @@ class CaseTestManager:
         except Exception as exc:
             result = internal_error_preflight(
                 exc,
-                project=project_meta["project"],
+                project=runtime_profile_id,
             )
         persist_paths = (
             job_root / "preflight.json",
@@ -3526,7 +3610,7 @@ class CaseTestManager:
         except Exception as exc:
             result = internal_error_preflight(
                 f"preflight 结果落盘失败: {exc}",
-                project=project_meta["project"],
+                project=runtime_profile_id,
             )
             for path in persist_paths:
                 try:
@@ -4964,6 +5048,50 @@ class WebApplication:
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
 
+    def provision_project_runtime_profiles(
+        self,
+        project: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Provision every W30 hardware profile allowed by a new project."""
+
+        results: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for target_id in project.get("allowed_targets") or []:
+            target = self.platforms.target(str(target_id))
+            if (
+                target.get("platform_id") != "w30"
+                or target.get("execution_target") != "hardware"
+            ):
+                continue
+            project_meta = {
+                **project,
+                **target,
+                "project": project["project_id"],
+            }
+            profile_id = _hardware_runtime_profile_id(project_meta)
+            if profile_id in seen:
+                continue
+            seen.add(profile_id)
+            try:
+                provision = _ensure_test_hardware_profile(project_meta)
+                results.append({
+                    "profile_id": profile_id,
+                    "target_id": target["target_id"],
+                    "ready": True,
+                    "version": provision.profile.version,
+                    "installed": provision.installed,
+                    "profiles_root": str(provision.profiles_root),
+                })
+            except HardwareRuntimeProfileError as exc:
+                results.append({
+                    "profile_id": profile_id,
+                    "target_id": target["target_id"],
+                    "ready": False,
+                    "installed": False,
+                    "error": str(exc),
+                })
+        return results
+
     def execution_options(
         self,
         project_id: str,
@@ -5149,6 +5277,12 @@ class WebApplication:
         project_meta = _test_project(project)
         project = project_meta["project"]
         if (
+            project_meta["execution_target"] == "simulator"
+            and project_meta["platform_id"] == "w30"
+        ):
+            with self._execution_lock:
+                return _run_simulator_environment_check(self.paths, project_meta)
+        if (
             project_meta["execution_target"] != "hardware"
             or project_meta["platform_id"] != "w30"
         ):
@@ -5164,6 +5298,7 @@ class WebApplication:
             run_hardware_preflight,
             target_busy_preflight,
         )
+        runtime_profile_id = _hardware_runtime_profile_id(project_meta)
 
         with self._execution_lock:
             active = self.test_jobs.active("hardware")
@@ -5175,14 +5310,14 @@ class WebApplication:
                     active = repair
             if active is not None:
                 result = target_busy_preflight(
-                    project=project,
+                    project=runtime_profile_id,
                     job_id=str(active.get("id") or "") or None,
                 )
             else:
                 try:
                     hardware_environment = _test_process_environment(project_meta)
                     result = run_hardware_preflight(
-                        project=project,
+                        project=runtime_profile_id,
                         evidence_dir=self.paths.environment_checks / project / "probe",
                         environment=hardware_environment,
                         llm_scopes=_configured_hardware_llm_scopes(
@@ -5190,7 +5325,10 @@ class WebApplication:
                         ),
                     )
                 except Exception as exc:
-                    result = internal_error_preflight(exc, project=project)
+                    result = internal_error_preflight(
+                        exc,
+                        project=runtime_profile_id,
+                    )
             try:
                 persist_hardware_preflight(
                     result,
@@ -5199,7 +5337,7 @@ class WebApplication:
             except Exception as exc:
                 result = internal_error_preflight(
                     f"preflight 结果落盘失败: {exc}",
-                    project=project,
+                    project=runtime_profile_id,
                 )
         return _hardware_environment_view(project, result)
 
@@ -5519,6 +5657,12 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
     )
     runtime_paths = RuntimePaths.from_root(paths.root)
     simulator_root = runtime_paths.firmware_workspaces / "620C_W6830"
+    bundled_profiles_root = runtime_paths.profiles
+    default_profiles_root = (
+        bundled_profiles_root
+        if bundled_profiles_root.is_dir()
+        else paths.root / ".runtime" / "profiles"
+    )
     return {
         "llm": {
             "provider": "environment",
@@ -5548,7 +5692,7 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             ),
             "profile_root": str(resolve_config_path(
                 (os.environ.get("W30_HARDWARE_PROFILE_ROOT") or "").strip()
-                or str(paths.root / "profiles"),
+                or default_profiles_root,
                 app_root=paths.root,
             )),
             "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
@@ -5982,6 +6126,250 @@ def _hardware_preflight_path(paths: AppPaths, project: str) -> Path:
     return paths.environment_checks / project / "preflight.json"
 
 
+def _simulator_check_path(paths: AppPaths, project: str) -> Path:
+    return paths.environment_checks / project / "simulator.json"
+
+
+def _simulator_environment_inputs(
+    paths: AppPaths,
+    project_meta: dict[str, Any],
+) -> dict[str, Any]:
+    cfg = _get_system_config(paths)
+    project = str(project_meta["project"])
+    if project == "620C_W6830":
+        source_path = Path(cfg["simulator"]["source_root"]).resolve()
+        workspace_path = Path(cfg["simulator"]["workspace_root"]).resolve()
+        artifact_path = Path(cfg["simulator"]["simulator_path"]).resolve()
+    else:
+        source_path = Path(
+            project_meta.get("simulator_source_root")
+            or cfg["simulator"]["source_root"]
+        ).resolve()
+        workspace_path = source_path
+        artifact_path = Path(
+            project_meta.get("simulator_artifact_path")
+            or cfg["simulator"]["simulator_path"]
+        ).resolve()
+    case_map_path = _case_catalog_root(paths, project_meta)
+    llm_ready = bool(cfg["llm"]["api_key"] and cfg["llm"]["base_url"])
+    signature_payload = {
+        "project": project,
+        "source_path": str(source_path),
+        "workspace_path": str(workspace_path),
+        "artifact_path": str(artifact_path),
+        "case_map_path": str(case_map_path),
+        "llm_ready": llm_ready,
+        "llm_model": str(cfg["llm"].get("model") or ""),
+    }
+    signature = hashlib.sha256(
+        json.dumps(signature_payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return {
+        **signature_payload,
+        "source_path": source_path,
+        "workspace_path": workspace_path,
+        "artifact_path": artifact_path,
+        "case_map_path": case_map_path,
+        "llm_model": str(cfg["llm"].get("model") or ""),
+        "signature": signature,
+    }
+
+
+def _simulator_environment_base(project_meta: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": str(project_meta["project"]),
+        "project": str(project_meta["project"]),
+        "project_label": project_meta["project_label"],
+        "platform_id": project_meta["platform_id"],
+        "target_id": project_meta["target_id"],
+        "execution_target": project_meta["execution_target"],
+        "execution_target_label": project_meta["execution_target_label"],
+        "transport": project_meta.get("transport"),
+        "transport_label": project_meta.get("transport_label"),
+        "capture_provider": project_meta.get("capture_provider"),
+        "capture_label": project_meta.get("capture_label"),
+    }
+
+
+def _unchecked_simulator_environment(project_meta: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **_simulator_environment_base(project_meta),
+        "ready": False,
+        "status": "unchecked",
+        "readiness_status": "unchecked",
+        "last_checked_at": None,
+        "checked_at": None,
+        "checks": [],
+        "logs": [],
+    }
+
+
+def _cached_simulator_environment(
+    paths: AppPaths,
+    project_meta: dict[str, Any],
+) -> dict[str, Any]:
+    inputs = _simulator_environment_inputs(paths, project_meta)
+    payload = _read_json(
+        _simulator_check_path(paths, str(project_meta["project"])),
+        {},
+    )
+    if not isinstance(payload, dict) or payload.get("config_signature") != inputs["signature"]:
+        return _unchecked_simulator_environment(project_meta)
+    result = {**_simulator_environment_base(project_meta), **payload}
+    result.pop("config_signature", None)
+    return result
+
+
+def _run_simulator_environment_check(
+    paths: AppPaths,
+    project_meta: dict[str, Any],
+) -> dict[str, Any]:
+    inputs = _simulator_environment_inputs(paths, project_meta)
+    source_path = inputs["source_path"]
+    workspace_path = inputs["workspace_path"]
+    artifact_path = inputs["artifact_path"]
+    case_map_path = inputs["case_map_path"]
+    checked_at = _now()
+    checks: list[dict[str, Any]] = []
+
+    missing_roots = [
+        str(path)
+        for path in dict.fromkeys((source_path, workspace_path))
+        if not path.is_dir()
+    ]
+    checks.append({
+        "key": "source",
+        "label": "源码与工作区",
+        "status": "warning" if missing_roots else "pass",
+        "detail": (
+            "缺少目录: " + "；".join(missing_roots)
+            if missing_roots
+            else f"源码与工作区就绪: {source_path}"
+        ),
+    })
+
+    case_files = list(case_map_path.glob("*.json")) if case_map_path.is_dir() else []
+    checks.append({
+        "key": "config",
+        "label": "项目配置",
+        "status": "pass" if case_map_path.is_dir() and case_files else "warning",
+        "detail": (
+            f"用例库已加载 ({len(case_files)} 个模块)"
+            if case_map_path.is_dir() and case_files
+            else f"用例库不可用: {case_map_path}"
+        ),
+    })
+
+    artifact_ready = artifact_path.is_file()
+    checks.append({
+        "key": "artifact",
+        "label": "执行产物",
+        "status": "pass" if artifact_ready else "warning",
+        "detail": (
+            f"模拟器程序就绪: {artifact_path}"
+            if artifact_ready
+            else f"模拟器程序不存在: {artifact_path}"
+        ),
+    })
+
+    if not artifact_ready:
+        blocked_detail = "模拟器程序不存在，本次未执行真实启动检查"
+        checks.extend((
+            {"key": "command", "label": "命令接口", "status": "warning", "detail": blocked_detail},
+            {"key": "capture", "label": "截图能力", "status": "warning", "detail": blocked_detail},
+        ))
+    else:
+        from agent_loop_system.tools.simulator import SimulatorSession
+
+        session = None
+        try:
+            execution_env = _test_process_environment(project_meta)
+            execution_env.update({
+                "W30_SOURCE_ROOT": str(source_path),
+                "W30_AGENT_WORKSPACE_ROOT": str(workspace_path),
+                "W30_PROJECT": str(
+                    project_meta.get("simulator_project") or project_meta["project"]
+                ),
+                "SIMULATOR_ARTIFACT_PATH": str(artifact_path),
+            })
+            session = SimulatorSession(
+                artifact_path,
+                startup_timeout=_positive_timeout(
+                    "AGENT_LOOP_SIMULATOR_CHECK_TIMEOUT", 90.0
+                ),
+                cmd_timeout=8.0,
+                environment=execution_env,
+            )
+            session.start()
+            checks.append({
+                "key": "command",
+                "label": "命令接口",
+                "status": "pass",
+                "detail": "模拟器已真实启动，GUI_PING 已收到处理回执",
+            })
+            capture_path = (
+                paths.environment_checks
+                / str(project_meta["project"])
+                / "probe"
+                / "screenshot.bmp"
+            )
+            capture_path.parent.mkdir(parents=True, exist_ok=True)
+            captured = session.capture_screenshot(str(capture_path))
+            checks.append({
+                "key": "capture",
+                "label": "截图能力",
+                "status": "pass" if captured else "error",
+                "detail": (
+                    f"已生成真实模拟器截图: {capture_path}"
+                    if captured
+                    else "模拟器已启动，但未找到可截图的宿主窗口"
+                ),
+            })
+        except Exception as exc:
+            detail = f"模拟器真实启动或命令检查失败: {exc}"
+            checks.extend((
+                {"key": "command", "label": "命令接口", "status": "error", "detail": detail},
+                {"key": "capture", "label": "截图能力", "status": "error", "detail": "命令通道未就绪，截图检查未完成"},
+            ))
+        finally:
+            if session is not None:
+                session.stop()
+
+    checks.append({
+        "key": "llm",
+        "label": "大模型服务",
+        "status": "pass" if inputs["llm_ready"] else "warning",
+        "detail": (
+            f"模型 {inputs['llm_model']} 已配置"
+            if inputs["llm_ready"]
+            else "未配置可用的模型服务"
+        ),
+    })
+    has_error = any(item["status"] == "error" for item in checks)
+    has_warning = any(item["status"] == "warning" for item in checks)
+    overall_status = "error" if has_error else ("partial" if has_warning else "ready")
+    result = {
+        **_simulator_environment_base(project_meta),
+        "ready": overall_status == "ready",
+        "status": overall_status,
+        "readiness_status": overall_status,
+        "last_checked_at": checked_at,
+        "checked_at": checked_at,
+        "checks": checks,
+        "logs": [{
+            "at": checked_at,
+            "message": (
+                f"{project_meta['project_label']} 真实环境检查完成，状态: {overall_status}"
+            ),
+        }],
+    }
+    _write_json(
+        _simulator_check_path(paths, str(project_meta["project"])),
+        {**result, "config_signature": inputs["signature"]},
+    )
+    return result
+
+
 def _hardware_environment_view(
     project: str,
     result: Any,
@@ -6023,9 +6411,8 @@ def _hardware_environment_view(
 
 
 def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
-    """Return static simulator checks and cached hardware probes only."""
+    """Return cached environment results without triggering live target probes."""
     items = []
-    cfg = _get_system_config(paths)
     for proj_meta in _test_project_options():
         proj_key = str(proj_meta["project"])
         if proj_meta["platform_id"] == "579":
@@ -6042,7 +6429,6 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
             })
             items.append(item)
             continue
-        checks = []
         is_hardware = proj_meta["execution_target"] == "hardware"
 
         if is_hardware:
@@ -6052,72 +6438,11 @@ def _get_environments_status(paths: AppPaths) -> list[dict[str, Any]]:
 
             cached = load_cached_hardware_preflight(
                 _hardware_preflight_path(paths, proj_key),
-                project=proj_key,
+                project=_hardware_runtime_profile_id(proj_meta),
             )
             items.append(_hardware_environment_view(proj_key, cached))
             continue
-
-        # 1. Simulator workspace (hardware returned its cached probe above).
-        if proj_key == "620C_W6830":
-            src_p = Path(cfg["simulator"]["source_root"])
-            status = "pass" if src_p.is_dir() else "warning"
-            detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
-        else:
-            src_p = Path(proj_meta.get("simulator_source_root", cfg["simulator"]["source_root"]))
-            status = "pass" if src_p.is_dir() else "warning"
-            detail = f"工作区就绪: {src_p}" if status == "pass" else f"工作区目录不存在: {src_p}"
-            checks.append({"key": "source", "label": "源码与工作区", "status": status, "detail": detail})
-        
-        # 2. 项目配置
-        case_map_p = _case_catalog_root(paths, proj_meta)
-        c_status = "pass" if case_map_p.is_dir() else "warning"
-        c_detail = f"用例库已加载 ({len(list(case_map_p.glob('*.json')))} 个模块)" if c_status == "pass" else "用例库目录未找到"
-        checks.append({"key": "config", "label": "项目配置", "status": c_status, "detail": c_detail})
-        
-        # 3. 执行产物
-        art_p = Path(proj_meta.get("simulator_artifact_path", cfg["simulator"]["simulator_path"]))
-        a_status = "pass" if art_p.is_file() else "warning"
-        a_detail = f"模拟器产物就绪: {art_p.name}" if a_status == "pass" else f"产物尚未生成: {art_p}"
-        checks.append({"key": "artifact", "label": "执行产物", "status": a_status, "detail": a_detail})
-            
-        # 4. 命令接口
-        checks.append({"key": "command", "label": "命令接口", "status": "pass", "detail": "QuickCmd 协议接口已启用"})
-        
-        # 5. 截图能力
-        checks.append({"key": "capture", "label": "截图能力", "status": "pass", "detail": "模拟器宿主窗口捕获已配置"})
-        
-        # 6. 大模型服务
-        llm_ready = bool(cfg["llm"]["api_key"] and cfg["llm"]["base_url"])
-        checks.append({
-            "key": "llm",
-            "label": "大模型服务",
-            "status": "pass" if llm_ready else "warning",
-            "detail": f"模型 {cfg['llm']['model']} (已配置)" if llm_ready else "未配置 OPENAI_API_KEY",
-        })
-        
-        has_error = any(c["status"] == "error" for c in checks)
-        has_warning = any(c["status"] == "warning" for c in checks)
-        overall_status = "error" if has_error else ("partial" if has_warning else "ready")
-        
-        items.append({
-            "id": proj_key,
-            "project": proj_key,
-            "project_label": proj_meta["project_label"],
-            "platform_id": proj_meta["platform_id"],
-            "target_id": proj_meta["target_id"],
-            "execution_target": proj_meta["execution_target"],
-            "execution_target_label": proj_meta["execution_target_label"],
-            "transport": proj_meta.get("transport"),
-            "transport_label": proj_meta.get("transport_label"),
-            "capture_provider": proj_meta.get("capture_provider"),
-            "capture_label": proj_meta.get("capture_label"),
-            "status": overall_status,
-            "readiness_status": overall_status,
-            "last_checked_at": _now(),
-            "checks": checks,
-            "logs": [{"at": _now(), "message": f"{proj_meta['project_label']} 环境自检完成，状态: {overall_status}"}],
-        })
+        items.append(_cached_simulator_environment(paths, proj_meta))
     return items
 
 
@@ -7274,7 +7599,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         if path == "/api/projects":
             body = self._body_json()
             project = self.app.projects.create(body)
-            self._json(project, HTTPStatus.CREATED)
+            runtime_profiles = self.app.provision_project_runtime_profiles(project)
+            self._json(
+                {**project, "runtime_profiles": runtime_profiles},
+                HTTPStatus.CREATED,
+            )
             return
 
         match = re.fullmatch(r"/api/projects/([^/]+)/archive", path)

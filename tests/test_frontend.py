@@ -1817,6 +1817,39 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(raised.exception.code, 400)
         self.assertEqual(error["error_code"], "TARGET_NOT_ALLOWED_FOR_PROJECT")
 
+    def test_new_hardware_project_auto_binds_and_provisions_target_profile(self) -> None:
+        application, base = self._server()
+        provision = SimpleNamespace(
+            profile=SimpleNamespace(version="v1.2.0-test"),
+            profiles_root=self.paths.root / ".runtime" / "profiles",
+            installed=True,
+        )
+        with patch(
+            "frontend.server._ensure_test_hardware_profile",
+            return_value=provision,
+        ) as ensure_profile:
+            with self._post_json(base + "/api/projects", {
+                "project_id": "new_6202_project",
+                "project_name": "新 6202 项目",
+                "allowed_platforms": ["w30"],
+                "default_platform": "w30",
+                "allowed_targets": ["w30.6202.hardware"],
+                "default_target": "w30.6202.hardware",
+            }) as response:
+                created = json.loads(response.read().decode("utf-8"))
+
+            resolved = application.projects.resolve("new_6202_project")
+            child_env = _test_process_environment(resolved)
+
+        self.assertEqual(response.status, 201)
+        self.assertEqual(created["runtime_profiles"][0]["profile_id"], "6202_W5230")
+        self.assertTrue(created["runtime_profiles"][0]["ready"])
+        self.assertTrue(created["runtime_profiles"][0]["installed"])
+        self.assertEqual(resolved["runtime_profile_id"], "6202_W5230")
+        self.assertEqual(child_env["W30_PROJECT"], "6202_W5230")
+        self.assertEqual(child_env["W30_HARDWARE_PROJECT"], "6202_W5230")
+        self.assertEqual(ensure_profile.call_count, 2)
+
     def test_agent_test_api_starts_batch_and_serves_batch_page(self) -> None:
         application, base = self._server()
         job = {"id": "batch1", "type": "batch", "status": "queued", "total": 1}
@@ -3872,6 +3905,12 @@ class FrontendDataTest(unittest.TestCase):
                 self.assertEqual(hardware["readiness_status"], "unchecked")
                 self.assertEqual(hardware["checks"][0]["key"], "profile")
                 self.assertEqual(hardware["checks"][0]["label"], "真机运行时档案")
+                simulator = next(
+                    item for item in data["items"] if item["id"] == "620C_W6830"
+                )
+                self.assertEqual(simulator["readiness_status"], "unchecked")
+                self.assertIsNone(simulator["last_checked_at"])
+                self.assertEqual(simulator["checks"], [])
             live_probe.assert_not_called()
             
         # 2. Environment check
@@ -3879,6 +3918,47 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("result", data)
+            simulator_checks = {
+                item["key"]: item for item in data["result"]["checks"]
+            }
+            self.assertEqual(simulator_checks["artifact"]["status"], "warning")
+            self.assertEqual(simulator_checks["command"]["status"], "warning")
+            self.assertEqual(simulator_checks["capture"]["status"], "warning")
+            self.assertIn("本次未执行真实启动检查", simulator_checks["command"]["detail"])
+            self.assertIsNotNone(data["result"]["last_checked_at"])
+        simulator_cache = (
+            self.paths.environment_checks / "620C_W6830" / "simulator.json"
+        )
+        self.assertTrue(simulator_cache.is_file())
+
+        simulator_root = self.paths.root / "firmware" / "620C_W6830"
+        simulator_exe = simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe"
+        simulator_exe.parent.mkdir(parents=True)
+        simulator_exe.write_bytes(b"MZ")
+        _save_system_config(
+            self.paths,
+            {
+                "simulator": {
+                    "source_root": str(simulator_root),
+                    "workspace_root": str(simulator_root),
+                    "simulator_path": str(simulator_exe),
+                }
+            },
+        )
+        with patch("agent_loop_system.tools.simulator.SimulatorSession") as session_class:
+            session = session_class.return_value
+            session.capture_screenshot.return_value = True
+            with self._post_json(base + "/api/environments/620C_W6830/check", {}) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                simulator_checks = {
+                    item["key"]: item for item in data["result"]["checks"]
+                }
+                self.assertEqual(simulator_checks["command"]["status"], "pass")
+                self.assertEqual(simulator_checks["capture"]["status"], "pass")
+            session.start.assert_called_once_with()
+            session.capture_screenshot.assert_called_once()
+            session.stop.assert_called_once_with()
 
         ready = _ready_hardware_preflight()
         with patch(
@@ -3961,7 +4041,10 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("ones", cfg)
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
-            self.assertEqual(cfg["hardware"]["profile_root"], str(self.paths.root / "profiles"))
+            self.assertEqual(
+                cfg["hardware"]["profile_root"],
+                str(self.paths.root / ".runtime" / "profiles"),
+            )
             self.assertIn("ble_address", cfg["hardware"])
             self.assertEqual(cfg["hardware"]["ble_scan_timeout"], 15.0)
             self.assertNotIn("hardware_source_root", cfg["simulator"])
@@ -4154,7 +4237,7 @@ class FrontendDataTest(unittest.TestCase):
         simulator_root = self.paths.root / "workspaces" / "firmware" / "620C_W6830"
         self.assertEqual(
             config["hardware"]["profile_root"],
-            str(self.paths.root / "profiles"),
+            str(self.paths.root / ".runtime" / "profiles"),
         )
         self.assertEqual(config["simulator"]["source_root"], str(simulator_root))
         simulator_6202 = next(

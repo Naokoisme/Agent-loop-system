@@ -17,6 +17,7 @@ import subprocess
 import threading
 import time
 import uuid
+from collections.abc import Mapping
 from ctypes import wintypes
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -220,9 +221,12 @@ class SimulatorSession:
         *,
         startup_timeout: float = 90.0,
         cmd_timeout: float = 5.0,
+        environment: Mapping[str, str] | None = None,
     ):
         self.exe = os.path.abspath(str(exe))
         self.cwd = os.path.dirname(self.exe)
+        self.environment = dict(environment) if environment is not None else None
+        settings = os.environ if self.environment is None else self.environment
         # 每个模拟器会话使用独立收件箱。若上一次运行异常退出并残留 main.exe，
         # 固定文件名会让旧进程抢走新会话的命令，导致当前 runner 等不到回执。
         self.inbox = os.path.join(
@@ -238,17 +242,22 @@ class SimulatorSession:
         self._ready = threading.Event()
         self._automation_ready = threading.Event()
         self._gui_command_ready = threading.Event()
-        self._automation_ready_marker = os.environ.get(
+        self._automation_ready_marker = settings.get(
             "SIMULATOR_SHELL_READY_MARKER", ""
         ).strip()
-        self._gui_command_ready_marker = os.environ.get(
+        self._gui_command_ready_marker = settings.get(
             "SIMULATOR_GUI_COMMAND_READY_MARKER", ""
         ).strip()
         self._reader: threading.Thread | None = None
 
     def start(self) -> None:
-        verify_simulator_resource_provenance(self.exe)
-        env = dict(os.environ)
+        settings = os.environ if self.environment is None else self.environment
+        verify_simulator_resource_provenance(
+            self.exe,
+            source_root=settings.get("W30_SOURCE_ROOT"),
+            project=settings.get("W30_PROJECT"),
+        )
+        env = dict(settings)
         env["W30_SIM_SHELL_COMMAND_FILE"] = self.inbox
         env["PATH"] = os.pathsep.join(
             p
