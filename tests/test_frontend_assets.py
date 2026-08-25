@@ -451,6 +451,12 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.stylesheet)
 
+    def test_report_range_label_contract_keeps_definition_and_call(self) -> None:
+        self.assertEqual(self.javascript.count("function reportRangeLabel"), 1)
+        self.assertIn("function reportRangeLabel(filters = {})", self.javascript)
+        self.assertIn("${escapeHtml(reportRangeLabel(filters))}", self.javascript)
+        self.assertIn("'最近24小时'", self.javascript)
+
     def test_search_stays_inline_and_async_results_never_overwrite_input(self) -> None:
         for token in ("data-page", "page_size=${PAGE_SIZE}"):
             self.assertIn(token, self.javascript)

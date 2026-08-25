@@ -5485,6 +5485,10 @@ function reportQuery(project, filters = {}) {
   return query;
 }
 
+function reportRangeLabel(filters = {}) {
+  return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;
+}
+
 function buildSnapshotReport(items = [], filters = {}) {
   const now = Date.now();
   const fromTime = filters.period === '24h' ? now - 24 * 60 * 60 * 1000 : filters.from ? new Date(`${filters.from}T00:00:00`).getTime() : 0;

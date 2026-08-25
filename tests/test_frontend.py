@@ -4,6 +4,7 @@ import copy
 import errno
 import json
 import os
+import shutil
 import subprocess
 import ssl
 import tempfile
@@ -3863,6 +3864,53 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/reports/export?project=620C_W6830", timeout=3) as resp:
             self.assertEqual(resp.status, 200)
             self.assertIn("application/vnd.openxmlformats-officedocument", resp.headers.get("Content-Type"))
+
+    def test_reports_cold_start_in_real_browser_avoids_error_boundary(self) -> None:
+        repo_frontend = Path(__file__).resolve().parents[1] / "frontend"
+        for name in ("index.html", "app.js", "styles.css"):
+            shutil.copy2(repo_frontend / name, self.paths.frontend / name)
+        _application, base = self._server()
+
+        browser_candidates = [
+            shutil.which("msedge"),
+            shutil.which("chrome"),
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        ]
+        browser = next(
+            (Path(candidate) for candidate in browser_candidates if candidate and Path(candidate).is_file()),
+            None,
+        )
+        if browser is None:
+            self.skipTest("当前环境没有可用的 Edge 或 Chrome，无法执行真实浏览器冷启动回归")
+
+        with tempfile.TemporaryDirectory(prefix="agent-loop-report-browser-") as profile_dir:
+            process = subprocess.run(
+                [
+                    str(browser),
+                    "--headless=new",
+                    "--disable-background-networking",
+                    "--disable-extensions",
+                    "--disable-gpu",
+                    "--no-first-run",
+                    f"--user-data-dir={profile_dir}",
+                    "--virtual-time-budget=5000",
+                    "--dump-dom",
+                    f"{base}/reports?project=579_Z1640",
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=60,
+            )
+
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("测试报告", process.stdout)
+        self.assertNotIn("页面读取失败", process.stdout)
+        self.assertNotIn("reportRangeLabel is not defined", process.stdout)
 
     def test_project_job_summary_excludes_other_projects(self) -> None:
         application, base = self._server()
