@@ -67,6 +67,14 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("缺陷闭环", self.index)
         self.assertNotIn("缺陷闭环", self.javascript)
 
+    def test_prd_case_navigation_precedes_case_management(self) -> None:
+        prd = 'data-route="/prd-cases" data-nav="prd-cases"'
+        cases = 'data-route="/cases" data-nav="cases"'
+        self.assertIn(prd, self.index)
+        self.assertIn(cases, self.index)
+        self.assertLess(self.index.index(prd), self.index.index(cases))
+        self.assertIn("if (parts[0] === 'prd-cases'", self.javascript)
+
     def test_run_form_submits_defect_and_explicit_project_only(self) -> None:
         self.assertIn("defect: String(defect.number)", self.javascript)
         self.assertIn("project: repairProject.project", self.javascript)
@@ -548,8 +556,8 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
 
     def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
-        self.assertIn('/assets/styles.css?v=20260825-5', self.index)
-        self.assertIn('/assets/app.js?v=20260825-5', self.index)
+        self.assertIn('/assets/styles.css?v=20260825-6', self.index)
+        self.assertIn('/assets/app.js?v=20260825-6', self.index)
 
     def test_run_status_tabs_are_real_links_with_script_free_fallback(self) -> None:
         for token in (

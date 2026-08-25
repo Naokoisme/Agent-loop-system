@@ -1,7 +1,7 @@
 # Agent-loop-system
 
-Agent-loop-system 是面向手表固件的自动化闭环工作台：读取缺陷或测试用例，驱动 Windows
-Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结果。
+Agent-loop-system 是面向手表固件的自动化闭环工作台：可从 PRD 生成并审查测试用例，也可读取
+缺陷或已有测试用例，驱动 Windows Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结果。
 
 本仓库只保存 Agent-loop 的编排代码、测试、用例映射和稳定文档。固件源码、设备绑定、密钥
 以及运行证据都有独立边界，不应混入同一个 Git 基线。
@@ -9,7 +9,9 @@ Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结�
 ## 工作流
 
 ```text
-缺陷 / 测试用例
+PRD → QA Skill → Excel → 人工审查 → 用例管理
+                              ↓
+                       缺陷 / 测试用例
         ↓
 Agent-loop Runner
         ↓
@@ -78,6 +80,47 @@ SHA256、自动化协议版本及 Agent-loop 最低版本。源码诊断、修�
 `--runtime-metadata` 一并交给
 `scripts/publish_profile.py`。普通测试机器只需要随发布包取得 `profiles/`、匹配固件、SuperCom
 和 Windows MTP，不需要 Git、Python SDK 或固件源码。
+
+## PRD 转测试用例与人工审查
+
+一级导航中的“PRD 转测试用例”位于“用例管理”之前，页面入口为 `/prd-cases`。该功能把
+“上传 PRD → 调用固定 QA Skill 生成 → 写入并重新读取 Excel → 网页审查 → 审批 → 同步用例管理”
+收敛为一个可追踪的本地工作流：
+
+```text
+.md / .txt / .docx（≤ 20 MB）
+            ↓
+校验随包 QA Skill 与 SHA-256
+            ↓
+大模型生成固定层级用例
+            ↓
+生成 Excel、重新读取并执行质量门禁
+            ↓
+可视化逐条审查 ──驳回意见──→ 重新生成
+            ↓ 审查通过
+按审批时 workbook SHA-256 同步到用例管理
+```
+
+生成用例统一使用 `功能模块 > 功能点 > 测试项 > 测试点 > 用例详情` 层级。审查页可查看全部
+用例、质量门禁、稳定 ID、追溯信息和 Excel 下载结果，并支持逐条意见、整体意见、驳回重生成及
+审查通过。审批结果绑定当时的工作簿 SHA-256；文件内容变化后旧审批不能继续同步。
+
+同步操作具备幂等和编号冲突保护：已同步任务重复提交不会重复写入；现有用例编号冲突时不覆盖
+原记录，任务标记为“部分同步”，并明确显示未写入数量。新用例保留稳定 ID、PRD/Skill/工作簿
+哈希和任务来源，自动化成熟度默认是 `UNMAPPED`，后续仍需在用例管理中完成执行绑定。
+
+使用前需在系统配置或 `.env` 中正确配置 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和
+`OPENAI_MODEL`。源 PRD、生成工作簿、审查记录与同步状态保存在
+`project_data/prd_cases/jobs/`，属于本机业务数据且不会进入 Git。Windows 便携包内置只读 QA
+Skill ZIP，并在生成前校验固定哈希，不依赖开发机上的 `D:` 盘 Skill 路径。
+
+当前边界：仅支持 Markdown、TXT、DOCX；不解析 PDF、扫描件或图片；审查为本机页面流程，尚未
+接入远程账号权限与消息通知；质量门禁通过后的准出状态是 `READY_WITH_RISKS`，不是自动化执行
+就绪或 `STRICT_GO`。
+
+接口统一使用 `/api/prd-cases` 前缀。详细状态机、数据合同和风险边界见
+[PRD 转测试用例页签设计方案](docs/prd-to-testcase-tab-design.md)，本轮实测证据见
+[PRD 转测试用例页签验收报告](docs/prd-to-testcase-tab-acceptance-report.md)。
 
 ## 快速开始
 
@@ -177,6 +220,8 @@ W30/579 统一平台的项目创建、快捷切换、运行平台选择与 579 �
 
 ## 文档入口
 
+- [PRD 转测试用例页签设计方案](docs/prd-to-testcase-tab-design.md)：页面位置、生成链路、审查状态机、同步合同与边界。
+- [PRD 转测试用例页签验收报告](docs/prd-to-testcase-tab-acceptance-report.md)：功能、接口、回归、真实模型和 Windows 便携包验收证据。
 - [W30/579 双平台当前整改说明](README-W30-579-当前整改说明.md)：本轮全部改动、当前验证结果、真机计算器证据和待处理项总览。
 - [前端导航与页签修复验收说明](README-前端导航与页签验收.md)：本次页签跳转修复、影响范围和浏览器验收结果。
 - [case map 数据合同](case_map/README.md)：映射成熟度、外部探索账本与 Runner 选择规则。

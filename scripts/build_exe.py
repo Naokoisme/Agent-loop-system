@@ -392,6 +392,9 @@ def build_exe(
         "agent_loop_system.runtime_root",
         "agent_loop_system.version",
         "agent_loop_system.internal_dispatcher",
+        "agent_loop_system.prd_cases",
+        "agent_loop_system.prd_cases.service",
+        "agent_loop_system.platform_data",
         "agent_loop_system.tools.test",
         "agent_loop_system.tools.test_batch",
         "agent_loop_system.tools.defect_store",
@@ -446,6 +449,14 @@ def build_exe(
     for hi in hidden_imports:
         cmd.extend(["--hidden-import", hi])
 
+    platform_data_src = root / "src" / "agent_loop_system" / "platform_data"
+    if not platform_data_src.is_dir():
+        raise FileNotFoundError(f"Platform package data not found: {platform_data_src}")
+    cmd.extend([
+        "--add-data",
+        f"{platform_data_src}{os.pathsep}agent_loop_system/platform_data",
+    ])
+
     cmd.append(str(entry_script))
 
     print(f"Executing PyInstaller build...")
@@ -474,6 +485,14 @@ def build_exe(
     case_map_src = root / "case_map"
     if case_map_src.exists():
         copy_release_case_map(case_map_src, target_dir / "case_map")
+
+    # Pinned, read-only QA Skill used by the PRD-to-test-case workflow.
+    qa_skill_src = root / "resources" / "skills" / "xiaozhou-portable-skill-execution-quality-20260825.zip"
+    if not qa_skill_src.is_file():
+        raise FileNotFoundError(f"Bundled QA Skill not found: {qa_skill_src}")
+    qa_skill_dst = target_dir / "resources" / "skills"
+    qa_skill_dst.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(qa_skill_src, qa_skill_dst / qa_skill_src.name)
 
     # 2. templates
     templates_src = root / "templates"

@@ -1608,7 +1608,7 @@ pre, code { font-family: var(--font-ui); }
   min-width: 0;
   margin: 0;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0;
@@ -1851,6 +1851,58 @@ pre, code { font-family: var(--font-ui); }
 .digest-items strong { display: block; margin-top: 3px; font-size: 17px; }
 
 .case-management-card { overflow: visible; }
+.prd-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; align-items: start; }
+.prd-sidebar { position: sticky; top: 76px; overflow: hidden; }
+.prd-upload-form { display: grid; gap: 14px; padding: 19px; border-bottom: 1px solid var(--line); }
+.prd-upload-form h2 { margin: 2px 0 0; }
+.prd-upload-form > label:not(.prd-file-drop), .prd-review-fields label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+.prd-upload-form select, .prd-review-fields input, .prd-review-fields textarea { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface); font: inherit; }
+.prd-file-drop { display: grid; gap: 5px; padding: 16px; border: 1px dashed var(--line-strong); border-radius: 10px; background: var(--surface-soft); cursor: pointer; }
+.prd-file-drop input { width: 100%; font-size: 11px; }
+.prd-file-drop span { color: var(--ink-soft); font-size: 11px; font-weight: 500; }
+.prd-job-list { max-height: 48vh; overflow: auto; padding: 12px; }
+.prd-job-list > header { display: flex; justify-content: space-between; padding: 4px 5px 10px; }
+.prd-job-list > header span { color: var(--ink-soft); }
+.prd-job-item { display: flex; gap: 10px; align-items: center; justify-content: space-between; width: 100%; margin: 0 0 7px; padding: 10px; border: 1px solid transparent; border-radius: 9px; color: var(--ink); background: transparent; cursor: pointer; text-align: left; }
+.prd-job-item:hover, .prd-job-item.is-active { border-color: var(--line); background: var(--surface-soft); }
+.prd-job-item > span:first-child { display: grid; min-width: 0; }
+.prd-job-item strong, .prd-job-item small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prd-job-item small { margin-top: 3px; color: var(--ink-soft); font-size: 10px; }
+.prd-status { display: inline-flex; flex: 0 0 auto; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 999px; color: #42556a; background: #e9eef4; font-size: 11px; font-weight: 750; white-space: nowrap; }
+.prd-status.is-success { color: #176c52; background: #dcf3e9; }
+.prd-status.is-error { color: #9a3329; background: #fbe3df; }
+.prd-status.is-warning { color: #885c0a; background: #fff0c7; }
+.prd-review-panel { overflow: hidden; }
+.prd-review-head { display: flex; gap: 18px; align-items: flex-start; justify-content: space-between; padding: 20px; }
+.prd-review-head h2 { margin: 2px 0 5px; }
+.prd-review-head p:last-child { margin: 0; color: var(--ink-soft); font-size: 12px; }
+.prd-job-state { display: grid; grid-template-columns: auto auto; gap: 5px 10px; align-items: center; justify-items: end; }
+.prd-job-state strong { font-size: 22px; }
+.prd-job-state small { grid-column: 1 / -1; color: var(--ink-soft); }
+.prd-progress { height: 5px; overflow: hidden; background: #e7e3db; }
+.prd-progress i { display: block; height: 100%; background: #2e6f9e; transition: width .25s ease; }
+.prd-gate { display: grid; gap: 9px; margin: 16px 18px; padding: 13px 15px; border: 1px solid #c7dfcf; border-radius: 9px; background: #f0f8f2; }
+.prd-gate.is-blocked { border-color: #efc3bc; background: #fff3f1; }
+.prd-gate > div { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.prd-gate span, .prd-gate summary, .prd-gate li { color: var(--ink-soft); font-size: 11px; }
+.prd-case-toolbar { display: grid; grid-template-columns: minmax(240px, 1fr) auto auto; gap: 12px; align-items: center; padding: 13px 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.prd-case-toolbar .search-box { display: grid; grid-template-columns: auto 1fr auto; gap: 7px; align-items: center; max-width: 600px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; }
+.prd-case-toolbar input { min-width: 0; height: 38px; border: 0; outline: 0; background: transparent; }
+.prd-case-toolbar .search-box button { border: 0; color: var(--ink-soft); background: transparent; cursor: pointer; }
+.prd-case-toolbar > span { color: var(--ink-soft); font-size: 12px; }
+.prd-case-table { min-width: 1260px; }
+.prd-case-table td { vertical-align: top; }
+.prd-case-table td > small { display: block; margin-top: 4px; color: var(--ink-soft); }
+.prd-case-detail { min-width: 340px; max-width: 480px; }
+.prd-case-detail details { margin-top: 6px; }
+.prd-case-detail summary { color: #2e5f91; cursor: pointer; font-size: 11px; }
+.prd-case-detail p { padding: 10px; border-radius: 7px; background: var(--surface-soft); font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+.prd-row-comment { width: 220px; min-height: 36px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; }
+.prd-generating, .prd-empty { display: grid; min-height: 360px; place-content: center; justify-items: center; color: var(--ink-soft); text-align: center; }
+.prd-review-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: end; padding: 18px; border-top: 1px solid var(--line); background: var(--surface-soft); }
+.prd-review-fields { display: grid; grid-template-columns: minmax(150px, .35fr) minmax(260px, 1fr); gap: 12px; }
+.prd-review-fields textarea { resize: vertical; }
+.prd-action-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .case-platform-gateway { max-width: 920px; margin: 38px auto 0; padding: 28px; }
 .case-platform-gateway > header { max-width: 640px; margin-bottom: 24px; }
 .case-platform-gateway > header h2 { margin: 4px 0 8px; font-size: 25px; }
@@ -2379,4 +2431,12 @@ pre, code { font-family: var(--font-ui); }
   .bluetooth-event-log li {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 980px) {
+  .prd-layout { grid-template-columns: 1fr; }
+  .prd-sidebar { position: static; }
+  .prd-job-list { max-height: 300px; }
+  .prd-review-actions, .prd-review-fields { grid-template-columns: 1fr; }
+  .prd-case-toolbar { grid-template-columns: 1fr; }
 }

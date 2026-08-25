@@ -8,6 +8,7 @@ let activeImportJobId = null;
 let repairRestoreTimer = null;
 let testPollTimer = null;
 let batchTestPollTimer = null;
+let prdCasesPollTimer = null;
 let latestBatchCandidateSummary = {};
 const selectedTestCases = new Map();
 let selectedTestProject = null;
@@ -56,7 +57,7 @@ const FUNCTION_CATEGORY_NAMES = Object.freeze(Object.keys(FUNCTION_CATEGORIES));
 const ALL_FUNCTION_MODULES = Object.freeze(FUNCTION_CATEGORY_NAMES.flatMap(name => FUNCTION_CATEGORIES[name]));
 const PROJECT_STORAGE_KEY = 'agent-loop-selected-project';
 const CASE_CATALOG_PAGE_SIZE = 100;
-const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
+const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/prd-cases', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
 const caseCatalogCache = new Map();
 let activePageController = null;
 let routeRequestToken = 0;
@@ -2097,6 +2098,178 @@ async function renderCasePlatformLanding() {
         </form>
       </div>
     </section>`;
+}
+
+function stopPrdCasesPolling() {
+  if (prdCasesPollTimer) clearTimeout(prdCasesPollTimer);
+  prdCasesPollTimer = null;
+}
+
+function prdJobStatusLabel(status = '') {
+  return ({
+    UPLOADED: '等待生成', GENERATING: '生成中', READY_FOR_REVIEW: '待审查',
+    QUALITY_BLOCKED: '质量门禁阻断', APPROVED: '审查通过', REJECTED: '已驳回',
+    SYNCED: '已同步', SYNCED_WITH_CONFLICTS: '部分同步', FAILED: '生成失败'
+  })[String(status).toUpperCase()] || status || '未知';
+}
+
+function prdStatusClass(status = '') {
+  const value = String(status).toUpperCase();
+  if (['APPROVED', 'SYNCED'].includes(value)) return 'is-success';
+  if (value === 'SYNCED_WITH_CONFLICTS') return 'is-warning';
+  if (['REJECTED', 'QUALITY_BLOCKED', 'FAILED'].includes(value)) return 'is-error';
+  if (value === 'READY_FOR_REVIEW') return 'is-warning';
+  return 'is-progress';
+}
+
+function fileToBase64(file) {
+  return file.arrayBuffer().then(buffer => {
+    const bytes = new Uint8Array(buffer);
+    const parts = [];
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+      parts.push(String.fromCharCode(...bytes.subarray(offset, offset + 0x8000)));
+    }
+    return btoa(parts.join(''));
+  });
+}
+
+async function renderPrdCases(explicitJobId = '') {
+  stopPrdCasesPolling();
+  setActiveNav('prd-cases');
+  document.title = 'PRD 转用例 · Agent-loop';
+  const params = new URLSearchParams(location.search);
+  const selectedProject = params.get('project') || currentProject();
+  const requestedJob = explicitJobId || params.get('job') || '';
+  app.innerHTML = Components.skeletonState('正在读取 PRD 用例任务…');
+  const jobsPayload = await api('/api/prd-cases/jobs');
+  const jobs = jobsPayload.items || [];
+  const jobId = requestedJob || jobs[0]?.job_id || '';
+  let job = null;
+  let casePayload = {items: [], gate: null};
+  if (jobId) {
+    job = await api(`/api/prd-cases/jobs/${encodeURIComponent(jobId)}`);
+    if (['READY_FOR_REVIEW', 'QUALITY_BLOCKED', 'APPROVED', 'REJECTED', 'SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status)) {
+      casePayload = await api(`/api/prd-cases/jobs/${encodeURIComponent(jobId)}/cases`);
+    }
+  }
+  const cases = casePayload.items || [];
+  const gate = casePayload.gate || job?.quality_gate || null;
+  const projectOptions = Object.values(TEST_PROJECTS).map(project =>
+    `<option value="${escapeHtml(project.project)}" ${project.project === selectedProject ? 'selected' : ''}>${escapeHtml(project.projectLabel)} · ${escapeHtml(project.project)}</option>`
+  ).join('');
+  const jobItems = jobs.map(item => `
+    <button class="prd-job-item ${item.job_id === jobId ? 'is-active' : ''}" type="button" data-prd-job="${escapeHtml(item.job_id)}">
+      <span><strong>${escapeHtml(item.filename)}</strong><small>${escapeHtml(item.project_id)} · ${escapeHtml(item.created_at || '')}</small></span>
+      <span class="prd-status ${prdStatusClass(item.status)}">${escapeHtml(prdJobStatusLabel(item.status))}</span>
+    </button>`).join('');
+  const gateErrors = (gate?.errors || []).map(issue => `<li><strong>${escapeHtml(issue.case_id || '整体')}</strong> ${escapeHtml(issue.message)}</li>`).join('');
+  const gateWarnings = (gate?.warnings || []).map(issue => `<li><strong>${escapeHtml(issue.case_id || '整体')}</strong> ${escapeHtml(issue.message)}</li>`).join('');
+  const caseRows = cases.map(item => `
+    <tr class="prd-case-row" data-prd-search="${escapeHtml([item.case_id, item.functional_module, item.feature, item.test_item, item.test_point, item.title].join(' ').toLowerCase())}">
+      <td><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.priority)}</small></td>
+      <td>${escapeHtml(item.functional_module)}<small>${escapeHtml(item.feature)}</small></td>
+      <td>${escapeHtml(item.test_item)}<small>${escapeHtml(item.test_point)}</small></td>
+      <td class="prd-case-detail"><strong>${escapeHtml(item.title)}</strong><details><summary>查看步骤与预期</summary><p><b>前置条件</b>\n${escapeHtml(item.preconditions || '无')}\n\n<b>操作步骤</b>\n${escapeHtml(item.steps_text)}\n\n<b>预期结果</b>\n${escapeHtml(item.expected_text)}</p></details></td>
+      <td>${escapeHtml((item.requirement_ids || []).join(', ') || '—')}</td>
+      <td><input class="prd-row-comment" data-case-id="${escapeHtml(item.stable_id || item.case_id)}" type="text" placeholder="可填写本条审查意见" aria-label="${escapeHtml(item.case_id)} 审查意见" ${job?.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}></td>
+    </tr>`).join('');
+  const activeBody = !job ? `
+      <section class="workspace-card prd-empty"><h2>上传一份 PRD 开始生成</h2><p>系统将校验内置 xiaozhou QA Skill，生成 Excel，再从 Excel 回读全部用例供人工审查。</p></section>` : `
+      <section class="workspace-card prd-review-panel">
+        <header class="prd-review-head">
+          <div><p class="eyebrow">当前任务</p><h2>${escapeHtml(job.filename)}</h2><p>${escapeHtml(job.project_id)} · Skill ${escapeHtml((job.skill?.sha256 || '').slice(0, 12) || '待校验')}…</p></div>
+          <div class="prd-job-state"><span class="prd-status ${prdStatusClass(job.status)}">${escapeHtml(prdJobStatusLabel(job.status))}</span><strong>${Number(job.progress || 0)}%</strong><small>${escapeHtml(job.stage || '')}</small></div>
+        </header>
+        <div class="prd-progress"><i style="width:${Math.max(0, Math.min(100, Number(job.progress || 0)))}%"></i></div>
+        ${job.error ? `<div class="notice notice-error"><strong>生成失败</strong><p>${escapeHtml(job.error)}</p></div>` : ''}
+        ${gate ? `<section class="prd-gate ${gate.passed ? 'is-pass' : 'is-blocked'}"><div><strong>${gate.passed ? '质量门禁通过' : '质量门禁未通过'}</strong><span>措辞 ${escapeHtml(gate.checks?.wording || '—')} · 分类 ${escapeHtml(gate.checks?.classification || '—')} · 顺序 ${escapeHtml(gate.checks?.order || '—')} · 边界 ${escapeHtml(gate.checks?.feature_boundary || '—')} · 稳定ID ${escapeHtml(gate.checks?.stable_ids || '—')}</span></div>${gateErrors ? `<details><summary>${gate.errors.length} 个阻断项</summary><ul>${gateErrors}</ul></details>` : ''}${gateWarnings ? `<details><summary>${gate.warnings.length} 个提醒项</summary><ul>${gateWarnings}</ul></details>` : ''}</section>` : ''}
+        ${cases.length ? `<div class="prd-case-toolbar"><label class="search-box">${icon('search', 17)}<input id="prd-case-search" type="search" placeholder="搜索编号、模块、功能点、测试项"><button id="clear-prd-case-search" type="button">清空</button></label><span>Excel 回读 ${cases.length} 条</span><button class="button button-secondary" type="button" data-prd-download>下载 Excel</button></div><div class="workspace-table-scroll"><table class="workspace-table prd-case-table"><thead><tr><th>用例编号</th><th>功能模块 / 功能点</th><th>测试项 / 测试点</th><th>用例详情</th><th>需求ID</th><th>审查意见</th></tr></thead><tbody>${caseRows}</tbody></table></div>` : `<div class="prd-generating"><div class="spinner"></div><p>${escapeHtml(job.stage || '正在生成用例…')}</p></div>`}
+        ${['READY_FOR_REVIEW', 'REJECTED', 'QUALITY_BLOCKED', 'FAILED', 'APPROVED', 'SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `<footer class="prd-review-actions"><div class="prd-review-fields"><label>审查人<input id="prd-reviewer" type="text" value="${escapeHtml(job.review?.reviewer || '')}" placeholder="请输入姓名" ${job.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}></label><label>整体意见<textarea id="prd-review-comment" rows="2" placeholder="驳回时必须填写；通过时可选">${escapeHtml(job.review?.comment || '')}</textarea></label></div><div class="prd-action-buttons">${job.status === 'READY_FOR_REVIEW' ? `<button class="button button-secondary" type="button" data-prd-review="reject">驳回修改</button><button class="button" type="button" data-prd-review="approve">审查通过</button>` : ''}${['REJECTED', 'QUALITY_BLOCKED', 'FAILED'].includes(job.status) ? `<button class="button" type="button" data-prd-regenerate>按意见重新生成</button>` : ''}${job.status === 'APPROVED' ? `<button class="button" type="button" data-prd-sync>同步到用例管理</button>` : ''}${['SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `<a class="button" href="${escapeHtml(pageUrl('/cases', job.project_id, {platform_id: currentPlatformFor(job.project_id)}))}">进入用例管理</a>` : ''}</div></footer>` : ''}
+      </section>`;
+  app.innerHTML = `
+    ${Components.pageHeader({title: 'PRD 转用例', intro: '上传 PRD，按 QA Skill 生成 Excel；人工审查通过后再同步到用例管理'})}
+    <section class="prd-layout">
+      <aside class="workspace-card prd-sidebar">
+        <form id="prd-upload-form" class="prd-upload-form">
+          <div><p class="eyebrow">新建任务</p><h2>上传 PRD</h2></div>
+          <label>目标项目<select id="prd-project" required>${projectOptions}</select></label>
+          <label>执行画像<select id="prd-profile"><option value="core">核心流程</option><option value="strict">严格流程</option></select></label>
+          <label class="prd-file-drop"><input id="prd-file" type="file" accept=".md,.txt,.docx" required><strong>选择 PRD 文件</strong><span>支持 Markdown、TXT、DOCX，最大 20 MB</span></label>
+          <button class="button" type="submit">上传并生成</button>
+        </form>
+        <div class="prd-job-list"><header><strong>生成记录</strong><span>${jobs.length}</span></header>${jobItems || '<p class="empty-copy">暂无记录</p>'}</div>
+      </aside>
+      <div class="prd-main">${activeBody}</div>
+    </section>`;
+
+  app.querySelector('#prd-upload-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const file = app.querySelector('#prd-file')?.files?.[0];
+    if (!file) return showToast('请选择 PRD 文件', 'error');
+    const button = event.submitter;
+    if (button) { button.disabled = true; button.textContent = '正在上传…'; }
+    try {
+      const created = await api('/api/prd-cases/jobs', {method: 'POST', body: JSON.stringify({
+        project_id: app.querySelector('#prd-project').value,
+        execution_profile: app.querySelector('#prd-profile').value,
+        filename: file.name,
+        file_base64: await fileToBase64(file)
+      })});
+      history.replaceState({}, '', pageUrl('/prd-cases', created.project_id, {job: created.job_id}));
+      showToast('PRD 已上传，正在生成用例');
+      await renderPrdCases(created.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      if (button) { button.disabled = false; button.textContent = '上传并生成'; }
+    }
+  });
+  app.querySelectorAll('[data-prd-job]').forEach(button => button.addEventListener('click', async () => {
+    const selected = button.dataset.prdJob;
+    history.replaceState({}, '', pageUrl('/prd-cases', selectedProject, {job: selected}));
+    await renderPrdCases(selected);
+  }));
+  const search = app.querySelector('#prd-case-search');
+  const applyFilter = () => {
+    const value = String(search?.value || '').trim().toLowerCase();
+    app.querySelectorAll('.prd-case-row').forEach(row => { row.hidden = Boolean(value && !row.dataset.prdSearch.includes(value)); });
+  };
+  search?.addEventListener('input', applyFilter);
+  app.querySelector('#clear-prd-case-search')?.addEventListener('click', () => { search.value = ''; applyFilter(); });
+  app.querySelector('[data-prd-download]')?.addEventListener('click', () => {
+    startBrowserDownload(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/download`, `${String(job.filename).replace(/\.[^.]+$/, '')}-测试用例.xlsx`);
+  });
+  app.querySelectorAll('[data-prd-review]').forEach(button => button.addEventListener('click', async () => {
+    const reviewer = app.querySelector('#prd-reviewer')?.value.trim() || '';
+    const comment = app.querySelector('#prd-review-comment')?.value.trim() || '';
+    const caseComments = [...app.querySelectorAll('.prd-row-comment')].filter(input => input.value.trim()).map(input => ({stable_id: input.dataset.caseId, comment: input.value.trim()}));
+    button.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/review`, {method: 'POST', body: JSON.stringify({action: button.dataset.prdReview, reviewer, comment, case_comments: caseComments})});
+      showToast(button.dataset.prdReview === 'approve' ? '审查已通过，可以同步' : '已驳回，可按意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); button.disabled = false; }
+  }));
+  app.querySelector('[data-prd-regenerate]')?.addEventListener('click', async event => {
+    const feedback = app.querySelector('#prd-review-comment')?.value.trim() || job.review?.comment || job.error || '';
+    event.currentTarget.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/regenerate`, {method: 'POST', body: JSON.stringify({feedback})});
+      showToast('已按审查意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); event.currentTarget.disabled = false; }
+  });
+  app.querySelector('[data-prd-sync]')?.addEventListener('click', async event => {
+    event.currentTarget.disabled = true;
+    try {
+      const result = await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/sync`, {method: 'POST'});
+      showToast(`同步完成：新增 ${result.created}，更新 ${result.updated}，冲突 ${result.conflicts}`);
+      caseCatalogCache.clear();
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); event.currentTarget.disabled = false; }
+  });
+  if (job && ['UPLOADED', 'GENERATING'].includes(job.status)) {
+    prdCasesPollTimer = setTimeout(() => renderPrdCases(job.job_id), 1400);
+  }
 }
 
 async function renderTests() {
@@ -6400,6 +6573,7 @@ async function route() {
     stopRepairRestore();
     stopTestPolling();
     stopBatchTestPolling();
+    stopPrdCasesPolling();
     app.onclick = null;
     initGlobalTargetSwitcher();
     let parts = location.pathname.split('/').filter(Boolean).map(decodeURIComponent);
@@ -6420,6 +6594,7 @@ async function route() {
       history.replaceState({}, '', `/cases${location.search}`);
       return await renderTests();
     }
+    if (parts[0] === 'prd-cases' && parts.length === 1) return await renderPrdCases();
     if (parts[0] === 'cases' && parts.length === 1) return await renderTests();
     if (parts[0] === 'runs' && parts.length === 1) {
       setActiveNav('runs');

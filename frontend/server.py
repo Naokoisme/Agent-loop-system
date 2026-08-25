@@ -45,6 +45,7 @@ from agent_loop_system.case_management import CaseManagementRepository
 from agent_loop_system.internal_dispatcher import build_child_command
 from agent_loop_system.outcome import outcome_fields
 from agent_loop_system.platforms.registry import PlatformRegistry
+from agent_loop_system.prd_cases import PrdCaseService
 from agent_loop_system.process_lifecycle import (
     DEFAULT_TERMINATION_GRACE_SECONDS as PROCESS_TERMINATION_GRACE_SECONDS,
     communicate_process as _communicate_process,
@@ -5659,6 +5660,13 @@ class WebApplication:
         self.case_store = CaseManagementRepository(
             paths.project_data / "case_management.sqlite3"
         )
+        self.prd_cases = PrdCaseService(
+            paths.root,
+            self.case_store,
+            project_lookup=lambda project_id: self.projects.get(
+                project_id, include_archived=False
+            ),
+        )
         self.cases = CaseMapRepository(paths, self.test_history, self.case_store)
         self.jobs = JobManager(paths, self.defects, self.history)
         self.test_jobs = CaseTestManager(
@@ -7676,6 +7684,33 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"items": projects, "total": len(projects)})
             return
 
+        if path == "/api/prd-cases/jobs":
+            project_id = query.get("project_id", [""])[0]
+            items = self.app.prd_cases.list_jobs(project_id=project_id)
+            self._json({"items": items, "total": len(items)})
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/cases", path)
+        if match:
+            self._json(self.app.prd_cases.get_cases(match.group(1)))
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/download", path)
+        if match:
+            job = self.app.prd_cases.get_job(match.group(1))
+            workbook = self.app.prd_cases.workbook_path(match.group(1))
+            self._serve_binary(
+                workbook.read_bytes(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                f"{Path(str(job['filename'])).stem}-测试用例.xlsx",
+            )
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})", path)
+        if match:
+            self._json(self.app.prd_cases.get_job(match.group(1)))
+            return
+
         if path == "/api/tests/projects":
             self._json({"items": _test_project_options()})
             return
@@ -8369,7 +8404,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if (
-            path in {"/", "/tests", "/overview", "/cases", "/runs", "/reports", "/defects", "/environments", "/bluetooth"}
+            path in {"/", "/tests", "/overview", "/prd-cases", "/cases", "/runs", "/reports", "/defects", "/environments", "/bluetooth"}
             or re.fullmatch(r"/(defect|history)/[^/]+(?:/[^/]+)?", path)
             or re.fullmatch(r"/test/[^/]+/[^/]+", path)
             or re.fullmatch(r"/test-batch/[^/]+", path)
@@ -8382,6 +8417,45 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _post(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/prd-cases/jobs":
+            body = self._body_json()
+            job = self.app.prd_cases.create_job(
+                project_id=str(body.get("project_id") or body.get("project") or ""),
+                filename=str(body.get("filename") or ""),
+                file_base64=str(body.get("file_base64") or ""),
+                execution_profile=str(body.get("execution_profile") or "core"),
+            )
+            self._json(job, HTTPStatus.ACCEPTED)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/review", path)
+        if match:
+            body = self._body_json()
+            result = self.app.prd_cases.review(
+                match.group(1),
+                action=str(body.get("action") or ""),
+                reviewer=str(body.get("reviewer") or ""),
+                comment=str(body.get("comment") or ""),
+                case_comments=body.get("case_comments") if isinstance(body.get("case_comments"), list) else None,
+            )
+            self._json(result)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/regenerate", path)
+        if match:
+            body = self._body_json()
+            result = self.app.prd_cases.regenerate(
+                match.group(1), str(body.get("feedback") or "")
+            )
+            self._json(result, HTTPStatus.ACCEPTED)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/sync", path)
+        if match:
+            result = self.app.prd_cases.sync(match.group(1))
+            self._json(result)
+            return
+
         if path == "/api/projects":
             body = self._body_json()
             project = self.app.projects.create(body)

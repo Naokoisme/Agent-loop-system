@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import base64
 import errno
 import json
 import os
@@ -1823,6 +1824,56 @@ class FrontendDataTest(unittest.TestCase):
         with self.assertRaises(HTTPError) as raised:
             urlopen(base + "/api/defects/missing", timeout=3)
         self.assertEqual(raised.exception.code, 404)
+
+    def test_prd_case_http_workflow_reviews_and_syncs_to_case_management(self) -> None:
+        application, base = self._server()
+        application.prd_cases.start_threads = False
+        application.prd_cases.skill_bundle = (
+            Path(__file__).resolve().parents[1]
+            / "resources"
+            / "skills"
+            / "xiaozhou-portable-skill-execution-quality-20260825.zip"
+        )
+        application.prd_cases.generator = lambda _text, _context: [{
+            "case_id": "PRD-HTTP-001",
+            "functional_module": "账号",
+            "feature": "登录",
+            "test_item": "密码登录",
+            "test_point": "有效凭据登录",
+            "title": "有效账号和密码登录成功",
+            "priority": "P0",
+            "preconditions": "账号已注册",
+            "steps": ["打开登录页", "输入有效账号和密码", "点击登录"],
+            "expected_results": ["显示登录页", "输入内容被接受", "进入首页并显示账号头像"],
+            "test_type": "功能",
+            "requirement_ids": ["REQ-HTTP-1"],
+            "note": "",
+        }]
+        content = "# 登录需求\n用户使用有效账号和密码登录后进入首页，并显示账号头像。"
+        with self._post_json(base + "/api/prd-cases/jobs", {
+            "project_id": "620C_W6830",
+            "filename": "login.md",
+            "file_base64": base64.b64encode(content.encode()).decode(),
+        }) as response:
+            created = json.load(response)
+        application.prd_cases.run_job(created["job_id"])
+        with urlopen(base + f"/api/prd-cases/jobs/{created['job_id']}/cases", timeout=3) as response:
+            cases = json.load(response)
+        self.assertEqual(cases["items"][0]["case_id"], "PRD-HTTP-001")
+        with self._post_json(base + f"/api/prd-cases/jobs/{created['job_id']}/review", {
+            "action": "approve",
+            "reviewer": "QA",
+            "comment": "审查通过",
+        }) as response:
+            reviewed = json.load(response)
+        self.assertEqual(reviewed["release"]["decision"], "GO")
+        with self._post_json(base + f"/api/prd-cases/jobs/{created['job_id']}/sync", {}) as response:
+            synced = json.load(response)
+        self.assertEqual(synced["created"], 1)
+        stored = application.case_store.get_case("620C_W6830", "PRD-HTTP-001")
+        self.assertEqual(stored["source_type"], "PRD_APPROVED")
+        with urlopen(base + "/prd-cases", timeout=3) as response:
+            self.assertIn("正常", response.read().decode("utf-8"))
 
     def test_agent_test_api_lists_opens_and_starts_cases(self) -> None:
         application, base = self._server()
