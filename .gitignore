@@ -29,6 +29,10 @@ defects_img/
 *.db
 *.db-wal
 *.db-shm
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+project_data/
 
 # Build and package output
 build/
@@ -46,5 +50,4 @@ Thumbs.db
 .work/
 Data/
 nul
-
 

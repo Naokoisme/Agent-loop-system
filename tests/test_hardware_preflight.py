@@ -148,7 +148,7 @@ class HardwarePreflightTest(unittest.TestCase):
         self.assertFalse(any(token in session.commands[0] for token in forbidden))
         self.assertTrue(session.stopped)
 
-    def test_profile_failure_stops_before_any_device_probe(self) -> None:
+    def test_profile_failure_still_collects_independent_connection_status(self) -> None:
         mtp = FakeMtpSystem()
         result, session = self._run(
             profile_loader=lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("bad profile")),
@@ -158,14 +158,30 @@ class HardwarePreflightTest(unittest.TestCase):
         self.assertFalse(result.ready)
         self.assertEqual(result.primary_code, "PROFILE_INVALID")
         self.assertEqual(session.commands, [])
-        self.assertEqual(mtp.calls, [])
+        self.assertEqual(mtp.calls, ["pnp", "wpd"])
+        self.assertEqual(len(result.checks), 6)
 
-    def test_port_not_selected(self) -> None:
+    def test_single_active_port_is_auto_selected(self) -> None:
         result, session = self._run(environment={
             **self.environment,
             "W30_HARDWARE_PORT": "",
         })
-        self.assertEqual(result.primary_code, "PORT_NOT_SELECTED")
+        self.assertTrue(result.ready)
+        self.assertEqual(len(session.commands), 1)
+        pipe = next(check for check in result.checks if check.key == "supercom_pipe")
+        self.assertEqual(pipe.diagnostics["selected_port"], "COM7")
+        self.assertEqual(pipe.diagnostics["selection_source"], "auto_discovered")
+
+    def test_no_active_port_reports_connection_unavailable(self) -> None:
+        result, session = self._run(
+            environment={**self.environment, "W30_HARDWARE_PORT": ""},
+            serial_ports_probe=lambda _port: {
+                "selected_port": "",
+                "active_count": 0,
+                "items": [],
+            },
+        )
+        self.assertEqual(result.primary_code, "SUPERCOM_PIPE_UNAVAILABLE")
         self.assertEqual(session.commands, [])
 
     def test_pipe_unavailable(self) -> None:
@@ -179,8 +195,10 @@ class HardwarePreflightTest(unittest.TestCase):
 
         self.assertEqual(absent.primary_code, "USB_DEVICE_NOT_PRESENT")
         self.assertEqual(ambiguous.primary_code, "USB_TARGET_AMBIGUOUS")
-        self.assertEqual(absent_session.commands, [])
-        self.assertEqual(ambiguous_session.commands, [])
+        self.assertEqual(len(absent_session.commands), 1)
+        self.assertEqual(len(ambiguous_session.commands), 1)
+        self.assertEqual(len(absent.checks), 6)
+        self.assertEqual(len(ambiguous.checks), 6)
 
     def test_usb_instance_must_be_online(self) -> None:
         result, session = self._run(
@@ -188,7 +206,7 @@ class HardwarePreflightTest(unittest.TestCase):
         )
 
         self.assertEqual(result.primary_code, "USB_DEVICE_NOT_PRESENT")
-        self.assertEqual(session.commands, [])
+        self.assertEqual(len(session.commands), 1)
         usb = next(check for check in result.checks if check.key == "usb_pnp")
         self.assertEqual(usb.diagnostics["online_count"], 0)
 
@@ -201,14 +219,53 @@ class HardwarePreflightTest(unittest.TestCase):
 
         self.assertEqual(result.primary_code, "PREFLIGHT_INTERNAL_ERROR")
         self.assertEqual(result.readiness_status, "blocked")
-        self.assertEqual(session.commands, [])
+        self.assertEqual(len(session.commands), 1)
 
-    def test_mtp_namespace_failure_stops_before_uart(self) -> None:
+    def test_mtp_namespace_failure_does_not_hide_uart_status(self) -> None:
         result, session = self._run(
             mtp_system=FakeMtpSystem(namespace_error=RuntimeError("download missing"))
         )
         self.assertEqual(result.primary_code, "MTP_NAMESPACE_NOT_READY")
-        self.assertEqual(session.commands, [])
+        self.assertEqual(len(session.commands), 1)
+        gui = next(check for check in result.checks if check.key == "gui_ping")
+        self.assertEqual(gui.status, "pass")
+
+    def test_stale_configured_port_is_replaced_for_gui_probe(self) -> None:
+        captured_environment: dict[str, str] = {}
+        session = FakeSerialSession()
+
+        def session_factory(**kwargs):
+            captured_environment.update(kwargs["environment"])
+            return session
+
+        with tempfile.TemporaryDirectory() as root:
+            result = run_hardware_preflight(
+                evidence_dir=Path(root),
+                environment=self.environment,
+                profile_loader=self._profile,
+                serial_ports_probe=lambda _port: {
+                    "configured_port": "COM7",
+                    "selected_port": "COM6",
+                    "active_count": 1,
+                    "items": [{
+                        "port": "COM6",
+                        "friendly_name": "USB Serial Port (COM6)",
+                        "present": True,
+                        "supercom_open": True,
+                        "pipe_path": r"\\.\pipe\SuperCom.AgentBridge.COM6",
+                    }],
+                },
+                mtp_system=FakeMtpSystem(),
+                serial_session_factory=session_factory,
+                llm_probe=self._llm,
+            )
+
+        self.assertTrue(result.ready)
+        self.assertEqual(captured_environment["W30_HARDWARE_PORT"], "COM6")
+        self.assertEqual(
+            captured_environment["W30_HARDWARE_PORT_SOURCE"],
+            "auto_discovered",
+        )
 
     def test_pipe_exists_but_uart_has_no_data(self) -> None:
         result, session = self._run(serial=FakeSerialSession(failure=TimeoutError("zero bytes")))
@@ -302,7 +359,6 @@ class HardwarePreflightTest(unittest.TestCase):
         profile, _ = self._run(
             profile_loader=lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("bad profile"))
         )
-        port, _ = self._run(environment={**self.environment, "W30_HARDWARE_PORT": ""})
         pipe, _ = self._run(serial_ports_probe=lambda _port: {"items": []})
         usb, _ = self._run(mtp_system=FakeMtpSystem(devices=0))
         screenshot, _ = self._run(
@@ -315,8 +371,7 @@ class HardwarePreflightTest(unittest.TestCase):
 
         expected = {
             "PROFILE_INVALID": "重新选择测试项目；如仍失败，联系维护人员",
-            "PORT_NOT_SELECTED": "打开系统设置，选择当前手表使用的串口后重新检查",
-            "SUPERCOM_PIPE_UNAVAILABLE": "打开 SuperCom，连接当前手表对应的串口后重新检查",
+            "SUPERCOM_PIPE_UNAVAILABLE": "在 SuperCom 中打开一个手表串口后重试，程序会自动识别端口",
             "USB_DEVICE_NOT_PRESENT": "重新插拔 USB，确认电脑能够识别手表后重试",
             "MTP_NAMESPACE_NOT_READY": "重新连接 USB，并确认电脑能够打开手表存储后重试",
             "SUPERCOM_NO_UART": "确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试",
@@ -324,7 +379,7 @@ class HardwarePreflightTest(unittest.TestCase):
             "TARGET_BUSY": "等待该任务结束或停止后再检查",
             "PREFLIGHT_INTERNAL_ERROR": "重新检查；如再次出现，展开诊断信息并联系维护人员",
         }
-        for result in (profile, port, pipe, usb, screenshot, watch, judge, busy, internal):
+        for result in (profile, pipe, usb, screenshot, watch, judge, busy, internal):
             with self.subTest(code=result.primary_code):
                 check = next(item for item in result.checks if item.code == result.primary_code)
                 self.assertEqual(check.action, expected[result.primary_code])

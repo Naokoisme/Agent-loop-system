@@ -48,6 +48,22 @@ def _check(
     )
 
 
+def unchecked_watch_579_preflight(
+    project: str = WATCH_579_PROJECT,
+) -> HardwarePreflightResult:
+    """Return an adapter-specific cold state without W30-only checks."""
+
+    return HardwarePreflightResult(
+        project=project,
+        ready=False,
+        readiness_status="unchecked",
+        checked_at=None,
+        checks=(),
+        execution_ready=False,
+        observation_ready=False,
+    )
+
+
 def run_watch_579_preflight(
     *,
     project: str = WATCH_579_PROJECT,
@@ -256,4 +272,8 @@ def run_watch_579_preflight(
     )
 
 
-__all__ = ["WATCH_579_PROJECT", "run_watch_579_preflight"]
+__all__ = [
+    "WATCH_579_PROJECT",
+    "run_watch_579_preflight",
+    "unchecked_watch_579_preflight",
+]

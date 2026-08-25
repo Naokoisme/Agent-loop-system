@@ -6,7 +6,10 @@ from agent_loop_system.tools.watch_579_ble import (
     Watch579BleUnavailable,
     Watch579Disconnected,
 )
-from agent_loop_system.tools.watch_579_preflight import run_watch_579_preflight
+from agent_loop_system.tools.watch_579_preflight import (
+    run_watch_579_preflight,
+    unchecked_watch_579_preflight,
+)
 
 
 class FakeBroker:
@@ -30,6 +33,15 @@ class FakeBroker:
 
 
 class Watch579PreflightTests(unittest.TestCase):
+    def test_unchecked_state_does_not_expose_w30_profile_checks(self) -> None:
+        result = unchecked_watch_579_preflight()
+
+        self.assertEqual(result.project, "579_Z1640")
+        self.assertEqual(result.readiness_status, "unchecked")
+        self.assertFalse(result.execution_ready)
+        self.assertFalse(result.observation_ready)
+        self.assertEqual(result.checks, ())
+
     def test_missing_address_blocks_execution_without_w30_dependencies(self) -> None:
         broker = FakeBroker()
         result = run_watch_579_preflight(

@@ -11,6 +11,7 @@ from types import SimpleNamespace
 
 from agent_loop_system.tools.hardware_runtime_profile import (
     HardwareRuntimeProfileError,
+    ensure_hardware_runtime_profile,
     load_hardware_runtime_profile,
 )
 from scripts.publish_profile import publish_profile
@@ -164,6 +165,49 @@ class HardwareRuntimeProfileTests(unittest.TestCase):
                 version="v30-test.1",
             )
             self.assertEqual(profile.version, "v30-test.1")
+
+    def test_auto_installs_a_verified_profile_into_runtime_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            source_root = self._publish(base / "library")
+            destination_root = base / "app" / ".runtime" / "profiles"
+
+            provision = ensure_hardware_runtime_profile(
+                project="6202_W5230",
+                profiles_root=destination_root,
+                app_root=base / "app",
+                search_roots=(source_root,),
+            )
+
+            self.assertTrue(provision.installed)
+            self.assertEqual(provision.profiles_root, destination_root.resolve())
+            self.assertEqual(provision.profile.version, "v30-test.1")
+            self.assertTrue(
+                (destination_root / "6202_W5230" / "latest.json").is_file()
+            )
+
+            reused = ensure_hardware_runtime_profile(
+                project="6202_W5230",
+                profiles_root=destination_root,
+                app_root=base / "app",
+                search_roots=(source_root,),
+            )
+            self.assertFalse(reused.installed)
+            self.assertEqual(reused.source_root, destination_root.resolve())
+
+    def test_auto_install_refuses_to_fabricate_a_missing_profile(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            with self.assertRaisesRegex(
+                HardwareRuntimeProfileError,
+                "自动查找已验证档案失败",
+            ):
+                ensure_hardware_runtime_profile(
+                    project="new_watch_target",
+                    profiles_root=base / ".runtime" / "profiles",
+                    app_root=base,
+                    search_roots=(base / "empty-library",),
+                )
 
     def test_rejects_corrupted_runtime_asset(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

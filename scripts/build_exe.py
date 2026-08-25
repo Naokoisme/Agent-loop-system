@@ -441,6 +441,11 @@ def build_exe(
         str(root / "src"),
         "--paths",
         str(root),
+        "--add-data",
+        (
+            f"{root / 'src' / 'agent_loop_system' / 'platform_data'}"
+            ":agent_loop_system/platform_data"
+        ),
     ]
 
     for hi in hidden_imports:

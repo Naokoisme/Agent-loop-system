@@ -12,6 +12,9 @@ let latestBatchCandidateSummary = {};
 const selectedTestCases = new Map();
 let selectedTestProject = null;
 let currentTestPageItems = [];
+let selectedRunPlatform = '';
+let selectedRunTarget = '';
+let executionOptionsToken = 0;
 
 const PAGE_SIZE = 20;
 const IMPORT_STORAGE_KEY = 'firmware-repair-import-job';
@@ -29,36 +32,14 @@ const TEST_FILTER_LABELS = {
   explored_unsolidified: '步骤待确认',
   solidified: '可直接运行'
 };
-const DEFAULT_TEST_PROJECT = '620C_W6830';
+let DEFAULT_TEST_PROJECT = '';
 const DEFAULT_TEST_STATE = 'all';
-const TEST_PROJECTS = {
-  '620C_W6830': {
-    project: '620C_W6830',
-    projectLabel: '620C W6830',
-    target: 'simulator',
-    targetLabel: '模拟器'
-  },
-  '6202_W5230': {
-    project: '6202_W5230',
-    projectLabel: '6202 W5230',
-    target: 'hardware',
-    targetLabel: '真机'
-  },
-  '6202_W5230_SIMULATOR': {
-    project: '6202_W5230_SIMULATOR',
-    projectLabel: '6202 W5230',
-    target: 'simulator',
-    targetLabel: '模拟器'
-  },
-  '579_Z1640': {
-    project: '579_Z1640',
-    projectLabel: '579 Z1640',
-    target: 'hardware',
-    targetLabel: '579 真机'
-  }
-};
+let TEST_PROJECTS = Object.create(null);
+let PLATFORM_PROFILES = Object.create(null);
+let PLATFORM_TARGETS = Object.create(null);
+let ENVIRONMENT_PROTOCOLS = Object.create(null);
 
-/** @typedef {'620C_W6830'|'6202_W5230_SIMULATOR'|'6202_W5230'|'579_Z1640'} ProjectKey */
+/** @typedef {string} ProjectKey */
 /** @typedef {'PASS'|'FAIL'|'ERROR'|'CANNOT_VERIFY'|'PENDING'|'RUNNING'} Verdict */
 /** @typedef {'unexplored'|'externally_explored'|'explored_unsolidified'|'solidified'} MaturityState */
 
@@ -80,32 +61,6 @@ const caseCatalogCache = new Map();
 let activePageController = null;
 let routeRequestToken = 0;
 
-const ENVIRONMENT_PROTOCOLS = Object.freeze({
-  '620C_W6830': {
-    transport: 'socket',
-    transportLabel: '模拟器连接',
-    captureProvider: 'simulator',
-    captureLabel: '模拟器截图'
-  },
-  '6202_W5230_SIMULATOR': {
-    transport: 'socket',
-    transportLabel: '模拟器连接',
-    captureProvider: 'simulator',
-    captureLabel: '模拟器截图'
-  },
-  '6202_W5230': {
-    transport: 'supercom',
-    transportLabel: 'SuperCom',
-    captureProvider: 'mtp',
-    captureLabel: 'USB 截图'
-  },
-  '579_Z1640': {
-    transport: 'pc_ble_legacy_l1_l2',
-    transportLabel: 'PC BLE / 579 L1-L2',
-    captureProvider: 'unavailable',
-    captureLabel: '暂不可用'
-  }
-});
 const BATCH_CATEGORY_LABELS = {
   untested: '尚未运行',
   fail: '最近运行失败',
@@ -258,8 +213,8 @@ const ISSUE_TABLE = Object.freeze({
     action: '请重新选择测试项目；如仍失败，请联系维护人员。'
   },
   PORT_NOT_SELECTED: {
-    cause: '尚未选择与手表相连的串口。',
-    action: '请打开系统设置，选择当前手表使用的串口后重新检查。'
+    cause: '当前没有发现唯一可用的 SuperCom 手表串口。',
+    action: '请在 SuperCom 中打开当前手表串口后重试，平台会自动识别，无需手动配置端口。'
   },
   SUPERCOM_PIPE_UNAVAILABLE: {
     cause: '平台没有检测到 SuperCom 中已打开的手表连接。',
@@ -476,6 +431,61 @@ async function api(url, options = {}) {
   return payload;
 }
 
+function normalizeProjectProfile(project) {
+  const projectId = String(project.project_id || project.project || '');
+  const defaultTargetId = String(project.default_target || project.allowed_targets?.[0] || '');
+  const target = PLATFORM_TARGETS[defaultTargetId] || {};
+  return {
+    ...project,
+    ...target,
+    project: projectId,
+    project_id: projectId,
+    projectLabel: String(project.project_name || project.project_label || projectId),
+    project_label: String(project.project_name || project.project_label || projectId),
+    target: String(target.execution_target || 'unknown'),
+    targetLabel: String(target.execution_target_label || target.target_label || '未配置目标'),
+    platform_id: String(project.default_platform || target.platform_id || ''),
+    target_id: defaultTargetId
+  };
+}
+
+async function loadPlatformRegistries() {
+  const [platformPayload, projectPayload] = await Promise.all([
+    api('/api/platforms'),
+    api('/api/projects')
+  ]);
+  PLATFORM_PROFILES = Object.fromEntries(
+    (platformPayload.platforms || []).map(item => [String(item.platform_id), item])
+  );
+  PLATFORM_TARGETS = Object.fromEntries(
+    (platformPayload.targets || []).map(item => [String(item.target_id), item])
+  );
+  TEST_PROJECTS = Object.fromEntries(
+    (projectPayload.items || []).map(item => {
+      const normalized = normalizeProjectProfile(item);
+      return [normalized.project, normalized];
+    })
+  );
+  ENVIRONMENT_PROTOCOLS = Object.fromEntries(
+    Object.values(TEST_PROJECTS).map(project => {
+      const target = PLATFORM_TARGETS[project.target_id] || {};
+      return [project.project, {
+        transport: target.transport,
+        transportLabel: target.transport_label,
+        captureProvider: target.capture_provider,
+        captureLabel: target.capture_label,
+        serialProvider: target.serial_provider,
+        serialLabel: target.serial_label,
+        feedbackProvider: target.feedback_provider
+      }];
+    })
+  );
+  const projects = Object.values(TEST_PROJECTS);
+  if (!projects.length) throw new Error('项目注册表为空，请先检查 /api/projects');
+  DEFAULT_TEST_PROJECT = projects[0].project;
+  renderGlobalProjectControls();
+}
+
 function icon(name, size = 20) {
   const paths = {
     overview: '<path d="M4 19V9l4-4 4 4 4-4 4 4v10"/><path d="M3 19h18M8 19v-5h3v5m5 0v-7h3v7"/>',
@@ -497,18 +507,84 @@ function icon(name, size = 20) {
 }
 
 function currentProject() {
-  const queryProject = new URLSearchParams(location.search).get('project');
-  if (queryProject && Object.hasOwn(TEST_PROJECTS, queryProject)) return queryProject;
+  const params = new URLSearchParams(location.search);
+  const queryProject = params.get('project_id') || params.get('project');
+  if (queryProject) return queryProject;
   const stored = localStorage.getItem(PROJECT_STORAGE_KEY);
-  return stored && Object.hasOwn(TEST_PROJECTS, stored) ? stored : DEFAULT_TEST_PROJECT;
+  return stored || DEFAULT_TEST_PROJECT;
 }
 
 function rememberProject(project) {
-  const normalized = Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT;
+  const normalized = String(project || '');
+  if (!Object.hasOwn(TEST_PROJECTS, normalized)) {
+    throw new Error(`项目不存在或已归档：${normalized || '空'}`);
+  }
   localStorage.setItem(PROJECT_STORAGE_KEY, normalized);
-  const select = document.querySelector('#global-target-select');
-  if (select && select.value !== normalized) select.value = normalized;
+  const button = document.querySelector('#global-project-switch');
+  if (button) button.textContent = `当前项目：${TEST_PROJECTS[normalized].projectLabel} ▾`;
   return normalized;
+}
+
+function renderGlobalProjectControls() {
+  const current = Object.hasOwn(TEST_PROJECTS, currentProject()) ? currentProject() : DEFAULT_TEST_PROJECT;
+  const button = document.querySelector('#global-project-switch');
+  if (button) button.textContent = `当前项目：${TEST_PROJECTS[current]?.projectLabel || current} ▾`;
+  renderProjectSwitchList('');
+  renderCreateProjectOptions();
+}
+
+function renderProjectSwitchList(query = '') {
+  const host = document.querySelector('#project-switch-list');
+  if (!host) return;
+  const needle = String(query).trim().toLocaleLowerCase('zh-CN');
+  const current = currentProject();
+  const projects = Object.values(TEST_PROJECTS).filter(project =>
+    !needle || `${project.projectLabel} ${project.project}`.toLocaleLowerCase('zh-CN').includes(needle)
+  );
+  host.innerHTML = projects.length ? projects.map(project => `
+    <button type="button" class="project-switch-item ${project.project === current ? 'is-current' : ''}" data-switch-project="${escapeHtml(project.project)}">
+      <span><strong>${escapeHtml(project.projectLabel)}</strong><small>${escapeHtml(project.project)}</small></span>
+      <span>${escapeHtml((project.allowed_platforms || []).map(id => PLATFORM_PROFILES[id]?.platform_label || id).join(' / '))}${project.project === current ? ' · 当前' : ''}</span>
+    </button>`).join('') : Components.emptyState('没有匹配的项目');
+}
+
+function renderCreateProjectOptions() {
+  const platformHost = document.querySelector('#create-project-platforms');
+  const targetHost = document.querySelector('#create-project-targets');
+  if (!platformHost || !targetHost) return;
+  const preferredProject = Object.hasOwn(TEST_PROJECTS, currentProject()) ? currentProject() : DEFAULT_TEST_PROJECT;
+  const preferredPlatform = currentPlatformFor(preferredProject);
+  const preferredTarget = currentTargetFor(preferredProject, preferredPlatform);
+  const platforms = Object.values(PLATFORM_PROFILES).sort((left, right) => {
+    if (left.platform_id === 'w30') return -1;
+    if (right.platform_id === 'w30') return 1;
+    return String(left.platform_label || left.platform_id).localeCompare(String(right.platform_label || right.platform_id), 'zh-CN');
+  });
+  platformHost.innerHTML = platforms.map(platform => `
+    <label><input type="checkbox" name="allowed_platforms" value="${escapeHtml(platform.platform_id)}" ${platform.platform_id === preferredPlatform ? 'checked' : ''}><span>${escapeHtml(platform.platform_label || platform.platform_id)}</span></label>`).join('');
+  targetHost.innerHTML = Object.values(PLATFORM_TARGETS).map(target => `
+    <label data-target-platform="${escapeHtml(target.platform_id)}"><input type="checkbox" name="allowed_targets" value="${escapeHtml(target.target_id)}" ${target.target_id === preferredTarget ? 'checked' : ''}><span>${escapeHtml(target.target_label || target.target_id)}</span></label>`).join('');
+  syncCreateProjectOptions();
+}
+
+function syncCreateProjectOptions() {
+  const form = document.querySelector('#create-project-form');
+  if (!form) return;
+  const platforms = [...form.querySelectorAll('input[name="allowed_platforms"]:checked')].map(input => input.value);
+  const defaultPlatform = form.querySelector('#create-project-default-platform');
+  const previousPlatform = defaultPlatform.value;
+  defaultPlatform.innerHTML = platforms.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(PLATFORM_PROFILES[id]?.platform_label || id)}</option>`).join('');
+  if (platforms.includes(previousPlatform)) defaultPlatform.value = previousPlatform;
+  form.querySelectorAll('[data-target-platform]').forEach(label => {
+    const allowed = platforms.includes(label.dataset.targetPlatform);
+    label.hidden = !allowed;
+    if (!allowed) label.querySelector('input').checked = false;
+  });
+  const targets = [...form.querySelectorAll('input[name="allowed_targets"]:checked')]
+    .map(input => input.value)
+    .filter(id => PLATFORM_TARGETS[id]?.platform_id === defaultPlatform.value);
+  const defaultTarget = form.querySelector('#create-project-default-target');
+  defaultTarget.innerHTML = targets.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(PLATFORM_TARGETS[id]?.target_label || id)}</option>`).join('');
 }
 
 function setGlobalTargetHealth(status = 'unchecked', label = '尚未检查') {
@@ -620,18 +696,74 @@ function restoreRememberedScroll() {
 }
 
 function initGlobalTargetSwitcher() {
-  const select = document.querySelector('#global-target-select');
-  if (!select || select.dataset.ready === 'true') return;
-  select.dataset.ready = 'true';
-  select.value = rememberProject(currentProject());
-  select.addEventListener('change', () => {
-    const project = rememberProject(select.value);
+  const button = document.querySelector('#global-project-switch');
+  if (!button || button.dataset.ready === 'true') return;
+  button.dataset.ready = 'true';
+  const switchDialog = document.querySelector('#project-switch-dialog');
+  const createDialog = document.querySelector('#create-project-dialog');
+  const switchToProject = projectValue => {
+    const project = rememberProject(projectValue);
     selectedTestCases.clear();
     selectedTestProject = project;
+    selectedRunPlatform = '';
+    selectedRunTarget = '';
+    invalidateCaseCatalog();
     const targetPath = TOP_LEVEL_ROUTE_PATHS.includes(location.pathname) ? location.pathname : '/cases';
-    history.pushState({}, '', pageUrl(targetPath, project));
+    const requestedPlatform = new URLSearchParams(location.search).get('platform_id');
+    const projectProfile = testProject(project);
+    const allowedPlatforms = projectProfile.allowed_platforms || [];
+    const compatiblePlatform = allowedPlatforms.includes(requestedPlatform)
+      ? requestedPlatform
+      : String(projectProfile.default_platform || allowedPlatforms[0] || '');
+    const extra = targetPath === '/cases' && compatiblePlatform
+      ? {platform_id: compatiblePlatform}
+      : {};
+    history.pushState({}, '', pageUrl(targetPath, project, extra));
+    switchDialog?.close();
     route();
+  };
+  button.addEventListener('click', () => { renderProjectSwitchList(''); switchDialog?.showModal(); });
+  document.querySelector('#open-create-project')?.addEventListener('click', () => { renderCreateProjectOptions(); createDialog?.showModal(); });
+  document.querySelector('#project-switch-create')?.addEventListener('click', () => { switchDialog?.close(); renderCreateProjectOptions(); createDialog?.showModal(); });
+  document.querySelectorAll('[data-close-project-switch]').forEach(item => item.addEventListener('click', () => switchDialog?.close()));
+  document.querySelectorAll('[data-close-create-project]').forEach(item => item.addEventListener('click', () => createDialog?.close()));
+  document.querySelector('#project-switch-search')?.addEventListener('input', event => renderProjectSwitchList(event.target.value));
+  document.querySelector('#project-switch-list')?.addEventListener('click', event => {
+    const item = event.target.closest('[data-switch-project]');
+    if (item) switchToProject(item.dataset.switchProject);
   });
+  document.querySelector('#create-project-form')?.addEventListener('change', event => {
+    if (event.target.matches('input[name="allowed_platforms"], input[name="allowed_targets"], #create-project-default-platform')) syncCreateProjectOptions();
+  });
+  document.querySelector('#create-project-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const error = form.querySelector('#create-project-error');
+    const submit = form.querySelector('[type="submit"]');
+    error.hidden = true;
+    submit.disabled = true;
+    try {
+      const data = new FormData(form);
+      const payload = {
+        project_name: String(data.get('project_name') || '').trim(),
+        project_id: String(data.get('project_id') || '').trim(),
+        allowed_platforms: data.getAll('allowed_platforms'),
+        default_platform: String(data.get('default_platform') || ''),
+        allowed_targets: data.getAll('allowed_targets'),
+        default_target: String(data.get('default_target') || '')
+      };
+      const created = await api('/api/projects', {method: 'POST', body: JSON.stringify(payload)});
+      await loadPlatformRegistries();
+      form.reset();
+      createDialog?.close();
+      showToast(`项目“${created.project_name}”已创建`, 'success');
+      switchToProject(created.project_id);
+    } catch (caught) {
+      error.textContent = caught.message;
+      error.hidden = false;
+    } finally { submit.disabled = false; }
+  });
+  rememberProject(currentProject());
 }
 
 function initPrimaryNavigation() {
@@ -740,30 +872,66 @@ async function mapWithLimit(values, limit, mapper) {
 }
 
 function invalidateCaseCatalog(project) {
-  if (project) caseCatalogCache.delete(project);
-  else caseCatalogCache.clear();
+  if (!project) {
+    caseCatalogCache.clear();
+    return;
+  }
+  for (const key of caseCatalogCache.keys()) {
+    if (key.startsWith(`${project}\u001f`)) caseCatalogCache.delete(key);
+  }
 }
 
 async function loadCaseCatalog(project = currentProject(), {force = false} = {}) {
   const normalized = testProject(project).project;
-  if (force) invalidateCaseCatalog(normalized);
-  if (caseCatalogCache.has(normalized)) return await caseCatalogCache.get(normalized);
+  const platformId = currentPlatformFor(normalized);
+  const cacheKey = `${normalized}\u001f${platformId}`;
+  if (force) invalidateCaseCatalog();
+  if (caseCatalogCache.has(cacheKey)) return await caseCatalogCache.get(cacheKey);
   const pending = (async () => {
-    const first = await api(`/api/tests?project=${encodeURIComponent(normalized)}&page=1&page_size=${CASE_CATALOG_PAGE_SIZE}`);
+    const first = await api(`/api/tests?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&page=1&page_size=${CASE_CATALOG_PAGE_SIZE}`);
     const pages = Array.from({length: Math.max(0, Number(first.total_pages || 1) - 1)}, (_, index) => index + 2);
-    const payloads = await mapWithLimit(pages, 6, page => api(`/api/tests?project=${encodeURIComponent(normalized)}&page=${page}&page_size=${CASE_CATALOG_PAGE_SIZE}`));
+    const payloads = await mapWithLimit(pages, 6, page => api(`/api/tests?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&page=${page}&page_size=${CASE_CATALOG_PAGE_SIZE}`));
     return {
       ...first,
       items: [...(first.items || []), ...payloads.flatMap(payload => payload.items || [])]
     };
   })();
-  caseCatalogCache.set(normalized, pending);
+  caseCatalogCache.set(cacheKey, pending);
   try {
     return await pending;
   } catch (error) {
-    caseCatalogCache.delete(normalized);
+    caseCatalogCache.delete(cacheKey);
     throw error;
   }
+}
+
+async function loadCaseOverview(project = currentProject()) {
+  const normalized = testProject(project).project;
+  const platformId = currentPlatformFor(normalized);
+  return await api(`/api/tests/overview?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&limit=20`);
+}
+
+async function loadCasePage(project, {query = '', page = 1, state = 'all', category = 'all', module = ''} = {}) {
+  const normalized = testProject(project).project;
+  const platformId = currentPlatformFor(normalized);
+  const params = new URLSearchParams({
+    project_id: normalized,
+    platform_id: platformId,
+    q: query,
+    page: String(page),
+    page_size: String(PAGE_SIZE),
+    state
+  });
+  const modules = module
+    ? [module]
+    : (category !== 'all' ? (FUNCTION_CATEGORIES[category] || []) : []);
+  modules.forEach(name => params.append('module', name));
+  const request = new URLSearchParams(params);
+  modules.forEach(name => {
+    if (!request.getAll('module').includes(name)) request.append('module', name);
+  });
+  const payload = await api(`/api/tests?${request.toString()}`);
+  return payload;
 }
 
 function moduleCategory(moduleName) {
@@ -837,7 +1005,13 @@ const Components = Object.freeze({
     return `<div class="progress-ring" style="--progress:${safe}" role="img" aria-label="${escapeHtml(label)} ${safe}%"><div><strong>${safe}%</strong><span>${escapeHtml(label)}</span></div></div>`;
   },
   subTabs(items, active) {
-    return `<nav class="workspace-subtabs" aria-label="页面分类">${items.map(item => `<button type="button" class="${item.value === active ? 'is-active' : ''}" data-subtab="${escapeHtml(item.value)}" ${item.disabled ? 'disabled' : ''}>${escapeHtml(item.label)}</button>`).join('')}</nav>`;
+    return `<nav class="workspace-subtabs" aria-label="页面分类">${items.map(item => {
+      const className = item.value === active ? 'is-active' : '';
+      if (item.href) {
+        return `<a href="${escapeHtml(item.href)}" class="${className}" ${item.value === active ? 'aria-current="page"' : ''}>${escapeHtml(item.label)}</a>`;
+      }
+      return `<button type="button" class="${className}" data-subtab="${escapeHtml(item.value)}" ${item.disabled ? 'disabled' : ''}>${escapeHtml(item.label)}</button>`;
+    }).join('')}</nav>`;
   },
   emptyState(title, message = '') {
     return `<div class="workspace-empty"><strong>${escapeHtml(title)}</strong>${message ? `<p>${escapeHtml(message)}</p>` : ''}</div>`;
@@ -891,6 +1065,11 @@ function resultChip(value) {
 }
 
 function maturityChip(row = {}) {
+  const maturity = String(row.automation_maturity || row.mapping_status || '').toUpperCase();
+  if (maturity === 'AUTO_READY') return '<span class="chip chip-solidified">自动化就绪</span>';
+  if (maturity === 'NEED_REVIEW') return '<span class="chip chip-unsolidified">待评审</span>';
+  if (maturity === 'MANUAL_REQUIRED') return '<span class="chip chip-warning">需人工执行</span>';
+  if (maturity === 'UNSUPPORTED') return '<span class="chip chip-fail">暂不支持</span>';
   if (row.is_promoted || row.maturity_state === 'solidified') {
     return '<span class="chip chip-solidified">可直接运行</span>';
   }
@@ -906,32 +1085,159 @@ function maturityChip(row = {}) {
   return '<span class="chip chip-unexplored">待生成步骤</span>';
 }
 
+function automationMaturityLabel(value) {
+  return ({
+    AUTO_READY: '自动化就绪',
+    PROMOTED: '已固化',
+    NEED_REVIEW: '待评审',
+    MANUAL_REQUIRED: '需人工执行',
+    UNSUPPORTED: '暂不支持',
+    UNMAPPED: '未绑定',
+  })[String(value || '').toUpperCase()] || String(value || '未知');
+}
+
+function caseSourceLabel(value) {
+  return ({
+    MANIFEST_579: '579 冻结基线',
+    W30_CASE_MAP: 'W30 Case Map 基线',
+    MANUAL: '人员新增',
+    EXCEL: 'Excel 导入',
+    CLONE: '复制创建',
+  })[String(value || '').toUpperCase()] || '统一用例库';
+}
+
+function platformApplicabilityMarkup(projectId, selected = [], inputName = 'case-applicable-platform') {
+  const project = testProject(projectId);
+  const active = new Set((selected || []).map(String));
+  return (project.allowed_platforms || []).map(platformId => {
+    const label = PLATFORM_PROFILES[platformId]?.platform_label || platformId;
+    return `<label class="platform-applicability-option"><input type="checkbox" name="${escapeHtml(inputName)}" value="${escapeHtml(platformId)}" ${active.has(platformId) ? 'checked' : ''}><span>${escapeHtml(label)}</span></label>`;
+  }).join('');
+}
+
+function selectedPlatformValues(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
+}
+
 function caseStatusChip(row = {}) {
-  if (row.is_promoted || row.maturity_state === 'solidified') {
-    const historyCount = Number(row.history_count || 0);
-    const rawVerdict = String(row.latest_verdict || 'PENDING').toUpperCase();
-    const normalized = historyCount > 0
-      ? ({SKIP: 'CANNOT_VERIFY'}[rawVerdict] || (
-        ['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict) ? rawVerdict : 'ERROR'
-      ))
-      : 'PENDING';
-    const presentation = resultPresentation(normalized);
-    return `<span class="${presentation.className}">${presentation.label}</span>`;
-  }
-  return maturityChip(row);
+  const historyCount = Math.max(
+    Number(row.history_count || 0),
+    Array.isArray(row.history) ? row.history.length : 0
+  );
+  const rawVerdict = String(row.latest_verdict || 'PENDING').toUpperCase();
+  const normalized = historyCount > 0
+    ? ({SKIP: 'CANNOT_VERIFY'}[rawVerdict] || (
+      ['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict) ? rawVerdict : 'ERROR'
+    ))
+    : 'PENDING';
+  const presentation = resultPresentation(normalized);
+  const label = {
+    PASS: 'PASS',
+    FAIL: 'FAIL',
+    CANNOT_VERIFY: 'CANNOT_VERIFY',
+    ERROR: 'ERROR'
+  }[normalized] || presentation.label;
+  return `<span class="${presentation.className}">${label}</span>`;
 }
 
 function testExecutionModeLabel(value) {
   const labels = {
-    fixed_mapping: '已保存步骤',
-    candidate_mapping: '步骤验证',
-    agent_exploration: '临时探索'
+    fixed_mapping: '固化步骤',
+    candidate_mapping: '外部候选复跑',
+    agent_exploration: 'Agent-loop 临时探索',
+    '579_deterministic': '579 冻结计划'
   };
   return labels[String(value || '')] || '旧记录未标明';
 }
 
 function testProject(value = DEFAULT_TEST_PROJECT) {
-  return TEST_PROJECTS[value] || TEST_PROJECTS[DEFAULT_TEST_PROJECT];
+  const project = TEST_PROJECTS[value];
+  if (!project) throw new Error(`项目不存在或已归档：${value || '空'}`);
+  return project;
+}
+
+function currentPlatformFor(project = currentProject()) {
+  const meta = testProject(project);
+  const requested = new URLSearchParams(location.search).get('platform_id');
+  if (requested && (meta.allowed_platforms || []).includes(requested)) return requested;
+  return String(meta.default_platform || meta.platform_id || '');
+}
+
+function targetsFor(project, platformId) {
+  const meta = testProject(project);
+  return (meta.allowed_targets || [])
+    .map(targetId => PLATFORM_TARGETS[targetId])
+    .filter(target => target?.platform_id === platformId);
+}
+
+function currentTargetFor(project, platformId = currentPlatformFor(project)) {
+  const requested = new URLSearchParams(location.search).get('target_id');
+  const targets = targetsFor(project, platformId);
+  if (requested && targets.some(target => target.target_id === requested)) return requested;
+  const meta = testProject(project);
+  if (targets.some(target => target.target_id === meta.default_target)) return meta.default_target;
+  return targets[0]?.target_id || '';
+}
+
+function targetProfile(project, platformId = currentPlatformFor(project), targetId = currentTargetFor(project, platformId)) {
+  const meta = testProject(project);
+  const target = PLATFORM_TARGETS[targetId] || {};
+  return {
+    ...meta,
+    ...target,
+    project: meta.project,
+    project_id: meta.project,
+    project_label: meta.projectLabel,
+    platform_id: platformId,
+    target_id: targetId,
+    target: target.execution_target || meta.target,
+    targetLabel: target.execution_target_label || target.target_label || meta.targetLabel,
+  };
+}
+
+function platformSwitchButtons(project, activePlatform = currentPlatformFor(project), attribute = 'data-platform-view') {
+  return (testProject(project).allowed_platforms || []).map(platformId => {
+    const platform = PLATFORM_PROFILES[platformId] || {};
+    return `<button type="button" class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" ${attribute}="${escapeHtml(platformId)}">${escapeHtml(platform.platform_label || platformId)}</button>`;
+  }).join('');
+}
+
+function runPlatformSwitchButtons(project, activePlatform = currentPlatformFor(project), attribute = 'data-run-platform') {
+  const allowed = new Set(testProject(project).allowed_platforms || []);
+  const platforms = Object.values(PLATFORM_PROFILES).sort((left, right) => {
+    if (left.platform_id === 'w30') return -1;
+    if (right.platform_id === 'w30') return 1;
+    return String(left.platform_label || left.platform_id).localeCompare(String(right.platform_label || right.platform_id), 'zh-CN');
+  });
+  return platforms.map(platform => {
+    const platformId = String(platform.platform_id || '');
+    const enabled = allowed.has(platformId);
+    const title = enabled ? '' : `当前项目未启用 ${platform.platform_label || platformId}`;
+    return `<button type="button" class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" ${attribute}="${escapeHtml(platformId)}" ${enabled ? '' : 'disabled'} title="${escapeHtml(title)}">${escapeHtml(platform.platform_label || platformId)}</button>`;
+  }).join('');
+}
+
+function caseProjectsForPlatform(platformId) {
+  return Object.values(TEST_PROJECTS).filter(project =>
+    (project.allowed_platforms || []).includes(platformId)
+  );
+}
+
+function caseProjectForPlatform(platformId, preferredProject = currentProject()) {
+  const projects = caseProjectsForPlatform(platformId);
+  const preferred = projects.find(project => project.project === preferredProject);
+  if (preferred) return preferred.project;
+  const canonicalId = platformId === '579' ? '579_O2' : DEFAULT_TEST_PROJECT;
+  return projects.find(project => project.project === canonicalId)?.project || projects[0]?.project || '';
+}
+
+function caseManagementPlatformButtons(activePlatform = '') {
+  return ['w30', '579'].map(platformId => {
+    const label = platformId === 'w30' ? 'W30' : '579';
+    const project = caseProjectForPlatform(platformId);
+    if (!project) return `<span class="platform-choice is-disabled">${label}</span>`;
+    return `<form class="case-platform-switch-form" method="get" action="/cases" data-case-platform="${platformId}"><input type="hidden" name="project" value="${escapeHtml(project)}"><input type="hidden" name="platform_id" value="${platformId}"><button class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" type="submit" ${platformId === activePlatform ? 'aria-current="page"' : ''}>${label}</button></form>`;
+  }).join('');
 }
 
 function confirm579Watchface(project) {
@@ -953,7 +1259,9 @@ function isHardwareTestTarget(value) {
 }
 
 function screenshotLabel(value) {
-  return isHardwareTestTarget(value) ? '真机截图' : '模拟器截图';
+  const meta = typeof value === 'string' ? testProject(value) : value;
+  if (meta?.capture_provider === 'o2' || meta?.target_id === '579.o2' || meta?.platform_id === '579') return 'O2 手表截图';
+  return isHardwareTestTarget(meta) ? '真机截图' : '模拟器截图';
 }
 
 function screenshotGridClass(value) {
@@ -1389,16 +1697,18 @@ function testListParams() {
   const params = new URLSearchParams(location.search);
   const rawPage = Number.parseInt(params.get('page') || '1', 10);
   const state = String(params.get('state') || DEFAULT_TEST_STATE).toLowerCase();
-  const project = String(params.get('project') || currentProject());
+  const project = String(params.get('project_id') || params.get('project') || currentProject());
   const rawCategory = String(params.get('category') || 'all');
   const category = rawCategory === 'all' || Object.hasOwn(FUNCTION_CATEGORIES, rawCategory) ? rawCategory : 'all';
   const rawModule = String(params.get('module') || '');
   const module = ALL_FUNCTION_MODULES.includes(rawModule) ? rawModule : '';
+  const normalizedProject = testProject(project).project;
   return {
     query: (params.get('q') || '').trim(),
     page: Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1,
     state: Object.hasOwn(TEST_FILTER_LABELS, state) ? state : DEFAULT_TEST_STATE,
-    project: Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT,
+    project: normalizedProject,
+    platform: currentPlatformFor(normalizedProject),
     category,
     module
   };
@@ -1407,6 +1717,7 @@ function testListParams() {
 function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT, category = 'all', module = '') {
   const params = new URLSearchParams();
   params.set('project', testProject(project).project);
+  params.set('platform_id', currentPlatformFor(project));
   if (query.trim()) params.set('q', query.trim());
   if (state !== DEFAULT_TEST_STATE) params.set('state', state);
   if (category !== 'all' && Object.hasOwn(FUNCTION_CATEGORIES, category)) params.set('category', category);
@@ -1436,10 +1747,6 @@ function testDetailHref(project, sheet, caseId, returnTo = '/cases') {
   return withTestReturn(`/test/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}`, project, returnTo);
 }
 
-function testHistoryHref(project, sheet, caseId, runId, returnTo = '/cases') {
-  return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
-}
-
 function testBatchHref(jobId, returnTo = currentRouteUrl()) {
   return withReturnContext(`/test-batch/${encodeURIComponent(jobId)}`, returnTo);
 }
@@ -1452,7 +1759,13 @@ function defectHistoryHref(number, runId, returnTo = currentRouteUrl()) {
   return withReturnContext(pageUrl(`/history/${encodeURIComponent(number)}/${encodeURIComponent(runId)}`, currentProject()), returnTo);
 }
 
-function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
+function testHistoryHref(project, sheet, caseId, runId, returnTo = '/cases') {
+  return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
+}
+
+function testMetricCards(summary = null, activeState = DEFAULT_TEST_STATE) {
+  const loading = summary === null;
+  const values = summary || {};
   const maturityCards = [
     ['all', 'all', '全部用例'],
     ['unexplored', 'unexplored', '待生成步骤'],
@@ -1461,13 +1774,13 @@ function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
   ];
   const renderCards = cards => cards.map(([state, countKey, label]) => `
     <button class="metric${activeState === state ? ' is-active' : ''}" type="button" data-test-filter="${state}" aria-pressed="${activeState === state}">
-      <strong>${Number(summary[countKey] || 0)}</strong><span>${label}</span>
+      <strong>${loading ? '—' : Number(values[countKey] || 0)}</strong><span>${label}</span>
     </button>`).join('');
   return `
     <section class="test-metric-group" aria-labelledby="maturity-status-title">
       <header class="test-metric-heading">
         <div><strong id="maturity-status-title">自动化状态</strong><span>按用例当前准备情况分类</span></div>
-        <small>全部 ${Number(summary.all || 0)}</small>
+        <small>${loading ? '正在读取用例统计' : `全部 ${Number(values.all || 0)}`}</small>
       </header>
       <div class="metrics test-metric-grid maturity-metrics">${renderCards(maturityCards)}</div>
     </section>`;
@@ -1485,18 +1798,21 @@ function testRows(items, query, state, returnTo = '/cases') {
     const sheet = String(row.file_sheet || row.sheet || '');
     const caseId = String(row.case_id || '');
     const selected = selectedTestCases.has(testCaseSelectionKey(sheet, caseId));
+    const sourceLocked = Boolean(row.source_locked || row.is_frozen_source);
+    const platforms = (row.applicable_platforms || []).map(platformId => PLATFORM_PROFILES[platformId]?.platform_label || platformId).join(' / ');
+    const revision = Number(row.current_revision || 1);
     return `<tr class="test-row-shell${selected ? ' is-selected' : ''}">
       <td><label class="table-checkbox" title="${escapeHtml(`选择 ${caseId} 创建精确批次`)}"><input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''}></label></td>
-      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
+      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
       <td class="case-purpose-cell"><strong>${escapeHtml(row.steps_text || row.expected_text || '未填写测试步骤')}</strong><small>${escapeHtml(row.expected_text || '未填写预期结果')}</small></td>
       <td><span class="chip chip-status priority-${escapeHtml(String(row.priority || '').toLowerCase())}">${escapeHtml(row.priority || '未分级')}</span></td>
-      <td>${maturityChip(row)}</td>
+      <td>${maturityChip(row)}<small>${escapeHtml(platforms ? `适用平台：${platforms}` : '未指定适用平台')}</small></td>
       <td>${caseStatusChip(row)}</td>
       <td><time>${row.last_run_at ? formatTime(row.last_run_at) : '—'}</time>${row.history_count ? `<small>${Number(row.history_count)} 次</small>` : ''}</td>
-      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="编辑用例 ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" aria-label="编辑用例 ${escapeHtml(caseId)}">✎</button></td>
+      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="${sourceLocked ? '创建新版本' : '编辑用例'} ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" data-applicable-platforms="${escapeHtml(JSON.stringify(row.applicable_platforms || []))}" data-workflow-state="${escapeHtml(row.workflow_state || 'ACTIVE')}" data-source-locked="${sourceLocked ? 'true' : 'false'}" aria-label="${sourceLocked ? '为冻结用例创建新版本' : '编辑用例'} ${escapeHtml(caseId)}">${sourceLocked ? '版' : '✎'}</button></td>
     </tr>`;
   }).join('');
-  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试点</th><th>优先级</th><th>自动化状态</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试点</th><th>优先级</th><th>自动化成熟度</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function testCaseSelectionKey(sheet, caseId) {
@@ -1515,6 +1831,69 @@ function selectedTestCaseList() {
     left.sheet.localeCompare(right.sheet, 'zh-CN')
     || left.case_id.localeCompare(right.case_id, 'zh-CN', {numeric: true})
   );
+}
+
+async function refreshExecutionOptions() {
+  const buttons = [...document.querySelectorAll('[data-run-platform]')];
+  const targetSelect = document.querySelector('#run-target-select');
+  const blocker = document.querySelector('#run-platform-blocker');
+  const run = document.querySelector('#run-selected-tests');
+  if (!targetSelect || !blocker || !run) return;
+  const project = selectedTestProject || currentProject();
+  const selected = selectedTestCaseList();
+  const token = ++executionOptionsToken;
+  if (!selected.length) {
+    selectedRunPlatform = currentPlatformFor(project);
+    const targets = targetsFor(project, selectedRunPlatform);
+    selectedRunTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}">${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    const allowed = new Set(testProject(project).allowed_platforms || []);
+    buttons.forEach(button => {
+      button.disabled = !allowed.has(button.dataset.runPlatform);
+      button.classList.toggle('is-active', button.dataset.runPlatform === selectedRunPlatform);
+      button.title = button.disabled ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.runPlatform]?.platform_label || button.dataset.runPlatform}` : '';
+    });
+    blocker.textContent = '勾选用例后校验平台映射';
+    run.disabled = true;
+    return;
+  }
+  run.disabled = true;
+  blocker.textContent = '正在校验所选用例的平台映射…';
+  try {
+    const params = new URLSearchParams();
+    params.set('case_ids', selected.map(item => item.case_id).join(','));
+    const payload = await api(`/api/projects/${encodeURIComponent(project)}/execution-options?${params.toString()}`);
+    if (token !== executionOptionsToken) return;
+    const options = payload.options || [];
+    let option = options.find(item => item.platform_id === selectedRunPlatform);
+    if (!option) option = options.find(item => item.platform_id === currentPlatformFor(project)) || options[0];
+    selectedRunPlatform = String(option?.platform_id || '');
+    buttons.forEach(button => {
+      const match = options.find(item => item.platform_id === button.dataset.runPlatform);
+      button.disabled = !match;
+      button.classList.toggle('is-active', button.dataset.runPlatform === selectedRunPlatform);
+      button.title = !match
+        ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.runPlatform]?.platform_label || button.dataset.runPlatform}`
+        : match.runnable ? '' : (match.blockers || []).map(item => `${item.case_id}: ${item.reason_label || item.reason}`).join('\n');
+    });
+    const targets = option?.targets || [];
+    if (!targets.some(target => target.target_id === selectedRunTarget)) selectedRunTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}" ${target.target_id === selectedRunTarget ? 'selected' : ''}>${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    targetSelect.disabled = !option?.runnable;
+    const blocked = Number(option?.blocked_count || 0);
+    blocker.textContent = option?.runnable
+      ? `${option.runnable_count} 条用例可使用 ${option.platform_label} 逻辑运行`
+      : blocked
+        ? `${blocked} 条用例在 ${option?.platform_label || '所选平台'} 被门禁阻止`
+        : '当前项目没有可用执行目标';
+    run.disabled = !option?.runnable || !selectedRunTarget;
+  } catch (error) {
+    if (token !== executionOptionsToken) return;
+    buttons.forEach(button => { button.disabled = true; });
+    targetSelect.disabled = true;
+    blocker.textContent = `平台校验失败：${error.message}`;
+    run.disabled = true;
+  }
 }
 
 function updateSelectedTestCasesUi() {
@@ -1550,9 +1929,10 @@ function updateSelectedTestCasesUi() {
   if (clear) clear.disabled = count < 1;
   const run = document.querySelector('#run-selected-tests');
   if (run) {
-    run.disabled = count < 1;
+    run.disabled = true;
     run.textContent = count ? `用已选用例创建批次（${count}）` : '用已选用例创建批次';
   }
+  void refreshExecutionOptions();
 }
 
 function selectedBatchCategories() {
@@ -1585,11 +1965,23 @@ function renderCaseCategoryTabs(activeCategory = 'all') {
   return `<button type="button" class="${activeCategory === 'all' ? 'is-active' : ''}" data-case-category="all">全部</button>${FUNCTION_CATEGORY_NAMES.map(name => `<button type="button" class="${activeCategory === name ? 'is-active' : ''}" data-case-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('')}`;
 }
 
-function renderModuleSidebar(moduleCounts = {}, catalogTotal = 0, activeCategory = 'all', activeModule = '') {
-  const counts = new Map(Object.entries(moduleCounts || {}));
+function renderModuleSidebar(itemsOrCounts = [], activeCategory = 'all', activeModule = '') {
+  const loading = itemsOrCounts === null;
+  const counts = new Map();
+  if (Array.isArray(itemsOrCounts)) {
+    for (const item of itemsOrCounts) {
+      const sheet = String(item.file_sheet || item.sheet || '未分类');
+      counts.set(sheet, (counts.get(sheet) || 0) + 1);
+    }
+  } else if (itemsOrCounts) {
+    for (const [sheet, value] of Object.entries(itemsOrCounts || {})) {
+      counts.set(sheet, Number(value || 0));
+    }
+  }
   const modules = activeCategory === 'all' ? ALL_FUNCTION_MODULES : (FUNCTION_CATEGORIES[activeCategory] || []);
+  const allTotal = [...counts.values()].reduce((total, value) => total + Number(value || 0), 0);
   const categoryTotal = modules.reduce((total, name) => total + Number(counts.get(name) || 0), 0);
-  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${activeCategory === 'all' ? Number(catalogTotal || 0) : categoryTotal}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
+  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${loading ? '—' : (activeCategory === 'all' ? allTotal : categoryTotal)}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${loading ? '—' : Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
 }
 
 async function refreshTests(query, page, {
@@ -1610,18 +2002,7 @@ async function refreshTests(query, page, {
     if (category !== 'all' && !Object.hasOwn(FUNCTION_CATEGORIES, category)) category = 'all';
     if (module && (!ALL_FUNCTION_MODULES.includes(module) || (category !== 'all' && !FUNCTION_CATEGORIES[category].includes(module)))) module = '';
     if (force) invalidateCaseCatalog(project);
-    const request = new URLSearchParams({
-      project,
-      q: query,
-      state,
-      page: String(page),
-      page_size: String(PAGE_SIZE)
-    });
-    const requestedModules = module
-      ? [module]
-      : (category !== 'all' ? FUNCTION_CATEGORIES[category] : []);
-    requestedModules.forEach(name => request.append('module', name));
-    const payload = await api(`/api/tests?${request.toString()}`);
+    const payload = await loadCasePage(project, {query, page, state, category, module});
     if (token !== testListRequestToken) return;
     ensureTestSelectionProject(payload.project);
     rememberProject(payload.project);
@@ -1634,7 +2015,7 @@ async function refreshTests(query, page, {
     const categoryTabs = document.querySelector('#case-category-tabs');
     if (categoryTabs) categoryTabs.innerHTML = renderCaseCategoryTabs(category);
     const moduleSidebar = document.querySelector('#case-module-sidebar');
-    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(payload.module_counts, payload.catalog_total, category, module);
+    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(payload.module_counts, category, module);
     updateBatchLaunch(payload.batch_summary);
     const returnTo = buildTestListUrl(query, payload.page || 1, selected, payload.project, category, module);
     list.innerHTML = testRows(currentTestPageItems, query, selected, returnTo);
@@ -1654,22 +2035,70 @@ async function refreshTests(query, page, {
   }
 }
 
+async function renderCasePlatformLanding() {
+  setActiveNav('cases');
+  document.title = '选择用例平台 · Agent-loop';
+  selectedTestCases.clear();
+  currentTestPageItems = [];
+  const w30Project = caseProjectForPlatform('w30');
+  const platform579Project = caseProjectForPlatform('579');
+  app.innerHTML = `
+    ${Components.pageHeader({title: '用例管理', intro: '请先选择需要管理的测试平台；选择后才会读取对应平台的项目与用例'})}
+    <section class="workspace-card case-platform-gateway" aria-labelledby="case-platform-gateway-title">
+      <header><p class="eyebrow">平台入口</p><h2 id="case-platform-gateway-title">选择用例平台</h2><p>W30 与 579 使用独立的项目范围、自动化绑定和执行链路。</p></header>
+      <div class="case-platform-gateway-grid">
+        <form class="case-platform-entry is-w30" method="get" action="/cases" data-case-platform="w30">
+          <input type="hidden" name="project" value="${escapeHtml(w30Project)}">
+          <input type="hidden" name="platform_id" value="w30">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">W30</span>
+            <strong>进入 W30 用例管理</strong>
+            <small>管理 W30 模拟器与真机项目用例，执行时使用 W30 命令链路。</small>
+          </button>
+        </form>
+        <form class="case-platform-entry is-579" method="get" action="/cases" data-case-platform="579">
+          <input type="hidden" name="project" value="${escapeHtml(platform579Project)}">
+          <input type="hidden" name="platform_id" value="579">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">579</span>
+            <strong>进入 579 用例管理</strong>
+            <small>管理 579 O2 与 Z1640 用例；执行时按目标使用 APP Bridge 或 PC-BLE，并保留各自证据边界。</small>
+          </button>
+        </form>
+      </div>
+    </section>`;
+}
+
 async function renderTests() {
   setActiveNav('cases');
   document.title = '用例管理 · Agent-loop';
+  const requestedPlatform = new URLSearchParams(location.search).get('platform_id');
+  if (!['w30', '579'].includes(requestedPlatform)) return renderCasePlatformLanding();
+  const compatibleProject = caseProjectForPlatform(requestedPlatform, currentProject());
+  if (!compatibleProject) return renderCasePlatformLanding();
+  if (compatibleProject !== currentProject()) {
+    history.replaceState({}, '', pageUrl('/cases', compatibleProject, {platform_id: requestedPlatform}));
+  }
+  rememberProject(compatibleProject);
   const initial = testListParams();
   const initialProject = testProject(initial.project);
+  const initialPlatform = currentPlatformFor(initial.project);
   ensureTestSelectionProject(initial.project);
+  if (!(initialProject.allowed_platforms || []).includes(selectedRunPlatform)) {
+    selectedRunPlatform = initialPlatform;
+    selectedRunTarget = '';
+  }
   app.innerHTML = `
-    ${Components.pageHeader({title: '用例管理', intro: '管理测试用例和自动化步骤', actions: '<button id="open-case-create" class="button" type="button">' + icon('plus', 17) + ' 新建用例</button>'})}
+    ${Components.pageHeader({title: '用例管理', intro: '按功能模块组织、探索并固化自动化测试用例', actions: `<button id="open-case-create" class="button" type="button">${icon('plus', 17)} 新建用例</button>`})}
     <section id="active-test-batch" class="batch-active" hidden></section>
     <section class="workspace-card case-management-card">
+      <div class="case-platform-context"><div><span>用例平台</span><div class="platform-choice-group">${caseManagementPlatformButtons(initialPlatform)}</div></div><small>切换平台后，只加载该平台下的项目与用例</small></div>
       <nav id="case-category-tabs" class="case-category-tabs" aria-label="功能分类">${renderCaseCategoryTabs(initial.category)}</nav>
       <div class="case-toolbar" aria-label="测试用例工具">
         <div class="project-stage">
           <label class="sr-only" for="test-project">项目与目标</label>
           <select id="test-project" aria-label="选择测试项目">
-            ${Object.values(TEST_PROJECTS).map(item => `<option value="${escapeHtml(item.project)}" ${item.project === initial.project ? 'selected' : ''}>${escapeHtml(item.projectLabel)} · ${escapeHtml(item.targetLabel)}</option>`).join('')}
+            ${caseProjectsForPlatform(initialPlatform).map(item => `<option value="${escapeHtml(item.project)}" ${item.project === initial.project ? 'selected' : ''}>${escapeHtml(item.projectLabel)} · ${escapeHtml(item.targetLabel)}</option>`).join('')}
           </select>
           <small id="test-project-target">${testTargetChip(initialProject)}</small>
         </div>
@@ -1685,9 +2114,9 @@ async function renderTests() {
         </div>
       </div>
       <div class="case-workspace-grid">
-        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar({}, 0, initial.category, initial.module)}</aside>
+        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar(null, initial.category, initial.module)}</aside>
         <div class="case-main-column">
-          <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards({}, initial.state)}</section>
+          <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards(null, initial.state)}</section>
           <details class="batch-launch case-batch-launch">
             <summary><strong>按运行状态创建批次</strong><small id="batch-selection-note">正在统计可运行用例…</small></summary>
             <div class="batch-scope" aria-label="选择批次范围">
@@ -1704,7 +2133,8 @@ async function renderTests() {
             <div id="test-pagination"></div>
           </section>
           <section class="test-selection-bar" aria-label="精确选择测试批次">
-            <div class="test-selection-copy"><strong id="selected-test-summary">尚未选择用例</strong><label class="test-page-selector"><input id="select-test-page" type="checkbox"><span>全选当前页</span></label></div>
+            <div class="test-selection-copy"><strong id="selected-test-summary">尚未勾选用例；勾选项可跨分页保留</strong><label class="test-page-selector"><input id="select-test-page" type="checkbox"><span>全选当前页</span></label></div>
+            <div class="selected-run-routing"><span>运行平台</span><div id="run-platform-buttons" class="platform-choice-group">${runPlatformSwitchButtons(initial.project, initialPlatform, 'data-run-platform')}</div><label>执行目标<select id="run-target-select" aria-label="本次执行目标"></select></label><small id="run-platform-blocker">勾选用例后校验平台映射</small></div>
             <div class="test-selection-actions"><button id="clear-selected-tests" class="button button-secondary" type="button" disabled>清空</button><button id="run-selected-tests" class="button" type="button" disabled>运行所选</button></div>
           </section>
         </div>
@@ -1721,6 +2151,11 @@ async function renderTests() {
             <strong>目标项目：</strong>
             <span id="excel-target-project-label"></span>
           </div>
+          <fieldset class="platform-applicability-fieldset">
+            <legend>适用平台 *</legend>
+            <div id="excel-applicable-platforms" class="platform-applicability-options">${platformApplicabilityMarkup(initial.project, [initialPlatform], 'excel-applicable-platform')}</div>
+            <small>导入前必须明确选择，平台只决定后续使用哪套自动化绑定与执行逻辑。</small>
+          </fieldset>
           <div id="excel-dropzone" class="excel-upload-zone">
             <input id="excel-file-input" type="file" accept=".xlsx" style="display: none;">
             <div class="dropzone-content">
@@ -1745,8 +2180,8 @@ async function renderTests() {
                   <span>增量导入（跳过已存在）</span>
                 </label>
                 <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
-                  <input type="radio" name="excel-import-overwrite-mode" value="overwrite">
-                  <span>覆盖更新（替换同名内容）</span>
+                  <input type="radio" name="excel-import-overwrite-mode" value="revision">
+                  <span>创建新版本（保留历史和冻结基线）</span>
                 </label>
               </div>
             </div>
@@ -1794,6 +2229,13 @@ async function renderTests() {
                 <option value="P3">P3</option>
               </select>
             </div>
+          </div>
+          <div class="case-lifecycle-row">
+            <fieldset class="platform-applicability-fieldset">
+              <legend>适用平台 *</legend>
+              <div id="case-input-platforms" class="platform-applicability-options">${platformApplicabilityMarkup(initial.project, [initialPlatform], 'case-applicable-platform')}</div>
+            </fieldset>
+            <label for="case-input-workflow"><span>用例状态</span><select id="case-input-workflow"><option value="DRAFT">草稿</option><option value="REVIEWING">评审中</option><option value="ACTIVE" selected>生效</option></select></label>
           </div>
           <div>
             <label for="case-input-precondition" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">前置条件</label>
@@ -1877,13 +2319,21 @@ async function renderTests() {
     }, 260);
   });
   projectSelect.addEventListener('change', () => {
-    const params = testListParams();
-    const state = params.state;
-    rememberProject(projectSelect.value);
-    ensureTestSelectionProject(projectSelect.value);
-    updateSelectedTestCasesUi();
-    setTestListUrl(input.value.trim(), 1, state, projectSelect.value, 'push', params.category, params.module);
-    refreshTests(input.value.trim(), 1, {state, project: projectSelect.value, category: params.category, module: params.module});
+    const project = rememberProject(projectSelect.value);
+    ensureTestSelectionProject(project);
+    selectedRunPlatform = '';
+    selectedRunTarget = '';
+    history.pushState({}, '', pageUrl('/cases', project, {platform_id: initialPlatform}));
+    route();
+  });
+  document.querySelectorAll('[data-run-platform]').forEach(button => button.addEventListener('click', () => {
+    if (button.disabled) return;
+    selectedRunPlatform = button.dataset.runPlatform;
+    selectedRunTarget = '';
+    void refreshExecutionOptions();
+  }));
+  document.querySelector('#run-target-select')?.addEventListener('change', event => {
+    selectedRunTarget = event.target.value;
   });
   document.querySelector('#clear-test-search').addEventListener('click', () => {
     clearTimeout(debounceTimer);
@@ -1928,7 +2378,9 @@ async function renderTests() {
     const cases = selectedTestCaseList();
     if (!cases.length) return;
     const projectMeta = testProject(projectSelect.value);
-    if (!window.confirm(`将在${projectMeta.targetLabel}运行已选的 ${cases.length} 条用例，包括最近已通过的用例。继续吗？`)) return;
+    const platformLabel = PLATFORM_PROFILES[selectedRunPlatform]?.platform_label || selectedRunPlatform;
+    const targetLabel = PLATFORM_TARGETS[selectedRunTarget]?.target_label || selectedRunTarget;
+    if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${cases.length}\n运行模式：确定性执行\n\n本批次只运行勾选项，平台不可用时不会自动改用另一套逻辑。`)) return;
     if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
@@ -1936,7 +2388,10 @@ async function renderTests() {
       const job = await api('/api/tests/run-batch', {
         method: 'POST',
         body: JSON.stringify({
-          project: projectSelect.value,
+          project_id: projectSelect.value,
+          platform_id: selectedRunPlatform,
+          target_id: selectedRunTarget,
+          run_mode: 'deterministic',
           cases,
           watchface_ready: projectSelect.value === '579_Z1640'
         }),
@@ -1959,7 +2414,11 @@ async function renderTests() {
       return;
     }
     const projectMeta = testProject(projectSelect.value);
-    if (!window.confirm(`将在${projectMeta.targetLabel}运行 ${total} 条符合条件的用例，最近已通过的用例不会重跑。继续吗？`)) return;
+    const platformId = selectedRunPlatform || currentPlatformFor(projectSelect.value);
+    const targetId = selectedRunTarget || targetsFor(projectSelect.value, platformId)[0]?.target_id || '';
+    const platformLabel = PLATFORM_PROFILES[platformId]?.platform_label || platformId;
+    const targetLabel = PLATFORM_TARGETS[targetId]?.target_label || targetId;
+    if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${total}\n范围：${labels.join('、')}\n\n最新结果已通过的用例不会重跑，平台不可用时不会自动回退。`)) return;
     if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
@@ -1969,7 +2428,10 @@ async function renderTests() {
         body: JSON.stringify({
           limit: 0,
           categories,
-          project: projectSelect.value,
+          project_id: projectSelect.value,
+          platform_id: platformId,
+          target_id: targetId,
+          run_mode: 'deterministic',
           watchface_ready: projectSelect.value === '579_Z1640'
         })
       });
@@ -2049,10 +2511,14 @@ async function renderTests() {
   const excelReportBox = document.querySelector('#excel-report-box');
   let currentExcelBase64 = null;
   let currentExcelFileName = '';
+  let currentExcelFile = null;
+  let currentExcelPreview = null;
 
   function resetExcelDialog() {
     currentExcelBase64 = null;
     currentExcelFileName = '';
+    currentExcelFile = null;
+    currentExcelPreview = null;
     if (excelFileInput) excelFileInput.value = '';
     if (dropzoneTitle) dropzoneTitle.textContent = '选择或拖拽 Excel 文件（.xlsx）至此处';
     if (dropzoneFileName) dropzoneFileName.textContent = '点击选择文件';
@@ -2070,6 +2536,7 @@ async function renderTests() {
 
   function handleExcelFile(file) {
     if (!file) return;
+    currentExcelPreview = null;
     if (!file.name.toLowerCase().endsWith('.xlsx')) {
       if (excelErrorBox) {
         excelErrorBox.textContent = `仅支持 .xlsx 文件，无法导入「${file.name}」。`;
@@ -2083,6 +2550,7 @@ async function renderTests() {
       return;
     }
 
+    currentExcelFile = file;
     currentExcelFileName = file.name;
     if (dropzoneFileName) dropzoneFileName.textContent = `已选择：${file.name}`;
     if (excelPreviewBox) excelPreviewBox.style.display = 'none';
@@ -2098,13 +2566,20 @@ async function renderTests() {
       const base64Data = reader.result.split(',')[1];
       currentExcelBase64 = base64Data;
       try {
-        const resp = await fetch('/api/excel/preview', {
+        const applicablePlatforms = selectedPlatformValues('excel-applicable-platform');
+        if (!applicablePlatforms.length) {
+          throw new Error('请至少选择一个适用平台');
+        }
+        const conflictStrategy = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'revision' ? 'NEW_REVISION' : 'SKIP';
+        const resp = await fetch('/api/cases/import/preview', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            project: projectSelect.value,
-            file_name: currentExcelFileName,
+            project_id: projectSelect.value,
+            filename: currentExcelFileName,
             file_base64: currentExcelBase64,
+            applicable_platforms: applicablePlatforms,
+            conflict_strategy: conflictStrategy,
           }),
         });
         const data = await resp.json();
@@ -2115,6 +2590,7 @@ async function renderTests() {
           submitExcelBtn.disabled = true;
           return;
         }
+        currentExcelPreview = data;
         document.querySelector('#preview-new-count').textContent = String(data.new_count);
         document.querySelector('#preview-skip-count').textContent = String(data.existing_count);
         document.querySelector('#preview-total-count').textContent = String(data.total_parsed);
@@ -2124,9 +2600,11 @@ async function renderTests() {
         document.querySelector('#preview-sample-list').innerHTML = sampleHtml;
         excelPreviewBox.style.display = 'block';
 
-        if (data.new_count > 0) {
+        if (data.new_count > 0 || (conflictStrategy === 'NEW_REVISION' && data.existing_count > 0)) {
           submitExcelBtn.disabled = false;
-          submitExcelBtn.textContent = `确认导入（新增 ${data.new_count} 条）`;
+          submitExcelBtn.textContent = conflictStrategy === 'NEW_REVISION'
+            ? `确认导入（${data.new_count} 条新增，${data.existing_count} 条新版本）`
+            : `确认导入 (${data.new_count} 条新增)`;
         } else {
           submitExcelBtn.disabled = true;
           submitExcelBtn.textContent = '无需导入（无新增）';
@@ -2194,21 +2672,28 @@ async function renderTests() {
     });
   }
 
+  document.querySelectorAll('input[name="excel-import-overwrite-mode"], input[name="excel-applicable-platform"]').forEach(control => {
+    control.addEventListener('change', () => {
+      if (currentExcelFile) handleExcelFile(currentExcelFile);
+    });
+  });
+
   if (submitExcelBtn) {
     submitExcelBtn.addEventListener('click', async () => {
       if (!currentExcelBase64) return;
-      const isOverwrite = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'overwrite';
+      const createsRevision = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'revision';
+      if (!currentExcelPreview) return;
       submitExcelBtn.disabled = true;
-      submitExcelBtn.textContent = '正在导入用例…';
+      submitExcelBtn.textContent = '正在写入统一用例库…';
       try {
-        const resp = await fetch('/api/excel/confirm', {
+        const resp = await fetch('/api/cases/import/commit', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            project: projectSelect.value,
-            file_name: currentExcelFileName,
-            file_base64: currentExcelBase64,
-            overwrite_existing: isOverwrite,
+            project_id: projectSelect.value,
+            batch_id: currentExcelPreview.batch_id,
+            preview_token: currentExcelPreview.preview_token,
+            source_sha256: currentExcelPreview.source_sha256,
           }),
         });
         const data = await resp.json();
@@ -2219,9 +2704,9 @@ async function renderTests() {
           submitExcelBtn.disabled = false;
           return;
         }
-        const summaryMsg = isOverwrite
-          ? `导入完成：新增 ${data.imported_count} 条，更新 ${data.overwritten_count || 0} 条。`
-          : `导入完成：新增 ${data.imported_count} 条，跳过 ${data.skipped_count} 条已有用例。`;
+        const summaryMsg = createsRevision
+          ? `导入成功！新增 ${data.imported_count} 条，创建新版本 ${data.new_revision_count || 0} 条。模块: ${(data.modules_updated || []).join(', ')}`
+          : `导入成功！新增 ${data.imported_count} 条用例，跳过 ${data.skipped_count} 条已有用例。模块: ${(data.modules_updated || []).join(', ')}`;
         excelReportBox.textContent = summaryMsg;
         excelReportBox.style.display = 'block';
         submitExcelBtn.textContent = '导入完成';
@@ -2268,6 +2753,8 @@ async function renderTests() {
   const caseInputSteps = document.querySelector('#case-input-steps');
   const caseInputExpected = document.querySelector('#case-input-expected');
   const caseInputNote = document.querySelector('#case-input-note');
+  const caseInputPlatforms = document.querySelector('#case-input-platforms');
+  const caseInputWorkflow = document.querySelector('#case-input-workflow');
   const caseEditErrorBox = document.querySelector('#case-edit-error');
   const caseEditSubmitBtn = document.querySelector('#submit-case-edit');
 
@@ -2281,6 +2768,10 @@ async function renderTests() {
     }
     if (caseEditModeInput) caseEditModeInput.value = mode;
     if (caseEditOrigIdInput) caseEditOrigIdInput.value = data.case_id || '';
+    const defaultPlatforms = [currentPlatformFor(projectSelect.value)];
+    let applicablePlatforms = Array.isArray(data.applicable_platforms) ? data.applicable_platforms : defaultPlatforms;
+    if (caseInputPlatforms) caseInputPlatforms.innerHTML = platformApplicabilityMarkup(projectSelect.value, applicablePlatforms, 'case-applicable-platform');
+    if (caseInputWorkflow) caseInputWorkflow.value = data.workflow_state || 'ACTIVE';
 
     if (mode === 'create') {
       if (caseDialogTitle) caseDialogTitle.textContent = '添加测试用例';
@@ -2296,10 +2787,12 @@ async function renderTests() {
       if (caseInputNote) caseInputNote.value = '';
       if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = '保存用例';
     } else {
-      if (caseDialogTitle) caseDialogTitle.textContent = `编辑测试用例（${data.case_id || ''}）`;
+      if (caseDialogTitle) caseDialogTitle.textContent = data.source_locked
+        ? `为冻结用例创建新版本 (${data.case_id || ''})`
+        : `编辑测试用例 (${data.case_id || ''})`;
       if (caseInputId) {
         caseInputId.value = data.case_id || '';
-        caseInputId.readOnly = false;
+        caseInputId.readOnly = true;
       }
       if (caseInputSheet) caseInputSheet.value = data.sheet || '';
       if (caseInputPriority) caseInputPriority.value = data.priority || 'P1';
@@ -2307,7 +2800,7 @@ async function renderTests() {
       if (caseInputSteps) caseInputSteps.value = data.steps_text || '';
       if (caseInputExpected) caseInputExpected.value = data.expected_text || '';
       if (caseInputNote) caseInputNote.value = data.note || '';
-      if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = '保存修改';
+      if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = data.source_locked ? '创建新版本' : '保存新版本';
     }
     caseEditDialog.showModal();
   }
@@ -2334,6 +2827,9 @@ async function renderTests() {
           steps_text: editBtn.dataset.steps,
           expected_text: editBtn.dataset.expected,
           note: editBtn.dataset.note,
+          applicable_platforms: JSON.parse(editBtn.dataset.applicablePlatforms || '[]'),
+          workflow_state: editBtn.dataset.workflowState || 'ACTIVE',
+          source_locked: editBtn.dataset.sourceLocked === 'true',
         });
       }
     });
@@ -2351,10 +2847,12 @@ async function renderTests() {
       const steps_text = caseInputSteps.value.trim();
       const expected_text = caseInputExpected.value.trim();
       const note = caseInputNote.value.trim();
+      const applicable_platforms = selectedPlatformValues('case-applicable-platform');
+      const workflow_state = caseInputWorkflow?.value || 'ACTIVE';
 
-      if (!caseId || !/^[A-Za-z0-9_]+$/.test(caseId)) {
+      if (!caseId || !/^[A-Za-z0-9_.-]+$/.test(caseId)) {
         if (caseEditErrorBox) {
-          caseEditErrorBox.textContent = '用例编号格式错误：只能包含字母、数字和下划线';
+          caseEditErrorBox.textContent = '用例编号格式错误：只能包含字母、数字、点、下划线和连字符';
           caseEditErrorBox.style.display = 'block';
         }
         return;
@@ -2373,6 +2871,13 @@ async function renderTests() {
         }
         return;
       }
+      if (!applicable_platforms.length) {
+        if (caseEditErrorBox) {
+          caseEditErrorBox.textContent = '请至少选择一个适用平台';
+          caseEditErrorBox.style.display = 'block';
+        }
+        return;
+      }
 
       if (caseEditSubmitBtn) {
         caseEditSubmitBtn.disabled = true;
@@ -2381,9 +2886,11 @@ async function renderTests() {
       if (caseEditErrorBox) caseEditErrorBox.style.display = 'none';
 
       try {
-        const endpoint = mode === 'create' ? '/api/cases/create' : '/api/cases/update';
-        const payload = mode === 'create' ? {
-          project: projectSelect.value,
+        const endpoint = mode === 'create'
+          ? '/api/cases'
+          : `/api/cases/${encodeURIComponent(origId)}/revisions`;
+        const payload = {
+          project_id: projectSelect.value,
           case: {
             case_id: caseId,
             sheet,
@@ -2392,19 +2899,10 @@ async function renderTests() {
             steps_text,
             expected_text,
             note,
-          }
-        } : {
-          project: projectSelect.value,
-          orig_case_id: origId,
-          case: {
-            case_id: caseId,
-            sheet,
-            priority,
-            precondition_text,
-            steps_text,
-            expected_text,
-            note,
-          }
+            applicable_platforms,
+            workflow_state,
+          },
+          change_summary: mode === 'create' ? '网页新增' : '网页编辑创建新版本',
         };
 
         const resp = await fetch(endpoint, {
@@ -2420,12 +2918,12 @@ async function renderTests() {
           }
           if (caseEditSubmitBtn) {
             caseEditSubmitBtn.disabled = false;
-            caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存修改';
+            caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存新版本';
           }
           return;
         }
 
-        showToast(mode === 'create' ? `用例 ${caseId} 已添加` : `用例 ${caseId} 已更新`);
+        showToast(mode === 'create' ? `用例 ${caseId} 添加成功！` : `用例 ${caseId} 已创建新版本！`);
         caseEditDialog.close();
         invalidateCaseCatalog(projectSelect.value);
         const params = testListParams();
@@ -2438,7 +2936,7 @@ async function renderTests() {
       } finally {
         if (caseEditSubmitBtn) {
           caseEditSubmitBtn.disabled = false;
-          caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存修改';
+          caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存新版本';
         }
       }
     });
@@ -2713,11 +3211,16 @@ async function renderTest(sheet, caseId) {
   const routeToken = routeRequestToken;
   const project = testListParams().project;
   const projectMeta = testProject(project);
+  let detailPlatform = currentPlatformFor(project);
+  let detailTarget = '';
   const returnTo = testReturnUrl();
   const returnLabel = returnDestinationLabel(returnTo, '用例管理');
-  const testCase = await api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}`);
+  const [testCase, executionOptions] = await Promise.all([
+    api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}&platform_id=${encodeURIComponent(detailPlatform)}`),
+    api(`/api/projects/${encodeURIComponent(project)}/execution-options?case_ids=${encodeURIComponent(caseId)}`)
+  ]);
   if (routeToken !== routeRequestToken) return;
-  document.title = `${testCase.case_id} · 测试详情`;
+  document.title = `${testCase.case_id} · Agent 测试`;
   const latest = testCase.history?.[0];
   const initialVerdict = latest?.verdict || 'PENDING';
   const usesFixedMapping = Boolean(testCase.is_fixed_runnable || testCase.is_promoted);
@@ -2759,6 +3262,12 @@ async function renderTest(sheet, caseId) {
       <aside class="panel repair-panel">
         <header class="panel-head"><div><h2>启动测试</h2><p>${escapeHtml(testCase.project_label)} · ${escapeHtml(testCase.execution_target_label)}</p></div></header>
         <form id="test-run-form" class="panel-body">
+          <div class="detail-run-routing">
+            <span>本次运行平台</span>
+            <div class="platform-choice-group">${runPlatformSwitchButtons(project, detailPlatform, 'data-detail-platform')}</div>
+            <label>执行目标<select id="detail-run-target" aria-label="本次执行目标"></select></label>
+            <small id="detail-run-blocker">正在校验平台映射…</small>
+          </div>
           <ul class="run-notes">
             <li>${executionBlocked ? `已阻止执行：${escapeHtml(blockReasonCode)}` : usesFixedMapping ? '按已保存步骤运行' : '根据用例内容尝试执行'}</li>
             ${executionOnly579
@@ -2784,6 +3293,34 @@ async function renderTest(sheet, caseId) {
       <header class="panel-head"><div><h2>测试历史</h2><p>每次运行的结果和截图</p></div></header>
       <div id="test-history-body" class="panel-body">${testHistoryRows(testCase.history, project, sheet, caseId, returnTo)}</div>
     </section>`;
+
+  const detailOptions = executionOptions.options || [];
+  const applyDetailOption = platformId => {
+    detailPlatform = String(platformId || '');
+    const option = detailOptions.find(item => item.platform_id === detailPlatform);
+    const targetSelect = document.querySelector('#detail-run-target');
+    const blocker = document.querySelector('#detail-run-blocker');
+    const runButton = document.querySelector('#test-run-button');
+    document.querySelectorAll('[data-detail-platform]').forEach(button => {
+      const match = detailOptions.find(item => item.platform_id === button.dataset.detailPlatform);
+      button.disabled = !match;
+      button.classList.toggle('is-active', button.dataset.detailPlatform === detailPlatform);
+      button.title = !match
+        ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.detailPlatform]?.platform_label || button.dataset.detailPlatform}`
+        : match.runnable ? '' : (match.blockers || []).map(item => `${item.case_id}: ${item.reason}`).join('\n');
+    });
+    const targets = option?.targets || [];
+    if (!targets.some(target => target.target_id === detailTarget)) detailTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}" ${target.target_id === detailTarget ? 'selected' : ''}>${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    targetSelect.disabled = !option?.runnable;
+    blocker.textContent = option?.runnable
+      ? `将使用 ${option.platform_label} 逻辑运行`
+      : (option?.blockers || []).map(item => item.reason_label || item.reason).join('；') || '当前平台没有可用执行目标';
+    runButton.disabled = !option?.runnable || !detailTarget;
+  };
+  document.querySelectorAll('[data-detail-platform]').forEach(button => button.addEventListener('click', () => applyDetailOption(button.dataset.detailPlatform)));
+  document.querySelector('#detail-run-target')?.addEventListener('change', event => { detailTarget = event.target.value; });
+  applyDetailOption(detailPlatform);
 
   const promoteBtn = document.querySelector('#test-promote-button');
   if (promoteBtn) {
@@ -2854,7 +3391,9 @@ async function renderTest(sheet, caseId) {
         const job = await api('/api/tests/run', {
           method: 'POST',
           body: JSON.stringify({
-            project,
+            project_id: project,
+            platform_id: detailPlatform,
+            target_id: detailTarget,
             sheet,
             case_id: caseId,
             watchface_ready: project === '579_Z1640'
@@ -2864,12 +3403,8 @@ async function renderTest(sheet, caseId) {
         const chip = document.querySelector('#test-job-chip');
         chip.className = 'chip chip-running';
         chip.textContent = '正在启动';
-        document.querySelector('#test-job-message').textContent = `正在启动${projectMeta.targetLabel}测试…`;
-        const cancelButton = document.querySelector('#test-cancel-button');
-        if (cancelButton) {
-          cancelButton.hidden = false;
-          cancelButton.dataset.jobId = job.id;
-        }
+        document.querySelector('#test-job-message').textContent = `任务 ${job.id} 已创建，正在启动 ${PLATFORM_PROFILES[detailPlatform]?.platform_label || detailPlatform} / ${PLATFORM_TARGETS[detailTarget]?.target_label || detailTarget} 链路…`;
+        showToast(`测试任务 ${job.id} 已启动`);
         pollTestJob(job.id, project, sheet, caseId);
       } catch (error) {
         showToast(error.message, error.status === 409 ? 'warning' : 'error');
@@ -3789,10 +4324,15 @@ async function renderTestHistory(sheet, caseId, runId) {
       <div class="panel-body">
         <div class="kv-grid">
           <div class="kv"><span>测试项目</span><strong>${escapeHtml(record.project_label)}</strong></div>
+          <div class="kv"><span>请求平台</span><strong>${escapeHtml(PLATFORM_PROFILES[record.requested_platform_id || record.platform_id]?.platform_label || record.requested_platform_id || record.platform_id || '旧记录未标明')}</strong></div>
+          <div class="kv"><span>实际执行适配器</span><strong>${escapeHtml(record.resolved_execution_adapter || record.execution_adapter || '旧记录未标明')}</strong></div>
           <div class="kv"><span>执行目标</span><strong>${escapeHtml(record.execution_target_label)}</strong></div>
           <div class="kv"><span>测试模块</span><strong>${escapeHtml(record.sheet)}</strong></div>
           <div class="kv"><span>用例编号</span><strong>${escapeHtml(record.case_id)}</strong></div>
           <div class="kv"><span>执行方式</span><strong>${escapeHtml(testExecutionModeLabel(record.execution_mode))}</strong></div>
+          <div class="kv"><span>产品结果</span><strong>${escapeHtml(record.product_verdict || record.verdict || '未记录')}</strong></div>
+          <div class="kv"><span>自动化成熟度</span><strong>${escapeHtml(record.automation_maturity || record.mapping_status || '旧记录未标明')}</strong></div>
+          <div class="kv"><span>基础设施状态</span><strong>${escapeHtml(record.infrastructure_status || '旧记录未标明')}</strong></div>
           <div class="kv"><span>优先级</span><strong>${escapeHtml(record.priority || '未分级')}</strong></div>
           <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
           <div class="kv"><span>结束时间</span><strong>${formatTime(record.finished_at)}</strong></div>
@@ -3807,6 +4347,7 @@ async function renderTestHistory(sheet, caseId, runId) {
       <header class="panel-head"><div><h2>证据完整性</h2><p>检查操作、检查点和截图是否齐全</p></div></header>
       <div class="panel-body">${evidenceContractEvidence(record)}</div>
     </section>
+    ${(record.requested_platform_id || record.platform_id) === '579' ? `<details class="panel collapsible-panel"><summary class="panel-head"><div><h2>579 三链路证据</h2><p>APP Bridge 仅代表动作交付；O1/O2 才用于设备效果判断</p></div><span class="collapse-controls"><span class="chip chip-pending">交付 ${Array.isArray(record.delivery_feedback) ? record.delivery_feedback.length : 0} / 观察 ${Array.isArray(record.observations) ? record.observations.length : 0}</span><span class="collapse-action" aria-hidden="true"></span></span></summary><div class="panel-body"><h3>APP Bridge 反馈</h3><pre class="code-block raw-output"><code>${escapeHtml(JSON.stringify(record.delivery_feedback || [], null, 2))}</code></pre><h3>COM3/O1 与 O2 只读观察</h3><pre class="code-block raw-output"><code>${escapeHtml(JSON.stringify(record.observations || [], null, 2))}</code></pre></div></details>` : ''}
     <section class="panel">
       <header class="panel-head"><div><h2>用例内容</h2><p>本次运行使用的步骤和预期结果</p></div></header>
       <div class="panel-body case-text-grid">
@@ -4500,29 +5041,32 @@ function workspaceVerdictLabel(value) {
 
 function environmentHealth(item = null) {
   const raw = String(item?.status || item?.readiness_status || 'unchecked').toLowerCase();
-  if (['ready', 'pass', 'healthy'].includes(raw)) return {status: 'ready', label: '可用'};
-  if (['partial', 'warning', 'degraded'].includes(raw)) return {status: 'partial', label: '部分可用'};
-  if (['error', 'fail', 'failed', 'unhealthy'].includes(raw)) return {status: 'error', label: '不可用'};
+  if (['ready', 'pass', 'healthy'].includes(raw)) return {status: 'ready', label: '就绪'};
+  if (['partial', 'warning', 'degraded'].includes(raw)) return {status: 'partial', label: '部分就绪'};
+  if (['blocked'].includes(raw)) return {status: 'error', label: '受门禁阻止'};
+  if (['error', 'fail', 'failed', 'unhealthy'].includes(raw)) return {status: 'error', label: '检查失败'};
   return {status: 'unchecked', label: '尚未检查'};
 }
 
-function renderEnvironmentTargetCard(profile, environmentItem = null, selectedProject = currentProject()) {
+function renderEnvironmentTargetCard(profile, environmentItem = null, selectedProject = currentProject(), selectedTarget = '') {
   const project = String(profile.project || '');
-  const protocol = ENVIRONMENT_PROTOCOLS[project] || {
-    transport: profile.transport || 'unknown',
-    transportLabel: profile.transport || '未知',
-    captureProvider: profile.capture_provider || 'unknown',
-    captureLabel: profile.capture_provider || '未知'
+  const projectProtocol = ENVIRONMENT_PROTOCOLS[project] || {};
+  const protocol = {
+    transport: profile.transport || projectProtocol.transport || 'unknown',
+    transportLabel: profile.transport_label || projectProtocol.transportLabel || profile.transport || '未知',
+    captureProvider: profile.capture_provider || projectProtocol.captureProvider || 'unknown',
+    captureLabel: profile.capture_label || projectProtocol.captureLabel || profile.capture_provider || '未知'
   };
   const health = environmentHealth(environmentItem);
   const status = health.status;
   const statusLabel = health.label;
   const iconName = profile.execution_target === 'hardware' ? 'environments' : 'runs';
-  return `<article class='target-health-card is-${escapeHtml(status)} ${project === selectedProject ? 'is-selected' : ''}'>
+  const selected = selectedTarget ? profile.target_id === selectedTarget : project === selectedProject;
+  return `<article class='target-health-card is-${escapeHtml(status)} ${selected ? 'is-selected' : ''}'>
     <div class='target-health-icon'>${icon(iconName, 23)}</div>
     <div class='target-health-copy'><div><strong>${escapeHtml(profile.project_label || project)}</strong><span>${escapeHtml(profile.execution_target_label || '')}</span></div><p class='health-status'><i></i>${escapeHtml(statusLabel)}</p></div>
-    <dl><div><dt>连接方式</dt><dd>${escapeHtml(protocol.transportLabel)}</dd></div><div><dt>截图方式</dt><dd>${escapeHtml(protocol.captureLabel)}</dd></div><div><dt>最后检查</dt><dd>${environmentItem?.last_checked_at ? formatTime(environmentItem.last_checked_at) : '—'}</dd></div></dl>
-    <a class='button button-secondary target-card-action' href='${escapeHtml(pageUrl('/environments', project))}'>查看环境</a>
+    <dl><div><dt>命令通道</dt><dd>${escapeHtml(protocol.transportLabel)}</dd></div><div><dt>截图方式</dt><dd>${escapeHtml(protocol.captureLabel)}</dd></div><div><dt>最后检查</dt><dd>${environmentItem?.last_checked_at ? formatTime(environmentItem.last_checked_at) : '—'}</dd></div></dl>
+    <a class='button button-secondary target-card-action' href='${escapeHtml(pageUrl('/environments', project, {platform_id: profile.platform_id, target_id: profile.target_id}))}'>查看环境</a>
   </article>`;
 }
 
@@ -4641,12 +5185,20 @@ function OverviewPage(project = currentProject()) {
     },
     render(data) {
       const {catalog, active, defects, repair, reports, environments, refreshedAt} = data;
-      const jobs = active.data ? activeTestJobs(active.data) : [];
+      const platformId = currentPlatformFor(project);
+      const jobs = active.data ? activeTestJobs(active.data).filter(job => !job.project || job.project === project) : [];
       const activeBatch = jobs.find(job => job.type === 'batch') || null;
-      const verdicts = catalog.verdict_summary || verdictCounts([]);
+      const verdicts = catalog.verdict_counts || {};
       const recentExceptions = catalog.recent_exceptions || [];
-      const recentCases = catalog.recent_items || [];
-      const profiles = catalog.projects || Object.values(TEST_PROJECTS);
+      const recentCases = catalog.recent_cases || [];
+      const projectMeta = testProject(project);
+      const profiles = targetsFor(project, platformId).map(target => ({
+        ...projectMeta,
+        ...target,
+        project,
+        project_label: projectMeta.projectLabel,
+        platform_id: platformId,
+      }));
       const environmentItems = environments.data?.items || [];
       const total = Number(catalog.summary?.all || 0);
       const completed = activeBatch ? Number(activeBatch.completed || 0) : 0;
@@ -4661,13 +5213,16 @@ function OverviewPage(project = currentProject()) {
       const defectSummary = defects.data?.summary || {};
       const defectValue = key => defectAvailable ? Number(defectSummary[key] || 0) : '—';
       const repairJob = repair.data?.job || null;
-      return `${Components.pageHeader({title: '项目总览', intro: '查看测试状态、最近结果和环境情况', updatedAt: formatTime(refreshedAt), actions: `<button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
-        <section class='workspace-panel environment-overview-panel'><header><div><h2>环境状态</h2><p>查看各测试目标是否可用</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project))}'>查看环境</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.id === profile.project || item.project === profile.project), project)).join('')}</div></section>
-        <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '可直接运行', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最近通过', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最近失败', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最近执行异常', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
-        <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按最近结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
-        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '测试结果汇总' : reportPending ? '正在读取统计数据' : '最近测试结果'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable && !reportPending ? Components.unavailableState('暂无趋势数据', '当前仅显示最近测试结果。') : ''}</article></section>
-        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>ONES 缺陷</h2><p>${defects.pending ? '正在读取缺陷' : '缺陷状态和当前修复任务'}</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${defectValue('all')}</strong></div><div><span>已通过</span><strong>${defectValue('passed')}</strong></div><div><span>失败</span><strong>${defectValue('failed')}</strong></div><div><span>待处理</span><strong>${defectValue('pending')}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? '运行中' : '无'}</strong></div></div></section>
-        <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日概览</h2><p>${reportAvailable ? '今日统计' : reportPending ? '正在读取统计数据' : '暂无统计数据'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
+      const maturity = catalog.automation_maturity_counts || {};
+      const platformSummary = platformId === '579' ? `<section class='workspace-panel platform-summary-panel'><header><div><h2>579 自动化成熟度与链路</h2><p>APP 交付与设备效果证据分开显示</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project, {platform_id: '579', target_id: '579.o2'}))}'>检查 579 环境</a></header><div class='digest-items'><div><span>${automationMaturityLabel('AUTO_READY')}</span><strong>${Number(maturity.AUTO_READY || 0)}</strong></div><div><span>${automationMaturityLabel('NEED_REVIEW')}</span><strong>${Number(maturity.NEED_REVIEW || 0)}</strong></div><div><span>${automationMaturityLabel('MANUAL_REQUIRED')}</span><strong>${Number(maturity.MANUAL_REQUIRED || 0)}</strong></div><div><span>${automationMaturityLabel('UNSUPPORTED')}</span><strong>${Number(maturity.UNSUPPORTED || 0)}</strong></div><div><span>控制链</span><strong>APP Bridge</strong></div><div><span>观察链</span><strong>COM3/O1 + O2</strong></div></div></section>` : '';
+      return `${Components.pageHeader({title: '项目总览', intro: '实时掌握测试执行状态、用例质量与环境健康度', updatedAt: formatTime(refreshedAt), actions: `<div class='platform-choice-group'>${platformSwitchButtons(project, platformId, 'data-overview-platform')}</div><button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
+        ${platformSummary}
+        <section class='workspace-panel environment-overview-panel'><header><div><h2>环境就绪状态</h2><p>协议来自项目配置；就绪状态只采用真实环境检查结果</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project, {platform_id: platformId}))}'>环境中心 ›</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.target_id === profile.target_id || item.id === profile.target_id || item.project === profile.project), project, currentTargetFor(project, platformId))).join('')}</div></section>
+        <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '已固化', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最新结果 PASS', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最新结果 FAIL', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最新结果 ERROR', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
+        <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
+        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '汇总结果' : '当前用例最新结果'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable ? Components.unavailableState('趋势数据暂不可用', '当前可继续查看最近一次测试结果。') : ''}</article></section>
+        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>ONES 缺陷概览</h2><p>缺陷队列与当前自动修复任务</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看 ONES 缺陷</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${Number(defectSummary.all || 0)}</strong></div><div><span>已通过</span><strong>${Number(defectSummary.passed || 0)}</strong></div><div><span>失败</span><strong>${Number(defectSummary.failed || 0)}</strong></div><div><span>待处理</span><strong>${Number(defectSummary.pending || 0)}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
+        <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '测试数据汇总' : '部分统计暂不可用'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -4679,6 +5234,11 @@ function OverviewPage(project = currentProject()) {
         invalidateCaseCatalog(project);
         route();
       });
+      root.querySelectorAll('[data-overview-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/overview', project, {platform_id: button.dataset.overviewPlatform}));
+        invalidateCaseCatalog(project);
+        route();
+      }));
       void loadDeferredSections(root);
       scheduleRefresh(root);
     },
@@ -4705,11 +5265,32 @@ function renderWorkflowStepper(job = {}) {
 
 function renderExecutionEvidence(job = {}) {
   const screenshots = Array.isArray(job.live_screenshots) ? job.live_screenshots : [];
-  if (!screenshots.length) return Components.emptyState('尚无实时截图', '截图检查点生成后会自动显示。');
-  return `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => {
-    const label = item.label || `检查点 ${index + 1}`;
+  const is579 = String(job.requested_platform_id || job.platform_id || '') === '579';
+  const screenshotCards = `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => {
+    const label = item.label || `${is579 ? 'O2 ' : ''}检查点 ${index + 1}`;
     return `<figure><a ${imagePreviewLinkAttributes(item.url || '#', label)}><img src='${escapeHtml(item.url || '')}' alt='${escapeHtml(label)}'></a><figcaption>${escapeHtml(label)}</figcaption></figure>`;
   }).join('')}</div>`;
+  if (!is579) {
+    if (!screenshots.length) return Components.emptyState('尚无实时截图', '截图检查点生成后会自动显示。');
+    return screenshotCards;
+  }
+  const deliveries = Array.isArray(job.delivery_feedback) ? job.delivery_feedback : [];
+  const observations = Array.isArray(job.observations) ? job.observations : [];
+  const o1 = observations.filter(item => item.kind === 'o1_log_observation');
+  const o2 = observations.filter(item => item.kind === 'o2_screenshot');
+  const status = items => items.length ? `${items.length} 条` : '等待证据';
+  return `<div class='execution-link-evidence'>
+    <div><span>APP Bridge / BLE 交付</span><strong>${escapeHtml(status(deliveries))}</strong><small>仅代表动作交付，不等于产品 PASS</small></div>
+    <div><span>COM3 / O1 只读日志</span><strong>${escapeHtml(status(o1))}</strong><small>串口仅观察，禁止写入</small></div>
+    <div><span>O2 手表截图</span><strong>${escapeHtml(status(o2.length ? o2 : screenshots))}</strong><small>截图新鲜度与设备效果用于最终判定</small></div>
+  </div>${screenshots.length ? screenshotCards : ''}`;
+}
+
+function executionRouteMeta(job = {}) {
+  const requested = String(job.requested_platform_id || job.platform_id || 'w30');
+  const adapter = String(job.resolved_execution_adapter || job.execution_adapter || '旧任务未标明');
+  const target = PLATFORM_TARGETS[job.target_id]?.target_label || job.execution_target_label || job.target_id || '旧任务未标明';
+  return `<div class='execution-route-meta'><span>请求平台 <strong>${escapeHtml(PLATFORM_PROFILES[requested]?.platform_label || requested)}</strong></span><span>实际适配器 <strong>${escapeHtml(adapter)}</strong></span><span>执行目标 <strong>${escapeHtml(target)}</strong></span>${job.product_verdict ? `<span>产品结果 <strong>${escapeHtml(job.product_verdict)}</strong></span>` : ''}${job.automation_maturity ? `<span>成熟度 <strong>${escapeHtml(job.automation_maturity)}</strong></span>` : ''}${job.infrastructure_status ? `<span>基础设施 <strong>${escapeHtml(job.infrastructure_status)}</strong></span>` : ''}</div>`;
 }
 
 function renderActiveExecution(job, project) {
@@ -4720,7 +5301,7 @@ function renderActiveExecution(job, project) {
   const counts = job.verdict_counts || {};
   const currentCase = job.current_case || {case_id: job.case_id, sheet: job.sheet};
   const isActive = ['queued', 'running', 'finalizing'].includes(String(job.status));
-  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='${escapeHtml(testBatchHref(job.id))}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header><div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>通过 ${Number(counts.PASS || 0)}</span><span class='is-fail'>失败 ${Number(counts.FAIL || 0)}</span><span class='is-error'>执行异常 ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>最新截图</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
+  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='${escapeHtml(testBatchHref(job.id))}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header>${executionRouteMeta(job)}<div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>通过 ${Number(counts.PASS || 0)}</span><span class='is-fail'>失败 ${Number(counts.FAIL || 0)}</span><span class='is-error'>执行异常 ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>最新证据</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
 }
 
 function ExecutionPage(project = currentProject()) {
@@ -4802,25 +5383,27 @@ function ExecutionPage(project = currentProject()) {
   const controller = {
     async load() {
       const view = ['queue', 'running', 'completed', 'interrupted'].includes(new URLSearchParams(location.search).get('view')) ? new URLSearchParams(location.search).get('view') : 'running';
+      const platformId = currentPlatformFor(project);
       const [recent, active, jobs] = await Promise.all([
-        optionalApi(`/api/tests/recent?project=${encodeURIComponent(project)}&limit=8`),
+        optionalApi(`/api/tests/recent?project=${encodeURIComponent(project)}&platform_id=${encodeURIComponent(platformId)}&limit=8`),
         optionalApi('/api/tests/active'),
         optionalApi(`/api/tests/jobs?project=${encodeURIComponent(project)}&status=${encodeURIComponent(view)}&page=1&page_size=20`)
       ]);
       return {recent, active, jobs, view};
     },
     render(data) {
+      const platformId = currentPlatformFor(project);
       const activeJobs = data.active.data ? activeTestJobs(data.active.data).filter(job => !job.project || job.project === project) : [];
       const activeJob = activeJobs.find(job => job.type === 'batch') || activeJobs[0] || null;
       const jobItems = data.jobs.data?.items || [];
       const recentItems = data.recent.data?.items || [];
-      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
+      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${escapeHtml(PLATFORM_PROFILES[item.last_platform_id]?.platform_label || item.last_platform_id || '旧记录')}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
       const listArea = data.view === 'running'
         ? renderActiveExecution(activeJob, project)
         : data.jobs.data
-          ? `<article class='workspace-panel'><header><div><h2>${escapeHtml({queue: '任务队列', completed: '已完成任务', interrupted: '已中断任务'}[data.view] || '任务')}</h2><p>按最近更新时间排列</p></div></header>${jobItems.length ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>任务</th><th>项目</th><th>状态</th><th>进度</th><th>时间</th></tr></thead><tbody>${jobItems.map(job => `<tr><td>${escapeHtml(job.id)}</td><td>${escapeHtml(job.project_label || job.project || '')}</td><td>${Components.statusChip(job.verdict || job.status, workspaceVerdictLabel(job.verdict || job.status))}</td><td>${Number(job.completed || 0)} / ${Number(job.total || 1)}</td><td>${formatTime(job.finished_at || job.started_at)}</td></tr>`).join('')}</tbody></table></div>` : Components.emptyState('当前分类没有任务')}</article>`
+          ? `<article class='workspace-panel'><header><div><h2>${escapeHtml({queue: '任务队列', completed: '已完成任务', interrupted: '已中断任务'}[data.view] || '任务')}</h2><p>来自任务列表接口</p></div></header>${jobItems.length ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>任务</th><th>项目</th><th>请求平台</th><th>实际适配器</th><th>状态</th><th>进度</th><th>时间</th></tr></thead><tbody>${jobItems.map(job => `<tr><td>${escapeHtml(job.id)}</td><td>${escapeHtml(job.project_label || job.project || '')}</td><td>${escapeHtml(PLATFORM_PROFILES[job.requested_platform_id]?.platform_label || job.requested_platform_id || '旧任务')}</td><td>${escapeHtml(job.resolved_execution_adapter || '旧任务未标明')}</td><td>${Components.statusChip(job.verdict || job.status, workspaceVerdictLabel(job.verdict || job.status))}</td><td>${Number(job.completed || 0)} / ${Number(job.total || 1)}</td><td>${formatTime(job.finished_at || job.started_at)}</td></tr>`).join('')}</tbody></table></div>` : Components.emptyState('当前分类没有任务')}</article>`
           : `<article class='workspace-panel'>${Components.unavailableState('任务列表暂不可用', '当前仍可查看正在运行的任务。')}</article>`;
-      return `${Components.pageHeader({title: '自动化执行', intro: '查看测试任务和最近结果', actions: `<a class='button' href='${escapeHtml(pageUrl('/cases', project))}'>${icon('runs', 17)} 新建测试</a>`})}${Components.subTabs([{value: 'queue', label: '任务队列'}, {value: 'running', label: '运行中'}, {value: 'completed', label: '已完成'}, {value: 'interrupted', label: '已中断'}], data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
+      return `${Components.pageHeader({title: '自动化执行', intro: '创建、监控和恢复单条或批量测试任务', actions: `<div class='platform-choice-group' aria-label='执行页平台视图'>${platformSwitchButtons(project, platformId, 'data-runs-platform')}</div><a class='button' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('runs', 17)} 新建执行任务</a><a class='button button-secondary' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('plus', 17)} 按状态创建批次</a>`})}${Components.subTabs([{value: 'queue', label: '任务队列'}, {value: 'running', label: '运行中'}, {value: 'completed', label: '已完成'}, {value: 'interrupted', label: '已中断'}], data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {platform_id: platformId}))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>平台</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -4828,6 +5411,11 @@ function ExecutionPage(project = currentProject()) {
       mountedRoot = root;
       clickHandler = event => { void handleClick(event, root); };
       root.addEventListener('click', clickHandler);
+      root.querySelectorAll('[data-runs-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/runs', project, {view: data.view, platform_id: button.dataset.runsPlatform}));
+        invalidateCaseCatalog(project);
+        route();
+      }));
       scheduleRefresh(root);
     },
     destroy() {
@@ -4870,7 +5458,11 @@ function reportParams() {
   const defaults = reportDatePresetRange(period || '7d');
   const from = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : defaults.from;
   const to = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : defaults.to;
-  return {view, module, from, to, period};
+  const platform = currentPlatformFor(currentProject());
+  const result = ['PASS', 'FAIL', 'ERROR', 'CANNOT_VERIFY'].includes(params.get('result')) ? params.get('result') : '';
+  const maturity = ['AUTO_READY', 'PROMOTED', 'NEED_REVIEW', 'MANUAL_REQUIRED', 'UNSUPPORTED', 'UNMAPPED'].includes(params.get('maturity')) ? params.get('maturity') : '';
+  const infrastructure = ['READY', 'ENV_BLOCKED', 'OBSERVATION_INCOMPLETE', 'CLEANUP_REQUIRED', 'RUNNER_ERROR', 'CAPABILITY_MISSING', 'UNKNOWN'].includes(params.get('infrastructure')) ? params.get('infrastructure') : '';
+  return {view, module, from, to, period, platform, result, maturity, infrastructure};
 }
 
 function activeReportDatePreset(filters = {}) {
@@ -4886,11 +5478,11 @@ function reportQuery(project, filters = {}) {
   const query = new URLSearchParams({project, from: filters.from, to: filters.to});
   if (filters.period === '24h') query.set('period', '24h');
   if (filters.module) query.set('module', filters.module);
+  if (filters.platform) query.set('platform_id', filters.platform);
+  if (filters.result) query.set('result', filters.result);
+  if (filters.maturity) query.set('maturity', filters.maturity);
+  if (filters.infrastructure) query.set('infrastructure', filters.infrastructure);
   return query;
-}
-
-function reportRangeLabel(filters = {}) {
-  return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;
 }
 
 function buildSnapshotReport(items = [], filters = {}) {
@@ -4900,6 +5492,10 @@ function buildSnapshotReport(items = [], filters = {}) {
   const executed = items.filter(item => {
     if (!item.last_run_at) return false;
     if (filters.module && String(item.file_sheet || item.sheet) !== filters.module) return false;
+    if (filters.platform && String(item.last_platform_id || item.platform_id) !== filters.platform) return false;
+    if (filters.result && String(item.last_product_verdict || item.latest_verdict).toUpperCase() !== filters.result) return false;
+    if (filters.maturity && String(item.last_automation_maturity || item.automation_maturity || item.mapping_status).toUpperCase() !== filters.maturity) return false;
+    if (filters.infrastructure && String(item.last_infrastructure_status || 'UNKNOWN').toUpperCase() !== filters.infrastructure) return false;
     const time = new Date(item.last_run_at).getTime();
     return Number.isFinite(time) && time >= fromTime && time <= toTime;
   });
@@ -5046,7 +5642,7 @@ function ReportsPage(project = currentProject()) {
       const metrics = report.metrics || {};
       const distribution = report.distribution || metrics;
       const insight = report.insight ? reportInsightPresentation(report.insight) : null;
-      const reportReturnTo = currentRouteUrl();
+      const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module, platform_id: filters.platform, result: filters.result, maturity: filters.maturity, infrastructure: filters.infrastructure});
       let content;
       if (filters.view === 'overview') {
         content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>执行数量和通过率</p></div><span class='chip chip-pending'>${escapeHtml(reportRangeLabel(filters))}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>产品结果与执行异常分开统计</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>失败较多的模块</h2><p>仅统计产品功能失败</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>执行异常较多的模块</h2><p>测试未能正常完成</p></div></header>${renderExecutionErrorModules(report.top_execution_error_modules || [])}</article></section><article class='workspace-panel'><header><div><h2>最近失败与执行异常</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article>${insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(insight.title)}</strong><p>${escapeHtml(insight.description)}</p></div></aside>` : Components.unavailableState('暂无分析结论')}`;
@@ -5057,7 +5653,24 @@ function ReportsPage(project = currentProject()) {
       }
       const activePreset = activeReportDatePreset(filters);
       const presetButtons = REPORT_DATE_PRESETS.map(item => `<button class='report-period-option ${activePreset === item.value ? 'is-active' : ''}' type='button' data-report-period='${escapeHtml(item.value)}' aria-pressed='${activePreset === item.value}'>${escapeHtml(item.label)}</button>`).join('');
-      return `${Components.pageHeader({title: '测试报告', intro: '查看测试结果、趋势和证据', actions: `<button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前暂无可导出的完整报告"'}>${icon('reports', 17)} 导出报告</button>`})}<section class='report-filter-bar'><label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label><label>目标<strong>${escapeHtml(testProject(project).targetLabel)}</strong></label><label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label><label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label><div class='report-period-field'><span>快捷筛选</span><div class='report-period-options' role='group' aria-label='快捷时间段'>${presetButtons}</div></div><label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label></section>${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>部分统计暂不可用，当前仅显示最近结果。</span></aside>` : ''}<section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '通过', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '失败', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '执行异常', value: Number(metrics.execution_error || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
+      const resultOptions = ['PASS', 'FAIL', 'ERROR', 'CANNOT_VERIFY'].map(value => `<option value='${value}' ${filters.result === value ? 'selected' : ''}>${escapeHtml(workspaceVerdictLabel(value))}</option>`).join('');
+      const maturityOptions = ['AUTO_READY', 'PROMOTED', 'NEED_REVIEW', 'MANUAL_REQUIRED', 'UNSUPPORTED', 'UNMAPPED'].map(value => `<option value='${value}' ${filters.maturity === value ? 'selected' : ''}>${escapeHtml(automationMaturityLabel(value))}</option>`).join('');
+      const infrastructureOptions = ['READY', 'ENV_BLOCKED', 'OBSERVATION_INCOMPLETE', 'CLEANUP_REQUIRED', 'RUNNER_ERROR', 'CAPABILITY_MISSING', 'UNKNOWN'].map(value => `<option value='${value}' ${filters.infrastructure === value ? 'selected' : ''}>${escapeHtml(value)}</option>`).join('');
+      return `${Components.pageHeader({title: '测试报告', intro: '查看测试结果、趋势和证据', actions: `<div class='platform-choice-group' aria-label='报告平台筛选'>${platformSwitchButtons(project, filters.platform, 'data-report-platform')}</div><button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前暂无可导出的完整报告"'}>${icon('reports', 17)} 导出报告</button>`})}
+        <section class='report-filter-bar'>
+          <label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label>
+          <label>平台<strong>${escapeHtml(PLATFORM_PROFILES[filters.platform]?.platform_label || filters.platform)}</strong></label>
+          <label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label>
+          <label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label>
+          <div class='report-period-field'><span>快捷筛选</span><div class='report-period-options' role='group' aria-label='快捷时间段'>${presetButtons}</div></div>
+          <label>产品结果<select id='report-result'><option value=''>全部结果</option>${resultOptions}</select></label>
+          <label>自动化成熟度<select id='report-maturity'><option value=''>全部成熟度</option>${maturityOptions}</select></label>
+          <label>基础设施<select id='report-infrastructure'><option value=''>全部状态</option>${infrastructureOptions}</select></label>
+          <label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label>
+        </section>
+        ${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}
+        ${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>部分统计暂不可用，当前仅显示最近结果。</span></aside>` : ''}
+        <section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '通过', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '失败', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '执行异常', value: Number(metrics.execution_error || metrics.error || distribution.ERROR || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -5065,20 +5678,31 @@ function ReportsPage(project = currentProject()) {
         const from = root.querySelector('#report-from')?.value || data.filters.from;
         const to = root.querySelector('#report-to')?.value || data.filters.to;
         const module = root.querySelector('#report-module')?.value || '';
-        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module, ...(preservePeriod && data.filters.period ? {period: data.filters.period} : {})}));
+        const result = root.querySelector('#report-result')?.value || '';
+        const maturity = root.querySelector('#report-maturity')?.value || '';
+        const infrastructure = root.querySelector('#report-infrastructure')?.value || '';
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module, platform_id: data.filters.platform, result, maturity, infrastructure, ...(preservePeriod && data.filters.period ? {period: data.filters.period} : {})}));
         route();
       };
       root.querySelector('#report-from')?.addEventListener('change', () => applyFilters());
       root.querySelector('#report-to')?.addEventListener('change', () => applyFilters());
       root.querySelector('#report-module')?.addEventListener('change', () => applyFilters({preservePeriod: true}));
+      root.querySelector('#report-result')?.addEventListener('change', applyFilters);
+      root.querySelector('#report-maturity')?.addEventListener('change', applyFilters);
+      root.querySelector('#report-infrastructure')?.addEventListener('change', applyFilters);
       root.querySelectorAll('[data-report-period]').forEach(button => button.addEventListener('click', () => {
         const period = button.dataset.reportPeriod || '7d';
         const range = reportDatePresetRange(period);
-        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from: range.from, to: range.to, module: data.filters.module, ...(period === '24h' ? {period} : {})}));
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from: range.from, to: range.to, module: data.filters.module, platform_id: data.filters.platform, result: data.filters.result, maturity: data.filters.maturity, infrastructure: data.filters.infrastructure, ...(period === '24h' ? {period} : {})}));
+        route();
+      }));
+      root.querySelectorAll('[data-report-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/reports', project, {...data.filters, platform_id: button.dataset.reportPlatform, platform: undefined}));
+        invalidateCaseCatalog(project);
         route();
       }));
       root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module, ...(data.filters.period ? {period: data.filters.period} : {})}));
+        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module, platform_id: data.filters.platform, result: data.filters.result, maturity: data.filters.maturity, infrastructure: data.filters.infrastructure, ...(data.filters.period ? {period: data.filters.period} : {})}));
         route();
       }));
       root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
@@ -5180,6 +5804,27 @@ function environmentLogRows(items = [], health = {label: '尚未检查'}) {
       : `环境检查完成：${health.label}`;
     return `<li><time>${formatTime(item.at || item.timestamp)}</time><div><span>${escapeHtml(summary)}</span>${detail ? `<details class='inline-diagnostics'><summary>诊断信息</summary><pre><code>${escapeHtml(detail)}</code></pre></details>` : ''}</div></li>`;
   }).join('')}</ol>`;
+}
+
+function mount579EnvironmentConfig(root, cfg = {}) {
+  const form = root.querySelector('#environment-config-form');
+  if (!form) return;
+  form.innerHTML = `
+    <div class='environment-safety-notice'><strong>579 无界面链路</strong><p>动作仅经 ADB → APP Bridge → BLE 下发；COM3 只用于 O1/O2 观察，网页不提供串口写入或原始命令入口。</p></div>
+    <label><span>控制链</span><input type='text' value='ADB → APP Bridge → BLE' readonly></label>
+    <label><span>串口观察</span><input type='text' value='${escapeHtml(cfg.serial_mode === 'read_only' ? `${cfg.com_port || 'COM3'}（严格只读）` : 'COM3（严格只读）')}' readonly></label>
+    <label><span>截图方式</span><input type='text' value='O2 手表截图' readonly></label>
+    <label><span>设备反馈</span><input type='text' value='APP Bridge 回执 + O1/O2 设备效果证据' readonly></label>
+    <label><span>579 配置启用</span><select name='enabled'><option value='false' ${cfg.enabled ? '' : 'selected'}>关闭</option><option value='true' ${cfg.enabled ? 'selected' : ''}>启用配置</option></select></label>
+    <label><span>ADB 路径</span><input name='adb_path' type='text' value='${escapeHtml(cfg.adb_path || '')}' placeholder='例如 adb 或 adb.exe 绝对路径'></label>
+    <label><span>APP 包名</span><input name='app_package' type='text' value='${escapeHtml(cfg.app_package || '')}' placeholder='APP Bridge 包名'></label>
+    <label><span>Bridge 组件</span><input name='bridge_component' type='text' value='${escapeHtml(cfg.bridge_component || '')}' placeholder='可选，完整组件名'></label>
+    <label><span>Bridge Action</span><input name='bridge_action' type='text' value='${escapeHtml(cfg.bridge_action || '')}' placeholder='广播 Action'></label>
+    <label><span>COM 端口</span><input name='com_port' type='text' value='${escapeHtml(cfg.com_port || 'COM3')}'></label>
+    <label><span>只读波特率</span><input name='com_baudrate' type='number' min='1' value='${escapeHtml(cfg.com_baudrate || 1500000)}'></label>
+    <label><span>证据目录</span><input name='artifact_root' type='text' value='${escapeHtml(cfg.artifact_root || '')}' placeholder='留空使用任务证据目录'></label>
+    <label><span>实机动作门禁</span><input type='text' value='${cfg.device_actions_enabled ? '已由受控授权开启' : '默认关闭，等待受控 Canary 授权'}' readonly></label>
+    <div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit'>保存 579 配置</button></div>`;
 }
 
 function BluetoothPage() {
@@ -5437,10 +6082,13 @@ function EnvironmentPage(project = currentProject()) {
       return {projects, config, environments, update, section: environmentSection()};
     },
     render(data) {
-      const profiles = data.projects.items || [];
-      const profile = profiles.find(item => item.project === project) || testProject(project);
+      const platformId = currentPlatformFor(project);
+      const targetId = currentTargetFor(project, platformId);
+      const projectMeta = testProject(project);
+      const profiles = (projectMeta.allowed_targets || []).map(id => targetProfile(project, PLATFORM_TARGETS[id]?.platform_id, id));
+      const profile = targetProfile(project, platformId, targetId);
       const environmentItems = data.environments.data?.items || [];
-      const environmentItem = environmentItems.find(item => item.id === project || item.project === project) || null;
+      const environmentItem = environmentItems.find(item => item.id === project || item.project === project || item.target_id === profile.target_id) || null;
       const targetHealth = environmentHealth(environmentItem);
       const cfg = data.config.data || {};
       const protocol = ENVIRONMENT_PROTOCOLS[project];
@@ -5465,23 +6113,64 @@ function EnvironmentPage(project = currentProject()) {
         content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>系统更新</h2><p>检查并安装新版本</p></div>${update.update_available ? `<button class='button' type='button' data-open-update>查看新版本</button>` : ''}</header><dl class='settings-summary-grid'><div><dt>当前版本</dt><dd>${escapeHtml(update.current_version || document.querySelector('#brand-system-version')?.textContent || '—')}</dd></div><div><dt>最新版本</dt><dd>${escapeHtml(update.latest_version || '—')}</dd></div><div><dt>更新状态</dt><dd>${data.update.data ? (update.update_available ? '发现新版本' : '当前已是最新') : '暂时无法检查更新'}</dd></div></dl></article>`;
       } else {
         const canManage = Boolean(data.environments.data);
-        const advancedSettings = project === '579_Z1640'
+        const is579Ble = profile.preflight_adapter === 'watch_579_ble';
+        const advancedSettings = is579Ble
           ? `<div class='environment-advanced-note'><p>579 不使用 W30 真机运行档案；设备地址和连接由蓝牙工作台统一管理。</p><a class='button button-secondary' href='${escapeHtml(pageUrl('/bluetooth'))}'>前往蓝牙工作台</a></div>`
           : `${project === '6202_W5230' ? `<label><span>SuperCom 管道</span><input type='text' value='${escapeHtml(profile.pipe_name || `\\\\.\\pipe\\SuperCom.AgentBridge.${cfg.hardware?.port || 'COM端口'}`)}' readonly></label>` : ''}${isHardware ? `<label><span>运行档案目录</span><input name='profile_root' type='text' value='${escapeHtml(runtimeProfileRoot)}' placeholder='例如 D:\\Agent-loop\\profiles' ${canManage ? '' : 'readonly'}></label><label><span>档案版本</span><input name='profile_version' type='text' value='${escapeHtml(runtimeProfileVersion)}' placeholder='留空自动选择' ${canManage ? '' : 'readonly'}></label>` : `<label><span>源码目录</span><input name='source_root' type='text' value='${escapeHtml(sourceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>工作区目录</span><input name='workspace_root' type='text' value='${escapeHtml(workspaceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>`}${profile.execution_target === 'simulator' ? `<label><span>构建目录</span><input name='build_directory' type='text' value='${escapeHtml(buildDirectory)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>模拟器程序</span><input name='artifact_path' type='text' value='${escapeHtml(artifactPath)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>` : ''}`;
-        const formActions = project === '579_Z1640'
+        const formActions = is579Ble
           ? ''
           : `<div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit' ${canManage ? '' : 'disabled title="暂不支持修改环境配置"'}>保存配置</button></div>`;
-        content = `<section class='target-health-grid environment-page-targets'>${profiles.map(item => renderEnvironmentTargetCard(item, environmentItems.find(env => env.id === item.project || env.project === item.project), project)).join('')}</section><section class='environment-main-grid'><article class='workspace-panel environment-config-panel'><header><div><h2>当前测试目标</h2><p>${escapeHtml(profile.project_label || project)} · ${escapeHtml(profile.execution_target_label || '')}</p></div>${Components.statusChip(targetHealth.status === 'ready' ? 'PASS' : targetHealth.status === 'error' ? 'ERROR' : 'PENDING', targetHealth.label)}</header><form id='environment-config-form'><label><span>连接方式</span><input type='text' value='${escapeHtml(protocol?.transportLabel || profile.transport || '未知')}' readonly></label><label><span>截图方式</span><input type='text' value='${escapeHtml(protocol?.captureLabel || profile.capture_provider || '未知')}' readonly></label><details class='environment-advanced'><summary>高级设置</summary><div class='environment-advanced-fields'>${advancedSettings}</div></details>${formActions}</form>${!canManage ? Components.unavailableState('暂不支持修改环境配置', '当前以只读方式显示已有配置。') : ''}</article><article class='workspace-panel environment-check-panel'><header><div><h2>环境检查</h2><p>检查操作、截图和必要服务是否可用</p></div><span class='readiness-score'>可用项 <strong>${checks.length ? `${readyChecks} / ${totalChecks}` : '—'}</strong></span></header>${environmentCheckRows(checks, isHardware)}<div class='environment-form-actions'><button class='button' type='button' data-environment-check ${canManage ? '' : 'disabled title="暂不支持环境检查"'}>${icon('refresh', 16)} 立即检查</button></div></article></section><article class='workspace-panel environment-log-panel'><header><div><h2>检查记录</h2><p>最近的环境检查结果</p></div></header>${environmentItem?.logs?.length ? environmentLogRows(environmentItem.logs, targetHealth) : Components.emptyState('尚无检查记录', '执行环境检查后，详细过程会显示在这里。')}</article>`;
+        content = `
+          <section class='target-health-grid environment-page-targets'>${profiles.map(item => renderEnvironmentTargetCard(item, environmentItems.find(env => env.id === item.project || env.project === item.project || env.target_id === item.target_id), project)).join('')}</section>
+          <section class='environment-main-grid'>
+            <article class='workspace-panel environment-config-panel'>
+              <header><div><h2>当前测试目标</h2><p>${escapeHtml(profile.project_label || project)} · ${escapeHtml(profile.execution_target_label || '')}</p></div>${Components.statusChip(targetHealth.status === 'ready' ? 'PASS' : targetHealth.status === 'error' ? 'ERROR' : 'PENDING', targetHealth.label)}</header>
+              <form id='environment-config-form'>
+                <label><span>连接方式</span><input type='text' value='${escapeHtml(protocol?.transportLabel || profile.transport_label || profile.transport || '未知')}' readonly></label>
+                <label><span>截图方式</span><input type='text' value='${escapeHtml(protocol?.captureLabel || profile.capture_label || profile.capture_provider || '未知')}' readonly></label>
+                <details class='environment-advanced'><summary>高级设置</summary><div class='environment-advanced-fields'>${advancedSettings}</div></details>
+                ${formActions}
+              </form>
+              ${!canManage ? Components.unavailableState('暂不支持修改环境配置', '当前以只读方式显示已有配置。') : ''}
+            </article>
+            <article class='workspace-panel environment-check-panel'>
+              <header><div><h2>环境检查</h2><p>检查操作、截图和必要服务是否可用</p></div><span class='readiness-score'>可用项 <strong>${checks.length ? `${readyChecks} / ${totalChecks}` : '—'}</strong></span></header>
+              ${environmentCheckRows(checks, isHardware)}
+              <div class='environment-form-actions'><button class='button' type='button' data-environment-check ${canManage ? '' : 'disabled title="暂不支持环境检查"'}>${icon('refresh', 16)} 立即检查</button></div>
+            </article>
+          </section>
+          <article class='workspace-panel environment-log-panel'><header><div><h2>检查记录</h2><p>最近的环境检查结果</p></div></header>${environmentItem?.logs?.length ? environmentLogRows(environmentItem.logs, targetHealth) : Components.emptyState('尚无检查记录', '执行环境检查后，详细过程会显示在这里。')}</article>`;
+        content = `<div class='environment-platform-switch'><span>平台视图</span><div class='platform-choice-group'>${platformSwitchButtons(project, platformId, 'data-environment-platform')}</div></div>` + content;
       }
-      return `${Components.pageHeader({title: '环境中心', intro: '查看和设置测试目标、模型服务与外部平台'})}${Components.subTabs([{value: 'targets', label: '测试目标'}, {value: 'llm', label: '模型服务'}, {value: 'ones', label: 'ONES'}, {value: 'updates', label: '系统更新'}], data.section)}${content}`;
+      const environmentTabHref = section => pageUrl('/environments', project, {platform_id: platformId, target_id: targetId, section});
+      return `${Components.pageHeader({title: '环境中心', intro: '统一管理模拟器、真机、模型服务和外部平台连接'})}${Components.subTabs([{value: 'targets', label: '测试目标', href: environmentTabHref('targets')}, {value: 'llm', label: '大模型', href: environmentTabHref('llm')}, {value: 'ones', label: 'ONES', href: environmentTabHref('ones')}, {value: 'updates', label: '系统更新', href: environmentTabHref('updates')}], data.section)}${content}`;
     },
     mount(root, data) {
       rememberProject(project);
-      const currentEnvironment = data.environments.data?.items?.find(item => item.id === project || item.project === project);
+      const platformId = currentPlatformFor(project);
+      const profile = targetProfile(project, platformId, currentTargetFor(project, platformId));
+      const is579O2 = profile.target_id === '579.o2';
+      const currentEnvironment = data.environments.data?.items?.find(item => item.id === project || item.project === project || item.target_id === profile.target_id);
       const health = environmentHealth(currentEnvironment);
       setGlobalTargetHealth(health.status, health.label);
+      if (is579O2) {
+        mount579EnvironmentConfig(root, data.config.data?.platform_579 || {});
+      } else {
+        root.querySelectorAll('#environment-config-form label').forEach(label => {
+          const field = label.querySelector('span')?.textContent;
+          const input = label.querySelector('input');
+          if (field === '连接方式' && input) input.value = profile.transport_label || profile.transport || '未知';
+          if (field === '截图方式' && input) input.value = profile.capture_label || profile.capture_provider || '未知';
+        });
+      }
+      root.querySelectorAll('[data-environment-platform]').forEach(button => button.addEventListener('click', () => {
+        const nextPlatform = button.dataset.environmentPlatform;
+        const nextTarget = targetsFor(project, nextPlatform)[0]?.target_id || '';
+        history.pushState({}, '', pageUrl('/environments', project, {platform_id: nextPlatform, target_id: nextTarget}));
+        route();
+      }));
       root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/environments', project, {section: button.dataset.subtab}));
+        history.pushState({}, '', pageUrl('/environments', project, {platform_id: platformId, target_id: profile.target_id, section: button.dataset.subtab}));
         route();
       }));
       root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => document.querySelector('#open-system-settings')?.click()));
@@ -5493,14 +6182,35 @@ function EnvironmentPage(project = currentProject()) {
         button.disabled = true;
         try {
           const values = Object.fromEntries(new FormData(form).entries());
-          await api(`/api/environments/${encodeURIComponent(project)}`, {method: 'PUT', body: JSON.stringify({paths: values})});
+          if (is579O2) {
+            values.enabled = values.enabled === 'true';
+            values.com_baudrate = Number(values.com_baudrate || 1500000);
+          }
+          const environmentId = profile.target_id;
+          const payload = is579O2 ? {platform_579: values} : {paths: values};
+          await api(`/api/environments/${encodeURIComponent(environmentId)}`, {method: 'PUT', body: JSON.stringify(payload)});
           showToast('环境配置已保存', 'success');
           route();
         } catch (error) { button.disabled = false; showToast(error.message, 'error'); }
       });
       root.querySelector('[data-environment-check]')?.addEventListener('click', async event => {
-        event.currentTarget.disabled = true;
-        try { await api(`/api/environments/${encodeURIComponent(project)}/check`, {method: 'POST', body: '{}'}); showToast('环境检查已完成'); route(); } catch (error) { event.currentTarget.disabled = false; showToast(error.message, 'error'); }
+        const button = event.currentTarget;
+        const idleMarkup = button.innerHTML;
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.innerHTML = `${icon('refresh', 16)} 正在检查…`;
+        const environmentId = profile.target_id;
+        try {
+          const response = await api(`/api/environments/${encodeURIComponent(environmentId)}/check`, {method: 'POST', body: '{}'});
+          const refreshedHealth = environmentHealth(response?.result);
+          await route();
+          showToast(`环境检查完成：${refreshedHealth.label}`, refreshedHealth.status === 'ready' ? 'success' : 'warning');
+        } catch (error) {
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          button.innerHTML = idleMarkup;
+          showToast(error.message, 'error');
+        }
       });
     },
     destroy() {}
@@ -5571,11 +6281,15 @@ async function route() {
 }
 
 initSystemSettings();
-initGlobalTargetSwitcher();
-initImagePreview();
 initPrimaryNavigation();
+initImagePreview();
 window.addEventListener('popstate', route);
-route();
+loadPlatformRegistries()
+  .then(() => {
+    initGlobalTargetSwitcher();
+    return route();
+  })
+  .catch(renderError);
 
 
   // ==========================================

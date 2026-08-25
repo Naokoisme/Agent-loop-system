@@ -248,7 +248,9 @@ class FrontendAssetsTest(unittest.TestCase):
             "项目文件需要配置",
             "测试程序尚未准备好",
             "模型服务尚未配置或不可用",
-            "环境检查完成：${health.label}",
+            "正在检查…",
+            "const refreshedHealth = environmentHealth(response?.result);",
+            "环境检查完成：${refreshedHealth.label}",
             "environmentLogRows(environmentItem.logs, targetHealth)",
             "检查操作、截图和必要服务是否可用",
             "可用项",
@@ -287,7 +289,7 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_bluetooth_is_a_top_level_workbench_not_a_settings_manager(self) -> None:
         for token in (
             'href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"',
-            'value="579_Z1640"',
+            'id="global-project-switch"',
             "前往蓝牙工作台",
         ):
             self.assertIn(token, self.index)
@@ -457,6 +459,59 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("input.value = query", self.javascript)
         self.assertNotIn("body.search-active", self.stylesheet)
         self.assertIn(".pagination", self.stylesheet)
+
+    def test_case_management_uses_one_server_paginated_request(self) -> None:
+        for token in (
+            "async function loadCasePage(project",
+            "page_size: String(PAGE_SIZE)",
+            "modules.forEach(name => params.append('module', name))",
+            "const payload = await loadCasePage(project",
+            "renderModuleSidebar(payload.module_counts",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_case_management_requires_platform_selection_before_loading_cases(self) -> None:
+        for token in (
+            "async function renderCasePlatformLanding()",
+            "if (!['w30', '579'].includes(requestedPlatform)) return renderCasePlatformLanding();",
+            'data-case-platform="w30"',
+            'data-case-platform="579"',
+            "进入 W30 用例管理",
+            "进入 579 用例管理",
+            "管理 579 O2 与 Z1640 用例",
+            "caseProjectsForPlatform(initialPlatform).map",
+            "切换平台后，只加载该平台下的项目与用例",
+        ):
+            self.assertIn(token, self.javascript)
+        for selector in (
+            ".case-platform-gateway-grid",
+            ".case-platform-entry",
+            ".case-platform-context",
+        ):
+            self.assertIn(selector, self.stylesheet)
+        self.assertIn('<form class="case-platform-entry is-w30" method="get" action="/cases"', self.javascript)
+        self.assertIn('<form class="case-platform-entry is-579" method="get" action="/cases"', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="w30">', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="579">', self.javascript)
+        self.assertIn('<button class="case-platform-entry-submit" type="submit">', self.javascript)
+        self.assertIn('.case-platform-entry-submit', self.stylesheet)
+        self.assertIn('<form class="case-platform-switch-form" method="get" action="/cases"', self.javascript)
+        self.assertIn('.case-platform-switch-form', self.stylesheet)
+        self.assertNotIn('data-native-navigation="true"', self.javascript)
+
+    def test_case_project_switch_keeps_or_selects_a_compatible_platform(self) -> None:
+        for token in (
+            "const requestedPlatform = new URLSearchParams(location.search).get('platform_id');",
+            "const allowedPlatforms = projectProfile.allowed_platforms || [];",
+            "allowedPlatforms.includes(requestedPlatform)",
+            "{platform_id: compatiblePlatform}",
+            "pageUrl('/cases', project, {platform_id: initialPlatform})",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
+        self.assertIn('/assets/styles.css?v=20260824-3', self.index)
+        self.assertIn('/assets/app.js?v=20260824-3', self.index)
 
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (
@@ -821,6 +876,19 @@ class FrontendAssetsTest(unittest.TestCase):
             "? rawVerdict : 'ERROR'",
         ):
             self.assertIn(token, self.javascript)
+        self.assertIn("适用平台：${platforms}", self.javascript)
+        self.assertIn("<th>自动化成熟度</th><th>最近结果</th>", self.javascript)
+        for duplicated_label in (
+            "579 · 自动化就绪",
+            "579 · 待评审",
+            "579 · 需人工",
+            "579 · 不支持",
+        ):
+            self.assertNotIn(duplicated_label, self.javascript)
+        status_function = self.javascript.split("function caseStatusChip(row = {})", 1)[1].split(
+            "function testExecutionModeLabel", 1
+        )[0]
+        self.assertNotIn("return maturityChip(row);", status_function)
         for token in (
             "['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict)",
             "{SKIP: 'CANNOT_VERIFY'}[rawVerdict]",
@@ -883,7 +951,7 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "const historyId = item.history_id || item.run_id || '';",
             "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
-            "const reportReturnTo = currentRouteUrl();",
+            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module, platform_id: filters.platform, result: filters.result, maturity: filters.maturity, infrastructure: filters.infrastructure});",
             "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
             "const backHref = pageReturnUrl(detailFallback);",
             "const backLabel = returnDestinationLabel(backHref, '测试详情');",
@@ -915,7 +983,11 @@ class FrontendAssetsTest(unittest.TestCase):
             "cannot_verify: '最近无法验证'",
             "error: '最近执行异常'",
             "latestBatchCandidateSummary.pass",
+            "最新结果已通过的用例不会重跑",
             "最新结果已通过的 ${Number(latestBatchCandidateSummary.pass || 0)} 条已排除",
+            "project_id: projectSelect.value",
+            "platform_id: platformId",
+            "target_id: targetId",
             "watchface_ready: projectSelect.value === '579_Z1640'",
             "batch-resume-button",
             "/resume",
@@ -938,6 +1010,28 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.javascript)
         self.assertIn(".batch-active-row", self.stylesheet)
+
+    def test_environment_tabs_have_real_links_and_do_not_depend_on_click_handlers(self) -> None:
+        for token in (
+            "if (item.href)",
+            "environmentTabHref('llm')",
+            "environmentTabHref('ones')",
+            "environmentTabHref('updates')",
+            'aria-current="page"',
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertIn(".workspace-subtabs a", self.stylesheet)
+
+    def test_automation_maturity_is_shown_in_chinese(self) -> None:
+        for text in ("自动化就绪", "待评审", "需人工执行", "暂不支持", "未绑定"):
+            self.assertIn(text, self.javascript)
+        for raw_label in (
+            "<span>AUTO_READY</span>",
+            "<span>NEED_REVIEW</span>",
+            "<span>MANUAL_REQUIRED</span>",
+            "<span>UNSUPPORTED</span>",
+        ):
+            self.assertNotIn(raw_label, self.javascript)
 
     def test_workspace_live_polling_updates_sections_without_rerouting(self) -> None:
         for token in (

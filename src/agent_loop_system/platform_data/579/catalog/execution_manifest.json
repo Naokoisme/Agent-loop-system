@@ -1,0 +1,411 @@
+{
+  "kind": "AgentLoop579ExecutionCatalog",
+  "schema_version": 1,
+  "manifests": [
+    {
+      "kind": "ExecutionManifest",
+      "schema_version": 1,
+      "manifest_id": "EXM-74BD8A6BFFCB407BE8B8",
+      "created_at": "2026-07-22T20:14:07+09:00",
+      "module": "秒表",
+      "stage": "03",
+      "automation_manifest_id": "ACM-FD11F2A5A4176AF40771",
+      "execution_mode": "formal_raw_receiver",
+      "evidence_eligible": true,
+      "user_review_approved": true,
+      "schedule_auto_ready_only": true,
+      "skill_snapshot": {
+        "runtime_policy": "local_snapshot_only",
+        "manifest_path": "integrations/qatest_skill_snapshot/SNAPSHOT_MANIFEST.json",
+        "manifest_sha256": "D2D01BD2F9AF87C2718630758B1B857FBD62E620B5F4C78995C814357EE4D96C",
+        "checked_file_count": 356
+      },
+      "device_policy": {
+        "adb_auto_recovery": false,
+        "com3": "read_only",
+        "pc_direct_watch_ble": false
+      },
+      "continuation_policy": {
+        "ordinary_non_pass": "record_and_continue",
+        "hard_stop_codes": [
+          "BLOCKED_ADB",
+          "BLOCKED_APP",
+          "BLOCKED_BLE",
+          "BLOCKED_SERIAL",
+          "CLEANUP_REQUIRED",
+          "RUNNER_INTERNAL_ERROR",
+          "STATE_HANDOFF_MISMATCH"
+        ]
+      },
+      "state_handoff": {
+        "enabled": false,
+        "case_order": [
+          "STOPWATCH-001",
+          "STOPWATCH-002",
+          "STOPWATCH-003",
+          "STOPWATCH-004",
+          "STOPWATCH-005",
+          "STOPWATCH-006",
+          "STOPWATCH-007",
+          "STOPWATCH-008",
+          "STOPWATCH-009",
+          "STOPWATCH-010",
+          "STOPWATCH-011",
+          "STOPWATCH-012",
+          "STOPWATCH-013",
+          "STOPWATCH-014",
+          "STOPWATCH-015",
+          "STOPWATCH-016",
+          "STOPWATCH-017",
+          "STOPWATCH-023",
+          "STOPWATCH-024",
+          "STOPWATCH-025",
+          "STOPWATCH-026",
+          "STOPWATCH-029",
+          "STOPWATCH-030",
+          "STOPWATCH-035",
+          "STOPWATCH-038",
+          "STOPWATCH-039"
+        ],
+        "fallback_independent_plan_required": true
+      },
+      "evidence_policy": {
+        "one_step_one_expected_one_screenshot": true,
+        "case_duration_required": true,
+        "step_duration_required": true,
+        "suite_wall_clock_required": true,
+        "append_only_attempts": true
+      },
+      "case_count": 26,
+      "case_order": [
+        "STOPWATCH-001",
+        "STOPWATCH-002",
+        "STOPWATCH-003",
+        "STOPWATCH-004",
+        "STOPWATCH-005",
+        "STOPWATCH-006",
+        "STOPWATCH-007",
+        "STOPWATCH-008",
+        "STOPWATCH-009",
+        "STOPWATCH-010",
+        "STOPWATCH-011",
+        "STOPWATCH-012",
+        "STOPWATCH-013",
+        "STOPWATCH-014",
+        "STOPWATCH-015",
+        "STOPWATCH-016",
+        "STOPWATCH-017",
+        "STOPWATCH-023",
+        "STOPWATCH-024",
+        "STOPWATCH-025",
+        "STOPWATCH-026",
+        "STOPWATCH-029",
+        "STOPWATCH-030",
+        "STOPWATCH-035",
+        "STOPWATCH-038",
+        "STOPWATCH-039"
+      ],
+      "batches": [
+        {
+          "batch_id": "STOPWATCH-B01",
+          "case_nos": [
+            "STOPWATCH-001",
+            "STOPWATCH-002",
+            "STOPWATCH-003",
+            "STOPWATCH-004",
+            "STOPWATCH-005"
+          ],
+          "count": 5
+        },
+        {
+          "batch_id": "STOPWATCH-B02",
+          "case_nos": [
+            "STOPWATCH-006"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B03",
+          "case_nos": [
+            "STOPWATCH-007"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B04",
+          "case_nos": [
+            "STOPWATCH-008"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B05",
+          "case_nos": [
+            "STOPWATCH-009",
+            "STOPWATCH-010",
+            "STOPWATCH-011",
+            "STOPWATCH-012"
+          ],
+          "count": 4
+        },
+        {
+          "batch_id": "STOPWATCH-B06",
+          "case_nos": [
+            "STOPWATCH-013"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B07",
+          "case_nos": [
+            "STOPWATCH-014",
+            "STOPWATCH-015",
+            "STOPWATCH-016",
+            "STOPWATCH-017",
+            "STOPWATCH-023"
+          ],
+          "count": 5
+        },
+        {
+          "batch_id": "STOPWATCH-B08",
+          "case_nos": [
+            "STOPWATCH-024",
+            "STOPWATCH-025",
+            "STOPWATCH-026",
+            "STOPWATCH-029",
+            "STOPWATCH-030"
+          ],
+          "count": 5
+        },
+        {
+          "batch_id": "STOPWATCH-B09",
+          "case_nos": [
+            "STOPWATCH-035"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B10",
+          "case_nos": [
+            "STOPWATCH-038"
+          ],
+          "count": 1
+        },
+        {
+          "batch_id": "STOPWATCH-B11",
+          "case_nos": [
+            "STOPWATCH-039"
+          ],
+          "count": 1
+        }
+      ],
+      "source_excel_path": "cases/首批秒表完整测试用例_已评审冻结版_20260722.xlsx",
+      "source_excel_sha256": "23ED95B28D2A6F2399DE67E98C795A793CC431C608D4FFE260103499415136A0",
+      "bounded_retry_policy": {
+        "enabled": true,
+        "scope": "case",
+        "max_attempts": 3,
+        "retry_result_codes": [
+          "STOPWATCH_MENU_WINDOW_NOT_CREATED",
+          "STOPWATCH_ENTRY_NOT_REACHED",
+          "STOPWATCH_PAGE_NOT_REACHED"
+        ],
+        "require_completed_teardown": true,
+        "skip_device_preflight_after_first_attempt": true,
+        "note": "仅重试秒表入口导航失败；每次失败先完成teardown，再从表盘重新切菜单、回顶、下滑和O2确认。"
+      },
+      "stage03_policy": {
+        "max_batch_size": 5,
+        "ordinary_non_pass": "record_and_continue",
+        "cleanup_or_link_failure": "stop",
+        "adb_auto_recovery": false,
+        "com3": "read_only",
+        "per_case_timing": true,
+        "per_step_timing": true,
+        "one_step_one_expected_one_screenshot": true
+      }
+    },
+    {
+      "kind": "ExecutionManifest",
+      "schema_version": 1,
+      "manifest_id": "EXM-C1FC6EE5EB61458BE580",
+      "created_at": "2026-07-27T18:10:30+09:00",
+      "module": "手电筒",
+      "stage": "04",
+      "automation_manifest_id": "ACM-1B4F1BEACC0320165E24",
+      "execution_mode": "formal_raw_receiver",
+      "evidence_eligible": true,
+      "user_review_approved": true,
+      "schedule_auto_ready_only": true,
+      "skill_snapshot": {
+        "runtime_policy": "local_snapshot_only",
+        "manifest_path": "integrations/qatest_skill_snapshot/SNAPSHOT_MANIFEST.json",
+        "manifest_sha256": "D2D01BD2F9AF87C2718630758B1B857FBD62E620B5F4C78995C814357EE4D96C",
+        "checked_file_count": 356
+      },
+      "device_policy": {
+        "adb_auto_recovery": false,
+        "com3": "read_only",
+        "pc_direct_watch_ble": false
+      },
+      "continuation_policy": {
+        "ordinary_non_pass": "record_and_continue",
+        "hard_stop_codes": [
+          "BLOCKED_ADB",
+          "BLOCKED_APP",
+          "BLOCKED_BLE",
+          "BLOCKED_SERIAL",
+          "CLEANUP_REQUIRED",
+          "RUNNER_INTERNAL_ERROR",
+          "STATE_HANDOFF_MISMATCH"
+        ]
+      },
+      "state_handoff": {
+        "enabled": false,
+        "case_order": [
+          "FLASHLIGHT-001",
+          "FLASHLIGHT-002",
+          "FLASHLIGHT-003",
+          "FLASHLIGHT-004",
+          "FLASHLIGHT-006",
+          "FLASHLIGHT-013",
+          "FLASHLIGHT-014",
+          "FLASHLIGHT-015",
+          "FLASHLIGHT-017",
+          "FLASHLIGHT-018",
+          "FLASHLIGHT-019"
+        ],
+        "fallback_independent_plan_required": true
+      },
+      "evidence_policy": {
+        "one_step_one_expected_one_screenshot": true,
+        "case_duration_required": true,
+        "step_duration_required": true,
+        "suite_wall_clock_required": true,
+        "append_only_attempts": true
+      },
+      "case_count": 11,
+      "case_order": [
+        "FLASHLIGHT-001",
+        "FLASHLIGHT-002",
+        "FLASHLIGHT-003",
+        "FLASHLIGHT-004",
+        "FLASHLIGHT-006",
+        "FLASHLIGHT-013",
+        "FLASHLIGHT-014",
+        "FLASHLIGHT-015",
+        "FLASHLIGHT-017",
+        "FLASHLIGHT-018",
+        "FLASHLIGHT-019"
+      ],
+      "batches": [
+        {
+          "batch_id": "FLASHLIGHT-B01",
+          "source_batch_id": "FLASHLIGHT-B01",
+          "case_nos": [
+            "FLASHLIGHT-001",
+            "FLASHLIGHT-002",
+            "FLASHLIGHT-003",
+            "FLASHLIGHT-004"
+          ],
+          "count": 4,
+          "isolated": false
+        },
+        {
+          "batch_id": "FLASHLIGHT-B02-006",
+          "source_batch_id": "FLASHLIGHT-B02",
+          "case_nos": [
+            "FLASHLIGHT-006"
+          ],
+          "count": 1,
+          "isolated": true
+        },
+        {
+          "batch_id": "FLASHLIGHT-B05",
+          "source_batch_id": "FLASHLIGHT-B05",
+          "case_nos": [
+            "FLASHLIGHT-013",
+            "FLASHLIGHT-014"
+          ],
+          "count": 2,
+          "isolated": false
+        },
+        {
+          "batch_id": "FLASHLIGHT-B06-015",
+          "source_batch_id": "FLASHLIGHT-B06",
+          "case_nos": [
+            "FLASHLIGHT-015"
+          ],
+          "count": 1,
+          "isolated": true
+        },
+        {
+          "batch_id": "FLASHLIGHT-B08-017",
+          "source_batch_id": "FLASHLIGHT-B08",
+          "case_nos": [
+            "FLASHLIGHT-017"
+          ],
+          "count": 1,
+          "isolated": true
+        },
+        {
+          "batch_id": "FLASHLIGHT-B08-018",
+          "source_batch_id": "FLASHLIGHT-B08",
+          "case_nos": [
+            "FLASHLIGHT-018"
+          ],
+          "count": 1,
+          "isolated": true
+        },
+        {
+          "batch_id": "FLASHLIGHT-B09-019",
+          "source_batch_id": "FLASHLIGHT-B09",
+          "case_nos": [
+            "FLASHLIGHT-019"
+          ],
+          "count": 1,
+          "isolated": true
+        }
+      ],
+      "source_excel_path": "cases/首批手电筒完整测试用例_探针后冻结版_20260727.xlsx",
+      "source_excel_sha256": "B340FC0354399935FFF5C896CFF55F820DA22A8BE2D2FCE15A3C26251AC09324",
+      "freeze_record_sha256": "2D6F9CDD4074795127780AFFF0AF02F2736A222470D660438BF677BEDDB608C4",
+      "bounded_retry_policy": {
+        "enabled": true,
+        "scope": "case",
+        "max_attempts": 2,
+        "retry_result_codes": [
+          "FLASHLIGHT_ENTRY_NOT_REACHED",
+          "FLASHLIGHT_EXIT_DESTINATION_MISMATCH",
+          "AI_ASSERT_UNCERTAIN"
+        ],
+        "require_completed_teardown": true,
+        "skip_device_preflight_after_first_attempt": true
+      },
+      "runtime_capability_overrides": {
+        "scope_case_nos": [
+          "FLASHLIGHT-015",
+          "FLASHLIGHT-017"
+        ],
+        "overrides": {
+          "supports_alarm_sync": true
+        },
+        "allowed_keys": [
+          "supports_alarm_sync"
+        ],
+        "persisted_matrix_changed": false,
+        "basis": "AppBleBridge.add_test_alarm/delete_test_alarm use the installed APP UI; the override is isolated to Stage 04 alarm-interrupt cases."
+      },
+      "stage04_policy": {
+        "max_batch_size": 5,
+        "ordinary_non_pass": "record_and_continue",
+        "cleanup_or_link_failure": "stop",
+        "adb_auto_recovery": false,
+        "com3": "read_only",
+        "per_case_timing": true,
+        "per_step_timing": true,
+        "one_step_one_expected_one_screenshot": true
+      }
+    }
+  ]
+}

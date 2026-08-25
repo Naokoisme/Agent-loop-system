@@ -1,0 +1,421 @@
+{
+  "kind": "AgentLoop579ActionBindings",
+  "schema_version": 1,
+  "visibility": "private_runtime_only",
+  "source": "frozen_automation_manifests",
+  "cases": [
+    {
+      "case_id": "STOPWATCH-001",
+      "binding_ref": "AC-F49310AF387BB629A83B",
+      "plan_sha256": "A327E1056001A925C8180AC0C3AF59E37926566E0FAAE50235FF41153F6A12BE",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-002",
+      "binding_ref": "AC-6784643896CE19CFC9CB",
+      "plan_sha256": "7E98ECF073922D907480A7151353F76989C9815164CE9FE540BFEFEC9DC326FF",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-003",
+      "binding_ref": "AC-7D7A080A7383C82EEC44",
+      "plan_sha256": "D20A579926B5DA8390814D61111FCB02A70EE2D7F10C40E6FA91AFA8330182F1",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-004",
+      "binding_ref": "AC-82A13A87D1DF7F13C679",
+      "plan_sha256": "300C07080B811221CAA85B02A3C54D9D66D19A0D3B82694E630B6EAF5709F6B9",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-005",
+      "binding_ref": "AC-0A39A64E80E45D87839C",
+      "plan_sha256": "676B63677E5DA45B4376E9AB34F0926DEB476EE2987EA8CD54C55B3492024A7F",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-006",
+      "binding_ref": "AC-2E8D54984E99CB2B8C60",
+      "plan_sha256": "DA3D895DEB819FAB1CA705150337D039968B66F2598FE5FAB485EEA9E64FE1FF",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-007",
+      "binding_ref": "AC-E59399C9410339D7F5B9",
+      "plan_sha256": "25238CFEFD704126494943417076C0466BE7EE02E0E35BFE2794CDFACCBA1662",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-008",
+      "binding_ref": "AC-3F64DC3AC9F429212AB3",
+      "plan_sha256": "E6C21B3F233C5F3EE4469D25F1B88D50127569B574514078BC0EADAFA2BD9D3E",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-009",
+      "binding_ref": "AC-77DD076702DC1971F61D",
+      "plan_sha256": "D0530481E4D61AB91B966BBA3379AA2FA844E8A3EF8EA451E39D38E89BEA350F",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-010",
+      "binding_ref": "AC-B16E2172B9A6ECE8DA1A",
+      "plan_sha256": "58606648FD437FF3A92FD584778A70A22BB7DFC005EE08691C3ADC87E808D049",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-011",
+      "binding_ref": "AC-2E32AE098609E4FD8023",
+      "plan_sha256": "58F0BFA09817F539607406C8C0E235B3F833BAFBF05109603214B14B563580EC",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-012",
+      "binding_ref": "AC-AE8CEB6572096AF4C8C7",
+      "plan_sha256": "ECBB3474492A1239974F48418B7482B567032E8B7DC6AF103AE998829B86C9A1",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-013",
+      "binding_ref": "AC-1AF3B7ACD110CF5643FF",
+      "plan_sha256": "F12C50EEE824D269DC0F41E2F4644F6F42B5C290FE09C249DF84060967735A21",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-014",
+      "binding_ref": "AC-B6AFE947FE023E7AB591",
+      "plan_sha256": "F4CA306BF3BF54FBB60D1ECA81CE6F03C2EB4E1EA9F47D91BA8F526A6A1F8797",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-015",
+      "binding_ref": "AC-665F5AFBFFE9DFAB7E1A",
+      "plan_sha256": "52B88F89603EC33A8F1A6B8B197313C8690E28CD9D235B1F6F8BD3E6EEBB39C4",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-016",
+      "binding_ref": "AC-5411E8BF6B11A41D3108",
+      "plan_sha256": "B2224A25EB705AFAB2A8A4E6F7417DB12F7467FAC2A063E261239EE7CBFF4A27",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-017",
+      "binding_ref": "AC-5BC474303B8F8EFB989D",
+      "plan_sha256": "DC4B4CBC6B686606034E4AFEFBBCA7374D590C3EEA7635F8A4A8E02787A0B3CB",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-018",
+      "binding_ref": "AC-3C24F2764DBEADDADD5D",
+      "plan_sha256": "A3C18C795E4746780D45BCC8A6D11C277B17A0AA5B2A84DA11B4A2289D5F4218",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-019",
+      "binding_ref": "AC-FA720585FD0F7022BC45",
+      "plan_sha256": "797EEA5E213D6903859FE1D97F95542ED6ACF700A01F669D1652EE07C4BD3401",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-020",
+      "binding_ref": "AC-6D75A99452603E0DFC7A",
+      "plan_sha256": "9D5AB90109261E6C08B004431116AB7D110AB58813B388A6BCA427AA43DE54D2",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-021",
+      "binding_ref": "AC-788AD8F8D34CFAC13523",
+      "plan_sha256": "9A9EE9B0234AC16370632F7BB643E4FCC1FA63B8CA7BD44E9C509F020082C579",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-022",
+      "binding_ref": "AC-3BF2AF67488F8BA7F277",
+      "plan_sha256": "F45FEAFBCF31833811AC7918FE63D46ECFFC98A7078E7AACDCAEC151502268F6",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-023",
+      "binding_ref": "AC-B1BBBD5B4BC55FE3791B",
+      "plan_sha256": "0A277566F3DC2B42D7D15985E4C66C147D086D1008959BEBDAFE1363D9073F58",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-024",
+      "binding_ref": "AC-8C30F582F589E7C67BCE",
+      "plan_sha256": "8650E6C683849FF49B6D767C2B50A450872991465B633C386FFF14AAD7B9D6C0",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-025",
+      "binding_ref": "AC-7B40F8DED77450386DFA",
+      "plan_sha256": "7BE25F986F8451BC9EBE3DA5C20E1387DE95616CBAEA5067B5E1B1BC09E7AC57",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-026",
+      "binding_ref": "AC-F5E4A3CDBCB7C3CB8325",
+      "plan_sha256": "24FC2E0D2FFFFFBFEFA23D345B63BACE3059E51DD5CD0692F3ECC27D305EA3DF",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-027",
+      "binding_ref": "AC-6C92F3DDE757E0DEA9D6",
+      "plan_sha256": "195776BFA236AD76F8DE1A05C1DD0D862D7E7250A6C1B35D668AA0AEDE1E4581",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-028",
+      "binding_ref": "AC-64A8CEF1F02225FA130B",
+      "plan_sha256": "B4ADF7F657B5B1A48A1643217B869F7BBB66CC0E9589BC3113D44C425C06DD8E",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-029",
+      "binding_ref": "AC-D2036A5D18C6E4BD4ACF",
+      "plan_sha256": "25C9191E665C0D5E030AD7572F938BBD8B5623C1C458EB12FD05BF4C6EB352AA",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-030",
+      "binding_ref": "AC-CE4FCEF7E80AEC5260B9",
+      "plan_sha256": "65ED98C313384E650BDD32D1EA08B34CAF0F799CBE0259E4C78DFB03B956F5C0",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-031",
+      "binding_ref": "AC-A7042356363C3A7B6188",
+      "plan_sha256": "1327D9D14486B04FC65017C3C15FC5D733482FACD9F51640E03F7C7BADA46F0C",
+      "maturity": "MANUAL_REQUIRED",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-032",
+      "binding_ref": "AC-17AACCB6623A0993727D",
+      "plan_sha256": "A687E32A698B3818A2831E2256FF289C8AECC7BEE66F2BDE450E6D7EF7F86A23",
+      "maturity": "MANUAL_REQUIRED",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-033",
+      "binding_ref": "AC-6DC3B5C46851C2C1F5C5",
+      "plan_sha256": "2FD32CC926A1C6A61B3B088B8712EFFCFDB1B8CAD275A1FFE20236C312EFF8E3",
+      "maturity": "MANUAL_REQUIRED",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-034",
+      "binding_ref": "AC-B44C62AB232BFAD72830",
+      "plan_sha256": "D3DE8F09B5FA023BA91F1A127083A5AA8AEB33E5F73539A778DB22B741FC3C57",
+      "maturity": "MANUAL_REQUIRED",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-035",
+      "binding_ref": "AC-4BD991940C2780AE630C",
+      "plan_sha256": "01F9D2DBF8F3E9830F8B2C0D739BCD3BCB14773845E6F6B6C4955E481ECF54A7",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-036",
+      "binding_ref": "AC-4E3F9EF175AB64DF625D",
+      "plan_sha256": "73FF10DFF71412B3C736438BC410FBA2CEB1F3DBBAD0B7577820248545974E7A",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-037",
+      "binding_ref": "AC-FE9D116B86BB79C1635E",
+      "plan_sha256": "47E014835BAC25DCA390FF3C84FF100E7851226895A366B66332D0EA7A6AE522",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "STOPWATCH-038",
+      "binding_ref": "AC-D4382595CC6B42BBBF8A",
+      "plan_sha256": "76C67966E1EC838BBA56C356AC3025DDE35CC67D942BF78EEB97B7C3B17B6145",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "STOPWATCH-039",
+      "binding_ref": "AC-7983E5A1AFF0F338095A",
+      "plan_sha256": "EEC486693291A7B6D99BCA2F3EB131D0A80C5164BF0FFF7C330CD6FC4E9136C8",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-001",
+      "binding_ref": "AC-8139CBB4F2B30258FE88",
+      "plan_sha256": "927210118B9E8B48F095F7176BB2739DD4F37C473DC51FAA8B8E1AB51EA09B54",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-002",
+      "binding_ref": "AC-96DE22D5F7951CD4112C",
+      "plan_sha256": "C8A0CAB646253394F17919F148CE2A8B1B8DAFFFC7221DBF584746D3A39D7DB7",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-003",
+      "binding_ref": "AC-07E7E57090BB86E4C08F",
+      "plan_sha256": "EEEEA55110ECD5FA9784166A5AC907686E14F371F8E80B555EE96F35B0EE1F3E",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-004",
+      "binding_ref": "AC-2751C231D937431B9290",
+      "plan_sha256": "B3FD926178F35F9946AA06C7FB3956CDA91E1418FE8F15C169A5616C8B73DE48",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-005",
+      "binding_ref": "AC-B9CE84F9A5AA6615974E",
+      "plan_sha256": "E628A9CBC00E6AF705F6B99183E4A0C7483BC8AA19962F8AE046D5385FDF2E7B",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-006",
+      "binding_ref": "AC-276CEF326FD959F9A4A9",
+      "plan_sha256": "6541DD6F26D2C6570F95D2978D489A9101F243E76DDC2A7BB5FF6D2577B7B2B2",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-007",
+      "binding_ref": "AC-4E31B40E855345BCC4EE",
+      "plan_sha256": "62AAB8297B1062EED6A31D0AE044CB5A0B1E2F6ABEC200643D7E964C713CC2DD",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-008",
+      "binding_ref": "AC-446A526CC5E8E61B2B48",
+      "plan_sha256": "9AC44F26A3CF5C1CE3DC654E5D76405C8F62C5A07E3A755F80E8FB8C7B3CFE03",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-009",
+      "binding_ref": "AC-DD2F838E1E7902BF2452",
+      "plan_sha256": "7B9CE53C69E247C6518F4E04F62E012B21ECD92025C5596A953473744BE822D4",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-010",
+      "binding_ref": "AC-5C81AE928D4FDB7C90C6",
+      "plan_sha256": "D1650BF7C306F26951B649E8641C71FB3AF6823FDC9EB6DC98FD4EBB2F5F82F5",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-011",
+      "binding_ref": "AC-EA6497077309AE761769",
+      "plan_sha256": "55008B9FB9E443E4EDD52B689E506328D2D06D6ADA06B61EA2961688761C9840",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-012",
+      "binding_ref": "AC-9F3506E038C293879282",
+      "plan_sha256": "280E226FB163C6AA414FCA2C738A9FF78318304726D036C8D35E4F0FD82FBF34",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-013",
+      "binding_ref": "AC-DA0CA00F1E2D4B0560C3",
+      "plan_sha256": "AFAA848A9FDE29500936EB640D43AF2C790B58F3910751EFFCA65A234A154C6A",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-014",
+      "binding_ref": "AC-625EC72BA7614B657556",
+      "plan_sha256": "34B6556726A3A273C766A550D460E6C63EFF631D0B3760EB36DBDE8D56E8DF1D",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-015",
+      "binding_ref": "AC-43CA9D6070886DC18B1E",
+      "plan_sha256": "B26FB4D71C183BFE56133E0B82930E409E745D8DA4D882B2E174E223346B758D",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-016",
+      "binding_ref": "AC-2CAFE25C1CB2EAC0163A",
+      "plan_sha256": "A972F0914D947D4AC2B36B6485643CCBE74B6DA9E490C176B2BD016B4981110B",
+      "maturity": "MANUAL_REQUIRED",
+      "runnable": false
+    },
+    {
+      "case_id": "FLASHLIGHT-017",
+      "binding_ref": "AC-4BD2B6E13456E8BACB2D",
+      "plan_sha256": "0072CC326F6D488DC531FE9C03A6C4844C4F8FF57475A5D2BC94E42A9439E45A",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-018",
+      "binding_ref": "AC-F6BF0933092A194A4F11",
+      "plan_sha256": "1E860529F7C080EBB95E585420475D49BD21E01D8CE4E0D214B30FE53E5BA3CA",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-019",
+      "binding_ref": "AC-4D6B920002CA51B767B9",
+      "plan_sha256": "12218DB0C6823ACDFE7EAA8B34DE91F785905EDB3F837A2867968BE265C909BD",
+      "maturity": "AUTO_READY",
+      "runnable": true
+    },
+    {
+      "case_id": "FLASHLIGHT-020",
+      "binding_ref": "AC-CB54B06641461EA78B01",
+      "plan_sha256": "4A7F2E8D86C55782E29FAC119A557CF332141409BBDF0488668CE12D293E8671",
+      "maturity": "NEED_REVIEW",
+      "runnable": false
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "kind": "AgentLoop579ImportManifest",
+  "schema_version": 1,
+  "converter_version": "1.0.0",
+  "imported_at": "2026-08-24T12:05:54+08:00",
+  "source_label": "crossend_harness frozen manifests",
+  "files": [
+    {
+      "module": "stopwatch",
+      "kind": "functional",
+      "source_file": "stage03_stopwatch_pipeline_frozen/functional_case_manifest.json",
+      "sha256": "0EE00360CF6DF44CF51E35DE7E853F4AF5F951F91E774E34561BD2CE26FC5F78",
+      "size": 58273
+    },
+    {
+      "module": "stopwatch",
+      "kind": "automation",
+      "source_file": "stage03_stopwatch_pipeline_frozen/automation_case_manifest.json",
+      "sha256": "49E5095CDB435017664171E45B17666FF05A8D874B90B4B281805FDE0F703AEE",
+      "size": 390687
+    },
+    {
+      "module": "stopwatch",
+      "kind": "execution",
+      "source_file": "stage03_stopwatch_pipeline_frozen/execution_manifest.json",
+      "sha256": "D0202A99E1A48C93EE8EA2B1082B656F4D47CFC1BDB653DB7C632C71A2DD6F0B",
+      "size": 5480
+    },
+    {
+      "module": "flashlight",
+      "kind": "functional",
+      "source_file": "stage04_flashlight_pipeline_frozen/functional_case_manifest.json",
+      "sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE",
+      "size": 34620
+    },
+    {
+      "module": "flashlight",
+      "kind": "automation",
+      "source_file": "stage04_flashlight_pipeline_frozen/automation_case_manifest.json",
+      "sha256": "E50BD6A7D560BCC8A3BABA8FA18133BA9D89546610732CDAD3B708DE19D5BDDE",
+      "size": 183267
+    },
+    {
+      "module": "flashlight",
+      "kind": "execution",
+      "source_file": "stage04_flashlight_pipeline_frozen/execution_manifest.json",
+      "sha256": "12F762C01A7C49AA9672026F9D8F14467606D2F4F75EA60EEAC3BF1F37973BB0",
+      "size": 4939
+    },
+    {
+      "module": "shared",
+      "kind": "state_restore_registry",
+      "source_file": "first_batch_state_restore_registry.json",
+      "sha256": "46B8ED73D5DD8F9C206C77296DA3D82DF8351C5D2ED525FF6B5EC0290C6EE62B",
+      "size": 16607
+    }
+  ],
+  "case_count": 59
+}

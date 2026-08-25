@@ -930,8 +930,10 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(watch_579["items"][0]["mapping_status"], "EXECUTION_READY")
         self.assertTrue(watch_579["items"][0]["is_fixed_runnable"])
         self.assertFalse(watch_579["items"][0]["is_promoted"])
-        self.assertEqual(len(hardware["projects"]), 4)
-        with self.assertRaisesRegex(ValueError, "测试项目不存在"):
+        self.assertEqual(len(hardware["projects"]), 5)
+        self.assertIn("579_O2", {item["project"] for item in hardware["projects"]})
+        self.assertIn("579_Z1640", {item["project"] for item in hardware["projects"]})
+        with self.assertRaisesRegex(ValueError, "PROJECT_NOT_FOUND"):
             self.cases.list(project="unknown")
 
     def test_watch_579_blocked_ota_entry_route_cannot_start_single_or_batch(self) -> None:
@@ -1788,15 +1790,28 @@ class FrontendDataTest(unittest.TestCase):
             payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual([item["case_id"] for item in payload["items"]], ["CALC_001", "CALC_002"])
         self.assertEqual(payload["module_counts"], {"计算器": 2})
-        with urlopen(base + "/api/tests?module=%E4%B8%8D%E5%AD%98%E5%9C%A8", timeout=3) as response:
-            missing_module = json.loads(response.read().decode("utf-8"))
-        self.assertEqual(missing_module["items"], [])
-        self.assertEqual(missing_module["summary"]["all"], 0)
+        module_query = urlencode([
+            ("project_id", "620C_W6830"),
+            ("module", "不存在模块"),
+            ("page", 1),
+            ("page_size", 20),
+        ])
+        with urlopen(base + "/api/tests?" + module_query, timeout=3) as response:
+            empty_module = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(empty_module["total"], 0)
+        self.assertEqual(empty_module["summary"]["all"], 0)
+        with urlopen(
+            base + "/api/tests/overview?project_id=620C_W6830&platform_id=w30&limit=20",
+            timeout=3,
+        ) as response:
+            overview = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(overview["summary"]["all"], 2)
+        self.assertEqual(overview["platform_id"], "w30")
+        self.assertEqual(overview["verdict_counts"]["PASS"], 0)
+        self.assertNotIn("items", overview)
         with urlopen(base + "/api/tests/projects", timeout=3) as response:
             projects = json.loads(response.read().decode("utf-8"))
-            self.assertEqual(len(projects["items"]), 4)
-        with urlopen(base + "/api/tests/overview", timeout=3) as response:
-            overview = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(len(projects["items"]), 5)
         self.assertEqual(overview["catalog_total"], 2)
         self.assertEqual(overview["recent_items"], [])
         with urlopen(base + "/api/tests/recent?limit=8", timeout=3) as response:
@@ -1844,6 +1859,107 @@ class FrontendDataTest(unittest.TestCase):
         start_hardware.assert_called_once_with(
             sheet="计算器", case_id="CALC_001", project="6202_W5230"
         )
+
+    def test_source_sync_fingerprint_skips_catalog_reparse_after_restart(self) -> None:
+        first = WebApplication(self.paths)
+        self.assertEqual(len(first.cases._all("620C_W6830")), 2)
+
+        reopened = WebApplication(self.paths)
+        with patch.object(
+            reopened.cases,
+            "_source_rows",
+            side_effect=AssertionError("unchanged source catalog should not be parsed again"),
+        ):
+            self.assertEqual(len(reopened.cases._all("620C_W6830")), 2)
+
+    def test_project_and_platform_apis_create_switchable_unified_project(self) -> None:
+        _, base = self._server()
+        with urlopen(base + "/api/platforms", timeout=3) as response:
+            platforms = json.loads(response.read().decode("utf-8"))
+        self.assertEqual({item["platform_id"] for item in platforms["platforms"]}, {"w30", "579"})
+        self.assertIn("579.o2", {item["target_id"] for item in platforms["targets"]})
+
+        with self._post_json(base + "/api/projects", {
+            "project_id": "watch_regression",
+            "project_name": "手表回归",
+            "allowed_platforms": ["w30", "579"],
+            "default_platform": "579",
+            "allowed_targets": ["w30.620c.simulator", "579.o2"],
+            "default_target": "579.o2",
+        }) as response:
+            created = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(response.status, 201)
+        self.assertEqual(created["case_catalog"]["type"], "unified")
+
+        with self._post_json(base + "/api/cases/create", {
+            "project": "watch_regression",
+            "case": {
+                "case_id": "CASE-001",
+                "sheet": "秒表",
+                "steps_text": "打开秒表",
+                "expected_text": "秒表页面可见",
+            },
+        }) as response:
+            self.assertEqual(response.status, 200)
+        case_path = self.paths.project_data / "watch_regression" / "cases" / "秒表.json"
+        case_payload = json.loads(case_path.read_text(encoding="utf-8"))
+        self.assertEqual(case_payload["profile"], "watch_regression")
+        self.assertEqual(case_payload["cases"][0]["case_id"], "CASE-001")
+
+        with urlopen(
+            base + "/api/projects/watch_regression/execution-options?case_ids=CASE-001",
+            timeout=3,
+        ) as response:
+            options = json.loads(response.read().decode("utf-8"))["options"]
+        by_platform = {item["platform_id"]: item for item in options}
+        self.assertTrue(by_platform["w30"]["runnable"])
+        self.assertFalse(by_platform["579"]["runnable"])
+        self.assertEqual(by_platform["579"]["blockers"][0]["reason"], "CASE_PLATFORM_MAPPING_MISSING")
+
+        with self.assertRaises(HTTPError) as raised:
+            self._post_json(base + "/api/tests/run", {
+                "project_id": "watch_regression",
+                "platform_id": "579",
+                "target_id": "w30.620c.simulator",
+                "sheet": "秒表",
+                "case_id": "CASE-001",
+            })
+        error = json.loads(raised.exception.read().decode("utf-8"))
+        self.assertEqual(raised.exception.code, 400)
+        self.assertEqual(error["error_code"], "TARGET_NOT_ALLOWED_FOR_PROJECT")
+
+    def test_new_hardware_project_auto_binds_and_provisions_target_profile(self) -> None:
+        application, base = self._server()
+        provision = SimpleNamespace(
+            profile=SimpleNamespace(version="v1.2.0-test"),
+            profiles_root=self.paths.root / ".runtime" / "profiles",
+            installed=True,
+        )
+        with patch(
+            "frontend.server._ensure_test_hardware_profile",
+            return_value=provision,
+        ) as ensure_profile:
+            with self._post_json(base + "/api/projects", {
+                "project_id": "new_6202_project",
+                "project_name": "新 6202 项目",
+                "allowed_platforms": ["w30"],
+                "default_platform": "w30",
+                "allowed_targets": ["w30.6202.hardware"],
+                "default_target": "w30.6202.hardware",
+            }) as response:
+                created = json.loads(response.read().decode("utf-8"))
+
+            resolved = application.projects.resolve("new_6202_project")
+            child_env = _test_process_environment(resolved)
+
+        self.assertEqual(response.status, 201)
+        self.assertEqual(created["runtime_profiles"][0]["profile_id"], "6202_W5230")
+        self.assertTrue(created["runtime_profiles"][0]["ready"])
+        self.assertTrue(created["runtime_profiles"][0]["installed"])
+        self.assertEqual(resolved["runtime_profile_id"], "6202_W5230")
+        self.assertEqual(child_env["W30_PROJECT"], "6202_W5230")
+        self.assertEqual(child_env["W30_HARDWARE_PROJECT"], "6202_W5230")
+        self.assertEqual(ensure_profile.call_count, 2)
 
     def test_agent_test_api_starts_batch_and_serves_batch_page(self) -> None:
         application, base = self._server()
@@ -2921,10 +3037,13 @@ class FrontendDataTest(unittest.TestCase):
             manager._jobs[job_id]["case_attempts"],
             {"0001-CALC_001": 1},
         )
-        self.assertEqual(
-            self.test_history.list("计算器", "CALC_001", project="6202_W5230"),
-            [],
+        interrupted_history = self.test_history.list(
+            "计算器", "CALC_001", project="6202_W5230"
         )
+        self.assertEqual(len(interrupted_history), 1)
+        self.assertEqual(interrupted_history[0]["verdict"], "ERROR")
+        self.assertIn("GUI_PING", interrupted_history[0]["reason"])
+        self.assertNotIn("batch_id", interrupted_history[0])
 
         with patch("frontend.server.threading.Thread.start"):
             resumed = manager.resume_batch(job_id)
@@ -2993,8 +3112,13 @@ class FrontendDataTest(unittest.TestCase):
             manager._jobs[job_id]["case_attempts"],
             {"0001-CALC_001": 2, "0002-CALC_002": 1},
         )
+        completed_history = self.test_history.list(
+            "计算器", "CALC_001", project="6202_W5230"
+        )
+        self.assertEqual(len(completed_history), 2)
+        self.assertEqual(completed_history[0]["batch_id"], job_id)
         self.assertTrue(
-            (self.paths.runtime_jobs / job_id / "0001-CALC_001").is_dir()
+            (self.paths.runtime_jobs / job_id / "0002-CALC_002").is_dir()
         )
 
     def test_batch_restart_scans_history_once_for_all_saved_batches(self) -> None:
@@ -4016,6 +4140,18 @@ class FrontendDataTest(unittest.TestCase):
                 self.assertEqual(hardware["readiness_status"], "unchecked")
                 self.assertEqual(hardware["checks"][0]["key"], "profile")
                 self.assertEqual(hardware["checks"][0]["label"], "真机运行时档案")
+                simulator = next(
+                    item for item in data["items"] if item["id"] == "620C_W6830"
+                )
+                self.assertEqual(simulator["readiness_status"], "unchecked")
+                self.assertIsNone(simulator["last_checked_at"])
+                self.assertEqual(simulator["checks"], [])
+                watch_579 = next(
+                    item for item in data["items"] if item["id"] == "579_Z1640"
+                )
+                self.assertEqual(watch_579["target_id"], "579.z1640")
+                self.assertEqual(watch_579["readiness_status"], "unchecked")
+                self.assertEqual(watch_579["checks"], [])
             live_probe.assert_not_called()
             
         # 2. Environment check
@@ -4023,6 +4159,47 @@ class FrontendDataTest(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
             self.assertIn("result", data)
+            simulator_checks = {
+                item["key"]: item for item in data["result"]["checks"]
+            }
+            self.assertEqual(simulator_checks["artifact"]["status"], "warning")
+            self.assertEqual(simulator_checks["command"]["status"], "warning")
+            self.assertEqual(simulator_checks["capture"]["status"], "warning")
+            self.assertIn("本次未执行真实启动检查", simulator_checks["command"]["detail"])
+            self.assertIsNotNone(data["result"]["last_checked_at"])
+        simulator_cache = (
+            self.paths.environment_checks / "620C_W6830" / "simulator.json"
+        )
+        self.assertTrue(simulator_cache.is_file())
+
+        simulator_root = self.paths.root / "firmware" / "620C_W6830"
+        simulator_exe = simulator_root / "core" / "gui" / "simulator" / "bin" / "main.exe"
+        simulator_exe.parent.mkdir(parents=True)
+        simulator_exe.write_bytes(b"MZ")
+        _save_system_config(
+            self.paths,
+            {
+                "simulator": {
+                    "source_root": str(simulator_root),
+                    "workspace_root": str(simulator_root),
+                    "simulator_path": str(simulator_exe),
+                }
+            },
+        )
+        with patch("agent_loop_system.tools.simulator.SimulatorSession") as session_class:
+            session = session_class.return_value
+            session.capture_screenshot.return_value = True
+            with self._post_json(base + "/api/environments/620C_W6830/check", {}) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                simulator_checks = {
+                    item["key"]: item for item in data["result"]["checks"]
+                }
+                self.assertEqual(simulator_checks["command"]["status"], "pass")
+                self.assertEqual(simulator_checks["capture"]["status"], "pass")
+            session.start.assert_called_once_with()
+            session.capture_screenshot.assert_called_once()
+            session.stop.assert_called_once_with()
 
         ready = _ready_hardware_preflight()
         with patch(
@@ -4145,7 +4322,10 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("ones", cfg)
             self.assertIn("hardware", cfg)
             self.assertIn("simulator", cfg)
-            self.assertEqual(cfg["hardware"]["profile_root"], str(self.paths.root / "profiles"))
+            self.assertEqual(
+                cfg["hardware"]["profile_root"],
+                str(self.paths.root / ".runtime" / "profiles"),
+            )
             self.assertIn("ble_address", cfg["hardware"])
             self.assertEqual(cfg["hardware"]["ble_scan_timeout"], 15.0)
             self.assertNotIn("hardware_source_root", cfg["simulator"])
@@ -4221,6 +4401,96 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             self.assertEqual(data["status"], "ok")
 
+    def test_unified_579_case_management_keeps_manifest_immutable(self) -> None:
+        import base64
+        import hashlib
+        import io
+        import openpyxl
+
+        manifest_root = self.paths.case_map / "579_case_map"
+        manifest_root.mkdir(parents=True, exist_ok=True)
+        manifest_path = manifest_root / "计时器.json"
+        manifest_path.write_text(json.dumps({
+            "profile": "579_O2",
+            "sheet": "计时器",
+            "cases": [{
+                "case_id": "TIMER-BASE-001",
+                "sheet": "计时器",
+                "priority": "P0",
+                "precondition_text": "设备处于表盘",
+                "steps_text": "1. 打开计时器",
+                "expected_text": "计时器页面正常显示",
+                "verification_points": ["计时器页面正常显示"],
+                "automation_maturity": "AUTO_READY",
+                "mapping_status": "AUTO_READY",
+                "platform_automation": {"579": {"maturity": "AUTO_READY", "runnable": True}},
+            }],
+        }, ensure_ascii=False), encoding="utf-8")
+        manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        _, base = self._server()
+
+        with urlopen(base + "/api/cases?project_id=579_O2&page_size=100", timeout=3) as response:
+            listed = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(listed["total"], 1)
+        self.assertTrue(listed["items"][0]["source_locked"])
+
+        with self._post_json(base + "/api/cases", {
+            "project_id": "579_O2",
+            "case": {
+                "case_id": "TIMER-MANUAL-001",
+                "sheet": "计时器",
+                "priority": "P1",
+                "steps_text": "1. 打开计时器\n2. 点击开始",
+                "expected_text": "计时开始",
+                "applicable_platforms": ["579"],
+            },
+        }) as response:
+            self.assertEqual(response.status, 201)
+
+        with self._post_json(base + "/api/cases/TIMER-BASE-001/revisions", {
+            "project_id": "579_O2",
+            "case": {"expected_text": "计时器页面完整显示"},
+        }) as response:
+            revised = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(revised["revision"], 2)
+        self.assertEqual(hashlib.sha256(manifest_path.read_bytes()).hexdigest(), manifest_sha)
+
+        with self._post_json(base + "/api/cases/execution-options", {
+            "project_id": "579_O2",
+            "platform_id": "579",
+            "target_id": "579.o2",
+            "case_ids": ["TIMER-MANUAL-001"],
+        }) as response:
+            options = json.loads(response.read().decode("utf-8"))["options"]
+        self.assertFalse(options[0]["cases"][0]["runnable"])
+        self.assertEqual(options[0]["cases"][0]["reason_code"], "BINDING_NOT_READY")
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = "自动化测试用例_v1"
+        sheet.append(["模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果", "不可自动化", "固化状态", "备注"])
+        sheet.append(["闹钟", "ALARM-MANUAL-001", "P1", "", "1. 打开闹钟", "闹钟页面显示", "否", "", ""])
+        buffer = io.BytesIO()
+        workbook.save(buffer)
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        with self._post_json(base + "/api/cases/import/preview", {
+            "project_id": "579_O2",
+            "filename": "579.xlsx",
+            "file_base64": encoded,
+            "applicable_platforms": ["579"],
+            "conflict_strategy": "SKIP",
+        }) as response:
+            preview = json.loads(response.read().decode("utf-8"))
+        with self._post_json(base + "/api/cases/import/commit", {
+            "project_id": "579_O2",
+            "batch_id": preview["batch_id"],
+            "preview_token": preview["preview_token"],
+            "source_sha256": preview["source_sha256"],
+        }) as response:
+            committed = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(committed["imported_count"], 1)
+        self.assertEqual(hashlib.sha256(manifest_path.read_bytes()).hexdigest(), manifest_sha)
+
     def test_blank_optional_simulator_paths_keep_settings_page_available(self) -> None:
         _, base = self._server()
         with patch.dict(
@@ -4248,7 +4518,7 @@ class FrontendDataTest(unittest.TestCase):
         simulator_root = self.paths.root / "workspaces" / "firmware" / "620C_W6830"
         self.assertEqual(
             config["hardware"]["profile_root"],
-            str(self.paths.root / "profiles"),
+            str(self.paths.root / ".runtime" / "profiles"),
         )
         self.assertEqual(config["simulator"]["source_root"], str(simulator_root))
         simulator_6202 = next(
