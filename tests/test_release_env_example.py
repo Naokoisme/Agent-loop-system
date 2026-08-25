@@ -62,6 +62,8 @@ def test_release_env_clears_credentials_local_paths_and_device_identity(tmp_path
                 "ONES_USER_ID=",
                 "W30_HARDWARE_PORT=COM7",
                 "W30_HARDWARE_BLE_ADDRESS=",
+                "WATCH_579_BLE_ADDRESS=",
+                "WATCH_579_BLE_SCAN_TIMEOUT=15",
                 r"AGENT_LOOP_LAYOUT_ROOT=..",
                 r"AGENT_LOOP_WORKSPACE_BASE=../workspaces/firmware",
                 r"W30_SOURCE_ROOT=D:\\source",
@@ -87,6 +89,8 @@ def test_release_env_clears_credentials_local_paths_and_device_identity(tmp_path
                 "ONES_USER_ID=user-secret",
                 "W30_HARDWARE_PORT=COM19",
                 "W30_HARDWARE_BLE_ADDRESS=AA:BB:CC:DD:EE:FF",
+                "WATCH_579_BLE_ADDRESS=41:42:72:6A:93:2D",
+                "WATCH_579_BLE_SCAN_TIMEOUT=21",
                 r"AGENT_LOOP_LAYOUT_ROOT=..",
                 r"AGENT_LOOP_WORKSPACE_BASE=../workspaces/firmware",
                 r"W30_HARDWARE_SOURCE_ROOT=D:\\local-firmware",
@@ -111,6 +115,8 @@ def test_release_env_clears_credentials_local_paths_and_device_identity(tmp_path
     assert values["ONES_USER_ID"] == ""
     assert values["W30_HARDWARE_PORT"] == ""
     assert values["W30_HARDWARE_BLE_ADDRESS"] == ""
+    assert values["WATCH_579_BLE_ADDRESS"] == ""
+    assert values["WATCH_579_BLE_SCAN_TIMEOUT"] == "21"
     assert values["AGENT_LOOP_LAYOUT_ROOT"] == ""
     assert values["AGENT_LOOP_WORKSPACE_BASE"] == ""
     assert values["W30_SOURCE_ROOT"] == ""
@@ -170,6 +176,8 @@ def test_internal_hardware_env_copies_model_keys_but_clears_machine_state(
                 "ONES_AUTH_TOKEN=",
                 "W30_HARDWARE_PORT=",
                 "W30_HARDWARE_BLE_ADDRESS=",
+                "WATCH_579_BLE_ADDRESS=",
+                "WATCH_579_BLE_SCAN_TIMEOUT=15",
                 r"W30_HARDWARE_SOURCE_ROOT=D:\\firmware",
                 r"W30_HARDWARE_WORKSPACE_ROOT=D:\\workspace",
                 r"W30_HARDWARE_PROFILE_ROOT=D:\\profiles",
@@ -190,6 +198,8 @@ def test_internal_hardware_env_copies_model_keys_but_clears_machine_state(
                 "ONES_AUTH_TOKEN=ones-secret",
                 "W30_HARDWARE_PORT=COM19",
                 "W30_HARDWARE_BLE_ADDRESS=AA:BB:CC:DD:EE:FF",
+                "WATCH_579_BLE_ADDRESS=41:42:72:6A:93:2D",
+                "WATCH_579_BLE_SCAN_TIMEOUT=21",
                 r"W30_HARDWARE_SOURCE_ROOT=D:\\local-firmware",
                 r"W30_HARDWARE_WORKSPACE_ROOT=D:\\local-workspace",
                 "W30_HARDWARE_PROFILE_VERSION=v1.2.0-dev.3",
@@ -210,6 +220,8 @@ def test_internal_hardware_env_copies_model_keys_but_clears_machine_state(
     assert values["ONES_AUTH_TOKEN"] == ""
     assert values["W30_HARDWARE_PORT"] == ""
     assert values["W30_HARDWARE_BLE_ADDRESS"] == ""
+    assert values["WATCH_579_BLE_ADDRESS"] == ""
+    assert values["WATCH_579_BLE_SCAN_TIMEOUT"] == "21"
     assert values["W30_HARDWARE_SOURCE_ROOT"] == ""
     assert values["W30_HARDWARE_WORKSPACE_ROOT"] == ""
     assert values["W30_HARDWARE_PROFILE_ROOT"] == "profiles"
