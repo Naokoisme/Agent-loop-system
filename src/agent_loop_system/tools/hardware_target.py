@@ -238,6 +238,7 @@ def build_hardware_agent_knowledge(config: HardwareTargetConfig) -> str:
         project_cmake=config.project_cmake,
         app_windows=config.app_windows,
         app_quick_cmd=config.app_quick_cmd,
+        project=config.project,
     )
     return (
         f"## 当前 {config.project} 真机命令与参数（从源码即时提取）\n"

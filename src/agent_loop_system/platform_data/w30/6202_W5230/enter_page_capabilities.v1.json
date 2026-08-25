@@ -1,0 +1,1252 @@
+{
+  "kind": "EnterPageCapabilityCatalog",
+  "schema_version": 1,
+  "catalog_id": "w30.6202_w5230.enter_page",
+  "project": "6202_W5230",
+  "windows_version": "5803_SBYH_FP410X502",
+  "source_method": "GUI_WIN_DEFINE registered windows plus reviewed ENTER_PAGE parameter semantics",
+  "expected_window_count": 213,
+  "expected_entry_count": 248,
+  "entries": [
+    {
+      "business_name": "活动步数目标弹窗",
+      "window_name": "ACTIVE_GOAL",
+      "param": 1
+    },
+    {
+      "business_name": "活动卡路里目标弹窗",
+      "window_name": "ACTIVE_GOAL",
+      "param": 2
+    },
+    {
+      "business_name": "活动时长目标弹窗",
+      "window_name": "ACTIVE_GOAL",
+      "param": 3
+    },
+    {
+      "business_name": "闹钟列表",
+      "window_name": "ALARM_CLOCK",
+      "param": 0
+    },
+    {
+      "business_name": "新增闹钟",
+      "window_name": "ALARM_CLOCK_ADD",
+      "param": 0
+    },
+    {
+      "business_name": "编辑闹钟",
+      "window_name": "ALARM_CLOCK_EDIT",
+      "param": 0
+    },
+    {
+      "business_name": "闹钟重复设置",
+      "window_name": "ALARM_CLOCK_REPEAT",
+      "param": 0
+    },
+    {
+      "business_name": "闹钟响铃弹窗",
+      "window_name": "ALARM_CLOCK_RING",
+      "param": 0
+    },
+    {
+      "business_name": "闹钟缩略页",
+      "window_name": "ALARM_CLOCK_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "闹钟时间设置",
+      "window_name": "ALARM_CLOCK_TIME",
+      "param": 0
+    },
+    {
+      "business_name": "闹钟工作日设置",
+      "window_name": "ALARM_CLOCK_WEEKDAY",
+      "param": 0
+    },
+    {
+      "business_name": "AOD 指针样式",
+      "window_name": "AOD_CLOCK_STYLE",
+      "param": 0
+    },
+    {
+      "business_name": "AOD 指针样式预览",
+      "window_name": "AOD_CLOCK_STYLE_PREVIEW",
+      "param": 0
+    },
+    {
+      "business_name": "AOD 数字样式预览",
+      "window_name": "AOD_NUMBER_STYLE_PREVIEW",
+      "param": 0
+    },
+    {
+      "business_name": "AOD 设置",
+      "window_name": "AOD_SETTING",
+      "param": 0
+    },
+    {
+      "business_name": "App 音量调节",
+      "window_name": "APP_VOLUME_ADJUST",
+      "param": 0
+    },
+    {
+      "business_name": "后台任务",
+      "window_name": "BACKGROUND_TASK",
+      "param": 0
+    },
+    {
+      "business_name": "电池",
+      "window_name": "BATTERY",
+      "param": 0
+    },
+    {
+      "business_name": "血氧",
+      "window_name": "BLOOD_OXYGEN",
+      "param": 0
+    },
+    {
+      "business_name": "血氧告警弹窗",
+      "window_name": "BLOOD_OXYGEN_ALARM",
+      "param": 0
+    },
+    {
+      "business_name": "血氧测量",
+      "window_name": "BLOOD_OXYGEN_MEASURE",
+      "param": 0
+    },
+    {
+      "business_name": "血氧缩略页",
+      "window_name": "BLOOD_OXYGEN_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "血氧提示",
+      "window_name": "BLOOD_OXYGEN_TIPS",
+      "param": 0
+    },
+    {
+      "business_name": "血氧组件",
+      "window_name": "BLOOD_OXYGEN_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸缩略页",
+      "window_name": "BREATH_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练",
+      "window_name": "BREATH_TRAIN",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练动画",
+      "window_name": "BREATH_TRAIN_ANIMATION",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练结束",
+      "window_name": "BREATH_TRAIN_END",
+      "param": 0
+    },
+    {
+      "business_name": "退出呼吸训练弹窗",
+      "window_name": "BREATH_TRAIN_EXIT",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练节奏",
+      "window_name": "BREATH_TRAIN_RHYTHM",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练设置",
+      "window_name": "BREATH_TRAIN_SETTING",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练时长",
+      "window_name": "BREATH_TRAIN_TIME",
+      "param": 0
+    },
+    {
+      "business_name": "呼吸训练振动",
+      "window_name": "BREATH_TRAIN_VIR",
+      "param": 0
+    },
+    {
+      "business_name": "计算器",
+      "window_name": "CALCULATOR",
+      "param": 0
+    },
+    {
+      "business_name": "日历",
+      "window_name": "CALENDAR",
+      "param": 0
+    },
+    {
+      "business_name": "日历组件",
+      "window_name": "CALENDAR_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "遥控拍照弹窗",
+      "window_name": "CAMERA",
+      "param": 0
+    },
+    {
+      "business_name": "充电弹窗",
+      "window_name": "CHARGING",
+      "param": 0
+    },
+    {
+      "business_name": "绑定等待弹窗",
+      "window_name": "COMMON_BIND_RESULT",
+      "param": 1
+    },
+    {
+      "business_name": "绑定成功弹窗",
+      "window_name": "COMMON_BIND_RESULT",
+      "param": 2
+    },
+    {
+      "business_name": "绑定失败弹窗",
+      "window_name": "COMMON_BIND_RESULT",
+      "param": 3
+    },
+    {
+      "business_name": "通用按钮提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "勿扰提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "闹钟编辑提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "运动数据不足提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "运动时间不足提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 4
+    },
+    {
+      "business_name": "断开后恢复出厂提示弹窗",
+      "window_name": "COMMON_BUTTON_TIP",
+      "param": 5
+    },
+    {
+      "business_name": "通用消息提示弹窗",
+      "window_name": "COMMON_MESSAGE_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "通用文本提示弹窗",
+      "window_name": "COMMON_TEXT_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "应用连接错误提示弹窗",
+      "window_name": "COMMON_TEXT_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "小睡提示弹窗",
+      "window_name": "COMMON_TEXT_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "启用短信提示弹窗",
+      "window_name": "COMMON_TEXT_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "通用提示弹窗",
+      "window_name": "COMMON_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "运动数据详情提示弹窗",
+      "window_name": "COMMON_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "卡路里提示弹窗",
+      "window_name": "COMMON_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "步数提示弹窗",
+      "window_name": "COMMON_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "活动时长提示弹窗",
+      "window_name": "COMMON_TIP",
+      "param": 4
+    },
+    {
+      "business_name": "通用标题按钮提示弹窗",
+      "window_name": "COMMON_TITLE_BUTTON_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "重启确认弹窗",
+      "window_name": "COMMON_TITLE_BUTTON_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "关机确认弹窗",
+      "window_name": "COMMON_TITLE_BUTTON_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "恢复出厂确认弹窗",
+      "window_name": "COMMON_TITLE_BUTTON_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "通用佩戴提示弹窗",
+      "window_name": "COMMON_WAER_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "压力未佩戴提示弹窗",
+      "window_name": "COMMON_WAER_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "心率未佩戴提示弹窗",
+      "window_name": "COMMON_WAER_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "血氧未佩戴提示弹窗",
+      "window_name": "COMMON_WAER_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "常亮时长",
+      "window_name": "CONSTANT_BRIGHTNESS_TIME",
+      "param": 0
+    },
+    {
+      "business_name": "活动记录",
+      "window_name": "DATA",
+      "param": 0
+    },
+    {
+      "business_name": "活动记录缩略页",
+      "window_name": "DATA_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "活动记录组件",
+      "window_name": "DATA_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "表盘",
+      "window_name": "DIAL",
+      "param": 0
+    },
+    {
+      "business_name": "删除表盘弹窗",
+      "window_name": "DIAL_DELETE",
+      "param": 0
+    },
+    {
+      "business_name": "删除表盘提示弹窗",
+      "window_name": "DIAL_DELETE_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "表盘编辑",
+      "window_name": "DIAL_EDIT",
+      "param": 0
+    },
+    {
+      "business_name": "表盘选择",
+      "window_name": "DIAL_SELECT",
+      "param": 0
+    },
+    {
+      "business_name": "断连提示弹窗",
+      "window_name": "DISCONNECT_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "显示亮度",
+      "window_name": "DISPLAY_BRIGHTNESS",
+      "param": 0
+    },
+    {
+      "business_name": "亮度调节",
+      "window_name": "DISPLAY_BRIGHTNESS_ADJUST",
+      "param": 0
+    },
+    {
+      "business_name": "亮屏时长",
+      "window_name": "DISPLAY_BRIGHTNESS_TIME",
+      "param": 0
+    },
+    {
+      "business_name": "勿扰定时",
+      "window_name": "DND_TIMER",
+      "param": 0
+    },
+    {
+      "business_name": "编辑勿扰定时",
+      "window_name": "DND_TIMER_EDIT",
+      "param": 0
+    },
+    {
+      "business_name": "下键设置",
+      "window_name": "DOWN_KEY_SETTING",
+      "param": 0
+    },
+    {
+      "business_name": "下键功能选择",
+      "window_name": "DOWN_KEY_SETTING_SELECT",
+      "param": 0
+    },
+    {
+      "business_name": "喝水提醒弹窗",
+      "window_name": "DRINK_REMINDER",
+      "param": 0
+    },
+    {
+      "business_name": "编辑缩略页",
+      "window_name": "EDIT_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "女性健康",
+      "window_name": "FEMALE_HEALTH",
+      "param": 0
+    },
+    {
+      "business_name": "经期提醒弹窗",
+      "window_name": "FEMALE_PERIOD_REMINDER",
+      "param": 0
+    },
+    {
+      "business_name": "查找手机",
+      "window_name": "FIND_PHONE",
+      "param": 0
+    },
+    {
+      "business_name": "查找手表弹窗",
+      "window_name": "FIND_WATCH",
+      "param": 0
+    },
+    {
+      "business_name": "手电筒弹窗",
+      "window_name": "FLASHLIGHT",
+      "param": 0
+    },
+    {
+      "business_name": "耳机连接",
+      "window_name": "HEADSET_CONNECT",
+      "param": 0
+    },
+    {
+      "business_name": "耳机连接历史",
+      "window_name": "HEADSET_CONNECT_HISTORY",
+      "param": 0
+    },
+    {
+      "business_name": "耳机连接信息",
+      "window_name": "HEADSET_CONNECT_INFO",
+      "param": 0
+    },
+    {
+      "business_name": "耳机连接结果",
+      "window_name": "HEADSET_CONNECT_RESULT",
+      "param": 0
+    },
+    {
+      "business_name": "耳机连接超时",
+      "window_name": "HEADSET_CONNECT_TIMEOUT",
+      "param": 0
+    },
+    {
+      "business_name": "耳机列表",
+      "window_name": "HEADSET_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "搜索耳机",
+      "window_name": "HEADSET_SEARCH",
+      "param": 0
+    },
+    {
+      "business_name": "心率",
+      "window_name": "HEART_RATE",
+      "param": 0
+    },
+    {
+      "business_name": "心率测量",
+      "window_name": "HEART_RATE_MEASURE",
+      "param": 0
+    },
+    {
+      "business_name": "心率提醒",
+      "window_name": "HEART_RATE_REMINDER",
+      "param": 0
+    },
+    {
+      "business_name": "心率缩略页",
+      "window_name": "HEART_RATE_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "心率组件",
+      "window_name": "HEART_RATE_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "克尔白",
+      "window_name": "KAABA",
+      "param": 0
+    },
+    {
+      "business_name": "克尔白校准",
+      "window_name": "KAABA_CALIBRATION",
+      "param": 0
+    },
+    {
+      "business_name": "克尔白 GPS 提示",
+      "window_name": "KAABA_GPS_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "克尔白等待",
+      "window_name": "KAABA_WAITING",
+      "param": 0
+    },
+    {
+      "business_name": "语言列表",
+      "window_name": "LANGUAGE_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "一级菜单选择",
+      "window_name": "LEVEL_1_MENU_SELECTED",
+      "param": 0
+    },
+    {
+      "business_name": "一级菜单排序",
+      "window_name": "LEVEL_1_MENU_SORT",
+      "param": 0
+    },
+    {
+      "business_name": "本地音乐声道",
+      "window_name": "LOCAL_MUSIC_CHANNEL",
+      "param": 0
+    },
+    {
+      "business_name": "本地音乐控制",
+      "window_name": "LOCAL_MUSIC_CONTROL",
+      "param": 0
+    },
+    {
+      "business_name": "本地音乐列表",
+      "window_name": "LOCAL_MUSIC_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "本地音乐更多",
+      "window_name": "LOCAL_MUSIC_MORE",
+      "param": 0
+    },
+    {
+      "business_name": "长按关机重启",
+      "window_name": "LONG_PRESS_POWER_OFF_RESTART",
+      "param": 0
+    },
+    {
+      "business_name": "低电量提示",
+      "window_name": "LOW_BATTERY_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "媒体音量调节",
+      "window_name": "MEDIA_VOLUME_ADJUST",
+      "param": 0
+    },
+    {
+      "business_name": "鱼眼菜单",
+      "window_name": "MENU_FISH_EYE",
+      "param": 0
+    },
+    {
+      "business_name": "星环菜单",
+      "window_name": "MENU_GALACTIC_RING",
+      "param": 0
+    },
+    {
+      "business_name": "3D 网格菜单",
+      "window_name": "MENU_GRID_3D",
+      "param": 0
+    },
+    {
+      "business_name": "蜂窝菜单",
+      "window_name": "MENU_HONEYCOMB",
+      "param": 0
+    },
+    {
+      "business_name": "列表菜单",
+      "window_name": "MENU_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "圆形列表菜单",
+      "window_name": "MENU_LIST_CIRCLE",
+      "param": 0
+    },
+    {
+      "business_name": "圆角列表菜单",
+      "window_name": "MENU_LIST_RADIUS",
+      "param": 0
+    },
+    {
+      "business_name": "瀑布流菜单",
+      "window_name": "MENU_WATERFALL",
+      "param": 0
+    },
+    {
+      "business_name": "消息列表",
+      "window_name": "MESSAGE_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "消息详情弹窗",
+      "window_name": "MESSAGE_SHOW_DETAIL",
+      "param": 0
+    },
+    {
+      "business_name": "同类型消息",
+      "window_name": "MESSAGE_SHOW_SAME_TYPE",
+      "param": 0
+    },
+    {
+      "business_name": "音乐",
+      "window_name": "MUSIC",
+      "param": 0
+    },
+    {
+      "business_name": "音乐主页",
+      "window_name": "MUSIC_MAIN",
+      "param": 0
+    },
+    {
+      "business_name": "无音乐提示弹窗",
+      "window_name": "MUSIC_NONE_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "音乐缩略页",
+      "window_name": "MUSIC_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "音乐组件",
+      "window_name": "MUSIC_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "NTC 提示弹窗",
+      "window_name": "NTC_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "一键测量",
+      "window_name": "ONE_CLICK_MEASURE",
+      "param": 0
+    },
+    {
+      "business_name": "一键测量未佩戴提示",
+      "window_name": "ONE_CLICK_MEASURE_NOT_WEAR_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "一键测量结果",
+      "window_name": "ONE_CLICK_MEASURE_RESULT",
+      "param": 0
+    },
+    {
+      "business_name": "固件升级弹窗",
+      "window_name": "OTA",
+      "param": 0
+    },
+    {
+      "business_name": "个性化",
+      "window_name": "PERSONALIZATION",
+      "param": 0
+    },
+    {
+      "business_name": "个性化页面切换动画",
+      "window_name": "PERS_ANIMATION_PAGE_TRANSITION",
+      "param": 0
+    },
+    {
+      "business_name": "个性化主表盘动画选择",
+      "window_name": "PERS_ANIMATION_SEL_MAIN_DIAL",
+      "param": 0
+    },
+    {
+      "business_name": "个性化状态栏动画",
+      "window_name": "PERS_ANIMATION_STATUS_PANEL",
+      "param": 0
+    },
+    {
+      "business_name": "个性化动画样式选择",
+      "window_name": "PERS_ANIMATION_STYLE_SEL",
+      "param": 0
+    },
+    {
+      "business_name": "菜单样式选择",
+      "window_name": "PERS_MENU_STYLE_SEL",
+      "param": 0
+    },
+    {
+      "business_name": "重启确认弹窗",
+      "window_name": "POWER_OFF_RESTART",
+      "param": 1
+    },
+    {
+      "business_name": "关机确认弹窗",
+      "window_name": "POWER_OFF_RESTART",
+      "param": 2
+    },
+    {
+      "business_name": "祈祷页面（数据无效）",
+      "window_name": "PRAY",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷页面（数据有效）",
+      "window_name": "PRAY",
+      "param": 1
+    },
+    {
+      "business_name": "祈祷内容列表",
+      "window_name": "PRAYER_CONTENT_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷播放",
+      "window_name": "PRAYER_PLAYER",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷类型",
+      "window_name": "PRAYER_TYPE",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷项目开关",
+      "window_name": "PRAY_ITEM_SWITCH",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷模式",
+      "window_name": "PRAY_MODE",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷提醒",
+      "window_name": "PRAY_REMIND",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷提醒时间设置",
+      "window_name": "PRAY_REMIND_TIME_SET",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷设置",
+      "window_name": "PRAY_SET",
+      "param": 0
+    },
+    {
+      "business_name": "祈祷时间显示",
+      "window_name": "PRAY_TIME_SHOW",
+      "param": 0
+    },
+    {
+      "business_name": "二维码",
+      "window_name": "QRCODE",
+      "param": 0
+    },
+    {
+      "business_name": "二维码大图",
+      "window_name": "QRCODE_BIG",
+      "param": 0
+    },
+    {
+      "business_name": "二维码说明",
+      "window_name": "QRCODE_INSTRUCTIONS",
+      "param": 0
+    },
+    {
+      "business_name": "二维码提醒",
+      "window_name": "QRCODE_REMINDER",
+      "param": 0
+    },
+    {
+      "business_name": "抬腕亮屏",
+      "window_name": "RAISE_TO_WAKE",
+      "param": 0
+    },
+    {
+      "business_name": "录音",
+      "window_name": "RECORD",
+      "param": 0
+    },
+    {
+      "business_name": "录音中",
+      "window_name": "RECORDING",
+      "param": 0
+    },
+    {
+      "business_name": "录音空间不足弹窗",
+      "window_name": "RECORD_NO_SPACE",
+      "param": 0
+    },
+    {
+      "business_name": "录音播放",
+      "window_name": "RECORD_PLAY",
+      "param": 0
+    },
+    {
+      "business_name": "录音组件",
+      "window_name": "RECORD_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "省电表盘",
+      "window_name": "SAVE_POWER_WATCHFACE",
+      "param": 0
+    },
+    {
+      "business_name": "退出省电表盘弹窗",
+      "window_name": "SAVE_POWER_WATCHFACE_EXIT",
+      "param": 0
+    },
+    {
+      "business_name": "屏幕解锁弹窗",
+      "window_name": "SCREEN_UNLOCK",
+      "param": 0
+    },
+    {
+      "business_name": "屏幕解锁弹窗（上键短按后）",
+      "window_name": "SCREEN_UNLOCK",
+      "param": 1
+    },
+    {
+      "business_name": "设置",
+      "window_name": "SETTING",
+      "param": 0
+    },
+    {
+      "business_name": "设置-勿扰",
+      "window_name": "SETTING_DND",
+      "param": 0
+    },
+    {
+      "business_name": "设置-通用",
+      "window_name": "SETTING_GENERAL",
+      "param": 0
+    },
+    {
+      "business_name": "设置-通知",
+      "window_name": "SETTING_NOTIFICATION",
+      "param": 0
+    },
+    {
+      "business_name": "设置缩略页",
+      "window_name": "SETTING_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "控制中心",
+      "window_name": "SHORTCUT",
+      "param": 0
+    },
+    {
+      "business_name": "负一屏",
+      "window_name": "SIDEBAR",
+      "param": 0
+    },
+    {
+      "business_name": "负一屏选择",
+      "window_name": "SIDEBAR_SELECT",
+      "param": 0
+    },
+    {
+      "business_name": "负一屏排序",
+      "window_name": "SIDEBAR_SORT",
+      "param": 0
+    },
+    {
+      "business_name": "负一屏添加",
+      "window_name": "SIEDBAR_ADD",
+      "param": 0
+    },
+    {
+      "business_name": "久坐提醒弹窗",
+      "window_name": "SIT_REMINDER",
+      "param": 0
+    },
+    {
+      "business_name": "睡眠",
+      "window_name": "SLEEP",
+      "param": 0
+    },
+    {
+      "business_name": "睡眠缩略页",
+      "window_name": "SLEEP_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "睡眠组件",
+      "window_name": "SLEEP_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "声音与振动",
+      "window_name": "SOUND_VIBRATION",
+      "param": 0
+    },
+    {
+      "business_name": "运动目标达成通用提示",
+      "window_name": "SPORT_AC_GOAL_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "运动目标达成50%提示",
+      "window_name": "SPORT_AC_GOAL_TIP",
+      "param": 1
+    },
+    {
+      "business_name": "运动目标达成100%提示",
+      "window_name": "SPORT_AC_GOAL_TIP",
+      "param": 2
+    },
+    {
+      "business_name": "运动距离目标达成提示",
+      "window_name": "SPORT_AC_GOAL_TIP",
+      "param": 3
+    },
+    {
+      "business_name": "运动时长目标达成提示",
+      "window_name": "SPORT_AC_GOAL_TIP",
+      "param": 4
+    },
+    {
+      "business_name": "运动卡路里目标列表",
+      "window_name": "SPORT_CALORIE_GOAL_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动倒计时",
+      "window_name": "SPORT_COUNT_DOWN",
+      "param": 0
+    },
+    {
+      "business_name": "运动距离目标列表",
+      "window_name": "SPORT_DISTANCE_GOAL_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动结束数据（距离配速）",
+      "window_name": "SPORT_END_DATA_SHOW",
+      "param": 1
+    },
+    {
+      "business_name": "运动结束数据（卡路里）",
+      "window_name": "SPORT_END_DATA_SHOW",
+      "param": 2
+    },
+    {
+      "business_name": "运动目标列表",
+      "window_name": "SPORT_GOAL_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动中（默认）",
+      "window_name": "SPORT_INPROGRESS",
+      "param": 0
+    },
+    {
+      "business_name": "运动中（卡路里）",
+      "window_name": "SPORT_INPROGRESS",
+      "param": 1
+    },
+    {
+      "business_name": "运动中（距离配速）",
+      "window_name": "SPORT_INPROGRESS",
+      "param": 2
+    },
+    {
+      "business_name": "运动长按退出弹窗",
+      "window_name": "SPORT_KEY_LONGHOLD_EXIT",
+      "param": 0
+    },
+    {
+      "business_name": "运动长按提示弹窗",
+      "window_name": "SPORT_KEY_LONGHOLD_TIP",
+      "param": 0
+    },
+    {
+      "business_name": "运动列表",
+      "window_name": "SPORT_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动准备（默认）",
+      "window_name": "SPORT_READY",
+      "param": 0
+    },
+    {
+      "business_name": "室内跑步准备",
+      "window_name": "SPORT_READY",
+      "param": 1
+    },
+    {
+      "business_name": "室外跑步准备",
+      "window_name": "SPORT_READY",
+      "param": 2
+    },
+    {
+      "business_name": "跳绳准备",
+      "window_name": "SPORT_READY",
+      "param": 3
+    },
+    {
+      "business_name": "运动记录",
+      "window_name": "SPORT_RECORD",
+      "param": 0
+    },
+    {
+      "business_name": "同类运动列表",
+      "window_name": "SPORT_SAME_TYPE_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动列表排序设置",
+      "window_name": "SPORT_SET_LIST_SORT",
+      "param": 0
+    },
+    {
+      "business_name": "运动时间目标列表",
+      "window_name": "SPORT_TIME_GOAL_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "运动类型卡片",
+      "window_name": "SPORT_TYPE_CARD",
+      "param": 0
+    },
+    {
+      "business_name": "秒表",
+      "window_name": "STOPWATCH",
+      "param": 0
+    },
+    {
+      "business_name": "秒表缩略页",
+      "window_name": "STOPWATCH_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "压力",
+      "window_name": "STRESS",
+      "param": 0
+    },
+    {
+      "business_name": "压力详情",
+      "window_name": "STRESS_DETAIL",
+      "param": 0
+    },
+    {
+      "business_name": "压力测量",
+      "window_name": "STRESS_MEASURE",
+      "param": 0
+    },
+    {
+      "business_name": "压力测量 App",
+      "window_name": "STRESS_MEASURE_APP",
+      "param": 0
+    },
+    {
+      "business_name": "压力缩略页",
+      "window_name": "STRESS_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "压力组件",
+      "window_name": "STRESS_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "系统信息",
+      "window_name": "SYSTEM_INFO",
+      "param": 0
+    },
+    {
+      "business_name": "念珠",
+      "window_name": "TASBIH",
+      "param": 0
+    },
+    {
+      "business_name": "念珠设置",
+      "window_name": "TASBIH_SET",
+      "param": 0
+    },
+    {
+      "business_name": "通话",
+      "window_name": "TELEPHONY",
+      "param": 0
+    },
+    {
+      "business_name": "通话中弹窗",
+      "window_name": "TELEPHONY_CALL",
+      "param": 0
+    },
+    {
+      "business_name": "联系人",
+      "window_name": "TELEPHONY_CONTACT",
+      "param": 0
+    },
+    {
+      "business_name": "拨号盘",
+      "window_name": "TELEPHONY_DIAL",
+      "param": 0
+    },
+    {
+      "business_name": "来电弹窗",
+      "window_name": "TELEPHONY_INCOMING",
+      "param": 0
+    },
+    {
+      "business_name": "去电弹窗",
+      "window_name": "TELEPHONY_OUTGOING",
+      "param": 0
+    },
+    {
+      "business_name": "预去电弹窗",
+      "window_name": "TELEPHONY_PRE_OUTGOING",
+      "param": 0
+    },
+    {
+      "business_name": "通话记录",
+      "window_name": "TELEPHONY_RECORD",
+      "param": 0
+    },
+    {
+      "business_name": "通话记录列表",
+      "window_name": "TELEPHONY_RECORD_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "短信弹窗",
+      "window_name": "TELEPHONY_SMS",
+      "param": 0
+    },
+    {
+      "business_name": "SOS 通话",
+      "window_name": "TELEPHONY_SOS",
+      "param": 0
+    },
+    {
+      "business_name": "通话音量弹窗",
+      "window_name": "TELEPHONY_VOLUME",
+      "param": 0
+    },
+    {
+      "business_name": "添加计时器",
+      "window_name": "TIMER_ADD",
+      "param": 0
+    },
+    {
+      "business_name": "计时器详情",
+      "window_name": "TIMER_DETAILS",
+      "param": 0
+    },
+    {
+      "business_name": "计时器结束弹窗",
+      "window_name": "TIMER_END",
+      "param": 0
+    },
+    {
+      "business_name": "计时器列表",
+      "window_name": "TIMER_LIST",
+      "param": 0
+    },
+    {
+      "business_name": "计时器缩略页",
+      "window_name": "TIMER_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "振动强度",
+      "window_name": "VIBRATION_STRENGTH",
+      "param": 0
+    },
+    {
+      "business_name": "语音助手交互",
+      "window_name": "VOICE_ASSISTANT_INTERACTION",
+      "param": 0
+    },
+    {
+      "business_name": "语音助手缩略页",
+      "window_name": "VOICE_ASSISTANT_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "音量调节",
+      "window_name": "VOLUME_ADJUST",
+      "param": 0
+    },
+    {
+      "business_name": "天气组件",
+      "window_name": "WEARHER_WIDGET",
+      "param": 0
+    },
+    {
+      "business_name": "天气主页",
+      "window_name": "WEATHER_HOME",
+      "param": 0
+    },
+    {
+      "business_name": "天气缩略页",
+      "window_name": "WEATHER_THUMBNAIL",
+      "param": 0
+    },
+    {
+      "business_name": "是否绑定弹窗",
+      "window_name": "WHETHER_TO_BIND",
+      "param": 0
+    },
+    {
+      "business_name": "世界时钟（当前已选城市）",
+      "window_name": "WORLD_CLOCK",
+      "param": 0
+    },
+    {
+      "business_name": "世界时钟城市列表",
+      "window_name": "WORLD_CLOCK_LIST",
+      "param": 0
+    }
+  ]
+}

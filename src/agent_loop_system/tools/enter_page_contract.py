@@ -8,7 +8,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
+
+if TYPE_CHECKING:
+    from agent_loop_system.tools.enter_page_catalog import (
+        EnterPageCapabilityCatalog,
+    )
 
 
 ENTER_PAGE_COMMAND = "ENTER_PAGE"
@@ -57,7 +62,7 @@ def enter_page_param_contract(
     extracted = tuple(special_values)
     if extracted:
         return EnterPageParamContract(
-            meaning="特殊页面模式，由页面源码的 switch(param) 解释",
+            meaning="已验证的页面业务模式",
             legal_values=extracted,
             canonical_value=extracted[0].value,
             complete=True,
@@ -77,6 +82,7 @@ def render_enter_page_knowledge(
     window_name: str,
     *,
     special_values: Iterable[EnterPageParamValue] = (),
+    canonical_value: int | None = None,
 ) -> str:
     """生成给执行 Agent 的完整页面参数说明。"""
 
@@ -89,13 +95,21 @@ def render_enter_page_knowledge(
         f"参数2=param（{ENTER_PAGE_PARAM_TYPE}，必填） | "
         f"param含义={contract.meaning}"
     )
-    if not contract.complete or contract.canonical_value is None:
+    selected_value = (
+        canonical_value if canonical_value is not None else contract.canonical_value
+    )
+    if not contract.complete or selected_value is None:
         return (
             f"语法=:ENTER_PAGE:{window_name},<uint32_param> | {common} | "
             "合法值=未知，禁止猜测 | 完整示例=无"
         )
 
-    command = f":ENTER_PAGE:{window_name},{contract.canonical_value}"
+    legal_value_set = {item.value for item in contract.legal_values}
+    if selected_value not in legal_value_set:
+        raise ValueError(
+            f"ENTER_PAGE 页面 {window_name} 的规范值 {selected_value} 不在合法值中"
+        )
+    command = f":ENTER_PAGE:{window_name},{selected_value}"
     legal_values = ", ".join(
         f"{item.value}={item.meaning}" for item in contract.legal_values
     )
@@ -105,7 +119,11 @@ def render_enter_page_knowledge(
     )
 
 
-def parse_enter_page_args(args: str) -> tuple[str, int]:
+def parse_enter_page_args(
+    args: str,
+    *,
+    catalog: "EnterPageCapabilityCatalog | None" = None,
+) -> tuple[str, int]:
     """解析 ``window_name,uint32_param`` 并校验已有的确定合同。"""
 
     if args.count(",") != 1:
@@ -130,10 +148,19 @@ def parse_enter_page_args(args: str) -> tuple[str, int]:
             f"ENTER_PAGE param 超出 uint32 范围，完整格式为 {_FORMAT_EXAMPLE}"
         )
     known = _KNOWN_WINDOW_CONTRACTS.get(window_name)
-    if known is not None and param not in {
-        item.value for item in known.legal_values
-    }:
-        legal_values = ", ".join(str(item.value) for item in known.legal_values)
+    if catalog is not None:
+        catalog_entries = catalog.entries_for(window_name)
+        if not catalog_entries:
+            raise ValueError(
+                f"ENTER_PAGE 页面 {window_name} 未登记在 {catalog.project} 能力目录"
+            )
+        legal_value_set = {item.param for item in catalog_entries}
+    elif known is not None:
+        legal_value_set = {item.value for item in known.legal_values}
+    else:
+        legal_value_set = None
+    if legal_value_set is not None and param not in legal_value_set:
+        legal_values = ", ".join(str(item) for item in sorted(legal_value_set))
         raise ValueError(
             f"ENTER_PAGE 页面 {window_name} 的合法 param 为 {legal_values}，"
             f"完整格式为 {_FORMAT_EXAMPLE}"

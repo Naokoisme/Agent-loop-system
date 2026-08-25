@@ -21,6 +21,9 @@ from agent_loop_system.tools.llm_retry import (
 )
 from agent_loop_system.tools.source_context import load_runtime_navigation_sources
 from agent_loop_system.tools.designer import DesignerPlan
+from agent_loop_system.tools.quick_command_source import (
+    resolve_project_command_source,
+)
 
 if TYPE_CHECKING:
     from agent_loop_system.reproduction import ReproductionDecision, ReproductionTrace
@@ -60,9 +63,7 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
         project = os.environ.get("W30_PROJECT", "").strip()
         if not project:
             raise ValueError("W30_PROJECT 未配置，不能从真实源码生成模拟器能力目录")
-        command_source = (
-            source_root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
-        )
+        command_source = resolve_project_command_source(source_root)
         project_cmake = source_root / "app" / "projects" / project / "Project.cmake"
         app_windows = source_root / "app" / "windows"
         app_root = source_root / "app" / "comm" / "TuoBu"
@@ -72,6 +73,7 @@ def load_simulator_knowledge(kb_dir: Path = SIMULATOR_KB_DIR) -> str:
             project_cmake=project_cmake,
             app_windows=app_windows,
             app_quick_cmd=app_quick_cmd,
+            project=project,
         ).strip()
         if not commands or not windows:
             raise ValueError(f"真实源码能力目录为空: {source_root}")
@@ -264,7 +266,8 @@ def decide_reproduction_action(
         target_rule = f"7. {str(platform_guidance).strip()}\n"
     else:
         navigation_rule = (
-            "6. 优先使用注册窗口的 ENTER_PAGE；目标窗口本身能展示文案、排版或图片时，不得额外读取"
+            "6. 先把用例中的中文页面语义与页面目录左侧业务名匹配，并优先原样使用该行的 ENTER_PAGE；"
+            "目标窗口本身能展示文案、排版或图片时，不得额外读取"
             " BUSINESS_GET 或注入无关业务数据。使用 ENTER_PAGE 时必须原样复制页面目录的完整示例；"
             "若目录标记‘完整示例=无’，不得猜测 param，应改走真实 UI 导航或 BLOCKED。\n"
         )

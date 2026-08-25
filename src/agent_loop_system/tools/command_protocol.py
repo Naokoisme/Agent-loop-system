@@ -21,6 +21,10 @@ from agent_loop_system.tools.enter_page_contract import (
     ENTER_PAGE_COMMAND,
     parse_enter_page_args,
 )
+from agent_loop_system.tools.enter_page_catalog import load_enter_page_catalog
+from agent_loop_system.tools.quick_command_source import (
+    resolve_project_command_source,
+)
 from agent_loop_system.tools.simulator import CommandResult, extract_json_objects
 
 if TYPE_CHECKING:
@@ -78,17 +82,7 @@ def _current_command_source() -> Path:
     source_root = os.environ.get("W30_SOURCE_ROOT", "").strip()
     if not source_root:
         raise ValueError("W30_SOURCE_ROOT 未配置，无法校验当前真实源码命令")
-    source = (
-        resolve_config_path(source_root)
-        / "core"
-        / "comm"
-        / "srv"
-        / "test"
-        / "hlq_quick_cmd_handler.c"
-    )
-    if not source.is_file():
-        raise ValueError(f"当前真实源码命令表不存在: {source}")
-    return source
+    return resolve_project_command_source(resolve_config_path(source_root))
 
 
 def load_command_capabilities_from_source(
@@ -126,7 +120,9 @@ def validate_agent_command(
         reason = capability.unavailable_reason or "源码明确标记不可用"
         raise ValueError(f"命令 {name} 不可用: {reason}")
     if name == ENTER_PAGE_COMMAND:
-        parse_enter_page_args(args)
+        project = os.environ.get("W30_PROJECT", "").strip()
+        catalog = load_enter_page_catalog(project) if project else None
+        parse_enter_page_args(args, catalog=catalog)
 
 
 def validate_agent_commands(

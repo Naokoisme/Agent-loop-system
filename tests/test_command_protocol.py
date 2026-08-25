@@ -173,6 +173,22 @@ class CommandProtocolTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "ENTER_PAGE"):
                     validate_agent_command(bad, self.capabilities)
 
+    def test_6202_enter_page_reuses_platform_catalog_legal_values(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {"W30_PROJECT": "6202_W5230"},
+            clear=False,
+        ):
+            validate_agent_command(":ENTER_PAGE:SHORTCUT,0", self.capabilities)
+            for param in (1, 2, 3):
+                validate_agent_command(
+                    f":ENTER_PAGE:ACTIVE_GOAL,{param}", self.capabilities
+                )
+            with self.assertRaisesRegex(ValueError, "合法 param 为 1, 2, 3"):
+                validate_agent_command(":ENTER_PAGE:ACTIVE_GOAL,0", self.capabilities)
+            with self.assertRaisesRegex(ValueError, "未登记在 6202_W5230 能力目录"):
+                validate_agent_command(":ENTER_PAGE:NOT_A_REAL_WINDOW,0", self.capabilities)
+
     def test_other_business_arguments_are_not_locally_judged(self) -> None:
         validate_agent_command(":GUI_TREE:1,2", self.capabilities)
         validate_agent_command(

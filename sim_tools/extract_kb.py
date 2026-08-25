@@ -20,6 +20,10 @@ from agent_loop_system.tools.enter_page_contract import (
     EnterPageParamValue,
     render_enter_page_knowledge,
 )
+from agent_loop_system.tools.enter_page_catalog import load_enter_page_catalog
+from agent_loop_system.tools.quick_command_source import (
+    resolve_project_command_source,
+)
 
 SIM_TOOLS = Path(__file__).parent
 KB_DIR = SIM_TOOLS / "kb"
@@ -601,30 +605,68 @@ def extract_windows(
     project_cmake: Path = PROJECT_CMAKE,
     app_windows: Path = APP_WINDOWS,
     app_quick_cmd: Path = APP_QUICK_CMD,
+    project: str | None = None,
+    capability_catalog_path: Path | None = None,
 ) -> str:
-    """汇总当前项目真实注册窗口和特殊窗口参数。"""
+    """汇总当前项目真实注册窗口和已验证的业务入口。"""
     project_text = project_cmake.read_text(encoding="utf-8", errors="ignore")
     version_match = re.search(r"set\s*\(\s*WINDOWS_VERSION\s+([A-Za-z0-9_]+)", project_text)
     if not version_match:
         raise ValueError(f"WINDOWS_VERSION 未找到: {project_cmake}")
+    windows_version = version_match.group(1)
+    project_name = str(project or project_cmake.parent.name).strip()
 
     quick_source = app_quick_cmd.read_text(encoding="utf-8", errors="ignore")
     special_params = _special_window_params(quick_source)
-    entries: dict[str, str] = {}
-    window_dir = app_windows / version_match.group(1)
+    registered: dict[str, tuple[str, str]] = {}
+    window_dir = app_windows / windows_version
     for source_file in sorted(window_dir.rglob("*.c")):
         source = source_file.read_text(encoding="utf-8", errors="ignore")
         for win_id, name, win_type in re.findall(
             r'GUI_WIN_DEFINE\(\s*([A-Z0-9_]+)\s*,\s*"([^"]+)"\s*,\s*([A-Z0-9_]+)',
             source,
         ):
-            entries[name] = (
-                f"{name} -> {name} | id={win_id} | {win_type} | "
+            registered[name] = (win_id, win_type)
+
+    catalog = load_enter_page_catalog(
+        project_name,
+        catalog_path=capability_catalog_path,
+    )
+    if catalog is not None:
+        catalog.validate_source(
+            registered_windows=registered,
+            windows_version=windows_version,
+        )
+        values_by_window = {
+            name: tuple(
+                EnterPageParamValue(entry.param, entry.business_name)
+                for entry in catalog.entries_for(name)
+            )
+            for name in catalog.window_names
+        }
+        lines: list[str] = []
+        for entry in catalog.entries:
+            win_id, win_type = registered[entry.window_name]
+            lines.append(
+                f"{entry.business_name} -> {entry.window_name} | "
+                f"id={win_id} | {win_type} | "
                 + render_enter_page_knowledge(
-                    name,
-                    special_values=special_params.get(name, ()),
+                    entry.window_name,
+                    special_values=values_by_window[entry.window_name],
+                    canonical_value=entry.param,
                 )
             )
+        return "\n".join(lines)
+
+    entries: dict[str, str] = {}
+    for name, (win_id, win_type) in registered.items():
+        entries[name] = (
+            f"{name} -> {name} | id={win_id} | {win_type} | "
+            + render_enter_page_knowledge(
+                name,
+                special_values=special_params.get(name, ()),
+            )
+        )
 
     return "\n".join(entries[key] for key in sorted(entries))
 
@@ -642,7 +684,7 @@ def main():
         os.environ.get("W30_SOURCE_ROOT", str(W30_ROOT))
     )
     project_name = os.environ.get("W30_PROJECT", PROJECT_NAME)
-    c_file = source_root / "core" / "comm" / "srv" / "test" / "hlq_quick_cmd_handler.c"
+    c_file = resolve_project_command_source(source_root)
     project_cmake = source_root / "app" / "projects" / project_name / "Project.cmake"
     app_windows = source_root / "app" / "windows"
     app_quick_cmd = source_root / "app" / "comm" / "TuoBu" / "quick_cmd" / "gui_comm_quick_cmd.c"
@@ -653,6 +695,7 @@ def main():
         project_cmake=project_cmake,
         app_windows=app_windows,
         app_quick_cmd=app_quick_cmd,
+        project=project_name,
     )
     KB_DIR.mkdir(exist_ok=True)
     (KB_DIR / "commands.txt").write_text(commands, encoding="utf-8")

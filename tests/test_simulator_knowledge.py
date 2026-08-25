@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -371,6 +372,81 @@ static const gui_comm_quick_special_win_t special_win[] = {
         self.assertIn("语法=:ENTER_PAGE:UNKNOWN,<uint32_param>", result)
         self.assertIn("合法值=未知，禁止猜测", result)
         self.assertIn("完整示例=无", result)
+
+    def test_extract_windows_uses_business_catalog_and_checks_source_coverage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            windows = root / "windows" / "TEST_WINDOWS"
+            windows.mkdir(parents=True)
+            (root / "Project.cmake").write_text(
+                "set(WINDOWS_VERSION TEST_WINDOWS)\n", encoding="utf-8"
+            )
+            (windows / "gui_win_shortcut.c").write_text(
+                'GUI_WIN_DEFINE(GUI_WIN_SHORTCUT, "SHORTCUT", '
+                "GUI_WIN_TYPE_PAGE, handler);\n",
+                encoding="utf-8",
+            )
+            (windows / "gui_win_goal.c").write_text(
+                'GUI_WIN_DEFINE(GUI_WIN_ACTIVE_GOAL, "ACTIVE_GOAL", '
+                "GUI_WIN_TYPE_POPUP, handler);\n",
+                encoding="utf-8",
+            )
+            quick_cmd = root / "gui_comm_quick_cmd.c"
+            quick_cmd.write_text("static int unused;\n", encoding="utf-8")
+            catalog = root / "catalog.json"
+            catalog.write_text(
+                json.dumps(
+                    {
+                        "kind": "EnterPageCapabilityCatalog",
+                        "schema_version": 1,
+                        "catalog_id": "test.enter_page",
+                        "project": "TEST",
+                        "windows_version": "TEST_WINDOWS",
+                        "source_method": "test",
+                        "expected_window_count": 2,
+                        "expected_entry_count": 3,
+                        "entries": [
+                            {
+                                "business_name": "控制中心",
+                                "window_name": "SHORTCUT",
+                                "param": 0,
+                            },
+                            {
+                                "business_name": "活动步数目标弹窗",
+                                "window_name": "ACTIVE_GOAL",
+                                "param": 1,
+                            },
+                            {
+                                "business_name": "活动卡路里目标弹窗",
+                                "window_name": "ACTIVE_GOAL",
+                                "param": 2,
+                            },
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            result = extract_windows(
+                project_cmake=root / "Project.cmake",
+                app_windows=root / "windows",
+                app_quick_cmd=quick_cmd,
+                project="TEST",
+                capability_catalog_path=catalog,
+            )
+
+        self.assertEqual(len(result.splitlines()), 3)
+        self.assertIn(
+            "控制中心 -> SHORTCUT | id=GUI_WIN_SHORTCUT | GUI_WIN_TYPE_PAGE",
+            result,
+        )
+        self.assertIn("命令=:ENTER_PAGE:SHORTCUT,0", result)
+        self.assertIn("完整示例=:ENTER_PAGE:ACTIVE_GOAL,2", result)
+        self.assertIn(
+            "合法值=1=活动步数目标弹窗, 2=活动卡路里目标弹窗",
+            result,
+        )
 
     def test_load_simulator_knowledge_reads_only_shared_command_and_window_kb(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

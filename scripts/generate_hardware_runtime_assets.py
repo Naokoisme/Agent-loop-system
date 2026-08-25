@@ -74,6 +74,7 @@ def generate_hardware_runtime_assets(
             project_cmake=config.project_cmake,
             app_windows=config.app_windows,
             app_quick_cmd=config.app_quick_cmd,
+            project=config.project,
         ).strip(),
     }
     with commands_path.open("x", encoding="utf-8") as stream:

@@ -15,6 +15,9 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from agent_loop_system.runtime_root import RuntimePaths, resolve_config_path
+from agent_loop_system.tools.quick_command_source import (
+    resolve_project_command_source,
+)
 from agent_loop_system.tools.case_map import (
     CaseEntry,
     OBSERVATION_ONLY_COMMANDS,
@@ -108,7 +111,7 @@ def _live_capabilities(target: str = "simulator") -> tuple[set[str], set[str]]:
             )
         )
         project = os.environ.get("W30_PROJECT", "620C_W6830")
-        command_source = source_root / "core/comm/srv/test/hlq_quick_cmd_handler.c"
+        command_source = resolve_project_command_source(source_root)
         project_cmake = source_root / f"app/projects/{project}/Project.cmake"
         app_windows = source_root / "app/windows"
         app_quick_cmd = source_root / "app/comm/TuoBu/quick_cmd/gui_comm_quick_cmd.c"
@@ -136,9 +139,9 @@ def _live_capabilities(target: str = "simulator") -> tuple[set[str], set[str]]:
     # HOST_WAIT/HOST_SCREENSHOT 由 Runner 在电脑端执行，不属于固件命令表。
     commands.update({"HOST_WAIT", "HOST_SCREENSHOT"})
     windows = {
-        line.split(" ->", 1)[0].strip()
+        line.split(" -> ", 1)[1].split(" |", 1)[0].strip()
         for line in window_text.splitlines()
-        if " ->" in line
+        if " -> " in line and " |" in line
     }
     return commands, windows
 
