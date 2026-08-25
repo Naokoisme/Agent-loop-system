@@ -355,6 +355,37 @@ class HardwarePreflightTest(unittest.TestCase):
         self.assertEqual(result.readiness_status, "blocked")
         self.assertEqual(result.primary_code, "PREFLIGHT_INTERNAL_ERROR")
 
+    def test_failure_actions_are_user_facing_and_actionable(self) -> None:
+        profile, _ = self._run(
+            profile_loader=lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("bad profile"))
+        )
+        pipe, _ = self._run(serial_ports_probe=lambda _port: {"items": []})
+        usb, _ = self._run(mtp_system=FakeMtpSystem(devices=0))
+        screenshot, _ = self._run(
+            mtp_system=FakeMtpSystem(namespace_error=RuntimeError("download missing"))
+        )
+        watch, _ = self._run(serial=FakeSerialSession(failure=TimeoutError("zero bytes")))
+        judge, _ = self._run(llm_probe=lambda **_kwargs: {"ok": False, "message": "401"})
+        busy = target_busy_preflight(job_id="abc123")
+        internal = internal_error_preflight(RuntimeError("probe exploded"))
+
+        expected = {
+            "PROFILE_INVALID": "重新选择测试项目；如仍失败，联系维护人员",
+            "SUPERCOM_PIPE_UNAVAILABLE": "在 SuperCom 中打开一个手表串口后重试，程序会自动识别端口",
+            "USB_DEVICE_NOT_PRESENT": "重新插拔 USB，确认电脑能够识别手表后重试",
+            "MTP_NAMESPACE_NOT_READY": "重新连接 USB，并确认电脑能够打开手表存储后重试",
+            "SUPERCOM_NO_UART": "确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试",
+            "LLM_NOT_READY": "检查网络和判定服务设置后重试",
+            "TARGET_BUSY": "等待该任务结束或停止后再检查",
+            "PREFLIGHT_INTERNAL_ERROR": "重新检查；如再次出现，展开诊断信息并联系维护人员",
+        }
+        for result in (profile, pipe, usb, screenshot, watch, judge, busy, internal):
+            with self.subTest(code=result.primary_code):
+                check = next(item for item in result.checks if item.code == result.primary_code)
+                self.assertEqual(check.action, expected[result.primary_code])
+                for forbidden in ("PnP", "MTP", "UART", "VID", "PID", "preflight.json"):
+                    self.assertNotIn(forbidden, check.action)
+
     def test_unchecked_result_is_not_ready(self) -> None:
         result = unchecked_hardware_preflight()
         self.assertFalse(result.ready)

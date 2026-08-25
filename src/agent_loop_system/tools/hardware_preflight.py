@@ -49,6 +49,8 @@ class HardwarePreflightResult:
     readiness_status: str
     checked_at: str | None
     checks: tuple[HardwarePreflightCheck, ...]
+    execution_ready: bool | None = None
+    observation_ready: bool | None = None
 
     @property
     def primary_code(self) -> str | None:
@@ -77,6 +79,12 @@ class HardwarePreflightResult:
             "schema_version": PREFLIGHT_SCHEMA_VERSION,
             "project": self.project,
             "ready": self.ready,
+            "execution_ready": (
+                self.ready if self.execution_ready is None else self.execution_ready
+            ),
+            "observation_ready": (
+                self.ready if self.observation_ready is None else self.observation_ready
+            ),
             "readiness_status": self.readiness_status,
             "checked_at": self.checked_at,
             "checks": [check.to_dict() for check in self.checks],
@@ -91,15 +99,15 @@ class HardwarePreflightFailed(RuntimeError):
 
 
 _CHECKS: dict[str, tuple[str, str]] = {
-    "profile": ("真机运行时档案", "检查 6202 运行时档案与真机配置"),
+    "profile": ("真机运行时档案", "重新选择测试项目；如仍失败，联系维护人员"),
     "supercom_pipe": (
         "SuperCom 命名管道",
         "在 SuperCom 中打开一个手表串口后重试，程序会自动识别端口",
     ),
-    "usb_pnp": ("Windows USB/PnP", "确认仅连接一台 6202 手表且 USB 已在线"),
-    "mtp_namespace": ("Windows MTP 命名空间", "在资源管理器中确认 ZORA/storage/download 可浏览"),
-    "gui_ping": ("UART/GUI 数据面", "确认 SuperCom 已转发 UART，并唤醒手表屏幕"),
-    "llm": ("大模型服务", "检查模型配置、网络和鉴权后重试"),
+    "usb_pnp": ("Windows USB/PnP", "重新插拔 USB，确认电脑能够识别手表后重试"),
+    "mtp_namespace": ("Windows MTP 命名空间", "重新连接 USB，并确认电脑能够打开手表存储后重试"),
+    "gui_ping": ("UART/GUI 数据面", "确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试"),
+    "llm": ("大模型服务", "检查网络和判定服务设置后重试"),
 }
 _ORDER = tuple(_CHECKS)
 
@@ -114,9 +122,10 @@ def _check(
     *,
     code: str | None = None,
     detail: str,
+    action: str | None = None,
     diagnostics: Mapping[str, Any] | None = None,
 ) -> HardwarePreflightCheck:
-    label, action = _CHECKS[key]
+    label, default_action = _CHECKS[key]
     return HardwarePreflightCheck(
         key=key,
         label=label,
@@ -124,7 +133,7 @@ def _check(
         blocking=True,
         code=code,
         detail=detail,
-        action=action if status == "error" else "",
+        action=(action or default_action) if status == "error" else "",
         diagnostics=dict(diagnostics or {}),
     )
 
@@ -193,7 +202,7 @@ def target_busy_preflight(
                 blocking=True,
                 code="TARGET_BUSY",
                 detail=detail,
-                action="等待当前真机任务结束后再检查",
+                action="等待该任务结束或停止后再检查",
             )
         ],
         project=project,
@@ -216,7 +225,7 @@ def internal_error_preflight(
                 blocking=True,
                 code="PREFLIGHT_INTERNAL_ERROR",
                 detail=f"环境探测内部异常: {error}",
-                action="保留 preflight.json 与日志并联系平台维护人员",
+                action="重新检查；如再次出现，展开诊断信息并联系维护人员",
             )
         ],
         project=project,
@@ -268,6 +277,16 @@ def load_cached_hardware_preflight(
             readiness_status=str(payload.get("readiness_status") or "unchecked"),
             checked_at=(str(payload["checked_at"]) if payload.get("checked_at") else None),
             checks=checks,
+            execution_ready=(
+                bool(payload["execution_ready"])
+                if "execution_ready" in payload
+                else None
+            ),
+            observation_ready=(
+                bool(payload["observation_ready"])
+                if "observation_ready" in payload
+                else None
+            ),
         )
     except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
         return unchecked_hardware_preflight(project)

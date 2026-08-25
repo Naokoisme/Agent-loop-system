@@ -88,6 +88,24 @@
       "feedback_provider": "app_bridge",
       "enabled": true,
       "live_status": "blocked_pending_canary"
+    },
+    {
+      "target_id": "579.z1640",
+      "platform_id": "579",
+      "target_label": "579 Z1640 真机",
+      "execution_target": "hardware",
+      "execution_target_label": "579 真机",
+      "execution_adapter": "watch_579_ble",
+      "case_catalog_adapter": "watch_579_case_map",
+      "health_adapter": "watch_579_ble",
+      "preflight_adapter": "watch_579_ble",
+      "execution_resource": "579.pc_ble",
+      "transport": "pc_ble_legacy_l1_l2",
+      "transport_label": "PC BLE / 579 L1-L2",
+      "capture_provider": "unavailable",
+      "capture_label": "暂不可用",
+      "enabled": true,
+      "live_status": "watchface_confirmation_required"
     }
   ]
 }

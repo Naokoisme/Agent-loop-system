@@ -63,12 +63,21 @@ class PlatformRegistry:
                     f"W30 真机执行目标 {target_id} 缺少 runtime_profile_id"
                 )
             if platform_id == "579":
-                if target.get("transport") != "app_ble":
-                    raise PlatformRegistryError("579 transport 必须为 app_ble")
-                if target.get("serial_provider") != "com3_readonly":
-                    raise PlatformRegistryError("579 serial provider 必须为 com3_readonly")
+                transport = target.get("transport")
                 if target.get("serial_write_provider"):
                     raise PlatformRegistryError("579 禁止配置 serial write provider")
+                if transport == "app_ble":
+                    if target.get("serial_provider") != "com3_readonly":
+                        raise PlatformRegistryError("579 APP Bridge 目标必须使用 com3_readonly")
+                elif transport == "pc_ble_legacy_l1_l2":
+                    if target.get("execution_adapter") != "watch_579_ble":
+                        raise PlatformRegistryError("579 PC-BLE 目标必须使用 watch_579_ble")
+                    if target.get("health_adapter") != "watch_579_ble":
+                        raise PlatformRegistryError("579 PC-BLE 健康检查必须使用 watch_579_ble")
+                    if target.get("capture_provider") != "unavailable":
+                        raise PlatformRegistryError("579 PC-BLE 当前必须声明截图不可用")
+                else:
+                    raise PlatformRegistryError(f"579 transport 不受支持: {transport}")
 
     def platform(self, platform_id: str) -> dict[str, Any]:
         try:

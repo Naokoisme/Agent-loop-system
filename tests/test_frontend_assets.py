@@ -212,14 +212,20 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "function issuePresentation(",
             "function knownIssueSummary(",
-            "服务暂时不可用，请稍后重试。",
-            "无法连接服务，请检查服务状态后重试。",
-            "手表暂未响应，请确认 SuperCom 已连接并唤醒屏幕后重试。",
-            "暂时无法读取手表截图，请重新连接 USB 后重试。",
+            "function safeProductCopy(",
+            "本次操作没有完成，平台暂时无法确定具体原因。",
+            "请重新操作；如再次出现，展开诊断信息并联系维护人员。",
+            "平台暂时无法连接本机服务。",
+            "平台找到了连接入口，但没有收到手表响应。",
+            "请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。",
+            "电脑检测到了手表，但暂时无法读取截图。",
+            "请重新连接 USB，并确认电脑能够打开手表存储后重试。",
             "error.diagnosticMessage = diagnosticMessage;",
             "error.code = 'NETWORK_ERROR';",
             "error.payload = payload;",
-            "FileNotFoundError",
+            "error.presentation = presentation;",
+            "TECHNICAL_DIAGNOSTIC_PATTERN",
+            "(?:Error|Exception)",
             '<details class="import-log-details"><summary>诊断信息',
             '<details class="inline-diagnostics"><summary>诊断信息</summary>',
         ):
@@ -260,7 +266,9 @@ class FrontendAssetsTest(unittest.TestCase):
             "label: 'USB 连接'",
             "label: '截图读取'",
             "label: '手表响应'",
-            "knownIssueSummary(item.code) || copy.fail",
+            "resolveIssueDefinition(item.code)",
+            "问题原因：",
+            "处理方法：",
         ):
             with self.subTest(token=token):
                 self.assertIn(token, check_copy)
@@ -269,76 +277,71 @@ class FrontendAssetsTest(unittest.TestCase):
             "MTP 命名空间",
             "UART/GUI 数据面",
             "environment-check-code",
-            "item.action ?",
+            "固件",
+            "命令接口",
+            "截图服务",
         ):
             with self.subTest(token=token):
                 self.assertNotIn(token, check_copy)
-        for token in (".environment-check-detail", ".environment-log .inline-diagnostics"):
+        for token in (".environment-check-detail", ".environment-log .inline-diagnostics", ".check-field-label"):
             self.assertIn(token, self.stylesheet)
 
-    def test_hardware_settings_expose_real_on_demand_ble_device_manager(self) -> None:
+    def test_bluetooth_is_a_top_level_workbench_not_a_settings_manager(self) -> None:
         for token in (
-            '<option value="ble">通过蓝牙获取截图（实验）</option>',
+            'href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"',
+            'id="global-project-switch"',
+            "前往蓝牙工作台",
+        ):
+            self.assertIn(token, self.index)
+
+        for token in (
+            "当前固件阻塞",
+            "WATCH_579_EXECUTION_BLOCKED",
+            "平台已阻止单条、批次和候选复跑",
+        ):
+            self.assertIn(token, self.javascript)
+        for old_id in (
             'id="cfg-hw-ble-options"',
             'id="cfg-hw-ble-address"',
             'id="cfg-hw-ble-scan-timeout"',
-            'id="ble-device-search"',
-            'placeholder="搜索设备名称或地址"',
-            'id="btn-scan-ble"',
-            'id="ble-connection-status"',
             'id="ble-discovered-list"',
             'id="ble-remembered-list"',
-            "已连接过的设备",
-            "设备仅在需要时连接",
-            "删除这里只会清除连接记录",
         ):
-            self.assertIn(token, self.index)
-        self.assertIn(
-            '<div id="cfg-hw-ble-options" class="ble-device-manager">',
-            self.index,
-        )
-        self.assertIn(".ble-device-manager {\n  display: grid;", self.stylesheet)
-        self.assertNotIn("hwBleOptions.style.display", self.javascript)
+            self.assertNotIn(old_id, self.index)
         for token in (
-            "async function loadRememberedBleDevices()",
-            "api('/api/hardware/ble/remembered')",
-            "/api/hardware/ble/devices?timeout=",
-            "api('/api/hardware/ble/connect'",
-            "/api/hardware/ble/remembered/${encodeURIComponent(address)}",
-            "data-ble-action=\"connect\"",
-            "data-ble-action=\"delete\"",
-            "bleDeviceMatches",
-            "正在连接并检查手表",
-            "连接成功，已设为截图设备",
-            "cfg.hardware?.ble_address || ''",
-            "cfg.hardware?.ble_scan_timeout || 15",
-            "ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim()",
-            "ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15",
+            "function BluetoothPage()",
+            "'/api/hardware/579/status'",
+            "'/api/hardware/579/connect'",
+            "'/api/hardware/579/disconnect'",
+            "'/api/hardware/579/preview'",
+            "'/api/hardware/579/send'",
+            "'/api/hardware/ble/connect'",
+            "hardware_579: {ble_address:",
+            "hardware: {ble_address:",
+            "data-bt-preset=\"find\"",
+            "data-bt-preset=\"calc\"",
+            "data-bt-preset=\"button\"",
+            "effect_verified=false",
+            "latestStatus?.lease?.active",
+            "data-ble-mutable",
         ):
             self.assertIn(token, self.javascript)
-        load_start = self.javascript.index("async function loadSettings()")
-        load_end = self.javascript.index("openBtn.addEventListener", load_start)
-        initial_load = self.javascript[load_start:load_end]
-        self.assertNotIn("/api/hardware/ble/devices", initial_load)
-        self.assertNotIn("/api/hardware/ble/connect", initial_load)
         for token in (
-            ".ble-device-columns",
-            ".ble-device-card.is-selected",
-            '.ble-connection-status[data-tone="success"]',
+            ".bluetooth-workbench-grid",
+            ".bluetooth-command-fields",
+            ".bluetooth-event-log",
         ):
             self.assertIn(token, self.stylesheet)
 
     def test_ble_discovery_copy_uses_plain_device_language(self) -> None:
         for token in (
-            "正在查找附近的蓝牙设备",
-            "查找过程不会连接任何设备",
-            "找到 ${bleDiscoveredDevices.length} 个蓝牙设备",
-            "本次未发现蓝牙设备",
+            "扫描结果只用于精确选择地址",
+            "找到 ${devices.length} 个蓝牙设备",
+            "没有匹配的扫描结果",
             "未命名设备",
-            "点击“查找设备”开始",
+            "点击“扫描”查找附近设备",
         ):
             self.assertIn(token, self.javascript)
-        self.assertIn('id="ble-discovered-count" class="chip chip-pending">0 个', self.index)
         for token in (
             "正在查找附近的手表",
             "发现 ${bleDiscoveredDevices.length} 台手表",
@@ -382,6 +385,9 @@ class FrontendAssetsTest(unittest.TestCase):
             'id="llm-config-status"',
             'id="llm-actual-success"',
             'id="llm-test-status"',
+            "data-llm-test-summary",
+            "data-llm-test-action",
+            "data-llm-test-diagnostics",
             "配置状态",
             "最近调用",
             "连接测试",
@@ -391,8 +397,8 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "cfg.llm?.configured === true",
             "cfg.llm?.last_actual_success_at",
-            "连接失败：",
-            "setLlmSignal(llmTestStatus",
+            "setLlmTestIssue(",
+            "data-llm-test-diagnostics",
         ):
             self.assertIn(token, self.javascript)
         self.assertNotIn("已就绪 (开箱即用)", self.index)
@@ -614,14 +620,166 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_interrupted_batch_notice_only_emphasizes_resume_message(self) -> None:
         self.assertIn(
-            "job.resume_available ? `<strong>${escapeHtml(testResultReason(job, '批次已中断'))} 可从第 ${completed + 1} 条继续。</strong>`",
+            "问题原因：",
             self.javascript,
         )
         self.assertIn(
-            "job.status === 'completed' ? '全部用例已完成。'",
+            "处理方法：",
             self.javascript,
         )
-        self.assertIn(": '正在准备下一条用例…'", self.javascript)
+        self.assertIn(
+            "可从第 ${completed + 1} 条继续。",
+            self.javascript,
+        )
+        self.assertIn("current.innerHTML = isInterrupted", self.javascript)
+        self.assertIn(
+            "job.status === 'completed'",
+            self.javascript,
+        )
+        self.assertIn("全部用例已完成。", self.javascript)
+        self.assertIn("正在准备下一条用例…", self.javascript)
+
+    def test_single_issue_presentation_table_covers_all_codes_with_cause_and_action(self) -> None:
+        for token in (
+            "const ISSUE_TABLE",
+            "function resolveIssueDefinition(",
+            "function issueNoticeHtml(",
+            "BLE_UNAVAILABLE",
+            "BLE_RUNTIME_UNAVAILABLE",
+            "BLE_SCAN_FAILED",
+            "BLE_CONNECT_TIMEOUT",
+            "BLE_CONNECT_FAILED",
+            "LLM_TLS_ERROR",
+            "LLM_TIMEOUT",
+            "LLM_AUTH_FAILED",
+            "LLM_MODEL_NOT_FOUND",
+            "LLM_QUOTA_EXCEEDED",
+            "LLM_REQUEST_FAILED",
+            "SUPERCOM_PIPE_UNAVAILABLE",
+            "SUPERCOM_NO_UART",
+            "USB_DEVICE_NOT_PRESENT",
+            "USB_TARGET_AMBIGUOUS",
+            "MTP_NAMESPACE_NOT_READY",
+            "LLM_NOT_READY",
+            "TARGET_BUSY",
+            "PREFLIGHT_INTERNAL_ERROR",
+            "HARDWARE_PREPARATION_FAILED",
+            "平台未能启动本次任务。",
+            "请稍后重试；如仍失败，请重新启动平台。",
+            "任务在规定时间内没有完成。",
+            "请检查目标设备连接后重试。",
+            "任务运行过程中出现平台异常，没有得到完整结果。",
+            "请重新运行；如再次出现，展开诊断信息并联系维护人员。",
+            "测试程序已经结束，但没有返回可用结果。",
+            "请重新运行；如仍失败，保留诊断信息并联系维护人员。",
+            "测试已经执行，但结果没有保存成功。",
+            "请确认电脑存储空间充足后重试。",
+            "测试过程中与手表的连接中断。",
+            "请重新执行环境检查，恢复连接后从该用例重试。",
+            "手表没有进入可开始测试的状态，因此用例尚未执行。",
+            "请重新执行环境检查，确认连接和手表界面正常后重试。",
+            "用于判断结果的截图或检查点没有收集完整。",
+            "请确认截图连接正常后重新运行该用例。",
+            "电脑无法与判定服务建立安全连接。",
+            "判定服务在规定时间内没有响应。",
+            "判定服务没有接受当前账号信息。",
+            "请在系统设置中重新核对判定服务账号或密钥。",
+            "当前选择的判定模型不可用。",
+            "判定服务暂时无法接受更多请求，或当前账号可用额度不足。",
+            "本次操作没有完成，平台暂时无法确定具体原因。",
+            "请重新操作；如再次出现，展开诊断信息并联系维护人员。",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.javascript)
+
+        issue_table_start = self.javascript.index("const ISSUE_TABLE")
+        issue_table_end = self.javascript.index("const ISSUE_CODE_ALIASES", issue_table_start)
+        issue_table_block = self.javascript[issue_table_start:issue_table_end]
+        issue_entries = {
+            code: (cause, action)
+            for code, cause, action in re.findall(
+                r"^\s{2}([A-Z0-9_]+): \{\s+cause: '([^']+)',\s+action: '([^']+)'\s+\}",
+                issue_table_block,
+                re.MULTILINE,
+            )
+        }
+        for code in (
+            "THREAD_START_FAILED",
+            "PROCESS_TIMEOUT",
+            "PROCESS_EXCEPTION",
+            "UNHANDLED_EXCEPTION",
+            "RESULT_MISSING",
+            "HISTORY_WRITE_FAILED",
+            "HARDWARE_INFRASTRUCTURE_FAILURE",
+            "HARDWARE_PREPARATION_FAILED",
+            "EVIDENCE_INCOMPLETE",
+            "PROFILE_INVALID",
+            "PORT_NOT_SELECTED",
+            "SUPERCOM_PIPE_UNAVAILABLE",
+            "SUPERCOM_NO_UART",
+            "USB_DEVICE_NOT_PRESENT",
+            "USB_TARGET_AMBIGUOUS",
+            "MTP_NAMESPACE_NOT_READY",
+            "LLM_NOT_READY",
+            "TARGET_BUSY",
+            "PREFLIGHT_INTERNAL_ERROR",
+            "BLE_UNAVAILABLE",
+            "BLE_SCAN_FAILED",
+            "BLE_CONNECT_TIMEOUT",
+            "BLE_CONNECT_FAILED",
+            "LLM_TLS_ERROR",
+            "LLM_TIMEOUT",
+            "LLM_AUTH_FAILED",
+            "LLM_MODEL_NOT_FOUND",
+            "LLM_QUOTA_EXCEEDED",
+            "LLM_REQUEST_FAILED",
+        ):
+            with self.subTest(code=code):
+                self.assertIn(code, issue_entries)
+                self.assertTrue(issue_entries[code][0])
+                self.assertTrue(issue_entries[code][1])
+        issue_copy_texts = [text for values in issue_entries.values() for text in values]
+        combined_primary_copy = "\n".join(issue_copy_texts)
+        for forbidden in (
+            "安装依赖",
+            "SSL/TLS",
+            "SSL",
+            "TLS",
+            "证书握手",
+            "代理",
+            "API Key",
+            "鉴权",
+            "UART",
+            "GUI_PING",
+            "gui_ack",
+            "MTP",
+            "PnP",
+            "VID/PID",
+            "FileNotFoundError",
+            "RuntimeError",
+            "TypeError",
+            "ValueError",
+            "KeyError",
+            "固件",
+            "命令接口",
+            "截图服务",
+        ):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, combined_primary_copy)
+
+        for token in (
+            "summary: known.cause",
+            "const defaultCause = safeProductCopy(fallback) || UNKNOWN_ISSUE.cause;",
+            "known?.action || safeProductCopy(item.action) || copy.action",
+            "error.presentation = presentation;",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            "action || known.action",
+            "const defaultCause = rawDetail || fallback",
+            "summary: formatIssueSummary",
+        ):
+            self.assertNotIn(token, self.javascript)
 
     def test_case_catalog_cold_start_uses_compact_server_queries(self) -> None:
         for token in (
@@ -702,7 +860,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "待生成步骤",
             "${caseStatusChip(row)}",
             "caseStatusChip({...testCase, latest_verdict: initialVerdict})",
-            "const usesFixedMapping = Boolean(testCase.is_promoted);",
+            "const usesFixedMapping = Boolean(testCase.is_fixed_runnable || testCase.is_promoted);",
+            "动作已保存，观察证据待补齐",
             "本次将尝试生成自动化步骤",
             "结果只用于本次运行，不会自动保存",
             "验证并保存步骤",
@@ -826,6 +985,7 @@ class FrontendAssetsTest(unittest.TestCase):
             "project_id: projectSelect.value",
             "platform_id: platformId",
             "target_id: targetId",
+            "watchface_ready: projectSelect.value === '579_Z1640'",
             "batch-resume-button",
             "/resume",
             "继续运行剩余",

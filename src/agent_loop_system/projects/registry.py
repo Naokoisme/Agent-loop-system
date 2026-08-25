@@ -43,6 +43,7 @@ class ProjectRegistry:
             self._seed("6202_W5230_SIMULATOR", "6202 W5230", "w30.6202.simulator", "case_map/6202_simulator_case_map", "6202_W5230_SIMULATOR"),
             self._seed("6202_W5230", "6202 W5230", "w30.6202.hardware", "case_map/6202_case_map", "6202_W5230"),
             self._seed("579_O2", "579 O2 真机", "579.o2", "case_map/579_case_map", "579_O2"),
+            self._seed("579_Z1640", "579 Z1640 真机", "579.z1640", "case_map/579_case_map", "579_Z1640"),
         ]
 
     def _seed(
@@ -74,9 +75,20 @@ class ProjectRegistry:
         }
 
     def _ensure_registry(self) -> None:
-        if self.path.is_file():
+        seeds = self._seed_projects()
+        if not self.path.is_file():
+            _atomic_json(self.path, {"version": "1", "projects": seeds})
             return
-        _atomic_json(self.path, {"version": "1", "projects": self._seed_projects()})
+        payload = self._load()
+        existing = {
+            str(item.get("project_id") or "")
+            for item in payload["projects"]
+            if isinstance(item, dict)
+        }
+        missing = [item for item in seeds if item["project_id"] not in existing]
+        if missing:
+            payload["projects"].extend(missing)
+            _atomic_json(self.path, payload)
 
     def _load(self) -> dict[str, Any]:
         payload = json.loads(self.path.read_text(encoding="utf-8"))

@@ -18,11 +18,11 @@
 | 统一用例管理 | 已完成 | 支持新增、编辑版本、Excel 导入/导出、复制、归档、恢复和审计 |
 | W30 原执行链兼容 | 已完成 | Simulator、SuperCom、MTP 和原 W30 Case Map 继续保留 |
 | W30 换机自适应 | 已完成 | 自动继承/安装运行时档案、识别唯一 SuperCom 串口及真实 MTP 存储卷 |
-| 579 平台适配框架 | 已完成 | 已接入 Catalog、动作注册表、APP Bridge、COM3 只读观察、O2 证据和门禁 |
+| 579 平台适配框架 | 已完成 | O2 的 APP Bridge 链路与 Z1640 的 PC-BLE 链路作为独立目标并存 |
 | 579 实机动作 | 默认关闭 | 必须完成受控 Canary 并由授权人员显式开启 |
 | W30 计算器探索式真机链路 | 已验证 | 已按“表盘 → 菜单 → 滚动查找 → 点击计算器”走通 |
 | W30 计算器正式 Runner | 当前受阻 | 缺少真机隔离工作区配置；现有 `CALC_001` 仍是直接进入页面的固化映射 |
-| 自动化回归 | 已通过 | `764 passed, 16 skipped, 9702 subtests passed` |
+| 自动化回归 | 已通过 | `808 passed, 17 skipped, 9812 subtests passed` |
 
 ## 2. 整改后的统一执行流程
 
@@ -54,9 +54,9 @@ Agent 根据截图、日志和设备反馈判断下一步或最终结果
 
 | 能力 | W30 | 579 |
 | --- | --- | --- |
-| 动作下发 | Socket 或 SuperCom 命令链 | ADB → APP Bridge → BLE |
+| 动作下发 | Socket 或 SuperCom 命令链 | O2：ADB → APP Bridge → BLE；Z1640：PC-BLE legacy L1/L2 |
 | 串口定位 | 可通过既有 W30 命令链驱动设备 | COM3 严格只读，只用于观察日志 |
-| 截图 | 模拟器截图或 USB MTP 截图 | O2 手表截图 |
+| 截图 | 模拟器截图或 USB MTP 截图 | O2 手表截图；Z1640 当前声明不可用 |
 | 辅助反馈 | 设备 ACK、串口日志、截图 | APP Bridge 回执、COM3/O1、O2 截图 |
 | 结果依据 | 新鲜截图为产品判定权威证据 | O2 新鲜截图为产品判定权威证据 |
 | 动作注册 | W30 Case Map 固化命令 | 受保护的 579 动作绑定注册表 |
@@ -74,6 +74,7 @@ APP Bridge ACK 或命令 ACK 只证明动作已交付，不能单独作为产品
 | `6202_W5230_SIMULATOR` | W30 | `w30.6202.simulator` | `case_map/6202_simulator_case_map` |
 | `6202_W5230` | W30 | `w30.6202.hardware` | `case_map/6202_case_map` |
 | `579_O2` | 579 | `579.o2` | `case_map/579_case_map` |
+| `579_Z1640` | 579 | `579.z1640` | `case_map/579_case_map`（按 profile 隔离） |
 
 内置项目当前各自绑定一个平台；通过“新增项目”可登记允许的平台、执行目标和默认项。执行请求必须携带明确的 `project_id`、`platform_id`、`target_id` 和用例身份。
 
@@ -151,8 +152,11 @@ project_data/case_management.sqlite3
 | `6202_W5230_SIMULATOR` | 3164 | 3164 | 0 / 0 |
 | `6202_W5230` | 3164 | 3164 | 0 / 0 |
 | `579_O2` | 59 | 59 | 0 / 0 |
+| `579_Z1640` | 38 | 38 | 0 / 0 |
 
-579 冻结基线的成熟度分布保持为：37 条自动化就绪、17 条待评审、5 条需人工执行、0 条暂不支持。
+579 O2 冻结基线的成熟度分布保持为：37 条自动化就绪、17 条待评审、5 条需人工执行、0 条暂不支持。
+579 Z1640 当前包含 38 条计算器映射；由于现有 OTA 无法从表盘自动进入菜单，均以 `BLOCKED`
+保存，平台会在单条和批次启动前明确阻断，不会误执行或回退到 O2/W30 链路。
 
 ## 7. Excel 导入与版本控制
 
@@ -171,7 +175,7 @@ uv run python tools/migrate_case_store.py --output project_data/migration-audit.
 
 ## 8. 579 平台适配
 
-579 没有使用 W30 的 RX 串口写指令方式，也没有把 `crossend_harness` 的桌面界面复制进来。接入方式是把 579 设备能力封装为 Agent-loop 的无界面适配器。
+579 没有使用 W30 的 RX 串口写指令方式，也没有把 `crossend_harness` 的桌面界面复制进来。接入方式是把 579 设备能力封装为 Agent-loop 的无界面适配器。当前包含 O2 的 APP Bridge 适配器和 Z1640 的 PC-BLE 适配器，两者具有独立 target、预检和运行门禁。
 
 核心目录：
 

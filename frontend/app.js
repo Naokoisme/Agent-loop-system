@@ -56,7 +56,7 @@ const FUNCTION_CATEGORY_NAMES = Object.freeze(Object.keys(FUNCTION_CATEGORIES));
 const ALL_FUNCTION_MODULES = Object.freeze(FUNCTION_CATEGORY_NAMES.flatMap(name => FUNCTION_CATEGORIES[name]));
 const PROJECT_STORAGE_KEY = 'agent-loop-selected-project';
 const CASE_CATALOG_PAGE_SIZE = 100;
-const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/cases', '/runs', '/reports', '/defects', '/environments']);
+const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
 const caseCatalogCache = new Map();
 let activePageController = null;
 let routeRequestToken = 0;
@@ -98,6 +98,19 @@ function imagePreviewLinkAttributes(url, label) {
   return `class="image-preview-trigger" href="${escapeHtml(url)}" data-image-preview data-image-preview-label="${escapeHtml(displayLabel)}" aria-label="${escapeHtml(`放大查看：${displayLabel}`)}"`;
 }
 
+const UNKNOWN_ISSUE = Object.freeze({
+  cause: '本次操作没有完成，平台暂时无法确定具体原因。',
+  action: '请重新操作；如再次出现，展开诊断信息并联系维护人员。'
+});
+
+const TECHNICAL_DIAGNOSTIC_PATTERN = /(?:Traceback|\b[A-Za-z_$][\w$]*(?:Error|Exception)\b|\b[A-Za-z]:[\\/]|\\\\[^\\\r\n]+\\|\/(?:Users|home|var|tmp|opt|etc)\/|https?:\/\/|\b(?:UART|MTP|PnP|GUI_PING|gui_ack)\b|\b(?:VID|PID)[_/:=-]?[0-9A-F]+\b|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b|\b[\w.-]+\.(?:json|log|txt|py|js|exe|zip)\b)/i;
+
+function safeProductCopy(value) {
+  const text = String(value ?? '').trim();
+  if (!text || TECHNICAL_DIAGNOSTIC_PATTERN.test(text)) return '';
+  return text;
+}
+
 function friendlyAgentError(value) {
   const text = String(value ?? '').trim();
   if (!text) return text;
@@ -107,58 +120,265 @@ function friendlyAgentError(value) {
   if (/识图 Agent API 出错|LLM 重试耗尽.*(APIConnectionError|LLMRetryError)/.test(text)) {
     return '图像判定服务暂时无法连接，请稍后重试。';
   }
-  return text;
+  return safeProductCopy(text);
 }
 
-const ISSUE_SUMMARIES = Object.freeze({
-  USER_CANCELLED: '任务已取消。',
-  SERVICE_RESTART: '服务已重启，本次任务未完成。',
-  ORPHAN_PROCESS: '检测到上次遗留的任务，请先停止后再试。',
-  PROCESS_TIMEOUT: '任务等待超时，请检查目标连接后重试。',
-  THREAD_START_FAILED: '任务启动失败，请稍后重试。',
-  PROCESS_EXCEPTION: '任务执行异常，请查看诊断信息。',
-  UNHANDLED_EXCEPTION: '任务执行异常，请查看诊断信息。',
-  RESULT_MISSING: '任务没有返回有效结果，请重试。',
-  HISTORY_WRITE_FAILED: '结果保存失败，请重试。',
-  HARDWARE_INFRASTRUCTURE_FAILURE: '设备连接异常，请检查连接后重试。',
-  EVIDENCE_INCOMPLETE: '证据不完整，暂时无法确认结果。',
-  PROFILE_INVALID: '测试配置不可用，请联系维护人员。',
-  PORT_NOT_SELECTED: '未自动发现可用的手表连接，请确认 SuperCom 已打开手表串口。',
-  SUPERCOM_PIPE_UNAVAILABLE: '未检测到可用的手表连接，请打开 SuperCom 并重新连接手表。',
-  SUPERCOM_NO_UART: '手表暂未响应，请确认 SuperCom 已连接并唤醒屏幕后重试。',
-  USB_DEVICE_NOT_PRESENT: '未检测到手表的 USB 连接，请重新连接后重试。',
-  USB_TARGET_AMBIGUOUS: '检测到多台手表，请只保留当前要测试的一台。',
-  MTP_NAMESPACE_NOT_READY: '暂时无法读取手表截图，请重新连接 USB 后重试。',
-  LLM_NOT_READY: '结果判定服务暂时不可用，请检查网络和模型服务设置后重试。',
-  TARGET_BUSY: '手表正在执行其他任务，请等待任务结束后再检查。',
-  PREFLIGHT_INTERNAL_ERROR: '环境检查未完成，请重试；如仍失败，请联系维护人员。',
-  HARDWARE_PREPARATION_FAILED: '手表未能回到测试起始状态，请检查连接后重试。'
+const ISSUE_TABLE = Object.freeze({
+  NETWORK_ERROR: {
+    cause: '平台暂时无法连接本机服务。',
+    action: '请确认平台仍在运行后重试；如已停止，请重新启动平台。'
+  },
+  USER_CANCELLED: {
+    cause: '任务已取消。',
+    action: '如需继续，请重新启动任务。'
+  },
+  SERVICE_RESTART: {
+    cause: '服务已重启，本次任务未完成。',
+    action: '请重新发起任务。'
+  },
+  ORPHAN_PROCESS: {
+    cause: '检测到上次遗留的任务。',
+    action: '请先停止上次任务后再试。'
+  },
+  PROCESS_TIMEOUT: {
+    cause: '任务在规定时间内没有完成。',
+    action: '请检查目标设备连接后重试。'
+  },
+  THREAD_START_FAILED: {
+    cause: '平台未能启动本次任务。',
+    action: '请稍后重试；如仍失败，请重新启动平台。'
+  },
+  PROCESS_EXCEPTION: {
+    cause: '任务运行过程中出现平台异常，没有得到完整结果。',
+    action: '请重新运行；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  UNHANDLED_EXCEPTION: {
+    cause: '任务运行过程中出现平台异常，没有得到完整结果。',
+    action: '请重新运行；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  RESULT_MISSING: {
+    cause: '测试程序已经结束，但没有返回可用结果。',
+    action: '请重新运行；如仍失败，保留诊断信息并联系维护人员。'
+  },
+  HISTORY_WRITE_FAILED: {
+    cause: '测试已经执行，但结果没有保存成功。',
+    action: '请确认电脑存储空间充足后重试。'
+  },
+  HARDWARE_INFRASTRUCTURE_FAILURE: {
+    cause: '测试过程中与手表的连接中断。',
+    action: '请重新执行环境检查，恢复连接后从该用例重试。'
+  },
+  HARDWARE_PREPARATION_FAILED: {
+    cause: '手表没有进入可开始测试的状态，因此用例尚未执行。',
+    action: '请重新执行环境检查，确认连接和手表界面正常后重试。'
+  },
+  EVIDENCE_INCOMPLETE: {
+    cause: '用于判断结果的截图或检查点没有收集完整。',
+    action: '请确认截图连接正常后重新运行该用例。'
+  },
+  OBSERVATION_UNAVAILABLE: {
+    cause: '动作已经执行，但当前 579 没有可用的手表截图通道。',
+    action: '查看每条 TX/L1 ACK 记录并人工确认现象；不要把本次结果当作正式通过。'
+  },
+  INVALID_RAW_COMMAND: {
+    cause: 'Cmd、Key 或 Data 的格式或长度不符合 579 协议要求。',
+    action: '检查十六进制输入；Data 可留空，非空时最多 499 字节。'
+  },
+  BLE_DEVICE_NOT_FOUND: {
+    cause: '扫描结果中没有找到已配置精确地址的手表。',
+    action: '确认手表地址、距离和广播状态后重新扫描。'
+  },
+  BLE_CONNECT_TIMEOUT: {
+    cause: '电脑未能在限定时间内连接 579 手表。',
+    action: '请关闭手机蓝牙和 ble_test 等占用方，然后手工重试。'
+  },
+  BLE_GATT_PROFILE_MISMATCH: {
+    cause: '已连接设备没有提供 579 所需的服务或写入、通知特征。',
+    action: '核对精确 MAC 和当前手表版本后重试。'
+  },
+  BLE_DISCONNECTED: {
+    cause: '579 BLE 会话已经断开。',
+    action: '恢复手表连接后重新执行当前命令；平台不会自动重发。'
+  },
+  BLE_ACK_TIMEOUT: {
+    cause: '命令写入后 5 秒内没有收到手表 L1 ACK。',
+    action: '检查手表连接和运行状态后，由你决定是否重新执行。'
+  },
+  TARGET_BUSY: {
+    cause: '579 正由自动化任务独占写入。',
+    action: '等待任务结束或取消后再从蓝牙工作台操作。'
+  },
+  PROFILE_INVALID: {
+    cause: '当前测试项目的运行配置缺失或无法读取。',
+    action: '请重新选择测试项目；如仍失败，请联系维护人员。'
+  },
+  PORT_NOT_SELECTED: {
+    cause: '当前没有发现唯一可用的 SuperCom 手表串口。',
+    action: '请在 SuperCom 中打开当前手表串口后重试，平台会自动识别，无需手动配置端口。'
+  },
+  SUPERCOM_PIPE_UNAVAILABLE: {
+    cause: '平台没有检测到 SuperCom 中已打开的手表连接。',
+    action: '请打开 SuperCom，连接当前手表对应的串口后重新检查。'
+  },
+  SUPERCOM_NO_UART: {
+    cause: '平台找到了连接入口，但没有收到手表响应。',
+    action: '请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。'
+  },
+  USB_DEVICE_NOT_PRESENT: {
+    cause: '电脑当前没有检测到手表的 USB 连接。',
+    action: '请重新插拔 USB，确认电脑能够识别手表后重试。'
+  },
+  USB_TARGET_AMBIGUOUS: {
+    cause: '电脑同时检测到多台可测试手表，无法确定目标。',
+    action: '请只保留当前要测试的一台手表后重试。'
+  },
+  MTP_NAMESPACE_NOT_READY: {
+    cause: '电脑检测到了手表，但暂时无法读取截图。',
+    action: '请重新连接 USB，并确认电脑能够打开手表存储后重试。'
+  },
+  LLM_NOT_READY: {
+    cause: '结果判定服务当前不可用。',
+    action: '请检查网络和判定服务设置后重试。'
+  },
+  TARGET_BUSY: {
+    cause: '当前手表正在执行另一个任务。',
+    action: '请等待该任务结束或停止后再检查。'
+  },
+  PREFLIGHT_INTERNAL_ERROR: {
+    cause: '环境检查没有正常完成。',
+    action: '请重新检查；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  BLE_UNAVAILABLE: {
+    cause: '当前电脑的蓝牙功能不可用。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_SCAN_FAILED: {
+    cause: '电脑没有完成本次蓝牙查找。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_CONNECT_TIMEOUT: {
+    cause: '在规定时间内没有与这台手表建立连接。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_CONNECT_FAILED: {
+    cause: '电脑没有与这台手表建立可用连接。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  LLM_TLS_ERROR: {
+    cause: '电脑无法与判定服务建立安全连接。',
+    action: '请检查网络后重试；如仍失败，请联系维护人员检查判定服务。'
+  },
+  LLM_TIMEOUT: {
+    cause: '判定服务在规定时间内没有响应。',
+    action: '请检查网络连接，稍后重新测试。'
+  },
+  LLM_AUTH_FAILED: {
+    cause: '判定服务没有接受当前账号信息。',
+    action: '请在系统设置中重新核对判定服务账号或密钥。'
+  },
+  LLM_MODEL_NOT_FOUND: {
+    cause: '当前选择的判定模型不可用。',
+    action: '请在系统设置中重新选择或核对判定模型。'
+  },
+  LLM_QUOTA_EXCEEDED: {
+    cause: '判定服务暂时无法接受更多请求，或当前账号可用额度不足。',
+    action: '请稍后重试，并检查判定服务账号状态。'
+  },
+  LLM_REQUEST_FAILED: {
+    cause: '电脑没有完成本次判定服务连接测试。',
+    action: '请检查网络和判定服务设置后重试。'
+  }
 });
 
-function knownIssueSummary(reasonCode = '') {
-  return ISSUE_SUMMARIES[String(reasonCode || '').trim().toUpperCase()] || '';
+const ISSUE_CODE_ALIASES = Object.freeze({
+  BLE_RUNTIME_UNAVAILABLE: 'BLE_UNAVAILABLE',
+  BLE_CONNECTION_TIMEOUT: 'BLE_CONNECT_TIMEOUT',
+  BLE_CONNECTION_FAILED: 'BLE_CONNECT_FAILED',
+  BLE_DISCOVERY_FAILED: 'BLE_SCAN_FAILED',
+  'SSL/TLS 握手失败': 'LLM_TLS_ERROR',
+  '网络连接超时': 'LLM_TIMEOUT',
+  'API KEY 鉴权失败': 'LLM_AUTH_FAILED',
+  '模型不存在': 'LLM_MODEL_NOT_FOUND',
+  '额度不足或频次超限': 'LLM_QUOTA_EXCEEDED',
+  '请求异常': 'LLM_REQUEST_FAILED'
+});
+
+function resolveIssueDefinition(reasonCode = '') {
+  const rawKey = String(reasonCode || '').trim();
+  if (!rawKey) return null;
+  const upper = rawKey.toUpperCase();
+  const direct = ISSUE_TABLE[upper] || ISSUE_TABLE[rawKey];
+  if (direct) return direct;
+  const aliasKey = ISSUE_CODE_ALIASES[upper] || ISSUE_CODE_ALIASES[rawKey];
+  if (aliasKey && ISSUE_TABLE[aliasKey]) return ISSUE_TABLE[aliasKey];
+  return null;
 }
 
-function issuePresentation({fallback = '操作未完成，请重试。', status = 0, reasonCode = '', detail = ''} = {}) {
+function knownIssueSummary(reasonCode = '') {
+  const def = resolveIssueDefinition(reasonCode);
+  return def ? def.cause : '';
+}
+
+function issuePresentation({fallback = '', status = 0, reasonCode = '', detail = '', action = ''} = {}) {
   const rawDetail = String(detail ?? '').trim();
   const code = String(reasonCode || '').trim().toUpperCase();
-  const knownSummary = knownIssueSummary(code);
-  if (knownSummary) return {summary: knownSummary, detail: rawDetail, code};
-  const friendly = friendlyAgentError(rawDetail);
-  if (friendly && friendly !== rawDetail) return {summary: friendly, detail: rawDetail, code};
-  if (status >= 500 || /Traceback|\b(?:TypeError|ValueError|KeyError|RuntimeError|FileNotFoundError)\b|服务器错误\s*[:：]/i.test(rawDetail)) {
-    return {summary: '服务暂时不可用，请稍后重试。', detail: rawDetail, code};
+  const known = resolveIssueDefinition(code || reasonCode);
+  if (known) {
+    return {
+      cause: known.cause,
+      action: known.action,
+      summary: known.cause,
+      detail: rawDetail,
+      code
+    };
   }
-  return {summary: rawDetail || fallback, detail: rawDetail, code};
+  const friendly = friendlyAgentError(rawDetail);
+  if (friendly && friendly !== rawDetail) {
+    const finalAction = safeProductCopy(action) || '请检查设置后重试。';
+    return {
+      cause: friendly,
+      action: finalAction,
+      summary: friendly,
+      detail: rawDetail,
+      code
+    };
+  }
+  const defaultCause = safeProductCopy(fallback) || UNKNOWN_ISSUE.cause;
+  const defaultAction = safeProductCopy(action) || UNKNOWN_ISSUE.action;
+  return {
+    cause: defaultCause,
+    action: defaultAction,
+    summary: defaultCause,
+    detail: rawDetail,
+    code
+  };
+}
+
+function issueNoticeHtml({reasonCode = '', detail = '', action = '', fallback = ''} = {}) {
+  const issue = issuePresentation({reasonCode, detail, action, fallback});
+  const causeHtml = `<p><strong>问题原因：</strong>${escapeHtml(issue.cause)}</p>`;
+  const actionHtml = issue.action ? `<p><strong>处理方法：</strong>${escapeHtml(issue.action)}</p>` : '';
+  const diagnosticsHtml = issue.detail ? `<details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(issue.detail)}</code></pre></details>` : '';
+  return `<div class="notice notice-error">${causeHtml}${actionHtml}</div>${diagnosticsHtml}`;
 }
 
 function productApiError(value, status = 0, reasonCode = '') {
+  return productApiPresentation(value, status, reasonCode).summary;
+}
+
+function productApiPresentation(value, status = 0, reasonCode = '') {
+  const safeFallback = status >= 400 && status < 500 ? safeProductCopy(value) : '';
+  return issuePresentation({fallback: safeFallback, status, reasonCode, detail: value});
+}
+
+function presentationFromError(error, fallback = '') {
+  if (error?.presentation) return error.presentation;
   return issuePresentation({
-    fallback: status >= 500 ? '服务暂时不可用，请稍后重试。' : `请求失败（${status || '未知状态'}）`,
-    status,
-    reasonCode,
-    detail: value
-  }).summary;
+    fallback,
+    status: Number(error?.status || 0),
+    reasonCode: error?.code || '',
+    detail: error?.diagnosticMessage || error?.message || ''
+  });
 }
 
 function showToast(message, type = '') {
@@ -185,11 +405,13 @@ async function api(url, options = {}) {
     response = await fetch(url, { ...options, headers });
   } catch (cause) {
     const diagnosticMessage = String(cause?.message || cause || '').trim();
-    const error = new Error('无法连接服务，请检查服务状态后重试。');
+    const presentation = issuePresentation({reasonCode: 'NETWORK_ERROR', detail: diagnosticMessage});
+    const error = new Error(presentation.summary);
     error.status = 0;
     error.diagnosticMessage = diagnosticMessage;
     error.code = 'NETWORK_ERROR';
     error.payload = {};
+    error.presentation = presentation;
     throw error;
   }
   let payload;
@@ -197,11 +419,13 @@ async function api(url, options = {}) {
   if (!response.ok) {
     const diagnosticMessage = payload.error || `请求失败（${response.status}）`;
     const reasonCode = payload.reason_code || payload.error_code || '';
-    const error = new Error(productApiError(diagnosticMessage, response.status, reasonCode));
+    const presentation = productApiPresentation(diagnosticMessage, response.status, reasonCode);
+    const error = new Error(presentation.summary);
     error.status = response.status;
     error.diagnosticMessage = diagnosticMessage;
     error.code = reasonCode;
     error.payload = payload;
+    error.presentation = presentation;
     throw error;
   }
   return payload;
@@ -432,6 +656,7 @@ function returnDestinationLabel(returnTo, fallback = '上一页') {
     '/reports': '测试报告',
     '/defects': '缺陷队列',
     '/environments': '环境中心',
+    '/bluetooth': '蓝牙工作台',
   };
   if (labels[pathname]) return labels[pathname];
   if (pathname.startsWith('/test-batch/')) return '批次运行';
@@ -848,6 +1073,12 @@ function maturityChip(row = {}) {
   if (row.is_promoted || row.maturity_state === 'solidified') {
     return '<span class="chip chip-solidified">可直接运行</span>';
   }
+  if (row.is_execution_blocked || row.mapping_status === 'BLOCKED') {
+    return '<span class="chip chip-fail">当前固件阻塞</span>';
+  }
+  if (row.is_execution_ready || row.mapping_status === 'EXECUTION_READY') {
+    return '<span class="chip chip-unsolidified">动作可运行</span>';
+  }
   if (row.external_explored || row.maturity_state === 'explored_unsolidified') {
     return '<span class="chip chip-unsolidified">步骤待确认</span>';
   }
@@ -1007,6 +1238,11 @@ function caseManagementPlatformButtons(activePlatform = '') {
     if (!project) return `<span class="platform-choice is-disabled">${label}</span>`;
     return `<form class="case-platform-switch-form" method="get" action="/cases" data-case-platform="${platformId}"><input type="hidden" name="project" value="${escapeHtml(project)}"><input type="hidden" name="platform_id" value="${platformId}"><button class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" type="submit" ${platformId === activePlatform ? 'aria-current="page"' : ''}>${label}</button></form>`;
   }).join('');
+}
+
+function confirm579Watchface(project) {
+  if (project !== '579_Z1640') return true;
+  return window.confirm('请先确认 579 手表当前位于亮屏表盘。确认后，Runner 会直接发送侧键和触控命令；若 OTA 后侧键路径失效，请取消并停止迁移。');
 }
 
 function testTargetChip(value) {
@@ -1567,7 +1803,7 @@ function testRows(items, query, state, returnTo = '/cases') {
     const revision = Number(row.current_revision || 1);
     return `<tr class="test-row-shell${selected ? ' is-selected' : ''}">
       <td><label class="table-checkbox" title="${escapeHtml(`选择 ${caseId} 创建精确批次`)}"><input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''}></label></td>
-      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}</small></td>
+      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
       <td class="case-purpose-cell"><strong>${escapeHtml(row.steps_text || row.expected_text || '未填写测试步骤')}</strong><small>${escapeHtml(row.expected_text || '未填写预期结果')}</small></td>
       <td><span class="chip chip-status priority-${escapeHtml(String(row.priority || '').toLowerCase())}">${escapeHtml(row.priority || '未分级')}</span></td>
       <td>${maturityChip(row)}<small>${escapeHtml(platforms ? `适用平台：${platforms}` : '未指定适用平台')}</small></td>
@@ -2145,6 +2381,7 @@ async function renderTests() {
     const platformLabel = PLATFORM_PROFILES[selectedRunPlatform]?.platform_label || selectedRunPlatform;
     const targetLabel = PLATFORM_TARGETS[selectedRunTarget]?.target_label || selectedRunTarget;
     if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${cases.length}\n运行模式：确定性执行\n\n本批次只运行勾选项，平台不可用时不会自动改用另一套逻辑。`)) return;
+    if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
     try {
@@ -2155,7 +2392,8 @@ async function renderTests() {
           platform_id: selectedRunPlatform,
           target_id: selectedRunTarget,
           run_mode: 'deterministic',
-          cases
+          cases,
+          watchface_ready: projectSelect.value === '579_Z1640'
         }),
       });
       window.location.href = testBatchHref(job.id);
@@ -2181,6 +2419,7 @@ async function renderTests() {
     const platformLabel = PLATFORM_PROFILES[platformId]?.platform_label || platformId;
     const targetLabel = PLATFORM_TARGETS[targetId]?.target_label || targetId;
     if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${total}\n范围：${labels.join('、')}\n\n最新结果已通过的用例不会重跑，平台不可用时不会自动回退。`)) return;
+    if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
     try {
@@ -2192,7 +2431,8 @@ async function renderTests() {
           project_id: projectSelect.value,
           platform_id: platformId,
           target_id: targetId,
-          run_mode: 'deterministic'
+          run_mode: 'deterministic',
+          watchface_ready: projectSelect.value === '579_Z1640'
         })
       });
       window.location.href = testBatchHref(job.id);
@@ -2945,7 +3185,7 @@ function testResultReason(record = {}, fallback = '未记录判定理由') {
   const workflowStatus = String(record.workflow_status || record.status || '').toLowerCase();
   const verdict = String(record.verdict || '').toUpperCase();
   if ((!workflowStatus || workflowStatus === 'completed') && ['PASS', 'FAIL', 'CANNOT_VERIFY'].includes(verdict)) {
-    return friendlyAgentError(detail || fallback);
+    return friendlyAgentError(detail || fallback) || fallback;
   }
   return issuePresentation({
     fallback,
@@ -2983,14 +3223,17 @@ async function renderTest(sheet, caseId) {
   document.title = `${testCase.case_id} · Agent 测试`;
   const latest = testCase.history?.[0];
   const initialVerdict = latest?.verdict || 'PENDING';
-  const usesFixedMapping = Boolean(testCase.is_promoted);
+  const usesFixedMapping = Boolean(testCase.is_fixed_runnable || testCase.is_promoted);
+  const executionOnly579 = project === '579_Z1640';
+  const executionBlocked = Boolean(testCase.is_execution_blocked || testCase.mapping_status === 'BLOCKED');
+  const blockReasonCode = testCase.block_reason_code || 'WATCH_579_EXECUTION_BLOCKED';
   app.innerHTML = `
     <a class="back-link test-list-back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(testCase.sheet)} · 自动化测试 · ${escapeHtml(testCase.execution_target_label)}</p>
         <h1 class="page-title detail-title">${escapeHtml(testCase.case_id)}</h1>
-        <div class="meta-line">${testTargetChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${caseStatusChip({...testCase, latest_verdict: initialVerdict})}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
+        <div class="meta-line">${testTargetChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${testCase.batch_id ? `<span class="chip chip-status">${escapeHtml(testCase.batch_id)}</span>` : ''}${caseStatusChip({...testCase, latest_verdict: initialVerdict})}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
       </div>
     </header>
     <div class="detail-grid">
@@ -3004,8 +3247,11 @@ async function renderTest(sheet, caseId) {
             ${verificationPoints(testCase.verification_points)}
           </div>
         </section>
-        ${usesFixedMapping ? `<details class="panel collapsible-panel">
-          <summary class="panel-head"><div><h2>自动化步骤</h2><p>已保存，可直接运行</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
+        ${executionBlocked ? `<section class="panel">
+          <header class="panel-head"><div><h2>当前固件入口阻塞</h2><p>${escapeHtml(blockReasonCode)}</p></div></header>
+          <div class="panel-body command-phases"><div class="notice notice-warning"><strong>本批计算器用例暂不可启动</strong><p>真机已确认菜单右滑能够返回表盘，但当前 OTA 固件不响应表盘侧键入口。平台已阻止单条、批次和候选复跑，且不会退回 08/96。</p></div></div>
+        </section>` : usesFixedMapping ? `<details class="panel collapsible-panel">
+          <summary class="panel-head"><div><h2>自动化步骤</h2><p>${testCase.is_execution_ready ? '动作已保存，观察证据待补齐' : '已保存，可直接运行'}</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
           <div class="panel-body command-phases">${commandPhase('准备环境', '运行前', testCase.setup)}${commandPhase('执行操作', '测试步骤', testCase.actions)}${commandPhase('采集证据', '检查结果', testCase.collect)}</div>
         </details>` : `<section class="panel">
           <header class="panel-head"><div><h2>首次运行</h2><p>本次将根据用例内容尝试执行</p></div></header>
@@ -3023,13 +3269,14 @@ async function renderTest(sheet, caseId) {
             <small id="detail-run-blocker">正在校验平台映射…</small>
           </div>
           <ul class="run-notes">
-            <li>${usesFixedMapping ? '按已保存步骤运行' : '根据用例内容尝试执行'}</li>
-            <li>在每个检查点采集${escapeHtml(screenshotLabel(testCase))}</li>
-            <li>根据截图判定并保存结果</li>
+            <li>${executionBlocked ? `已阻止执行：${escapeHtml(blockReasonCode)}` : usesFixedMapping ? '按已保存步骤运行' : '根据用例内容尝试执行'}</li>
+            ${executionOnly579
+              ? '<li>记录每条 TX 与 L1 ACK，不将 ACK 当作业务效果</li><li>当前无截图通道，结果固定为观察不完整</li>'
+              : `<li>在每个检查点采集${escapeHtml(screenshotLabel(testCase))}</li><li>根据截图判定并保存结果</li>`}
           </ul>
-          <button id="test-run-button" class="button button-wide" type="submit">启动测试</button>
+          <button id="test-run-button" class="button button-wide" type="submit" ${executionBlocked ? 'disabled' : ''}>${executionBlocked ? '当前固件入口阻塞' : '启动测试'}</button>
           <button id="test-cancel-button" class="button button-danger button-wide" type="button" hidden>取消当前测试</button>
-          ${!usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">验证并保存步骤</button>` : ''}
+          ${!executionBlocked && !usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">验证并保存步骤</button>` : ''}
           ${project === '6202_W5230' ? `<button id="test-migrate-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">从 6202 模拟器迁移</button>` : ''}
           <p class="form-note">当前目标一次只能运行一个测试或修复任务。</p>
         </form>
@@ -3132,13 +3379,25 @@ async function renderTest(sheet, caseId) {
 
   document.querySelector('#test-run-form').addEventListener('submit', async event => {
       event.preventDefault();
+      if (executionBlocked) {
+        showToast(`${blockReasonCode}: 当前固件入口阻塞`, 'warning');
+        return;
+      }
+      if (!confirm579Watchface(project)) return;
       const button = document.querySelector('#test-run-button');
       button.disabled = true;
       button.textContent = '正在启动…';
       try {
         const job = await api('/api/tests/run', {
           method: 'POST',
-          body: JSON.stringify({project_id: project, platform_id: detailPlatform, target_id: detailTarget, sheet, case_id: caseId})
+          body: JSON.stringify({
+            project_id: project,
+            platform_id: detailPlatform,
+            target_id: detailTarget,
+            sheet,
+            case_id: caseId,
+            watchface_ready: project === '579_Z1640'
+          })
         });
         updateTestWorkflow({});
         const chip = document.querySelector('#test-job-chip');
@@ -3227,7 +3486,11 @@ async function restoreActiveTest(project, sheet, caseId) {
   } catch (error) {
     button.disabled = false;
     button.textContent = '启动测试';
-    message.textContent = `暂时无法读取任务状态：${error.message}`;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
   }
 }
 
@@ -3252,7 +3515,7 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
       chip.className = job.status === 'orphaned' ? 'chip chip-warning' : 'chip chip-running';
       if (job.status === 'orphaned') {
         chip.textContent = '上次任务未结束';
-        message.textContent = issuePresentation({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason}).summary;
+        message.innerHTML = issueNoticeHtml({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason});
       } else if (job.status === 'finalizing') {
         chip.textContent = isPromotionFlow ? '正在保存步骤' : '保存结果中';
         message.textContent = isPromotionFlow ? '测试已结束，正在验证并保存自动化步骤…' : '测试已结束，正在保存结果…';
@@ -3281,6 +3544,14 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
     const evidenceLink = job.history_id
       ? `<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, currentRouteUrl()))}">查看本次测试证据 →</a>`
       : '';
+    const interruptionStatus = String(job.workflow_status || job.status || '').toLowerCase();
+    const isInterrupted = ['failed', 'interrupted', 'orphaned'].includes(interruptionStatus)
+      || Boolean(job.error || job.interruption_reason);
+    const jobIssue = isInterrupted ? issuePresentation({
+      reasonCode: job.reason_code,
+      detail: job.interruption_reason || job.error,
+      fallback: '本次测试没有正常完成。'
+    }) : null;
     if (isPromotionFlow) {
       const promotionIssues = Array.isArray(job.promotion_issues) ? job.promotion_issues.filter(Boolean) : [];
       if (job.promotion_status === 'promoted') {
@@ -3296,7 +3567,9 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
         promoteButton.textContent = '验证并保存步骤';
       }
     } else {
-      if (job.history_id) {
+      if (isInterrupted) {
+        message.innerHTML = `${issueNoticeHtml({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '本次测试没有正常完成。'})}${evidenceLink}`;
+      } else if (job.history_id) {
         message.innerHTML = `测试已结束。${evidenceLink}`;
       } else if (job.status === 'cancelled') {
         message.textContent = '测试已取消，本次没有保存结果。';
@@ -3316,7 +3589,7 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
     document.querySelector('#test-history-body').innerHTML = testHistoryRows(detail.history, project, sheet, caseId, testReturnUrl());
     if (!isPromotionFlow) {
       if (job.status === 'cancelled') showToast('测试任务已取消', 'warning');
-      else if (job.workflow_status && job.workflow_status !== 'completed') showToast('测试流程执行异常，请查看原因', 'error');
+      else if (jobIssue) showToast(jobIssue.summary, 'error');
       else if (job.verdict === 'PASS') showToast('测试通过');
       else if (job.verdict === 'CANNOT_VERIFY') showToast('测试无法验证，请查看判定理由和证据', 'warning');
       else showToast(job.verdict === 'ERROR' ? '测试执行异常' : '测试未通过', 'error');
@@ -3324,7 +3597,11 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
   } catch (error) {
     chip.className = 'chip chip-fail';
     chip.textContent = '状态读取失败';
-    message.textContent = error.message;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
     button.disabled = false;
     button.textContent = '重新启动';
   }
@@ -3403,13 +3680,19 @@ function updateBatchView(job) {
   const current = document.querySelector('#batch-current-case');
   if (current) {
     const item = job.current_case;
-    current.innerHTML = item ? `
+    const isInterrupted = Boolean(job.status === 'interrupted' || job.status === 'orphaned' || job.status === 'failed' || job.resume_available || job.interruption_reason || job.error);
+    const batchIssue = isInterrupted ? issuePresentation({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '批次已中断。'}) : null;
+    current.innerHTML = isInterrupted
+      ? `<div class="notice notice-error"><p><strong>问题原因：</strong>${escapeHtml(batchIssue.cause)}</p>${batchIssue.action ? `<p><strong>处理方法：</strong>${escapeHtml(batchIssue.action)}</p>` : ''}${job.resume_available ? `<p><strong>可从第 ${completed + 1} 条继续。</strong></p>` : ''}</div>${(job.interruption_reason || job.error) ? `<details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(job.interruption_reason || job.error)}</code></pre></details>` : ''}`
+      : item ? `
       <div class="batch-case-head"><div><span>当前用例 ${Number(job.current_index || 0)} / ${total}</span><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.sheet)} · ${escapeHtml(item.priority || '未分级')}</small></div>${resultChip('RUNNING')}</div>
       <div class="batch-case-grid">
         <div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '启动中')}</strong></div>
       </div>
       <p>${escapeHtml(item.expected_text || '未填写预期结果')}</p>`
-      : `<div class="notice">${job.status === 'completed' ? '全部用例已完成。' : job.resume_available ? `<strong>${escapeHtml(testResultReason(job, '批次已中断'))} 可从第 ${completed + 1} 条继续。</strong>` : '正在准备下一条用例…'}</div>`;
+      : job.status === 'completed'
+        ? '<div class="notice">全部用例已完成。</div>'
+        : '<div class="notice">正在准备下一条用例…</div>';
   }
   const target = document.querySelector('#batch-target');
   if (target) target.innerHTML = testTargetChip(job);
@@ -3443,7 +3726,11 @@ async function pollBatchTest(jobId) {
     if (active) batchTestPollTimer = setTimeout(() => pollBatchTest(jobId), 2000);
   } catch (error) {
     const current = document.querySelector('#batch-current-case');
-    if (current) current.innerHTML = `<div class="notice notice-error">批次状态读取失败：${escapeHtml(error.message)}</div>`;
+    if (current) current.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取批次状态。'
+    });
   }
 }
 
@@ -3747,7 +4034,11 @@ async function restoreActiveRepair(defectNumber) {
   } catch (error) {
     button.disabled = false;
     button.textContent = '启动修复';
-    message.textContent = `暂时无法读取任务状态：${error.message}`;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
   }
 }
 
@@ -3766,7 +4057,7 @@ async function pollJob(jobId, defectNumber) {
       chip.className = job.status === 'orphaned' ? 'chip chip-warning' : 'chip chip-running';
       if (job.status === 'orphaned') {
         chip.textContent = '上次任务未结束';
-        message.textContent = issuePresentation({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason}).summary;
+        message.innerHTML = issueNoticeHtml({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason});
       } else if (job.status === 'finalizing') {
         chip.textContent = '保存结果中';
         message.textContent = '修复已结束，正在保存结果…';
@@ -3783,9 +4074,31 @@ async function pollJob(jobId, defectNumber) {
       setTimeout(() => pollJob(jobId, defectNumber), 2000);
       return;
     }
-    setResultChip(chip, job.verdict);
-    if (job.history_id) {
-      message.innerHTML = `修复已结束。<a href="${escapeHtml(defectHistoryHref(defectNumber, job.history_id))}">查看本次修复证据 →</a>`;
+    const interruptionStatus = String(job.workflow_status || job.status || '').toLowerCase();
+    const isInterrupted = job.status !== 'cancelled' && (
+      ['failed', 'interrupted', 'orphaned'].includes(interruptionStatus)
+      || (Boolean(job.workflow_status) && interruptionStatus !== 'completed')
+      || String(job.verdict || '').toUpperCase() === 'ERROR'
+      || Boolean(job.error || job.interruption_reason)
+    );
+    const jobIssue = isInterrupted ? issuePresentation({
+      reasonCode: job.reason_code,
+      detail: job.interruption_reason || job.error,
+      fallback: '本次任务没有正常完成。'
+    }) : null;
+    if (isInterrupted) {
+      chip.className = 'chip chip-fail';
+      chip.textContent = '执行异常';
+    } else {
+      setResultChip(chip, job.verdict);
+    }
+    const evidenceLink = job.history_id
+      ? `<a href="${escapeHtml(defectHistoryHref(defectNumber, job.history_id))}">查看本次修复证据 →</a>`
+      : '';
+    if (isInterrupted) {
+      message.innerHTML = `${issueNoticeHtml({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '本次任务没有正常完成。'})}${evidenceLink}`;
+    } else if (job.history_id) {
+      message.innerHTML = `修复已结束。${evidenceLink}`;
     } else if (job.status === 'cancelled') {
       message.textContent = '修复已取消，本次没有保存结果。';
     } else {
@@ -3802,14 +4115,18 @@ async function pollJob(jobId, defectNumber) {
     const historyPayload = await api(`/api/history/${encodeURIComponent(defectNumber)}`);
     document.querySelector('#history-body').innerHTML = historyRows(historyPayload.history, defectNumber);
     if (job.status === 'cancelled') showToast('修复任务已取消', 'warning');
-    else if (job.workflow_status && job.workflow_status !== 'completed') showToast('修复流程执行异常，请查看原因', 'error');
+    else if (jobIssue) showToast(jobIssue.summary, 'error');
     else if (job.verdict === 'PASS') showToast('修复与验证均已通过');
     else if (job.verdict === 'CANNOT_VERIFY') showToast('无法验证，请查看测试命令和证据', 'warning');
     else showToast('修复未通过，请查看失败原因和证据', 'error');
   } catch (error) {
     chip.className = 'chip chip-fail';
     chip.textContent = '状态读取失败';
-    message.textContent = error.message;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
     button.disabled = false;
     button.textContent = '重新启动';
   }
@@ -3929,7 +4246,7 @@ async function renderHistory(number, runId) {
         <div class="kv"><span>代码是否保留</span><strong>${escapeHtml(codeRetention(record))}</strong></div>
         <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
         <div class="kv"><span>结束时间</span><strong>${formatTime(record.finished_at)}</strong></div>
-      </div>${record.error ? `<div class="notice notice-error">${escapeHtml(issuePresentation({reasonCode: record.reason_code, detail: record.error}).summary)}</div><details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(record.error)}</code></pre></details>` : ''}</div>
+      </div>${(record.error || record.interruption_reason) ? issueNoticeHtml({reasonCode: record.reason_code, detail: record.error || record.interruption_reason}) : ''}</div>
     </section>
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>执行详情</h2><p>各阶段最终状态</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
@@ -4019,7 +4336,7 @@ async function renderTestHistory(sheet, caseId, runId) {
           <div class="kv"><span>优先级</span><strong>${escapeHtml(record.priority || '未分级')}</strong></div>
           <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
           <div class="kv"><span>结束时间</span><strong>${formatTime(record.finished_at)}</strong></div>
-        </div>
+        </div>${(record.error || record.interruption_reason || (record.verdict === 'ERROR' && record.reason)) ? issueNoticeHtml({reasonCode: record.reason_code, detail: record.error || record.interruption_reason || record.reason}) : ''}
       </div>
     </section>
     <section class="panel">
@@ -4120,13 +4437,28 @@ function initSystemSettings() {
     }
     return value;
   };
-  const setBleConnectionStatus = (tone, title, detail) => {
+  const setBleConnectionStatus = (tone, title, detail, diagnostic = '') => {
     if (!bleConnectionStatus) return;
     bleConnectionStatus.dataset.tone = tone;
     const titleNode = bleConnectionStatus.querySelector('strong');
     const detailNode = bleConnectionStatus.querySelector('small');
+    const diagnosticNode = bleConnectionStatus.querySelector('[data-ble-diagnostics]');
+    const diagnosticCode = diagnosticNode?.querySelector('code');
     if (titleNode) titleNode.textContent = title;
     if (detailNode) detailNode.textContent = detail;
+    if (diagnosticNode) {
+      diagnosticNode.hidden = !diagnostic;
+      diagnosticNode.open = false;
+    }
+    if (diagnosticCode) diagnosticCode.textContent = diagnostic;
+  };
+  const setBleIssue = issue => {
+    setBleConnectionStatus(
+      'error',
+      `问题原因：${issue.cause}`,
+      `处理方法：${issue.action}`,
+      issue.detail
+    );
   };
   const refreshSelectedBleStatus = () => {
     const address = String(hwBleAddress?.value || '').trim();
@@ -4208,10 +4540,11 @@ function initSystemSettings() {
     } catch (error) {
       bleRememberedDevices = [];
       bleRememberedLoaded = false;
+      const issue = presentationFromError(error, '无法读取已保存的蓝牙设备。');
       if (bleRememberedList) {
-        bleRememberedList.innerHTML = `<div class="ble-device-empty">读取连接记录失败：${escapeHtml(error.message)}</div>`;
+        bleRememberedList.innerHTML = `<div class="ble-device-empty">${escapeHtml(issue.cause)}</div>`;
       }
-        setBleConnectionStatus('error', '无法读取蓝牙设备记录', error.message);
+      setBleIssue(issue);
     }
   }
   bleSearchInput?.addEventListener('input', renderBleDevices);
@@ -4360,8 +4693,9 @@ function initSystemSettings() {
       refreshSelectedBleStatus();
       showToast(`找到 ${bleDiscoveredDevices.length} 个蓝牙设备`);
     } catch (error) {
-      setBleConnectionStatus('error', '查找蓝牙设备失败', error.message);
-      showToast(error.message, 'error');
+      const issue = presentationFromError(error, '电脑没有完成本次蓝牙查找。');
+      setBleIssue(issue);
+      showToast(issue.summary, 'error');
     } finally {
       setBleBusy(false);
       bleScanButton.textContent = originalText;
@@ -4384,7 +4718,12 @@ function initSystemSettings() {
           method: 'POST',
           body: JSON.stringify({address, name, timeout: bleTimeout()}),
         });
-        if (!data.verified) throw new Error(productApiError(data.error || '手表连接失败', 500, data.reason_code));
+        if (!data.verified) {
+          const issue = issuePresentation({reasonCode: data.reason_code || 'BLE_CONNECT_FAILED', detail: data.error});
+          const connectionError = new Error(issue.summary);
+          connectionError.presentation = issue;
+          throw connectionError;
+        }
         if (hwBleAddress) hwBleAddress.value = data.device?.address || address;
         await loadRememberedBleDevices();
         const verifiedName = data.device?.name || name || '未命名手表';
@@ -4412,8 +4751,9 @@ function initSystemSettings() {
         showToast('已删除设备记录');
       }
     } catch (error) {
-      setBleConnectionStatus('error', action === 'connect' ? '手表连接失败' : '操作失败', error.message);
-      showToast(error.message, 'error');
+      const issue = presentationFromError(error, action === 'connect' ? '电脑没有与这台手表建立可用连接。' : '本次蓝牙操作没有完成。');
+      setBleIssue(issue);
+      showToast(issue.summary, 'error');
     } finally {
       setBleBusy(false);
       renderBleDevices();
@@ -4425,6 +4765,30 @@ function initSystemSettings() {
     element.textContent = text;
     element.dataset.tone = tone;
   };
+  const setLlmTestStatus = (tone, summary, action = '', diagnostic = '') => {
+    if (!llmTestStatus) return;
+    llmTestStatus.dataset.tone = tone;
+    const summaryNode = llmTestStatus.querySelector('[data-llm-test-summary]');
+    const actionNode = llmTestStatus.querySelector('[data-llm-test-action]');
+    const diagnosticNode = llmTestStatus.querySelector('[data-llm-test-diagnostics]');
+    const diagnosticCode = diagnosticNode?.querySelector('code');
+    if (summaryNode) summaryNode.textContent = summary;
+    if (actionNode) {
+      actionNode.textContent = action;
+      actionNode.hidden = !action;
+    }
+    if (diagnosticNode) {
+      diagnosticNode.hidden = !diagnostic;
+      diagnosticNode.open = false;
+    }
+    if (diagnosticCode) diagnosticCode.textContent = diagnostic;
+  };
+  const setLlmTestIssue = issue => setLlmTestStatus(
+    'warning',
+    `问题原因：${issue.cause}`,
+    `处理方法：${issue.action}`,
+    issue.detail
+  );
 
   // Tab switching
   dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
@@ -4508,10 +4872,7 @@ function initSystemSettings() {
       if (hwBaud) hwBaud.value = cfg.hardware?.baudrate || 1500000;
       if (hwTrans) hwTrans.value = cfg.hardware?.transport || 'supercom';
       if (hwCap) hwCap.value = cfg.hardware?.capture_provider || 'mtp';
-      if (hwBleAddress) hwBleAddress.value = cfg.hardware?.ble_address || '';
-      if (hwBleScanTimeout) hwBleScanTimeout.value = cfg.hardware?.ble_scan_timeout || 15;
       await loadSerialPorts();
-      await loadRememberedBleDevices();
     } catch (err) {
       if (errorBox) {
         errorBox.textContent = `读取配置失败：${err.message}`;
@@ -4534,18 +4895,19 @@ function initSystemSettings() {
     btnTestLlm.addEventListener('click', async () => {
       btnTestLlm.disabled = true;
       btnTestLlm.textContent = '正在测试…';
-      setLlmSignal(llmTestStatus, '正在测试连接…', 'pending');
+      setLlmTestStatus('pending', '正在测试连接…');
       try {
         const resp = await fetch('/api/config/test-llm', { method: 'POST' });
         const data = await resp.json();
         if (data.ok) {
-          setLlmSignal(llmTestStatus, `连接成功 · ${data.latency_ms}ms`, 'success');
+          setLlmTestStatus('success', `连接成功 · ${data.latency_ms}ms`);
         } else {
           const detail = data.error || data.message || '未知错误';
-          setLlmSignal(llmTestStatus, productApiError(detail, 500, data.error_category), 'warning');
+          const reasonCode = data.error_code || data.reason_code || data.error_category || '';
+          setLlmTestIssue(issuePresentation({reasonCode, detail, status: resp.status}));
         }
       } catch (err) {
-        setLlmSignal(llmTestStatus, `连接失败：${productApiError(err.message || err, 500)}`, 'warning');
+        setLlmTestIssue(issuePresentation({reasonCode: 'LLM_REQUEST_FAILED', detail: err?.message || err}));
       } finally {
         btnTestLlm.disabled = false;
         btnTestLlm.textContent = '测试连接';
@@ -4643,8 +5005,6 @@ function initSystemSettings() {
           baudrate: Number(document.querySelector('#cfg-hw-baudrate')?.value) || 1500000,
           transport: document.querySelector('#cfg-hw-transport')?.value || 'supercom',
           capture_provider: document.querySelector('#cfg-hw-capture')?.value || 'mtp',
-          ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim(),
-          ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15,
         },
       };
 
@@ -5362,34 +5722,52 @@ function environmentSection() {
 }
 
 const ENVIRONMENT_CHECK_COPY = Object.freeze({
-  source: {label: '项目文件', pass: '项目文件可用', warning: '项目文件需要配置', fail: '项目文件不可用'},
-  profile: {label: '真机配置', pass: '真机配置可用', warning: '真机配置需要完善', fail: '真机配置不可用'},
-  supercom_pipe: {label: '手表连接', pass: '手表连接可用', warning: '手表连接需要检查', fail: '手表连接不可用'},
-  usb_pnp: {label: 'USB 连接', pass: '手表已通过 USB 连接', warning: 'USB 连接需要检查', fail: 'USB 连接不可用'},
-  mtp_namespace: {label: '截图读取', pass: '可以读取手表截图', warning: '截图读取需要检查', fail: '暂时无法读取手表截图'},
-  gui_ping: {label: '手表响应', pass: '手表可以接收测试操作', warning: '手表响应需要检查', fail: '手表暂未响应测试操作'},
-  target_busy: {label: '当前手表', pass: '当前手表可用', warning: '当前手表需要检查', fail: '当前手表正在使用中'},
-  internal: {label: '环境检查', pass: '环境检查可用', warning: '环境检查需要重试', fail: '环境检查未完成'},
-  config: {label: '用例配置', pass: '用例配置可用', warning: '用例配置需要完善', fail: '用例配置不可用'},
-  artifact: {label: '测试程序', pass: '测试程序可用', warning: '测试程序尚未准备好', fail: '测试程序不可用'},
-  command: {label: '操作能力', pass: '操作能力可用', warning: '操作能力需要检查', fail: '操作能力不可用'},
-  capture: {label: '截图能力', pass: '截图能力可用', warning: '截图能力需要检查', fail: '截图能力不可用'},
-  llm: {label: '模型服务', pass: '模型服务可用', warning: '模型服务尚未配置或不可用', fail: '模型服务不可用'}
+  source: {label: '项目文件', pass: '项目文件可用', warning: '项目文件需要配置', fail: '项目文件不可用', action: '请在系统设置中配置项目路径。'},
+  profile: {label: '真机配置', pass: '真机配置可用', warning: '真机配置需要完善', fail: '真机配置不可用', action: '请重新选择测试项目；如仍失败，请联系维护人员。'},
+  supercom_pipe: {label: '手表连接', pass: '手表连接可用', warning: '手表连接需要检查', fail: '手表连接不可用', action: '请打开 SuperCom，连接当前手表对应的串口后重新检查。'},
+  usb_pnp: {label: 'USB 连接', pass: '手表已通过 USB 连接', warning: 'USB 连接需要检查', fail: 'USB 连接不可用', action: '请重新插拔 USB，确认电脑能够识别手表后重试。'},
+  mtp_namespace: {label: '截图读取', pass: '可以读取手表截图', warning: '截图读取需要检查', fail: '暂时无法读取手表截图', action: '请重新连接 USB，并确认电脑能够打开手表存储后重试。'},
+  gui_ping: {label: '手表响应', pass: '手表可以接收测试操作', warning: '手表响应需要检查', fail: '手表暂未响应测试操作', action: '请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。'},
+  target_busy: {label: '当前手表', pass: '当前手表可用', warning: '当前手表需要检查', fail: '当前手表正在使用中', action: '请等待该任务结束或停止后再检查。'},
+  internal: {label: '环境检查', pass: '环境检查可用', warning: '环境检查需要重试', fail: '环境检查未完成', action: '请重新检查；如再次出现，展开诊断信息并联系维护人员。'},
+  config: {label: '用例配置', pass: '用例配置可用', warning: '用例配置需要完善', fail: '用例配置不可用', action: '请在系统设置中检查用例配置。'},
+  artifact: {label: '测试程序', pass: '测试程序可用', warning: '测试程序尚未准备好', fail: '测试程序不可用', action: '请在系统设置中检查测试程序路径或重新准备测试程序。'},
+  command: {label: '操作能力', pass: '操作能力可用', warning: '操作能力需要检查', fail: '操作能力不可用', action: '请在系统设置中检查设备连接与操作设置。'},
+  capture: {label: '截图能力', pass: '截图能力可用', warning: '截图能力需要检查', fail: '截图能力不可用', action: '请在系统设置中检查截图连接设置。'},
+  llm: {label: '模型服务', pass: '模型服务可用', warning: '模型服务尚未配置或不可用', fail: '模型服务不可用', action: '请在系统设置中检查网络和模型服务配置。'}
 });
 
 function environmentCheckPresentation(item = {}, status = 'unchecked') {
   const key = String(item.key || '');
   const copy = ENVIRONMENT_CHECK_COPY[key] || {
-    label: item.label || key || '检查项',
+    label: safeProductCopy(item.label) || '检查项',
     pass: '当前可用',
     warning: '需要检查',
-    fail: '当前不可用'
+    fail: '当前不可用',
+    action: '请检查相关配置后重试。'
   };
-  const detail = String(item.detail || '').trim();
-  if (['pass', 'ready'].includes(status)) return {label: copy.label, summary: copy.pass, detail};
-  if (status === 'unchecked') return {label: copy.label, summary: '尚未检查', detail: ''};
-  if (status === 'warning') return {label: copy.label, summary: copy.warning, detail};
-  return {label: copy.label, summary: knownIssueSummary(item.code) || copy.fail, detail};
+  const diagnosticPayload = item.diagnostics && typeof item.diagnostics === 'object' && Object.keys(item.diagnostics).length
+    ? JSON.stringify(item.diagnostics, null, 2)
+    : '';
+  const detail = [String(item.detail || '').trim(), diagnosticPayload].filter(Boolean).join('\n\n');
+  const label = copy.label;
+  if (['pass', 'ready'].includes(status)) {
+    return {label, cause: copy.pass, action: '', summary: copy.pass, detail};
+  }
+  if (status === 'unchecked') {
+    return {label, cause: '尚未检查', action: '', summary: '尚未检查', detail: ''};
+  }
+  const fallbackCause = status === 'warning' ? copy.warning : copy.fail;
+  const known = resolveIssueDefinition(item.code);
+  const cause = known ? known.cause : fallbackCause;
+  const action = known?.action || safeProductCopy(item.action) || copy.action;
+  return {
+    label,
+    cause,
+    action,
+    summary: cause,
+    detail
+  };
 }
 
 function environmentCheckRows(checks = [], isHardware = false) {
@@ -5410,7 +5788,11 @@ function environmentCheckRows(checks = [], isHardware = false) {
     const diagnostics = presentation.detail && presentation.detail !== presentation.summary
       ? `<details class='inline-diagnostics'><summary>诊断信息</summary><pre><code>${escapeHtml(presentation.detail)}</code></pre></details>`
       : '';
-    return `<div class='environment-check-row is-${escapeHtml(status)}'><i>${icon(iconName, 17)}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span><div class='environment-check-detail'><p>${escapeHtml(presentation.summary)}</p>${diagnostics}</div></div>`;
+    const isProblem = ['warning', 'fail', 'error'].includes(status);
+    const content = isProblem
+      ? `<div class='environment-check-detail'><p class='check-cause'><span class='check-field-label'>问题原因：</span>${escapeHtml(presentation.cause)}</p>${presentation.action ? `<p class='check-action'><span class='check-field-label'>处理方法：</span>${escapeHtml(presentation.action)}</p>` : ''}${diagnostics}</div>`
+      : `<div class='environment-check-detail'><p>${escapeHtml(presentation.summary)}</p>${diagnostics}</div>`;
+    return `<div class='environment-check-row is-${escapeHtml(status)}'><i>${icon(iconName, 17)}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span>${content}</div>`;
   }).join('')}</div>`;
 }
 
@@ -5443,6 +5825,249 @@ function mount579EnvironmentConfig(root, cfg = {}) {
     <label><span>证据目录</span><input name='artifact_root' type='text' value='${escapeHtml(cfg.artifact_root || '')}' placeholder='留空使用任务证据目录'></label>
     <label><span>实机动作门禁</span><input type='text' value='${cfg.device_actions_enabled ? '已由受控授权开启' : '默认关闭，等待受控 Canary 授权'}' readonly></label>
     <div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit'>保存 579 配置</button></div>`;
+}
+
+function BluetoothPage() {
+  let pollTimer = null;
+  let destroyed = false;
+  let eventCursor = 0;
+  let events = [];
+  let devices = [];
+  let latestStatus = null;
+
+  const calculatorData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 54 50 5F 43 4C 49 43 4B 3A 35 31 2C 31 35 36 2C 31 20 3B';
+  const buttonData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 42 55 54 54 4F 4E 5F 50 52 45 53 53 3A 31 2C 31 2C 30 3B';
+
+  return {
+    async load() {
+      const [config, status, remembered] = await Promise.all([
+        api('/api/config'),
+        optionalApi('/api/hardware/579/status'),
+        optionalApi('/api/hardware/ble/remembered'),
+      ]);
+      latestStatus = status.data;
+      return {config, status, remembered};
+    },
+    render(data) {
+      const initialPurpose = currentProject() === '6202_W5230' ? '6202' : '579';
+      const address579 = data.config.hardware_579?.ble_address || '';
+      const address6202 = data.config.hardware?.ble_address || '';
+      const remembered = data.remembered.data?.items || [];
+      return `${Components.pageHeader({title: '蓝牙工作台', intro: '管理独立蓝牙目标、复用 579 GATT 连接并发送原始命令'})}
+        <section class="bluetooth-workbench-grid" data-bluetooth-workbench data-purpose="${initialPurpose}" data-address-579="${escapeHtml(address579)}" data-address-6202="${escapeHtml(address6202)}">
+          <article class="workspace-panel bluetooth-device-panel">
+            <header><div><h2>设备与连接</h2><p>扫描结果只用于精确选择地址，不按名称猜测目标。</p></div><span id="bt-lease-chip" class="chip chip-pending">手工可用</span></header>
+            <div class="bluetooth-form-grid">
+              <label><span>用途</span><select id="bt-purpose" data-ble-mutable><option value="579" ${initialPurpose === '579' ? 'selected' : ''}>579 指令执行</option><option value="6202" ${initialPurpose === '6202' ? 'selected' : ''}>6202 BLE 截图</option></select></label>
+              <label><span>扫描超时（秒）</span><input id="bt-timeout" type="number" min="1" max="60" value="${Number(data.config.hardware_579?.ble_scan_timeout || data.config.hardware?.ble_scan_timeout || 15)}" data-ble-mutable></label>
+              <label class="bluetooth-address-field"><span>精确目标地址</span><input id="bt-address" type="text" value="${escapeHtml(initialPurpose === '579' ? address579 : address6202)}" placeholder="例如 41:42:72:6A:93:2D" autocomplete="off" data-ble-mutable></label>
+            </div>
+            <div class="bluetooth-actions">
+              <input id="bt-search" type="search" placeholder="按名称或地址过滤" autocomplete="off" data-ble-mutable>
+              <button id="bt-scan" class="button button-secondary" type="button" data-ble-mutable>扫描</button>
+              <button id="bt-save-target" class="button button-secondary" type="button" data-ble-mutable>保存目标</button>
+              <button id="bt-connect" class="button" type="button" data-ble-mutable>连接</button>
+              <button id="bt-disconnect" class="button button-secondary" type="button" data-ble-mutable>断开</button>
+            </div>
+            <div id="bt-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite"><span class="ble-connection-dot" aria-hidden="true"></span><div><strong>正在读取连接状态</strong><small></small></div></div>
+            <div id="bt-device-list" class="bluetooth-device-list">${remembered.length ? remembered.map(item => `<button type="button" class="bluetooth-device-choice" data-device-address="${escapeHtml(item.address)}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address)}</code><small>6202 已记住设备</small></button>`).join('') : '<div class="ble-device-empty">点击“扫描”查找附近设备</div>'}</div>
+          </article>
+
+          <article id="bt-command-panel" class="workspace-panel bluetooth-command-panel">
+            <header><div><h2>579 原始命令</h2><p>Cmd / Key / Data 由后端规范化并封包。</p></div><span class="chip chip-warning">effect_verified=false</span></header>
+            <div class="notice notice-warning bluetooth-risk"><p><strong>风险说明：</strong>此处不设命令白名单，也不对高风险 Cmd/Key 二次确认。仅发送你明确了解的命令；L1 ACK 只证明传输回执，不证明手表业务效果。</p></div>
+            <div class="bluetooth-presets" aria-label="已验证预置">
+              <button type="button" class="button button-secondary" data-bt-preset="find" data-ble-mutable>查找手表 02/3B</button>
+              <button type="button" class="button button-secondary" data-bt-preset="calc" data-ble-mutable>计算器点击 0→1</button>
+              <button type="button" class="button button-secondary" data-bt-preset="button" data-ble-mutable>侧键短按</button>
+            </div>
+            <div class="bluetooth-command-fields">
+              <label><span>Cmd</span><input id="bt-cmd" value="02" placeholder="02 或 0x02" autocomplete="off" data-ble-mutable></label>
+              <label><span>Key</span><input id="bt-key" value="3B" placeholder="3B 或 0x3b" autocomplete="off" data-ble-mutable></label>
+              <label class="bluetooth-data-field"><span>Data（HEX，可留空）</span><textarea id="bt-data" rows="5" placeholder="连续 HEX 或空格/逗号分隔" data-ble-mutable></textarea></label>
+            </div>
+            <div class="bluetooth-actions"><button id="bt-preview" class="button button-secondary" type="button">生成预览</button><button id="bt-send" class="button" type="button" data-ble-mutable>发送并等待 L1 ACK</button></div>
+            <dl id="bt-preview-result" class="bluetooth-packet-preview"><div><dt>规范化命令</dt><dd>尚未生成</dd></div><div><dt>完整 Packet</dt><dd>—</dd></div></dl>
+          </article>
+        </section>
+        <article class="workspace-panel bluetooth-log-panel"><header><div><h2>579 TX / RX 日志</h2><p>cursor 增量轮询；包含 L1 ACK、设备主动上报与主机 ACK。</p></div><button id="bt-clear-log" class="button button-secondary" type="button">清空显示</button></header><ol id="bt-event-log" class="bluetooth-event-log"><li><span>等待 Broker 事件…</span></li></ol></article>`;
+    },
+    mount(root, data) {
+      const workbench = root.querySelector('[data-bluetooth-workbench]');
+      const purpose = root.querySelector('#bt-purpose');
+      const address = root.querySelector('#bt-address');
+      const timeout = root.querySelector('#bt-timeout');
+      const search = root.querySelector('#bt-search');
+      const list = root.querySelector('#bt-device-list');
+      const statusBox = root.querySelector('#bt-status');
+      const commandPanel = root.querySelector('#bt-command-panel');
+      const eventLog = root.querySelector('#bt-event-log');
+      const cmd = root.querySelector('#bt-cmd');
+      const key = root.querySelector('#bt-key');
+      const rawData = root.querySelector('#bt-data');
+      const previewResult = root.querySelector('#bt-preview-result');
+      let namesByAddress = new Map();
+      devices = (data.remembered.data?.items || []).map(item => ({...item, rssi: null}));
+      for (const item of devices) namesByAddress.set(String(item.address || '').toLowerCase(), item.name || '');
+
+      const configuredAddress = selectedPurpose => selectedPurpose === '579'
+        ? workbench.dataset.address579
+        : workbench.dataset.address6202;
+      const scanTimeout = () => {
+        const value = Number(timeout.value);
+        if (!Number.isFinite(value) || value < 1 || value > 60) throw new Error('扫描超时必须在 1 到 60 秒之间');
+        return value;
+      };
+      const leaseActive = () => Boolean(latestStatus?.lease?.active);
+      const setStatus = (tone, title, detail = '') => {
+        statusBox.dataset.tone = tone;
+        statusBox.querySelector('strong').textContent = title;
+        statusBox.querySelector('small').textContent = detail;
+      };
+      const applyLease = () => {
+        const active = leaseActive();
+        const chip = root.querySelector('#bt-lease-chip');
+        chip.className = `chip ${active ? 'chip-running' : 'chip-pending'}`;
+        chip.textContent = active ? `自动化占用 · ${latestStatus.lease.owner || '任务'}` : '手工可用';
+        root.querySelectorAll('[data-ble-mutable]').forEach(control => { control.disabled = active; });
+      };
+      const renderConnection = () => {
+        const is579 = purpose.value === '579';
+        commandPanel.hidden = !is579;
+        root.querySelector('#bt-disconnect').hidden = !is579;
+        if (is579) {
+          if (latestStatus?.connected) setStatus('success', `${latestStatus.name || '579 手表'} · ${latestStatus.address}`, 'GATT ready；Notify 已订阅');
+          else if (latestStatus?.last_error) setStatus('error', latestStatus.last_error.reason_code || '连接异常', latestStatus.last_error.message || '');
+          else setStatus('neutral', '579 尚未连接', '连接后 Broker 会保持并复用这一条 GATT 会话');
+        } else {
+          setStatus('neutral', '6202 按需连接', '连接检查后会断开；运行截图时按已保存地址重新连接');
+        }
+        applyLease();
+      };
+      const renderDevices = () => {
+        const query = String(search.value || '').trim().toLowerCase();
+        const filtered = devices.filter(item => !query || String(item.address || '').toLowerCase().includes(query) || String(item.name || '').toLowerCase().includes(query));
+        list.innerHTML = filtered.length ? filtered.map(item => `<button type="button" class="bluetooth-device-choice ${String(item.address || '').toLowerCase() === String(address.value || '').toLowerCase() ? 'is-selected' : ''}" data-device-address="${escapeHtml(item.address || '')}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable ${leaseActive() ? 'disabled' : ''}><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address || '')}</code><small>${item.rssi === null || item.rssi === undefined ? 'RSSI 未知' : `${Number(item.rssi)} dBm`}</small></button>`).join('') : '<div class="ble-device-empty">没有匹配的扫描结果</div>';
+      };
+      const renderEvents = () => {
+        eventLog.innerHTML = events.length ? events.map(item => `<li><time>${escapeHtml(String(item.at || ''))}</time><strong>${escapeHtml(item.kind || 'EVENT')}</strong><code>${escapeHtml(JSON.stringify(item))}</code></li>`).join('') : '<li><span>等待 Broker 事件…</span></li>';
+        eventLog.scrollTop = eventLog.scrollHeight;
+      };
+      const saveTarget = async () => {
+        const value = String(address.value || '').trim();
+        if (!value) throw new Error('请先填写或选择精确目标地址');
+        if (purpose.value === '579') {
+          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware_579: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
+          workbench.dataset.address579 = value;
+        } else {
+          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
+          workbench.dataset.address6202 = value;
+        }
+      };
+      const preview = async () => {
+        const result = await api('/api/hardware/579/preview', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
+        cmd.value = result.cmd;
+        key.value = result.key;
+        rawData.value = result.data_hex;
+        previewResult.innerHTML = `<div><dt>规范化命令</dt><dd><code>Cmd=${escapeHtml(result.cmd)} · Key=${escapeHtml(result.key)} · Data=${escapeHtml(result.data_hex || '空')} · ${Number(result.packet_length)} B</code></dd></div><div><dt>完整 Packet</dt><dd><code>${escapeHtml(result.packet_hex)}</code></dd></div>`;
+        return result;
+      };
+      const poll = async () => {
+        if (destroyed) return;
+        try {
+          const [status, eventBatch] = await Promise.all([
+            api('/api/hardware/579/status'),
+            api(`/api/hardware/579/events?after=${eventCursor}&limit=200`),
+          ]);
+          latestStatus = status;
+          const incoming = eventBatch.items || [];
+          if (incoming.length) {
+            events = [...events, ...incoming].slice(-300);
+            eventCursor = Number(eventBatch.next_cursor || eventCursor);
+            renderEvents();
+          }
+          renderConnection();
+          renderDevices();
+        } catch (error) {
+          if (purpose.value === '579') setStatus('error', 'Broker 状态读取失败', error.message);
+        } finally {
+          if (!destroyed) pollTimer = setTimeout(poll, 1000);
+        }
+      };
+
+      purpose.addEventListener('change', () => {
+        address.value = configuredAddress(purpose.value) || '';
+        renderConnection();
+        renderDevices();
+      });
+      address.addEventListener('input', renderDevices);
+      search.addEventListener('input', renderDevices);
+      list.addEventListener('click', event => {
+        const choice = event.target.closest('[data-device-address]');
+        if (!choice || leaseActive()) return;
+        address.value = choice.dataset.deviceAddress || '';
+        namesByAddress.set(address.value.toLowerCase(), choice.dataset.deviceName || '');
+        renderDevices();
+      });
+      root.querySelector('#bt-scan').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          const result = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(scanTimeout())}&q=${encodeURIComponent(search.value.trim())}`);
+          devices = result.items || [];
+          renderDevices();
+          showToast(`找到 ${devices.length} 个蓝牙设备`);
+        } catch (error) { showToast(error.message, 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-save-target').addEventListener('click', async () => {
+        try { await saveTarget(); showToast('蓝牙目标已保存'); } catch (error) { showToast(error.message, 'error'); }
+      });
+      root.querySelector('#bt-connect').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          const value = String(address.value || '').trim();
+          if (!value) throw new Error('请先填写或选择精确目标地址');
+          if (purpose.value === '579') {
+            latestStatus = await api('/api/hardware/579/connect', {method: 'POST', body: JSON.stringify({address: value, timeout: scanTimeout()})});
+            workbench.dataset.address579 = latestStatus.address || value;
+          } else {
+            await api('/api/hardware/ble/connect', {method: 'POST', body: JSON.stringify({address: value, name: namesByAddress.get(value.toLowerCase()) || '', timeout: scanTimeout()})});
+            workbench.dataset.address6202 = value;
+          }
+          renderConnection();
+          showToast('蓝牙目标连接成功');
+        } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-disconnect').addEventListener('click', async () => {
+        try { latestStatus = await api('/api/hardware/579/disconnect', {method: 'POST', body: '{}'}); renderConnection(); showToast('579 BLE 已断开'); } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+      });
+      root.querySelectorAll('[data-bt-preset]').forEach(button => button.addEventListener('click', () => {
+        const preset = button.dataset.btPreset;
+        cmd.value = preset === 'find' ? '02' : '04';
+        key.value = preset === 'find' ? '3B' : '05';
+        rawData.value = preset === 'find' ? '' : preset === 'calc' ? calculatorData : buttonData;
+        preview().catch(error => showToast(error.message, 'error'));
+      }));
+      root.querySelector('#bt-preview').addEventListener('click', () => preview().catch(error => showToast(error.message, 'error')));
+      root.querySelector('#bt-send').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          await preview();
+          const result = await api('/api/hardware/579/send', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
+          showToast(result.transport_acked ? '收到 L1 ACK；请人工确认手表业务现象' : '未收到 L1 ACK', result.transport_acked ? 'success' : 'warning');
+        } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-clear-log').addEventListener('click', () => { events = []; renderEvents(); });
+      renderConnection();
+      void poll();
+    },
+    destroy() {
+      destroyed = true;
+      if (pollTimer) clearTimeout(pollTimer);
+    }
+  };
 }
 
 function EnvironmentPage(project = currentProject()) {
@@ -5633,6 +6258,11 @@ async function route() {
       setActiveNav('environments');
       document.title = '环境中心 · Agent-loop';
       return await mountPageController(EnvironmentPage(project));
+    }
+    if (parts[0] === 'bluetooth' && parts.length === 1) {
+      setActiveNav('bluetooth');
+      document.title = '蓝牙工作台 · Agent-loop';
+      return await mountPageController(BluetoothPage());
     }
     if (parts[0] === 'test' && parts[1] && parts[2] && parts.length === 3) return await renderTest(parts[1], parts[2]);
     if (parts[0] === 'test-batch' && parts[1] && parts.length === 2) return await renderTestBatch(parts[1]);

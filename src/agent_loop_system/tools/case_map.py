@@ -1,7 +1,8 @@
 """映射表加载 + 用例执行：查表顺序发命令 + 采集终端 JSON。
 
 映射按执行项目隔离在 ``case_map/620C_simulator_case_map``、
-``case_map/6202_case_map`` 和 ``case_map/6202_simulator_case_map``，
+``case_map/6202_case_map``、``case_map/579_case_map`` 和
+``case_map/6202_simulator_case_map``，
 不得跨项目静默回退。
 实际格式为扁平三段式：setup（前置）→ actions（操作）→ collect（采集判定依据）。
 本模块加载并按 case_id 查表，用兼容会话顺序发命令，采集终端 JSON。
@@ -32,16 +33,19 @@ CASE_MAP_PROFILE_DIRS = {
     "620C_W6830": CASE_MAP_DIR / "620C_simulator_case_map",
     "6202_W5230": CASE_MAP_DIR / "6202_case_map",
     "6202_W5230_SIMULATOR": CASE_MAP_DIR / "6202_simulator_case_map",
+    "579_Z1640": CASE_MAP_DIR / "579_case_map",
 }
 CASE_MAP_PROFILE_TARGETS = {
     "620C_W6830": "simulator",
     "6202_W5230": "hardware",
     "6202_W5230_SIMULATOR": "simulator",
+    "579_Z1640": "hardware",
 }
 CASE_MAP_PROFILE_PROJECTS = {
     "620C_W6830": "620C_W6830",
     "6202_W5230": "6202_W5230",
     "6202_W5230_SIMULATOR": "6202_W5230",
+    "579_Z1640": "579_Z1640",
 }
 CASE_MAP_TARGET_DEFAULT_PROFILES = {
     "simulator": "620C_W6830",
@@ -98,6 +102,7 @@ class CaseEntry(BaseModel):
     collect: list[str] = []
     unable: bool = False  # 旧数据兼容；不再作为 Runner 入口闸门
     mapping_status: str = ""
+    block_reason_code: str = ""
     note: str = ""
 
     @property
@@ -105,6 +110,18 @@ class CaseEntry(BaseModel):
         """只有精确的 PROMOTED 才使用固化步骤。"""
 
         return self.mapping_status == "PROMOTED"
+
+    @property
+    def is_execution_ready(self) -> bool:
+        """动作可固定执行但尚无完整观察证据。"""
+
+        return self.mapping_status == "EXECUTION_READY"
+
+    @property
+    def is_fixed_runnable(self) -> bool:
+        """PROMOTED 与 EXECUTION_READY 都可走确定性的固定映射。"""
+
+        return self.is_promoted or self.is_execution_ready
 
     @property
     def has_candidate_mapping(self) -> bool:
@@ -138,6 +155,8 @@ class CaseRunResult:
     precomputed_reason: str = ""
     exploration_trace: dict[str, object] | None = None
     provenance: dict[str, str] = field(default_factory=dict)
+    observation_available: bool = True
+    observation_unavailable_reason: str = ""
 
 
 def effective_case_entries(data: object) -> list[dict]:
@@ -279,7 +298,13 @@ def run_case(
         case_id=case.case_id,
         sheet=case.sheet,
         expected_text=case.expected_text,
-        execution_mode=("fixed_mapping" if case.is_promoted else "candidate_mapping"),
+        execution_mode=(
+            "fixed_mapping"
+            if case.is_promoted
+            else "execution_ready_mapping"
+            if case.is_execution_ready
+            else "candidate_mapping"
+        ),
         precondition_text=case.precondition_text,
         steps_text=case.steps_text,
         verification_points=list(case.verification_points),
@@ -288,6 +313,10 @@ def run_case(
             "action": list(case.actions),
             "collect": list(case.collect),
         },
+        observation_available=bool(getattr(session, "observation_available", True)),
+        observation_unavailable_reason=str(
+            getattr(session, "observation_unavailable_reason", "") or ""
+        ),
     )
 
     # setup：前置条件，失败则中止
@@ -299,7 +328,7 @@ def run_case(
     if err:
         result.setup_errors.append(err)
         result.aborted = True
-        if screenshot_base and not result.screenshots:
+        if screenshot_base and result.observation_available and not result.screenshots:
             _capture_checkpoint(session, result, screenshot_base, "final", "")
         return _finish_case_run(case, result)
 
@@ -308,14 +337,14 @@ def run_case(
     if err:
         result.action_errors.append(err)
         result.aborted = True
-        if screenshot_base and not result.screenshots:
+        if screenshot_base and result.observation_available and not result.screenshots:
             _capture_checkpoint(session, result, screenshot_base, "final", "")
         return _finish_case_run(case, result)
 
     # collect：采集判定依据，失败不中止
     _run_commands(session, case.collect, result, "collect", screenshot_base)
 
-    if screenshot_base and not result.screenshots:
+    if screenshot_base and result.observation_available and not result.screenshots:
         _capture_checkpoint(session, result, screenshot_base, "final", "")
     return _finish_case_run(case, result)
 
@@ -491,7 +520,11 @@ def _run_commands(
 
         # accepted 只表示命令入队。setup/action 后用 GUI_PING 等队列真正处理完，
         # 避免下一条命令或采集抢在界面更新前面。
-        if phase in {"setup", "action"} and command_name not in _SELF_SYNCHRONIZING_COMMANDS:
+        if (
+            phase in {"setup", "action"}
+            and command_name not in _SELF_SYNCHRONIZING_COMMANDS
+            and bool(getattr(session, "requires_gui_ping_barrier", True))
+        ):
             seq = next(_BARRIER_SEQ)
             barrier_command = f":GUI_PING:{seq}"
             try:
@@ -638,6 +671,8 @@ def _capture_checkpoint(
     planned_index: int | None = None,
 ) -> bool:
     """在每个 GUI_TREE 检查点保存独立截图，并与验证点按顺序关联。"""
+    if not result.observation_available:
+        return False
     # GUI_PING/GUI_TREE 只能保证事件已处理；窗口绘制和桌面合成可能仍晚一帧。
     # 所有检查点统一留出很短的稳定时间，避免抓到操作前的旧画面。
     _perform_host_wait(
@@ -712,10 +747,14 @@ def _finish_case_run(case: CaseEntry, result: CaseRunResult) -> CaseRunResult:
         }
         return result
 
-    issues: list[dict[str, str]] = []
+    issues: list[dict[str, object]] = []
 
-    def add_issue(code: str, message: str) -> None:
-        issues.append({"code": code, "message": message})
+    def add_issue(code: str, message: str, *, execution_blocking: bool = True) -> None:
+        issues.append({
+            "code": code,
+            "message": message,
+            "execution_blocking": execution_blocking,
+        })
 
     if result.aborted or result.setup_errors or result.action_errors:
         detail = (result.setup_errors + result.action_errors)[0] if (
@@ -760,13 +799,20 @@ def _finish_case_run(case: CaseEntry, result: CaseRunResult) -> CaseRunResult:
 
     required_screenshots = len(result.verification_points) or 1
     captured_screenshots = len(result.screenshots)
-    if captured_screenshots != required_screenshots:
+    if not result.observation_available:
+        add_issue(
+            "observation_unavailable",
+            result.observation_unavailable_reason
+            or "当前执行目标没有可用的截图观察通道",
+            execution_blocking=False,
+        )
+    elif captured_screenshots != required_screenshots:
         add_issue(
             "checkpoint_screenshot_mismatch",
             f"需要 {required_screenshots} 张检查点截图，实际采集 {captured_screenshots} 张",
         )
 
-    if not result.verification_points and captured_screenshots > 1:
+    if result.observation_available and not result.verification_points and captured_screenshots > 1:
         add_issue(
             "unlabeled_multiple_checkpoints",
             "采集了多张截图但没有 verification_points，无法一一对应视觉预期",
@@ -793,8 +839,15 @@ def _finish_case_run(case: CaseEntry, result: CaseRunResult) -> CaseRunResult:
                     f"第 {index} 张截图没有绑定到对应 verification_point",
                 )
 
+    evidence_status = (
+        "INCOMPLETE"
+        if not result.observation_available
+        else "COMPLETE"
+        if not issues
+        else "ERROR"
+    )
     result.evidence_contract = {
-        "status": "COMPLETE" if not issues else "ERROR",
+        "status": evidence_status,
         "complete": not issues,
         "required_screenshots": required_screenshots,
         "captured_screenshots": captured_screenshots,

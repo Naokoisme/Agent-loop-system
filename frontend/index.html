@@ -21,6 +21,7 @@
       <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
       <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>ONES 缺陷</a>
       <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
+      <a href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"><span aria-hidden="true">⌁</span>蓝牙工作台</a>
     </nav>
     <div class="topbar-actions">
       <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
@@ -116,9 +117,16 @@
                 <span>最近调用</span>
                 <strong id="llm-actual-success" class="llm-signal-value" data-tone="neutral">尚无成功记录</strong>
               </div>
-              <div class="llm-signal-row">
+              <div class="llm-signal-row is-expanded">
                 <span>连接测试</span>
-                <strong id="llm-test-status" class="llm-signal-value" data-tone="neutral" role="status" aria-live="polite">尚未执行</strong>
+                <div id="llm-test-status" class="llm-test-status" data-tone="neutral" role="status" aria-live="polite">
+                  <strong data-llm-test-summary>尚未执行</strong>
+                  <small data-llm-test-action hidden></small>
+                  <details class="inline-diagnostics" data-llm-test-diagnostics hidden>
+                    <summary>诊断信息</summary>
+                    <pre><code></code></pre>
+                  </details>
+                </div>
               </div>
             </div>
 
@@ -212,71 +220,12 @@
               </select>
             </div>
           </div>
-          <div id="cfg-hw-ble-options" class="ble-device-manager">
-            <header class="ble-device-manager-head">
-              <div>
-                <strong>手表蓝牙连接</strong>
-                <p>扫描不会连接设备，点击“连接”后才会检查手表。</p>
-              </div>
-              <span class="chip chip-pending">按需连接</span>
-            </header>
-
-            <div class="ble-target-grid">
-              <label for="cfg-hw-ble-address">
-                <span>手表地址（可选）</span>
-                <input id="cfg-hw-ble-address" type="text" class="input" placeholder="留空时自动查找手表" autocomplete="off">
-              </label>
-              <label for="cfg-hw-ble-scan-timeout">
-                <span>查找和连接超时（秒）</span>
-                <input id="cfg-hw-ble-scan-timeout" type="number" class="input" min="1" max="60" step="1" value="15">
-              </label>
+          <div class="ble-workbench-entry">
+            <div>
+              <strong>蓝牙设备与指令</strong>
+              <p>579 指令执行与 6202 BLE 截图设备已迁移到独立页面。</p>
             </div>
-
-            <div class="ble-device-search-row">
-              <label class="ble-device-search" for="ble-device-search">
-                <span aria-hidden="true">⌕</span>
-                <input id="ble-device-search" type="search" placeholder="搜索设备名称或地址" autocomplete="off">
-              </label>
-              <button id="btn-scan-ble" class="button button-secondary" type="button">查找设备</button>
-            </div>
-
-            <div id="ble-connection-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite">
-              <span class="ble-connection-dot" aria-hidden="true"></span>
-              <div>
-                <strong>未选择手表</strong>
-                <small>点击“查找设备”开始</small>
-              </div>
-            </div>
-
-            <div class="ble-device-columns">
-              <section class="ble-device-column" aria-labelledby="ble-discovered-title">
-                <header>
-                  <div>
-                    <strong id="ble-discovered-title">本次找到的设备</strong>
-                    <small>最近一次查找结果</small>
-                  </div>
-                  <span id="ble-discovered-count" class="chip chip-pending">0 个</span>
-                </header>
-                <div id="ble-discovered-list" class="ble-device-list">
-                  <div class="ble-device-empty">点击“查找设备”开始</div>
-                </div>
-              </section>
-
-              <section class="ble-device-column" aria-labelledby="ble-remembered-title">
-                <header>
-                  <div>
-                    <strong id="ble-remembered-title">已连接过的设备</strong>
-                    <small>连接成功后会保存在这里</small>
-                  </div>
-                  <span id="ble-remembered-count" class="chip chip-pending">0 个</span>
-                </header>
-                <div id="ble-remembered-list" class="ble-device-list">
-                  <div class="ble-device-empty">正在读取连接记录…</div>
-                </div>
-              </section>
-            </div>
-
-            <p class="ble-device-note">设备仅在需要时连接。删除这里只会清除连接记录，不会操作手表。</p>
+            <a class="button button-secondary" href="/bluetooth" data-route="/bluetooth">前往蓝牙工作台</a>
           </div>
         </div>
 

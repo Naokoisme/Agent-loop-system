@@ -84,6 +84,27 @@
       "built_in": true,
       "created_at": "2026-08-24T11:36:12+08:00",
       "updated_at": "2026-08-24T11:36:12+08:00"
+    },
+    {
+      "project_id": "579_Z1640",
+      "project_name": "579 Z1640 真机",
+      "case_catalog": {
+        "type": "watch_579_case_map",
+        "root": "case_map/579_case_map",
+        "profile": "579_Z1640"
+      },
+      "allowed_platforms": [
+        "579"
+      ],
+      "default_platform": "579",
+      "allowed_targets": [
+        "579.z1640"
+      ],
+      "default_target": "579.z1640",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-25T10:00:00+08:00",
+      "updated_at": "2026-08-25T10:00:00+08:00"
     }
   ]
 }
