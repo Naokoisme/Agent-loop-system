@@ -21,6 +21,8 @@ from agent_loop_system.tools.hardware_preflight import (
     HardwarePreflightCheck,
     HardwarePreflightResult,
 )
+from agent_loop_system.tools.watch_ble import WatchBleDependencyError
+from agent_loop_system.tools.watch_579_ble import Watch579TargetBusy
 from frontend.server import (
     AppPaths,
     BATCH_STATE_FILE,
@@ -158,6 +160,7 @@ class FrontendDataTest(unittest.TestCase):
             self.paths.case_map / "620C_simulator_case_map",
             self.paths.case_map / "6202_case_map",
             self.paths.case_map / "6202_simulator_case_map",
+            self.paths.case_map / "579_case_map",
         ):
             path.mkdir(parents=True, exist_ok=True)
         (self.paths.frontend / "index.html").write_text("<h1>正常</h1>", encoding="utf-8")
@@ -251,6 +254,30 @@ class FrontendDataTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (self.paths.case_map / "579_case_map" / "计算器.json").write_text(
+            json.dumps(
+                {
+                    "profile": "579_Z1640",
+                    "sheet": "计算器",
+                    "cases": [{
+                        "case_id": "CALC-001",
+                        "sheet": "计算器",
+                        "priority": "P1",
+                        "precondition_text": "579 位于亮屏表盘",
+                        "steps_text": "侧键进入菜单并点击计算器",
+                        "expected_text": "动作执行完成但无截图",
+                        "verification_points": ["计算器页面显示"],
+                        "setup": [],
+                        "actions": [":BUTTON_PRESS:1,1,0", ":TP_CLICK:85,312,1"],
+                        "collect": [],
+                        "mapping_status": "EXECUTION_READY",
+                        "unable": False,
+                    }],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
         for directory, target, records in (
             ("620C_simulator_case_map", "620C_W6830", [("CALC_001", "计算器")]),
             ("6202_case_map", "6202_W5230", [("CALC_001", "计算器")]),
@@ -259,6 +286,7 @@ class FrontendDataTest(unittest.TestCase):
                 "6202_W5230_SIMULATOR",
                 [("CALC_001", "计算器")],
             ),
+            ("579_case_map", "579_Z1640", []),
         ):
             ledger = self.paths.case_map / directory / "external_execution_history.jsonl"
             ledger.write_text(
@@ -430,6 +458,37 @@ class FrontendDataTest(unittest.TestCase):
         self.assertNotIn("W30_HARDWARE_PROJECT", child_env)
         self.assertEqual(child_env["W30_SOURCE_ROOT"], r"D:\firmware\620C_W6830")
 
+    def test_watch_579_child_environment_isolated_from_w30_profiles(self) -> None:
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "W30_PROJECT": "6202_W5230",
+                    "W30_HARDWARE_PROJECT": "6202_W5230",
+                    "W30_HARDWARE_PROFILE_ROOT": r"D:\Agent-loop\profiles",
+                    "W30_HARDWARE_PROFILE_VERSION": "current",
+                    "W30_HARDWARE_SOURCE_ROOT": r"D:\firmware\6202",
+                },
+                clear=False,
+            ),
+            patch("frontend.server._load_test_runtime_environment"),
+        ):
+            child_env = _test_process_environment({
+                "project": "579_Z1640",
+                "execution_target": "hardware",
+                "execution_adapter": "watch_579_ble",
+            })
+
+        self.assertEqual(child_env["WATCH_579_PROJECT"], "579_Z1640")
+        for key in (
+            "W30_PROJECT",
+            "W30_HARDWARE_PROJECT",
+            "W30_HARDWARE_PROFILE_ROOT",
+            "W30_HARDWARE_PROFILE_VERSION",
+            "W30_HARDWARE_SOURCE_ROOT",
+        ):
+            self.assertNotIn(key, child_env)
+
     def test_ones_ssl_context_keeps_certificate_and_hostname_verification(self) -> None:
         with patch.dict(os.environ, {"ONES_CA_BUNDLE": ""}, clear=False):
             context = _ones_ssl_context()
@@ -530,6 +589,7 @@ class FrontendDataTest(unittest.TestCase):
         server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(application))
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
+        self.addCleanup(application.close)
         self.addCleanup(server.server_close)
         self.addCleanup(server.shutdown)
         return application, f"http://127.0.0.1:{server.server_port}"
@@ -838,6 +898,7 @@ class FrontendDataTest(unittest.TestCase):
         simulator = self.cases.list(project="620C_W6830")
         hardware = self.cases.list(project="6202_W5230")
         simulator_6202 = self.cases.list(project="6202_W5230_SIMULATOR")
+        watch_579 = self.cases.list(project="579_Z1640")
 
         self.assertEqual(simulator["project_label"], "620C W6830")
         self.assertEqual(simulator["execution_target"], "simulator")
@@ -853,9 +914,46 @@ class FrontendDataTest(unittest.TestCase):
             simulator_6202["items"][0]["steps_text"],
             "在 6202 模拟器点击等号",
         )
-        self.assertEqual(len(hardware["projects"]), 3)
+        self.assertEqual(watch_579["execution_target"], "hardware")
+        self.assertEqual(watch_579["items"][0]["mapping_status"], "EXECUTION_READY")
+        self.assertTrue(watch_579["items"][0]["is_fixed_runnable"])
+        self.assertFalse(watch_579["items"][0]["is_promoted"])
+        self.assertEqual(len(hardware["projects"]), 4)
         with self.assertRaisesRegex(ValueError, "测试项目不存在"):
             self.cases.list(project="unknown")
+
+    def test_watch_579_blocked_ota_entry_route_cannot_start_single_or_batch(self) -> None:
+        path = self.paths.case_map / "579_case_map" / "计算器.json"
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw["cases"][0].update({
+            "unable": True,
+            "mapping_status": "BLOCKED",
+            "block_reason_code": "BUTTON_PRESS_UNSUPPORTED_AFTER_OTA",
+        })
+        path.write_text(json.dumps(raw, ensure_ascii=False), encoding="utf-8")
+
+        detail = self.cases.get("计算器", "CALC-001", project="579_Z1640")
+        self.assertTrue(detail["is_execution_blocked"])
+        self.assertFalse(detail["is_fixed_runnable"])
+        self.assertEqual(
+            detail["block_reason_code"],
+            "BUTTON_PRESS_UNSUPPORTED_AFTER_OTA",
+        )
+
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        with self.assertRaisesRegex(ValueError, "BUTTON_PRESS_UNSUPPORTED_AFTER_OTA"):
+            manager.start(
+                sheet="计算器",
+                case_id="CALC-001",
+                project="579_Z1640",
+                watchface_ready=True,
+            )
+        with self.assertRaisesRegex(ValueError, "BUTTON_PRESS_UNSUPPORTED_AFTER_OTA"):
+            manager.start_batch(
+                case_refs=[{"sheet": "计算器", "case_id": "CALC-001"}],
+                project="579_Z1640",
+                watchface_ready=True,
+            )
 
     def test_internal_promotion_is_solidified_without_faking_external_history(self) -> None:
         ledger = self.paths.case_map / "6202_case_map" / "external_execution_history.jsonl"
@@ -1684,7 +1782,7 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(missing_module["summary"]["all"], 0)
         with urlopen(base + "/api/tests/projects", timeout=3) as response:
             projects = json.loads(response.read().decode("utf-8"))
-        self.assertEqual(len(projects["items"]), 3)
+            self.assertEqual(len(projects["items"]), 4)
         with urlopen(base + "/api/tests/overview", timeout=3) as response:
             overview = json.loads(response.read().decode("utf-8"))
         self.assertEqual(overview["catalog_total"], 2)
@@ -1825,6 +1923,130 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(recovered["execution_status"], "ERROR")
         self.assertEqual(recovered["verdict"], "CANNOT_VERIFY")
         self.assertIsNone(restarted.active("simulator"))
+
+    def test_watch_579_lease_is_always_released_after_runner_exception(self) -> None:
+        class FakeBroker:
+            def __init__(self) -> None:
+                self.acquired: list[str] = []
+                self.released: list[str] = []
+
+            def acquire_lease(self, *, owner: str) -> str:
+                self.acquired.append(owner)
+                return "random-lease-token"
+
+            def release_lease(self, token: str) -> bool:
+                self.released.append(token)
+                return True
+
+        broker = FakeBroker()
+        manager = CaseTestManager(
+            self.paths,
+            self.cases,
+            self.test_history,
+            watch_579_broker_provider=lambda: broker,
+        )
+        manager.configure_internal_base_url("http://127.0.0.1:8768")
+        with patch("frontend.server.threading.Thread.start"):
+            started = manager.start(
+                sheet="计算器",
+                case_id="CALC-001",
+                project="579_Z1640",
+                watchface_ready=True,
+            )
+
+        with patch.object(
+            manager,
+            "_run_single_body",
+            side_effect=RuntimeError("runner stopped"),
+        ):
+            manager._run(started["id"])
+
+        self.assertEqual(broker.acquired, [f"test:{started['id']}"])
+        self.assertEqual(broker.released, ["random-lease-token"])
+        self.assertEqual(manager.get(started["id"])["execution_status"], "ERROR")
+        self.assertNotIn(started["id"], manager._watch_579_lease_tokens)
+
+    def test_watch_579_child_uses_internal_broker_and_execution_only_result(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        manager.configure_internal_base_url("http://127.0.0.1:8768")
+        case = self.cases.get("计算器", "CALC-001", project="579_Z1640")
+        manager._jobs["watch-579-child"] = {
+            "process": None,
+            "candidate_replay": False,
+            "cancel_requested": False,
+        }
+        manager._watch_579_lease_tokens["watch-579-child"] = "random-token"
+        captured_argv: list[str] = []
+        captured_env: dict[str, str] = {}
+
+        class FakeProcess:
+            pid = None
+            returncode = 0
+
+            def __init__(self, argv: list[str], env: dict[str, str]) -> None:
+                captured_argv.extend(argv)
+                captured_env.update(env)
+
+            def communicate(self) -> tuple[str, str]:
+                result_file = Path(captured_argv[captured_argv.index("--result-file") + 1])
+                result_file.write_text(
+                    json.dumps({
+                        "verdict": "CANNOT_VERIFY",
+                        "reason": "579 BLE 动作与 ACK 完成；缺少截图观察",
+                        "setup_errors": [],
+                        "action_errors": [],
+                        "collect_errors": [],
+                        "evidence_contract": {
+                            "status": "INCOMPLETE",
+                            "complete": False,
+                            "issues": [{
+                                "code": "observation_unavailable",
+                                "message": "579 BLE 截图通道尚不可用",
+                                "execution_blocking": False,
+                            }],
+                        },
+                        "workflow_status": "completed",
+                        "execution_status": "OK",
+                        "evidence_status": "INCOMPLETE",
+                        "mapping_status": "EXECUTION_READY",
+                        "reason_code": "OBSERVATION_UNAVAILABLE",
+                    }, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                return "CANNOT_VERIFY", ""
+
+        with (
+            patch("frontend.server._load_test_runtime_environment"),
+            patch(
+                "frontend.server.subprocess.Popen",
+                side_effect=lambda argv, **kwargs: FakeProcess(argv, kwargs["env"]),
+            ),
+        ):
+            execution = manager._execute_case(
+                job_id="watch-579-child",
+                case=case,
+                job_dir=self.paths.runtime_jobs / "watch-579-child" / "single",
+                hardware_preflight_completed=True,
+            )
+
+        self.assertEqual(
+            captured_argv[captured_argv.index("--execution-adapter") + 1],
+            "watch_579_ble",
+        )
+        self.assertEqual(
+            captured_argv[captured_argv.index("--case-map-profile") + 1],
+            "579_Z1640",
+        )
+        self.assertEqual(captured_env["AGENT_LOOP_INTERNAL_BASE_URL"], "http://127.0.0.1:8768")
+        self.assertEqual(captured_env["WATCH_579_LEASE_TOKEN"], "random-token")
+        self.assertNotIn("W30_HARDWARE_PROJECT", captured_env)
+        self.assertNotIn("W30_HARDWARE_PROFILE_ROOT", captured_env)
+        self.assertFalse(execution["execute_failed"])
+        self.assertEqual(execution["workflow_status"], "completed")
+        self.assertEqual(execution["execution_status"], "OK")
+        self.assertEqual(execution["evidence_status"], "INCOMPLETE")
+        self.assertEqual(execution["reason_code"], "OBSERVATION_UNAVAILABLE")
+        self.assertEqual(execution["verdict"], "CANNOT_VERIFY")
 
     def test_case_timeout_is_framework_error_not_product_fail(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
@@ -4089,7 +4311,7 @@ class FrontendDataTest(unittest.TestCase):
             client_again.assert_not_called()
 
         failed_client = SimpleNamespace(
-            connect=AsyncMock(side_effect=RuntimeError("device unavailable")),
+            connect=AsyncMock(side_effect=RuntimeError("device timed out after backend failure")),
             close=AsyncMock(return_value=None),
             connected=False,
         )
@@ -4106,9 +4328,71 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(context.exception.code, 502)
             error = json.loads(context.exception.read().decode("utf-8"))
             self.assertFalse(error["verified"])
+            self.assertEqual(error["reason_code"], "BLE_CONNECT_FAILED")
+            self.assertEqual(error["error_code"], "BLE_CONNECT_FAILED")
             failed_client.close.assert_awaited_once_with()
         remembered_payload = json.loads(remembered_path.read_text(encoding="utf-8"))
         self.assertEqual(len(remembered_payload["items"]), 1)
+
+        # Test BLE connect timeout classification
+        timeout_client = SimpleNamespace(
+            connect=AsyncMock(side_effect=TimeoutError("connect timed out")),
+            close=AsyncMock(return_value=None),
+            connected=False,
+        )
+        with patch("frontend.server.WatchBleClient", return_value=timeout_client):
+            with self.assertRaises(HTTPError) as context:
+                self._post_json(
+                    base + "/api/hardware/ble/connect",
+                    {
+                        "address": "BB:CC:DD:EE:FF:00",
+                        "timeout": 1,
+                    },
+                )
+            self.assertEqual(context.exception.code, 502)
+            timeout_error = json.loads(context.exception.read().decode("utf-8"))
+            self.assertEqual(timeout_error["reason_code"], "BLE_CONNECT_TIMEOUT")
+            self.assertEqual(timeout_error["error_code"], "BLE_CONNECT_TIMEOUT")
+
+        # Test BLE unavailable dependency classification on connect
+        dep_client = SimpleNamespace(
+            connect=AsyncMock(side_effect=WatchBleDependencyError("bleak missing")),
+            close=AsyncMock(return_value=None),
+            connected=False,
+        )
+        with patch("frontend.server.WatchBleClient", return_value=dep_client):
+            with self.assertRaises(HTTPError) as context:
+                self._post_json(
+                    base + "/api/hardware/ble/connect",
+                    {
+                        "address": "BB:CC:DD:EE:FF:00",
+                        "timeout": 1,
+                    },
+                )
+            self.assertEqual(context.exception.code, 502)
+            dep_error = json.loads(context.exception.read().decode("utf-8"))
+            self.assertEqual(dep_error["reason_code"], "BLE_UNAVAILABLE")
+            self.assertEqual(dep_error["error_code"], "BLE_UNAVAILABLE")
+
+        # Test BLE scan failure classification
+        with patch("frontend.server.discover_ble_devices", side_effect=RuntimeError("runtime backend unavailable")):
+            with self.assertRaises(HTTPError) as context:
+                with urlopen(base + "/api/hardware/ble/devices", timeout=3):
+                    pass
+            self.assertEqual(context.exception.code, 502)
+            scan_error = json.loads(context.exception.read().decode("utf-8"))
+            self.assertEqual(scan_error["reason_code"], "BLE_SCAN_FAILED")
+            self.assertEqual(scan_error["error_code"], "BLE_SCAN_FAILED")
+
+        # Test BLE unavailable dependency classification on scan
+        with patch("frontend.server.discover_ble_devices", side_effect=WatchBleDependencyError("bleak missing")):
+            with self.assertRaises(HTTPError) as context:
+                with urlopen(base + "/api/hardware/ble/devices", timeout=3):
+                    pass
+            self.assertEqual(context.exception.code, 502)
+            dep_scan_error = json.loads(context.exception.read().decode("utf-8"))
+            self.assertEqual(dep_scan_error["reason_code"], "BLE_UNAVAILABLE")
+            self.assertEqual(dep_scan_error["error_code"], "BLE_UNAVAILABLE")
 
         address = quote("42:74:DC:C8:0A:02", safe="")
         with (
@@ -4125,6 +4409,130 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/hardware/ble/remembered", timeout=3) as resp:
             remembered = json.loads(resp.read().decode("utf-8"))
         self.assertEqual(remembered["items"], [])
+
+    def test_watch_579_broker_api_and_bluetooth_spa_route(self) -> None:
+        application, base = self._server()
+
+        class FakeBroker:
+            def __init__(self):
+                self.connected = False
+                self.lease_active = False
+                self.calls = []
+
+            def status(self):
+                return {
+                    "state": "ready" if self.connected else "disconnected",
+                    "connected": self.connected,
+                    "ready": self.connected,
+                    "address": "41:42:72:6A:93:2D" if self.connected else None,
+                    "lease": {"active": self.lease_active, "owner": "batch" if self.lease_active else None},
+                    "latest_cursor": 2,
+                }
+
+            def events(self, *, after, limit):
+                self.calls.append(("events", int(after), int(limit)))
+                return {"items": [{"cursor": 2, "kind": "RX_TRANSPORT_ACK"}], "next_cursor": 2, "latest_cursor": 2}
+
+            def connect(self, *, address, timeout):
+                self.calls.append(("connect", address, float(timeout)))
+                if self.lease_active:
+                    raise Watch579TargetBusy("owned by batch")
+                self.connected = True
+                return self.status()
+
+            def disconnect(self):
+                if self.lease_active:
+                    raise Watch579TargetBusy("owned by batch")
+                self.connected = False
+                return self.status()
+
+            def preview(self, *, cmd, key, data):
+                self.calls.append(("preview", cmd, key, data))
+                return {"cmd": "02", "key": "3B", "data_hex": "", "packet_hex": "AB 00", "packet_length": 14, "write_with_response": True}
+
+            def send_manual(self, *, cmd, key, data):
+                self.calls.append(("manual", cmd, key, data))
+                if self.lease_active:
+                    raise Watch579TargetBusy("owned by batch")
+                return {"tx_id": "tx1", "transport_acked": True, "effect_verified": False}
+
+            def send_internal(self, *, lease_token, cmd, key, data):
+                self.calls.append(("internal", lease_token, cmd, key, data))
+                if lease_token != "secret-token":
+                    raise Watch579TargetBusy("invalid lease")
+                return {"tx_id": "tx2", "transport_acked": True, "effect_verified": False}
+
+            def shutdown(self):
+                pass
+
+        fake = FakeBroker()
+        application._watch_579_broker_instance = fake
+
+        with urlopen(base + "/bluetooth", timeout=3) as response:
+            self.assertEqual(response.status, 200)
+        with urlopen(base + "/api/hardware/579/status", timeout=3) as response:
+            status = json.loads(response.read().decode("utf-8"))
+        self.assertFalse(status["connected"])
+        with urlopen(base + "/api/hardware/579/events?after=1&limit=20", timeout=3) as response:
+            event_payload = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(event_payload["items"][0]["kind"], "RX_TRANSPORT_ACK")
+
+        with self._post_json(base + "/api/hardware/579/preview", {"cmd": "0x02", "key": "3b", "data": ""}) as response:
+            preview = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(preview["packet_length"], 14)
+        with self._post_json(base + "/api/hardware/579/connect", {"address": "41:42:72:6A:93:2D", "timeout": 4}) as response:
+            connected = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(connected["connected"])
+        self.assertEqual(os.environ["WATCH_579_BLE_ADDRESS"], "41:42:72:6A:93:2D")
+        with self._post_json(base + "/api/hardware/579/send", {"cmd": "02", "key": "3B", "data": ""}) as response:
+            sent = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(sent["transport_acked"])
+        self.assertFalse(sent["effect_verified"])
+
+        internal = Request(
+            base + "/api/internal/hardware/579/send",
+            data=json.dumps({"cmd": "04", "key": "05", "data": "00"}).encode("utf-8"),
+            headers={"Content-Type": "application/json", "X-Agent-Loop-579-Lease": "secret-token"},
+            method="POST",
+        )
+        with urlopen(internal, timeout=3) as response:
+            internal_result = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(internal_result["tx_id"], "tx2")
+
+        fake.lease_active = True
+        with self.assertRaises(HTTPError) as raised:
+            self._post_json(base + "/api/hardware/579/send", {"cmd": "02", "key": "3B"})
+        self.assertEqual(raised.exception.code, 409)
+        busy = json.loads(raised.exception.read().decode("utf-8"))
+        self.assertEqual(busy["reason_code"], "TARGET_BUSY")
+
+    def test_watch_579_start_requires_explicit_bright_watchface_gate(self) -> None:
+        application, base = self._server()
+        with self.assertRaises(HTTPError) as raised:
+            self._post_json(base + "/api/tests/run", {
+                "project": "579_Z1640",
+                "sheet": "计算器",
+                "case_id": "CALC-001",
+            })
+        self.assertEqual(raised.exception.code, 400)
+        error = json.loads(raised.exception.read().decode("utf-8"))
+        self.assertIn("WATCHFACE_CONFIRMATION_REQUIRED", error["error"])
+
+        job = {"id": "579job", "status": "queued", "project": "579_Z1640"}
+        with patch.object(application, "start_case_test", return_value=job) as start:
+            with self._post_json(base + "/api/tests/run", {
+                "project": "579_Z1640",
+                "sheet": "计算器",
+                "case_id": "CALC-001",
+                "watchface_ready": True,
+            }) as response:
+                self.assertEqual(response.status, 202)
+        start.assert_called_once_with(
+            sheet="计算器",
+            case_id="CALC-001",
+            project="579_Z1640",
+            watchface_ready=True,
+        )
 
     def test_hardware_serial_ports_endpoint(self) -> None:
         _, base = self._server()

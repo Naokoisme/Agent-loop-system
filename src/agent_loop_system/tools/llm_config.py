@@ -217,22 +217,28 @@ def test_llm_connectivity(timeout: float = 20.0) -> dict[str, Any]:
 
         # 细化错误诊断
         error_category = "请求异常"
+        error_code = "LLM_REQUEST_FAILED"
         suggestion = "请检查网络连接或稍后重试"
 
         if "UNEXPECTED_EOF" in exc_str or "SSL" in exc_str:
             error_category = "SSL/TLS 握手失败"
+            error_code = "LLM_TLS_ERROR"
             suggestion = "服务端连接协商异常或证书握手被中断"
         elif "timeout" in exc_str.lower() or "timed out" in exc_str.lower():
             error_category = "网络连接超时"
+            error_code = "LLM_TIMEOUT"
             suggestion = f"在 {timeout}s 内未收到服务端响应，请检查外网连通性或当前网关负载"
         elif "401" in exc_str or "Unauthorized" in exc_str or "auth" in exc_str.lower():
             error_category = "API Key 鉴权失败"
+            error_code = "LLM_AUTH_FAILED"
             suggestion = "API Key 凭据失效或未授权访问该模型"
         elif "404" in exc_str or "NotFound" in exc_str or ("model" in exc_str.lower() and "exist" in exc_str.lower()):
             error_category = "模型不存在"
+            error_code = "LLM_MODEL_NOT_FOUND"
             suggestion = f"网关 {base_url} 未部署或未提供模型 {model_name}"
         elif "429" in exc_str or "rate limit" in exc_str.lower() or "quota" in exc_str.lower():
             error_category = "额度不足或频次超限"
+            error_code = "LLM_QUOTA_EXCEEDED"
             suggestion = "网关余额不足或请求过于频繁"
 
         return {
@@ -242,6 +248,8 @@ def test_llm_connectivity(timeout: float = 20.0) -> dict[str, Any]:
             "base_url": base_url,
             "error_type": exc_type,
             "error_category": error_category,
+            "error_code": error_code,
+            "reason_code": error_code,
             "error": exc_str,
             "suggestion": suggestion,
             "message": f"[{error_category}] {exc_str}",

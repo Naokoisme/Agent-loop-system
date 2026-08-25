@@ -20,6 +20,7 @@ from agent_loop_system.tools.llm_config import (
     get_llm_config,
     get_llm_model,
     llm_api_key_scope,
+    test_llm_connectivity as _test_llm_connectivity,
 )
 
 
@@ -165,3 +166,55 @@ def test_create_chat_llm_resolves_the_requested_scope() -> None:
 
     assert constructor.call_args.kwargs["api_key"] == "fixed-key"
     assert constructor.call_args.kwargs["model"] == "fixed-model"
+
+
+@pytest.mark.parametrize(
+    ("exception_text", "expected_code", "expected_category"),
+    [
+        ("SSL: UNEXPECTED_EOF_WHILE_READING", "LLM_TLS_ERROR", "SSL/TLS 握手失败"),
+        ("Request timed out after 20s", "LLM_TIMEOUT", "网络连接超时"),
+        ("Error code: 401 - Unauthorized", "LLM_AUTH_FAILED", "API Key 鉴权失败"),
+        ("Error code: 404 - The model does not exist", "LLM_MODEL_NOT_FOUND", "模型不存在"),
+        ("Error code: 429 - rate limit exceeded", "LLM_QUOTA_EXCEEDED", "额度不足或频次超限"),
+        ("Connection refused by peer", "LLM_REQUEST_FAILED", "请求异常"),
+    ],
+)
+def test_test_llm_connectivity_failure_returns_stable_error_codes(
+    exception_text: str,
+    expected_code: str,
+    expected_category: str,
+) -> None:
+    fake_constructor = mock.Mock()
+    fake_instance = mock.Mock()
+    fake_instance.invoke.side_effect = RuntimeError(exception_text)
+    fake_constructor.return_value = fake_instance
+    fake_langchain_openai = ModuleType("langchain_openai")
+    fake_langchain_openai.ChatOpenAI = fake_constructor
+    fake_langchain_core = ModuleType("langchain_core")
+    fake_messages = ModuleType("langchain_core.messages")
+    fake_messages.HumanMessage = mock.Mock()
+    fake_langchain_core.messages = fake_messages
+
+    with (
+        mock.patch.dict(
+            sys.modules,
+            {
+                "langchain_openai": fake_langchain_openai,
+                "langchain_core": fake_langchain_core,
+                "langchain_core.messages": fake_messages,
+            },
+        ),
+        mock.patch(
+            "agent_loop_system.tools.llm_config._create_http_client",
+            return_value=None,
+        ),
+    ):
+        result = _test_llm_connectivity(timeout=5.0)
+
+    assert result["ok"] is False
+    assert result["error_code"] == expected_code
+    assert result["reason_code"] == expected_code
+    assert result["error_category"] == expected_category
+    assert "latency_ms" in result
+    assert result["error"] == exception_text
+    assert "suggestion" in result

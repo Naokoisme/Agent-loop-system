@@ -118,6 +118,8 @@ def _result_provenance(
     project_environment = (
         "W30_PROJECT"
         if normalized_target == "simulator"
+        else "WATCH_579_PROJECT"
+        if expected_project == "579_Z1640"
         else "W30_HARDWARE_PROJECT"
     )
     configured_project = os.environ.get(project_environment, "").strip()
@@ -566,26 +568,46 @@ def save_evidence(
         for item in contract_issues
         if isinstance(item, dict) and str(item.get("message") or "").strip()
     ), "")
-    execution_errors = (
-        result.setup_errors + result.action_errors + result.collect_errors
+    blocking_evidence_error = next((
+        str(item.get("message") or "").strip()
+        for item in contract_issues
+        if isinstance(item, dict)
+        and item.get("execution_blocking") is not False
+        and str(item.get("message") or "").strip()
+    ), "")
+    observation_unavailable = any(
+        isinstance(item, dict) and item.get("code") == "observation_unavailable"
+        for item in contract_issues
     )
-    execution_failure = bool(result.aborted or execution_errors or evidence_error)
+    blocking_execution_errors = result.setup_errors + result.action_errors
+    execution_errors = blocking_execution_errors + result.collect_errors
+    execution_failure = bool(
+        result.aborted or execution_errors or blocking_evidence_error
+    )
+    judgement_blocked = bool(
+        result.aborted or blocking_execution_errors or blocking_evidence_error
+    )
     reason_code = (
-        "EVIDENCE_INCOMPLETE"
-        if evidence_error
+        "OBSERVATION_UNAVAILABLE"
+        if observation_unavailable and not execution_failure
+        else "EVIDENCE_INCOMPLETE"
+        if blocking_evidence_error
         else "CASE_EXECUTION_ERROR" if execution_failure else None
     )
     if result.skipped:
         raw_verdict = "CANNOT_VERIFY"
         reason = "旧 Runner 返回了跳过结果；当前用例应重新运行"
         reason_code = "LEGACY_SKIPPED"
-    elif result.aborted or result.setup_errors or result.action_errors or evidence_error:
+    elif judgement_blocked:
         raw_verdict = "CANNOT_VERIFY"
         reason = (
             (result.setup_errors + result.action_errors)[0]
             if result.setup_errors or result.action_errors
-            else evidence_error or "准备或操作阶段未完整执行"
+            else blocking_evidence_error or "准备或操作阶段未完整执行"
         )
+    elif observation_unavailable:
+        raw_verdict = "CANNOT_VERIFY"
+        reason = evidence_error or "当前执行目标没有可用的截图观察通道"
     elif result.precomputed_verdict:
         raw_verdict = result.precomputed_verdict
         reason = result.precomputed_reason or "Agent-loop 探索已完成"
@@ -616,10 +638,13 @@ def save_evidence(
         "collect_errors": result.collect_errors,
         "workflow_status": "failed" if execution_failure else "completed",
         "execution_status": "ERROR" if execution_failure else "OK",
+        "evidence_status": str(
+            result.evidence_contract.get("status") or "NOT_RECORDED"
+        ).upper(),
         "execution_reason": (
             execution_errors[0]
             if execution_errors
-            else evidence_error or (reason if execution_failure else "")
+            else blocking_evidence_error or (reason if execution_failure else "")
         ),
         "reason_code": reason_code,
         "terminal_json": result.terminal_json,
@@ -855,14 +880,16 @@ def run_single_case(
     if target not in {"hardware", "simulator"}:
         raise ValueError(f"未知执行目标: {target!r}")
     if candidate_replay:
-        if case.is_promoted:
-            raise ValueError("--candidate-replay 只允许复跑尚未晋升的临时候选")
+        if case.is_fixed_runnable:
+            raise ValueError("--candidate-replay 只允许复跑尚未进入固定执行的临时候选")
         if not case.has_candidate_mapping:
             raise ValueError("--candidate-replay 要求当前用例存在非空候选 actions")
     provenance = _result_provenance(
         target=target,
         case_map_profile=case_map_profile,
     )
+    if case.is_execution_ready:
+        provenance["mapping_status"] = "EXECUTION_READY"
     if hardware_recovery_reboot and not reset_hardware:
         raise ValueError(
             "hardware_recovery_reboot requires hardware state preparation"
@@ -880,7 +907,7 @@ def run_single_case(
 
     scope = (
         LLM_API_KEY_SCOPE_EXPLORATION
-        if not case.is_promoted and not candidate_replay
+        if not case.is_fixed_runnable and not candidate_replay
         else LLM_API_KEY_SCOPE_FIXED
     )
     with llm_api_key_scope(scope):
@@ -909,7 +936,7 @@ def run_single_case(
             )
 
         hardware_runtime_profile = None
-        if target == "hardware":
+        if target == "hardware" and hardware_project != "579_Z1640":
             from agent_loop_system.tools.hardware_runtime_profile import (
                 load_hardware_runtime_profile,
             )
@@ -926,7 +953,7 @@ def run_single_case(
                 provenance=provenance,
             )
 
-        if not case.is_promoted and not candidate_replay:
+        if not case.is_fixed_runnable and not candidate_replay:
             exploration_kwargs = {
                 "screenshot_path": screenshot_path,
                 "target": target,
@@ -1005,7 +1032,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--execution-adapter",
-        choices=("watch_ble",),
+        choices=("watch_ble", "watch_579_ble"),
         help="显式选择非默认真机动作适配器；普通 Runner 不使用",
     )
     parser.add_argument(
@@ -1042,6 +1069,14 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--hardware-recovery-reboot cannot be combined with --skip-hardware-reset")
     if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
         parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
+    if args.execution_adapter == "watch_579_ble" and args.case_map_profile != "579_Z1640":
+        parser.error(
+            "--execution-adapter watch_579_ble requires --case-map-profile 579_Z1640"
+        )
+    if args.case_map_profile == "579_Z1640" and args.execution_adapter != "watch_579_ble":
+        parser.error(
+            "--case-map-profile 579_Z1640 requires --execution-adapter watch_579_ble"
+        )
 
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None
     if args.execution_adapter == "watch_ble":
@@ -1056,6 +1091,10 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         external_executor = execute_watch_ble
+    elif args.execution_adapter == "watch_579_ble":
+        from agent_loop_system.tools.watch_579_case import run_watch_579_case
+
+        external_executor = run_watch_579_case
 
     print(
         f"[test] 加载用例: target={args.target} "
@@ -1093,6 +1132,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[test] reason: {decision.reason}")
 
     print(f"[test] 证据已落盘: {evidence_path}")
+    if args.execution_adapter == "watch_579_ble":
+        # 579 is deliberately execution-only until a real observation channel
+        # exists. A successful command/ACK path is therefore a successful
+        # process even though the product verdict remains CANNOT_VERIFY.
+        saved = json.loads(Path(evidence_path).read_text(encoding="utf-8"))
+        return 0 if saved.get("execution_status") == "OK" else 1
     return 0 if decision.verdict == "PASS" else 1
 
 

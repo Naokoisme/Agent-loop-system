@@ -685,6 +685,22 @@ a { color: inherit; }
 .llm-signal-value[data-tone="error"] { color: #c14b43; }
 .llm-signal-value[data-tone="pending"] { color: var(--blue); }
 .llm-signal-value[data-tone="neutral"] { color: var(--ink-soft); }
+.llm-test-status {
+  display: grid;
+  min-width: 0;
+  max-width: min(100%, 430px);
+  justify-items: end;
+  gap: 3px;
+  text-align: right;
+}
+.llm-test-status strong { overflow-wrap: anywhere; }
+.llm-test-status small { color: var(--ink-soft); line-height: 1.45; overflow-wrap: anywhere; }
+.llm-test-status[data-tone="success"] strong { color: #17835d; }
+.llm-test-status[data-tone="warning"] strong { color: #b36a00; }
+.llm-test-status[data-tone="error"] strong { color: #c14b43; }
+.llm-test-status[data-tone="pending"] strong { color: var(--blue); }
+.llm-test-status[data-tone="neutral"] strong { color: var(--ink-soft); }
+.llm-test-status .inline-diagnostics { max-width: 100%; margin-top: 3px; text-align: left; }
 
 .llm-config-details {
   display: grid;
@@ -769,9 +785,10 @@ a { color: inherit; }
   background: var(--surface);
 }
 .ble-connection-dot { width: 10px; height: 10px; flex: 0 0 10px; border-radius: 50%; background: #9d9a93; }
-.ble-connection-status div { display: grid; min-width: 0; }
+.ble-connection-status > div { display: grid; width: 100%; min-width: 0; }
 .ble-connection-status strong { font-size: var(--font-size-secondary); overflow-wrap: anywhere; }
 .ble-connection-status small { color: var(--ink-soft); font-size: var(--font-size-caption); overflow-wrap: anywhere; }
+.ble-connection-status .inline-diagnostics { max-width: 100%; margin-top: 4px; }
 .ble-connection-status[data-tone="pending"] .ble-connection-dot { background: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
 .ble-connection-status[data-tone="success"] { border-color: rgba(40, 116, 84, .28); background: var(--green-soft); }
 .ble-connection-status[data-tone="success"] .ble-connection-dot { background: var(--green); box-shadow: 0 0 0 4px rgba(40, 116, 84, .12); }
@@ -1896,6 +1913,8 @@ pre, code { font-family: var(--font-ui); }
 .environment-check-row > span { color: var(--ink-soft); font-size: var(--font-size-caption); }
 .environment-check-row p { margin: 0; color: var(--ink-soft); font-size: var(--font-size-caption); }
 .environment-check-detail { min-width: 0; }
+.environment-check-detail p + p { margin-top: 3px; }
+.check-field-label { font-weight: 700; color: var(--ink); }
 .environment-check-detail .inline-diagnostics { margin: 4px 0 6px; }
 .environment-check-panel > .environment-form-actions { padding: 0 18px 16px; }
 .environment-log-panel { margin-top: 16px; }
@@ -1990,6 +2009,8 @@ pre, code { font-family: var(--font-ui); }
   .environment-check-row { grid-template-columns: 24px 1fr auto; padding: 8px 0; }
   .environment-check-detail { grid-column: 2 / -1; }
   .settings-summary-grid { grid-template-columns: 1fr; }
+  .llm-signal-row.is-expanded { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .llm-test-status { width: 100%; max-width: 100%; justify-items: start; text-align: left; }
   .ble-target-grid, .ble-device-columns { grid-template-columns: 1fr; }
   .ble-device-search-row { grid-template-columns: 1fr; }
   .ble-device-card { align-items: flex-start; flex-direction: column; }
@@ -2020,4 +2041,225 @@ pre, code { font-family: var(--font-ui); }
   border-color: #fecaca;
   background: #fef2f2;
   color: #b91c1c;
+}
+.ble-workbench-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.ble-workbench-entry p {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.bluetooth-workbench-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.bluetooth-workbench-grid > article,
+.bluetooth-log-panel {
+  min-width: 0;
+}
+
+.bluetooth-workbench-grid article > header,
+.bluetooth-log-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bluetooth-workbench-grid article > header h2,
+.bluetooth-log-panel > header h2 {
+  margin: 0;
+}
+
+.bluetooth-workbench-grid article > header p,
+.bluetooth-log-panel > header p {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+}
+
+.bluetooth-form-grid,
+.bluetooth-command-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.bluetooth-form-grid label,
+.bluetooth-command-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bluetooth-form-grid input,
+.bluetooth-form-grid select,
+.bluetooth-command-fields input,
+.bluetooth-command-fields textarea,
+.bluetooth-actions input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.bluetooth-address-field,
+.bluetooth-data-field {
+  grid-column: 1 / -1;
+}
+
+.bluetooth-actions,
+.bluetooth-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.bluetooth-actions input {
+  flex: 1 1 180px;
+}
+
+.bluetooth-device-list {
+  display: grid;
+  gap: 8px;
+  max-height: 350px;
+  margin-top: 14px;
+  overflow: auto;
+}
+
+.bluetooth-device-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.bluetooth-device-choice:hover,
+.bluetooth-device-choice.is-selected {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.bluetooth-device-choice code {
+  grid-column: 1;
+  overflow-wrap: anywhere;
+}
+
+.bluetooth-device-choice small {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  color: var(--ink-soft);
+}
+
+.bluetooth-risk {
+  margin-top: 16px;
+}
+
+.bluetooth-packet-preview {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.bluetooth-packet-preview > div {
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+
+.bluetooth-packet-preview dt {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.bluetooth-packet-preview dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.bluetooth-log-panel {
+  margin-top: 18px;
+}
+
+.bluetooth-event-log {
+  max-height: 380px;
+  margin: 16px 0 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.bluetooth-event-log li {
+  display: grid;
+  grid-template-columns: 190px 170px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 12px;
+}
+
+.bluetooth-event-log time {
+  color: #9ca3af;
+}
+
+.bluetooth-event-log code {
+  color: #d1fae5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1050px) {
+  .bluetooth-workbench-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .bluetooth-form-grid,
+  .bluetooth-command-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .bluetooth-address-field,
+  .bluetooth-data-field {
+    grid-column: auto;
+  }
+
+  .bluetooth-event-log li {
+    grid-template-columns: 1fr;
+  }
 }

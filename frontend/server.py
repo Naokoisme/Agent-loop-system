@@ -68,7 +68,9 @@ from agent_loop_system.tools.external_execution_history import (
 from agent_loop_system.tools.watch_ble import (
     WatchBleClient,
     WatchBleConnectionError,
+    WatchBleDependencyError,
     WatchBleDevice,
+    WatchBleTimeoutError,
     discover_ble_devices,
 )
 
@@ -138,6 +140,18 @@ TEST_PROJECTS: dict[str, dict[str, str]] = {
         "simulator_project": "6202_W5230",
         "simulator_build_directory": "../workspaces/firmware/6202_W5230/core/gui/simulator/out/build/6202_W5230",
         "simulator_artifact_path": "../workspaces/firmware/6202_W5230/core/gui/simulator/bin/main.exe",
+    },
+    "579_Z1640": {
+        "project": "579_Z1640",
+        "project_label": "579 Z1640",
+        "execution_target": "hardware",
+        "execution_target_label": "579 真机",
+        "case_map_dir": "579_case_map",
+        "case_map_profile": "579_Z1640",
+        "execution_adapter": "watch_579_ble",
+        "preflight_adapter": "watch_579_ble",
+        "transport": "pc_ble_legacy_l1_l2",
+        "capture_provider": "unavailable",
     },
 }
 
@@ -360,10 +374,17 @@ def _test_process_environment(project_meta: dict[str, str]) -> dict[str, str]:
     execution_env["W30_PROJECT"] = str(project_meta["project"])
     if project_meta.get("execution_target") == "hardware":
         hardware_project = str(project_meta["project"])
-        execution_env.update({
-            "W30_PROJECT": hardware_project,
-            "W30_HARDWARE_PROJECT": hardware_project,
-        })
+        if project_meta.get("execution_adapter") == "watch_579_ble":
+            execution_env["WATCH_579_PROJECT"] = hardware_project
+            execution_env.pop("W30_PROJECT", None)
+            execution_env.pop("W30_HARDWARE_PROJECT", None)
+            execution_env.pop("W30_HARDWARE_PROFILE_ROOT", None)
+            execution_env.pop("W30_HARDWARE_PROFILE_VERSION", None)
+        else:
+            execution_env.update({
+                "W30_PROJECT": hardware_project,
+                "W30_HARDWARE_PROJECT": hardware_project,
+            })
         for source_key in (
             "W30_SOURCE_ROOT",
             "W30_AGENT_WORKSPACE_ROOT",
@@ -2030,7 +2051,9 @@ class CaseMapRepository:
                         if isinstance(item.get("mapping_status"), str)
                         else ""
                     ),
+                    "block_reason_code": str(item.get("block_reason_code") or ""),
                     "note": str(item.get("note") or ""),
+                    "batch_id": str(item.get("batch_id") or ""),
                     **{key: project_meta[key] for key in (
                         "project", "project_label", "execution_target", "execution_target_label"
                     )},
@@ -2041,6 +2064,15 @@ class CaseMapRepository:
                 # 外部探索账本与映射固化是两条独立事实轴。显式的站内候选
                 # 复跑也能形成 PROMOTED，但绝不能伪造一条“外部探索”记录。
                 row["is_promoted"] = row["mapping_status"] == "PROMOTED"
+                row["is_execution_ready"] = (
+                    row["mapping_status"] == "EXECUTION_READY"
+                )
+                row["is_execution_blocked"] = (
+                    row["mapping_status"] == "BLOCKED"
+                )
+                row["is_fixed_runnable"] = (
+                    row["is_promoted"] or row["is_execution_ready"]
+                )
                 row["maturity_state"] = (
                     "solidified"
                     if row["is_promoted"]
@@ -2268,17 +2300,70 @@ class CaseTestManager:
         "vid_301a&pid_6808",
         "capture provider",
         "no result for",
+        "ble_disconnected",
+        "ble_ack_timeout",
+        "ble_connect_timeout",
+        "ble_connect_failed",
+        "ble_device_not_found",
+        "ble_gatt_profile_mismatch",
+        "ble_unavailable",
+        "ble_scan_failed",
+        "ble_write_failed",
+        "ble_rx_crc_or_length_error",
+        "ble_broker_unavailable",
+        "invalid_raw_command",
+        "target_busy",
     )
 
-    def __init__(self, paths: AppPaths, cases: CaseMapRepository, history: TestHistoryStore):
+    def __init__(
+        self,
+        paths: AppPaths,
+        cases: CaseMapRepository,
+        history: TestHistoryStore,
+        *,
+        watch_579_broker_provider: Any | None = None,
+    ):
         self.paths = paths
         self.cases = cases
         self.history = history
         self._lock = threading.Lock()
         self._jobs: dict[str, dict[str, Any]] = {}
         self._active_job_ids: dict[str, str] = {}
+        self._watch_579_broker_provider = watch_579_broker_provider
+        self._watch_579_lease_tokens: dict[str, str] = {}
+        self._internal_base_url = ""
         self._load_batches()
         self._recover_stale_promotions()
+
+    def configure_internal_base_url(self, base_url: str) -> None:
+        value = str(base_url or "").strip().rstrip("/")
+        parsed = urlparse(value)
+        if parsed.scheme != "http" or not _is_loopback_host(parsed.hostname):
+            raise ValueError("579 Runner 内部 API 必须使用 loopback HTTP 地址")
+        self._internal_base_url = value
+
+    def _watch_579_broker(self):
+        if self._watch_579_broker_provider is None:
+            raise RuntimeError("579 BLE Broker 未配置")
+        return self._watch_579_broker_provider()
+
+    def _acquire_watch_579_lease(self, job_id: str) -> None:
+        with self._lock:
+            job = self._jobs.get(job_id)
+            project = str(job.get("project") or "") if job else ""
+        if project != "579_Z1640":
+            return
+        if not self._internal_base_url:
+            raise RuntimeError("579 Runner 内部 API 地址尚未配置")
+        token = self._watch_579_broker().acquire_lease(owner=f"test:{job_id}")
+        with self._lock:
+            self._watch_579_lease_tokens[job_id] = token
+
+    def _release_watch_579_lease(self, job_id: str) -> None:
+        with self._lock:
+            token = self._watch_579_lease_tokens.pop(job_id, "")
+        if token:
+            self._watch_579_broker().release_lease(token)
 
     @staticmethod
     def _execution_slot(job: dict[str, Any]) -> str:
@@ -2562,12 +2647,22 @@ class CaseTestManager:
         project: str = DEFAULT_TEST_PROJECT,
         candidate_replay: bool = False,
         promotion_source: dict[str, Any] | None = None,
+        watchface_ready: bool = False,
     ) -> dict[str, Any]:
         project_meta = _test_project(project)
         project = project_meta["project"]
+        if project == "579_Z1640" and watchface_ready is not True:
+            raise ValueError("WATCHFACE_CONFIRMATION_REQUIRED: 请确认 579 手表位于亮屏表盘")
         case = self.cases.get(sheet, case_id, project=project)
         if case is None:
             raise ValueError("测试用例不存在")
+        if project == "579_Z1640" and case.get("mapping_status") == "BLOCKED":
+            reason_code = str(
+                case.get("block_reason_code") or "WATCH_579_EXECUTION_BLOCKED"
+            )
+            raise ValueError(
+                f"{reason_code}: 当前 OTA 固件无法从表盘自动进入菜单，已阻止执行"
+            )
         if candidate_replay and not isinstance(promotion_source, dict):
             raise ValueError("候选复跑缺少自主探索来源记录")
         promotion_context: dict[str, Any] | None = None
@@ -2667,9 +2762,12 @@ class CaseTestManager:
         case_refs: list[dict[str, str]] | None = None,
         categories: set[str] | None = None,
         project: str = DEFAULT_TEST_PROJECT,
+        watchface_ready: bool = False,
     ) -> dict[str, Any]:
         project_meta = _test_project(project)
         project = project_meta["project"]
+        if project == "579_Z1640" and watchface_ready is not True:
+            raise ValueError("WATCHFACE_CONFIRMATION_REQUIRED: 请确认 579 手表位于亮屏表盘")
         if case_refs is not None and categories is not None:
             raise ValueError("cases 和 categories 不能同时使用")
         cases = self.cases.executable(categories, project=project)
@@ -2694,6 +2792,18 @@ class CaseTestManager:
             cases = cases[:limit]
         if not cases:
             raise ValueError("没有可执行测试用例")
+        if project == "579_Z1640":
+            blocked = next(
+                (case for case in cases if case.get("mapping_status") == "BLOCKED"),
+                None,
+            )
+            if blocked is not None:
+                reason_code = str(
+                    blocked.get("block_reason_code") or "WATCH_579_EXECUTION_BLOCKED"
+                )
+                raise ValueError(
+                    f"{reason_code}: 当前 OTA 固件无法从表盘自动进入菜单，已阻止批次执行"
+                )
         with self._lock:
             job_id = uuid.uuid4().hex[:12]
             job = {
@@ -3014,12 +3124,26 @@ class CaseTestManager:
 
         job_root = self.paths.runtime_jobs / job_id
         try:
-            result = run_hardware_preflight(
-                project=project_meta["project"],
-                evidence_dir=job_root / "preflight-evidence",
-                environment=environment,
-                llm_scopes=llm_scopes,
-            )
+            if project_meta.get("preflight_adapter") == "watch_579_ble":
+                from agent_loop_system.tools.watch_579_preflight import (
+                    run_watch_579_preflight,
+                )
+
+                with self._lock:
+                    lease_token = self._watch_579_lease_tokens.get(job_id, "")
+                result = run_watch_579_preflight(
+                    project=project_meta["project"],
+                    environment=environment,
+                    broker=self._watch_579_broker(),
+                    lease_token=lease_token,
+                )
+            else:
+                result = run_hardware_preflight(
+                    project=project_meta["project"],
+                    evidence_dir=job_root / "preflight-evidence",
+                    environment=environment,
+                    llm_scopes=llm_scopes,
+                )
         except Exception as exc:
             result = internal_error_preflight(
                 exc,
@@ -3076,6 +3200,9 @@ class CaseTestManager:
             "--screenshot-path",
             str(screenshot),
         ]
+        execution_adapter = str(project_meta.get("execution_adapter") or "")
+        if execution_adapter:
+            child_args.extend(("--execution-adapter", execution_adapter))
         with self._lock:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
         if candidate_replay:
@@ -3095,6 +3222,15 @@ class CaseTestManager:
         process: Any = None
         timed_out = False
         execution_env = _test_process_environment(project_meta)
+        if execution_adapter == "watch_579_ble":
+            with self._lock:
+                lease_token = self._watch_579_lease_tokens.get(job_id, "")
+            if not lease_token:
+                raise RuntimeError("579 自动化 lease 不存在或已经释放")
+            execution_env.update({
+                "AGENT_LOOP_INTERNAL_BASE_URL": self._internal_base_url,
+                "WATCH_579_LEASE_TOKEN": lease_token,
+            })
         try:
             process = subprocess.Popen(
                 argv,
@@ -3162,6 +3298,17 @@ class CaseTestManager:
             for item in evidence_issues
             if isinstance(item, dict) and str(item.get("message") or "").strip()
         ), "")
+        blocking_evidence_error = next((
+            str(item.get("message") or "").strip()
+            for item in evidence_issues
+            if isinstance(item, dict)
+            and item.get("execution_blocking") is not False
+            and str(item.get("message") or "").strip()
+        ), "")
+        observation_unavailable = any(
+            isinstance(item, dict) and item.get("code") == "observation_unavailable"
+            for item in evidence_issues
+        )
         evidence_incomplete = bool(
             isinstance(evidence_contract, dict)
             and evidence_contract
@@ -3176,7 +3323,8 @@ class CaseTestManager:
             or result.get("setup_errors")
             or result.get("action_errors")
             or result.get("collect_errors")
-            or evidence_incomplete
+            or bool(blocking_evidence_error)
+            or str(result.get("execution_status") or "").upper() == "ERROR"
             or raw_verdict not in {"PASS", "FAIL", "CANNOT_VERIFY"}
         )
         error = "" if result else (stderr.strip() or "测试进程未生成结果文件")
@@ -3195,7 +3343,7 @@ class CaseTestManager:
         ]
         execution_reason = str(
             result.get("execution_reason")
-            or (execution_errors[0] if execution_errors else evidence_error or error)
+            or (execution_errors[0] if execution_errors else blocking_evidence_error or error)
         )
         if cancelled or timed_out:
             execution_reason = error
@@ -3222,9 +3370,16 @@ class CaseTestManager:
                 "execution_status": "ERROR",
                 "reason_code": (
                     "EVIDENCE_INCOMPLETE"
-                    if evidence_incomplete
+                    if blocking_evidence_error
                     else str(result.get("reason_code") or "CASE_EXECUTION_ERROR")
                 ),
+            })
+        elif observation_unavailable:
+            outcome.update({
+                "workflow_status": "completed",
+                "execution_status": "OK",
+                "evidence_status": "INCOMPLETE",
+                "reason_code": "OBSERVATION_UNAVAILABLE",
             })
         return {
             "result": result,
@@ -3247,6 +3402,7 @@ class CaseTestManager:
         promotion_context: dict[str, Any] | None = None
         promotion_needs_rollback = False
         try:
+            self._acquire_watch_579_lease(job_id)
             self._run_single_body(job_id)
         except BaseException as exc:
             with self._lock:
@@ -3329,6 +3485,10 @@ class CaseTestManager:
                     job.pop("process", None)
                     self._release_execution_slot_locked(job_id)
                     self._persist_single_test_locked(job)
+            try:
+                self._release_watch_579_lease(job_id)
+            except Exception:
+                pass
 
     def _run_single_body(self, job_id: str) -> None:
         with self._lock:
@@ -3365,15 +3525,19 @@ class CaseTestManager:
         if project_meta["execution_target"] == "hardware":
             hardware_environment = _test_process_environment(project_meta)
             hardware_case = job["case"]
-            hardware_llm_scope = _hardware_case_llm_scope(
-                hardware_case,
-                candidate_replay=bool(job.get("candidate_replay")),
+            hardware_llm_scope = (
+                ""
+                if project_meta.get("execution_adapter") == "watch_579_ble"
+                else _hardware_case_llm_scope(
+                    hardware_case,
+                    candidate_replay=bool(job.get("candidate_replay")),
+                )
             )
             preflight = self._run_job_hardware_preflight(
                 job_id=job_id,
                 project_meta=project_meta,
                 environment=hardware_environment,
-                llm_scopes=(hardware_llm_scope,),
+                llm_scopes=tuple(scope for scope in (hardware_llm_scope,) if scope),
             )
             if not preflight.ready:
                 with self._lock:
@@ -3539,6 +3703,7 @@ class CaseTestManager:
 
     def _run_batch(self, job_id: str) -> None:
         try:
+            self._acquire_watch_579_lease(job_id)
             self._run_batch_body(job_id)
         except BaseException as exc:
             with self._lock:
@@ -3578,6 +3743,10 @@ class CaseTestManager:
                     job.pop("process", None)
                     self._release_execution_slot_locked(job_id)
                     self._persist_batch_locked(job)
+            try:
+                self._release_watch_579_lease(job_id)
+            except Exception:
+                pass
 
     def _run_batch_body(self, job_id: str) -> None:
         with self._lock:
@@ -3602,10 +3771,14 @@ class CaseTestManager:
                 max(int(job.get("completed") or 0), 0),
                 len(job.get("cases", [])),
             )
-            hardware_llm_scopes = tuple(dict.fromkeys(
-                _hardware_case_llm_scope(case)
-                for case in job.get("cases", [])[remaining_start:]
-            ))
+            hardware_llm_scopes = (
+                ()
+                if project_meta.get("execution_adapter") == "watch_579_ble"
+                else tuple(dict.fromkeys(
+                    _hardware_case_llm_scope(case)
+                    for case in job.get("cases", [])[remaining_start:]
+                ))
+            )
             preflight = self._run_job_hardware_preflight(
                 job_id=job_id,
                 project_meta=project_meta,
@@ -3694,7 +3867,10 @@ class CaseTestManager:
                 )
                 self._persist_batch_locked(job)
 
-            if execution_target == "hardware":
+            if (
+                execution_target == "hardware"
+                and project_meta.get("execution_adapter") != "watch_579_ble"
+            ):
                 try:
                     from agent_loop_system.tools.real_device import (
                         prepare_hardware_case_state,
@@ -3760,7 +3936,10 @@ class CaseTestManager:
                 case=case,
                 job_dir=case_dir,
                 hardware_preflight_completed=hardware_preflight_completed,
-                hardware_preparation_completed=execution_target == "hardware",
+                hardware_preparation_completed=(
+                    execution_target == "hardware"
+                    and project_meta.get("execution_adapter") != "watch_579_ble"
+                ),
             )
             with self._lock:
                 cancel_requested = bool(self._jobs[job_id].get("cancel_requested"))
@@ -3922,11 +4101,20 @@ class CaseTestManager:
                     "ERROR" if int(job.get("execution_error_count") or 0) else "OK"
                 )
                 job["evidence_status"] = (
-                    "ERROR" if int(job.get("evidence_error_count") or 0) else "COMPLETE"
+                    (
+                        "INCOMPLETE"
+                        if str(job.get("project") or "") == "579_Z1640"
+                        else "ERROR"
+                    )
+                    if int(job.get("evidence_error_count") or 0)
+                    else "COMPLETE"
                 )
                 job["reason_code"] = (
                     "CASE_EXECUTION_ERROR"
                     if int(job.get("execution_error_count") or 0)
+                    else "OBSERVATION_UNAVAILABLE"
+                    if int(job.get("evidence_error_count") or 0)
+                    and str(job.get("project") or "") == "579_Z1640"
                     else None
                 )
             else:
@@ -4411,16 +4599,42 @@ class JobManager:
 class WebApplication:
     def __init__(self, paths: AppPaths):
         self.paths = paths
+        self._watch_579_broker_instance = None
+        self._watch_579_broker_lock = threading.Lock()
         self.history = HistoryStore(paths)
         self.test_history = TestHistoryStore(paths)
         self.defects = DefectRepository(paths, self.history)
         self.cases = CaseMapRepository(paths, self.test_history)
         self.jobs = JobManager(paths, self.defects, self.history)
-        self.test_jobs = CaseTestManager(paths, self.cases, self.test_history)
+        self.test_jobs = CaseTestManager(
+            paths,
+            self.cases,
+            self.test_history,
+            watch_579_broker_provider=lambda: self.watch_579_broker,
+        )
         self.ble_devices = BleDeviceManager(paths)
         self._execution_lock = threading.Lock()
         self.import_jobs: dict[str, dict[str, Any]] = {}
         self._import_lock = threading.Lock()
+
+    @property
+    def watch_579_broker(self):
+        with self._watch_579_broker_lock:
+            if self._watch_579_broker_instance is None:
+                from agent_loop_system.tools.watch_579_ble import Watch579BleBroker
+
+                self._watch_579_broker_instance = Watch579BleBroker()
+            return self._watch_579_broker_instance
+
+    def configure_internal_base_url(self, base_url: str) -> None:
+        self.test_jobs.configure_internal_base_url(base_url)
+
+    def close(self) -> None:
+        with self._watch_579_broker_lock:
+            broker = self._watch_579_broker_instance
+            self._watch_579_broker_instance = None
+        if broker is not None:
+            broker.shutdown()
 
     def start_repair(
         self,
@@ -4439,11 +4653,17 @@ class WebApplication:
         sheet: str,
         case_id: str,
         project: str = DEFAULT_TEST_PROJECT,
+        watchface_ready: bool = False,
     ) -> dict[str, Any]:
         with self._execution_lock:
             if self.jobs.active():
                 raise RuntimeError("已有缺陷修复任务正在运行")
-            return self.test_jobs.start(sheet=sheet, case_id=case_id, project=project)
+            return self.test_jobs.start(
+                sheet=sheet,
+                case_id=case_id,
+                project=project,
+                watchface_ready=watchface_ready,
+            )
 
     def start_candidate_replay(
         self,
@@ -4471,6 +4691,7 @@ class WebApplication:
         case_refs: list[dict[str, str]] | None = None,
         categories: set[str] | None = None,
         project: str = DEFAULT_TEST_PROJECT,
+        watchface_ready: bool = False,
     ) -> dict[str, Any]:
         with self._execution_lock:
             if self.jobs.active():
@@ -4480,6 +4701,7 @@ class WebApplication:
                 case_refs=case_refs,
                 categories=categories,
                 project=project,
+                watchface_ready=watchface_ready,
             )
 
     def resume_batch_test(self, job_id: str) -> dict[str, Any]:
@@ -4891,6 +5113,12 @@ def _get_system_config(paths: AppPaths) -> dict[str, Any]:
             )),
             "profile_version": os.environ.get("W30_HARDWARE_PROFILE_VERSION", ""),
         },
+        "hardware_579": {
+            "ble_address": os.environ.get("WATCH_579_BLE_ADDRESS", ""),
+            "ble_scan_timeout": float(
+                os.environ.get("WATCH_579_BLE_SCAN_TIMEOUT", "15")
+            ),
+        },
         "simulator": {
             "source_root": str(resolve_config_path(
                 (os.environ.get("W30_SIMULATOR_SOURCE_ROOT") or "").strip()
@@ -4971,6 +5199,15 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             )
         if "profile_version" in hw and hw["profile_version"] is not None:
             env_updates["W30_HARDWARE_PROFILE_VERSION"] = str(hw["profile_version"])
+
+    if "hardware_579" in cfg and isinstance(cfg["hardware_579"], dict):
+        hw_579 = cfg["hardware_579"]
+        if "ble_address" in hw_579 and hw_579["ble_address"] is not None:
+            env_updates["WATCH_579_BLE_ADDRESS"] = str(hw_579["ble_address"])
+        if "ble_scan_timeout" in hw_579 and hw_579["ble_scan_timeout"] is not None:
+            env_updates["WATCH_579_BLE_SCAN_TIMEOUT"] = str(
+                hw_579["ble_scan_timeout"]
+            )
             
     if "simulator" in cfg and isinstance(cfg["simulator"], dict):
         sim = cfg["simulator"]
@@ -5025,6 +5262,20 @@ def _save_system_config(paths: AppPaths, cfg: dict[str, Any]) -> None:
             new_lines.append(f"{k}={v}")
             
     env_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+
+def _classify_ble_scan_error(exc: Exception) -> str:
+    if isinstance(exc, (WatchBleDependencyError, ImportError, ModuleNotFoundError)):
+        return "BLE_UNAVAILABLE"
+    return "BLE_SCAN_FAILED"
+
+
+def _classify_ble_connect_error(exc: Exception) -> str:
+    if isinstance(exc, (WatchBleDependencyError, ImportError, ModuleNotFoundError)):
+        return "BLE_UNAVAILABLE"
+    if isinstance(exc, (TimeoutError, asyncio.TimeoutError, WatchBleTimeoutError)):
+        return "BLE_CONNECT_TIMEOUT"
+    return "BLE_CONNECT_FAILED"
 
 
 class BleDeviceManager:
@@ -5805,6 +6056,29 @@ class RequestHandler(BaseHTTPRequestHandler):
     server_version = "W30AgentUI/0.4"
     app: WebApplication
 
+    def _watch_579_failure(self, exc: BaseException) -> None:
+        reason_code = str(
+            getattr(exc, "reason_code", None) or "BLE_REQUEST_FAILED"
+        )
+        status = {
+            "INVALID_RAW_COMMAND": HTTPStatus.BAD_REQUEST,
+            "TARGET_BUSY": HTTPStatus.CONFLICT,
+            "BLE_DEVICE_NOT_FOUND": HTTPStatus.NOT_FOUND,
+            "BLE_CONNECT_TIMEOUT": HTTPStatus.BAD_GATEWAY,
+            "BLE_GATT_PROFILE_MISMATCH": HTTPStatus.BAD_GATEWAY,
+            "BLE_DISCONNECTED": HTTPStatus.BAD_GATEWAY,
+            "BLE_ACK_TIMEOUT": HTTPStatus.GATEWAY_TIMEOUT,
+        }.get(reason_code, HTTPStatus.BAD_GATEWAY)
+        self._json(
+            {
+                "ok": False,
+                "error": str(exc),
+                "reason_code": reason_code,
+                "error_code": reason_code,
+            },
+            status,
+        )
+
     def log_message(self, format: str, *args: Any) -> None:
         timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         sys.stderr.write(f"[{timestamp}] {self.address_string()} {format % args}\n")
@@ -6245,6 +6519,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json(_get_system_config(self.app.paths))
             return
 
+        if path == "/api/hardware/579/status":
+            self._json(self.app.watch_579_broker.status())
+            return
+
+        if path == "/api/hardware/579/events":
+            self._json(self.app.watch_579_broker.events(
+                after=query.get("after", [0])[0],
+                limit=query.get("limit", [200])[0],
+            ))
+            return
+
         if path == "/api/hardware/serial-ports":
             configured_port = os.environ.get("W30_HARDWARE_PORT", "")
             try:
@@ -6279,8 +6564,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             except ValueError:
                 raise
             except Exception as exc:
+                reason_code = _classify_ble_scan_error(exc)
                 self._json(
-                    {"error": f"查找蓝牙设备失败：{exc}"},
+                    {
+                        "error": f"查找蓝牙设备失败：{exc}",
+                        "reason_code": reason_code,
+                        "error_code": reason_code,
+                    },
                     HTTPStatus.BAD_GATEWAY,
                 )
                 return
@@ -6395,7 +6685,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if (
-            path in {"/", "/tests", "/overview", "/cases", "/runs", "/reports", "/defects", "/environments"}
+            path in {"/", "/tests", "/overview", "/cases", "/runs", "/reports", "/defects", "/environments", "/bluetooth"}
             or re.fullmatch(r"/(defect|history)/[^/]+(?:/[^/]+)?", path)
             or re.fullmatch(r"/test/[^/]+/[^/]+", path)
             or re.fullmatch(r"/test-batch/[^/]+", path)
@@ -6411,6 +6701,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         if path == "/api/tests/run-batch":
             body = self._body_json()
             project = _test_project(str(body.get("project") or DEFAULT_TEST_PROJECT))["project"]
+            watchface_ready = body.get("watchface_ready") is True
+            watchface_kwargs = (
+                {"watchface_ready": watchface_ready}
+                if project == "579_Z1640"
+                else {}
+            )
             limit = body.get("limit", 0)
             if isinstance(limit, bool) or not isinstance(limit, int) or limit < 0 or limit > 5000:
                 raise ValueError("limit 必须是 0 到 5000 的整数")
@@ -6446,14 +6742,24 @@ class RequestHandler(BaseHTTPRequestHandler):
             if case_refs is not None and categories is not None:
                 raise ValueError("cases 和 categories 不能同时使用")
             if case_refs is None and categories is None:
-                job = self.app.start_batch_test(limit=limit, project=project)
+                job = self.app.start_batch_test(
+                    limit=limit,
+                    project=project,
+                    **watchface_kwargs,
+                )
             elif categories is not None:
                 job = self.app.start_batch_test(
-                    limit=limit, categories=categories, project=project
+                    limit=limit,
+                    categories=categories,
+                    project=project,
+                    **watchface_kwargs,
                 )
             else:
                 job = self.app.start_batch_test(
-                    limit=limit, case_refs=case_refs, project=project
+                    limit=limit,
+                    case_refs=case_refs,
+                    project=project,
+                    **watchface_kwargs,
                 )
             self._json(job, HTTPStatus.ACCEPTED)
             return
@@ -6477,8 +6783,16 @@ class RequestHandler(BaseHTTPRequestHandler):
                 raise ValueError("sheet 必填")
             if not isinstance(case_id, str) or not case_id.strip():
                 raise ValueError("case_id 必填")
+            watchface_kwargs = (
+                {"watchface_ready": body.get("watchface_ready") is True}
+                if project == "579_Z1640"
+                else {}
+            )
             job = self.app.start_case_test(
-                sheet=sheet.strip(), case_id=case_id.strip(), project=project
+                sheet=sheet.strip(),
+                case_id=case_id.strip(),
+                project=project,
+                **watchface_kwargs,
             )
             self._json(job, HTTPStatus.ACCEPTED)
             return
@@ -6801,6 +7115,78 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"status": "ok", "message": "系统设置已保存并生效"})
             return
 
+        if path == "/api/hardware/579/connect":
+            body = self._body_json()
+            try:
+                result = self.app.watch_579_broker.connect(
+                    address=body.get("address"),
+                    timeout=body.get(
+                        "timeout",
+                        os.environ.get("WATCH_579_BLE_SCAN_TIMEOUT", "15"),
+                    ),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            _save_system_config(self.app.paths, {
+                "hardware_579": {"ble_address": result.get("address") or ""}
+            })
+            self._json(result)
+            return
+
+        if path == "/api/hardware/579/disconnect":
+            try:
+                result = self.app.watch_579_broker.disconnect()
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/579/preview":
+            body = self._body_json()
+            try:
+                result = self.app.watch_579_broker.preview(
+                    cmd=body.get("cmd"),
+                    key=body.get("key"),
+                    data=body.get("data", ""),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/579/send":
+            body = self._body_json()
+            try:
+                result = self.app.watch_579_broker.send_manual(
+                    cmd=body.get("cmd"),
+                    key=body.get("key"),
+                    data=body.get("data", ""),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/internal/hardware/579/send":
+            body = self._body_json()
+            token = self.headers.get("X-Agent-Loop-579-Lease", "")
+            try:
+                result = self.app.watch_579_broker.send_internal(
+                    lease_token=token,
+                    cmd=body.get("cmd"),
+                    key=body.get("key"),
+                    data=body.get("data", ""),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
         if path == "/api/hardware/ble/connect":
             body = self._body_json()
             try:
@@ -6815,6 +7201,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             except ValueError:
                 raise
             except Exception as exc:
+                reason_code = _classify_ble_connect_error(exc)
                 self._json(
                     {
                         "ok": False,
@@ -6822,6 +7209,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                         "connected": False,
                         "connection_mode": "on_demand",
                         "error": f"手表连接失败：{exc}",
+                        "reason_code": reason_code,
+                        "error_code": reason_code,
                     },
                     HTTPStatus.BAD_GATEWAY,
                 )
@@ -7271,6 +7660,9 @@ def main(argv: list[str] | None = None) -> int:
         search_next_port=args.port is None,
     )
     display_host = f"[{args.host}]" if ":" in args.host else args.host
+    app.configure_internal_base_url(
+        f"http://{display_host}:{server.server_address[1]}"
+    )
     print(f"W30 Agent UI: http://{display_host}:{server.server_address[1]}")
     try:
         server.serve_forever()
@@ -7278,6 +7670,7 @@ def main(argv: list[str] | None = None) -> int:
         print("\n服务已停止")
     finally:
         server.server_close()
+        app.close()
     return 0
 
 
