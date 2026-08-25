@@ -38,6 +38,8 @@ from frontend.server import (
     TestHistoryStore as CaseRunHistoryStore,
     ThreadingHTTPServer,
     WebApplication,
+    _functional_case_metadata_579,
+    _functional_case_metadata_w30,
     _reload_runtime_limits,
     _save_system_config,
     _test_process_environment,
@@ -1192,6 +1194,10 @@ class FrontendDataTest(unittest.TestCase):
                 recent = self.cases.recent(limit=1)
             self.assertEqual(recent["items"][0]["case_id"], "CALC_001")
             self.assertEqual(recent["items"][0]["latest_verdict"], "FAIL")
+            self.assertEqual(recent["items"][0]["last_platform_id"], "w30")
+            self.assertEqual(
+                recent["items"][0]["last_execution_adapter"], "w30_cli"
+            )
 
             with patch.object(self.cases, "_all", wraps=self.cases._all) as load_all:
                 overview = self.cases.overview(recent_limit=1, exception_limit=1)
@@ -2426,6 +2432,7 @@ class FrontendDataTest(unittest.TestCase):
 
         load_env.assert_called_once_with()
         self.assertEqual(captured_argv[captured_argv.index("--target") + 1], "hardware")
+        self.assertNotIn("--execution-adapter", captured_argv)
         self.assertNotIn("--preserve-test-session", captured_argv)
         self.assertNotIn("--skip-hardware-reset", captured_argv)
         self.assertNotIn("W30_SOURCE_ROOT", captured_env)
@@ -2478,6 +2485,7 @@ class FrontendDataTest(unittest.TestCase):
             )
 
         self.assertIn("--candidate-replay", captured_argv)
+        self.assertNotIn("--execution-adapter", captured_argv)
         self.cases.rollback_agent_candidate(context)
 
     def test_candidate_replay_start_stages_candidate_and_persists_recovery_state(self) -> None:
@@ -2672,6 +2680,7 @@ class FrontendDataTest(unittest.TestCase):
             captured_argv[captured_argv.index("--case-map-profile") + 1],
             "6202_W5230_SIMULATOR",
         )
+        self.assertNotIn("--execution-adapter", captured_argv)
         self.assertNotIn("--preserve-test-session", captured_argv)
         self.assertEqual(captured_env["W30_PROJECT"], "6202_W5230")
         self.assertEqual(
@@ -3595,6 +3604,8 @@ class FrontendDataTest(unittest.TestCase):
                 "case_id": "CALC_NEW_01",
                 "sheet": "计算器",
                 "priority": "P1",
+                "test_item": "基础运算",
+                "test_point": "输入数字后页面正确显示",
                 "precondition_text": "已打开计算器",
                 "steps_text": "点击按键1",
                 "expected_text": "屏幕显示1",
@@ -3642,10 +3653,10 @@ class FrontendDataTest(unittest.TestCase):
             self.assertIn("自动化测试用例_v1", wb.sheetnames)
             ws = wb["自动化测试用例_v1"]
             self.assertEqual(ws.freeze_panes, "A2")
-            self.assertEqual(ws.auto_filter.ref, f"A1:I{ws.max_row}")
+            self.assertEqual(ws.auto_filter.ref, f"A1:L{ws.max_row}")
             self.assertFalse(ws.sheet_view.showGridLines)
             self.assertEqual(ws.page_setup.orientation, "landscape")
-            self.assertEqual(ws.column_dimensions["E"].width, 46)
+            self.assertEqual(ws.column_dimensions["G"].width, 46)
             self.assertEqual(ws.row_dimensions[1].height, 28)
 
             header = ws["A1"]
@@ -3659,10 +3670,70 @@ class FrontendDataTest(unittest.TestCase):
             self.assertEqual(case_row[0].font.name, "宋体")
             self.assertEqual(case_row[1].font.name, "Times New Roman")
             self.assertEqual(case_row[1].font.sz, 10)
-            self.assertTrue(case_row[4].alignment.wrap_text)
-            self.assertEqual(case_row[4].alignment.vertical, "top")
-            self.assertEqual(case_row[4].border.bottom.style, "thin")
+            self.assertEqual(case_row[2].value, "基础运算")
+            self.assertEqual(case_row[3].value, "输入数字后页面正确显示")
+            self.assertTrue(case_row[6].alignment.wrap_text)
+            self.assertEqual(case_row[6].alignment.vertical, "top")
+            self.assertEqual(case_row[6].border.bottom.style, "thin")
             self.assertGreaterEqual(ws.row_dimensions[case_row[0].row].height, 22)
+
+    def test_579_frozen_catalog_restores_test_item_and_test_point(self) -> None:
+        metadata = _functional_case_metadata_579()
+        self.assertEqual(metadata["FLASHLIGHT-FC-001"]["test_item"], "入口")
+        self.assertEqual(
+            metadata["FLASHLIGHT-FC-001"]["test_point"],
+            "控制中心显示手电筒入口",
+        )
+
+        (self.paths.case_map / "579_case_map" / "手电筒.json").write_text(
+            json.dumps({
+                "profile": "579_O2",
+                "sheet": "手电筒",
+                "cases": [{
+                    "case_id": "FLASHLIGHT-001",
+                    "sheet": "手电筒",
+                    "priority": "P0",
+                    "precondition_text": "手表处于表盘",
+                    "steps_text": "打开控制中心",
+                    "expected_text": "手电筒入口可见",
+                    "source_ref": {"functional_case_id": "FLASHLIGHT-FC-001"},
+                    "applicable_platforms": ["579"],
+                }],
+            }, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        application = WebApplication(self.paths)
+        row = application.cases._all("579_O2")[0]
+        self.assertEqual(row["test_item"], "入口")
+        self.assertEqual(row["test_point"], "控制中心显示手电筒入口")
+
+    def test_w30_workbook_restores_merged_test_items_and_test_points(self) -> None:
+        import openpyxl
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = "计算器"
+        sheet.append([
+            "序号", "用例编号", "功能模块", "功能点", "测试项", "测试点/检查项",
+            "前置条件", "操作步骤", "预期结果",
+        ])
+        sheet.append([1, "CALC_001", "计算器", "数字输入", "顺序输入", "验证数字按点击顺序追加显示", "", "", ""])
+        sheet.append([2, "CALC_002", "计算器", "数字输入", None, "验证第十位数字输入无响应", "", "", ""])
+        sheet.merge_cells("E2:E3")
+        workbook.save(self.paths.case_map / "620手表全功能测试用例.xlsx")
+
+        metadata = _functional_case_metadata_w30(self.paths.case_map)
+        self.assertEqual(metadata["CALC_001"]["test_item"], "顺序输入")
+        self.assertEqual(metadata["CALC_002"]["test_item"], "顺序输入")
+        self.assertEqual(
+            metadata["CALC_002"]["test_point"],
+            "验证第十位数字输入无响应",
+        )
+
+        application = WebApplication(self.paths)
+        rows = {item["case_id"]: item for item in application.cases._all("620C_W6830")}
+        self.assertEqual(rows["CALC_001"]["test_item"], "顺序输入")
+        self.assertEqual(rows["CALC_001"]["test_point"], "验证数字按点击顺序追加显示")
 
     def test_excel_import_preview_and_confirm(self) -> None:
         _, base = self._server()
@@ -4110,6 +4181,7 @@ class FrontendDataTest(unittest.TestCase):
         self.assertLessEqual(detail.row_dimensions[error_row].height, 120)
         self.assertEqual(detail.page_setup.orientation, "landscape")
 
+    @patch.dict(os.environ, {"OPENAI_API_KEY": ""}, clear=False)
     def test_environments_and_config_endpoints(self) -> None:
         application, base = self._server()
         

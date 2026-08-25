@@ -12,6 +12,7 @@ from contextlib import contextmanager
 import errno
 import hashlib
 import ipaddress
+from importlib.resources import files as package_files
 import io
 import math
 import openpyxl
@@ -107,7 +108,80 @@ BLE_DEVICE_STORE_FILE = "ble-devices.json"
 DEFAULT_TEST_PROJECT = "620C_W6830"
 CASE_TEST_TIMEOUT_SECONDS = 1800.0
 REPAIR_JOB_TIMEOUT_SECONDS = 3600.0
+EXPLICIT_TEST_CLI_ADAPTERS = frozenset({"watch_ble", "watch_579_ble"})
 _PLATFORM_REGISTRY = PlatformRegistry()
+
+
+def _functional_case_metadata_579() -> dict[str, dict[str, Any]]:
+    """Return frozen 579 functional semantics indexed by both source and case id."""
+
+    path = Path(str(package_files("agent_loop_system.platform_data"))) / "579" / "catalog" / "functional_cases.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {}
+    index: dict[str, dict[str, Any]] = {}
+    for manifest in payload.get("manifests", []) if isinstance(payload, dict) else []:
+        if not isinstance(manifest, dict):
+            continue
+        for item in manifest.get("cases", []):
+            if not isinstance(item, dict):
+                continue
+            metadata = {
+                "test_item": str(item.get("test_item") or "").strip(),
+                "test_point": str(item.get("test_point") or "").strip(),
+                "actual_result": str(item.get("actual_result") or "").strip(),
+            }
+            for key in (item.get("functional_case_id"), item.get("case_no")):
+                if str(key or "").strip():
+                    index[str(key).strip()] = metadata
+    return index
+
+
+def _functional_case_metadata_w30(case_map_root: Path) -> dict[str, dict[str, Any]]:
+    """Load W30 test-item and test-point semantics from the canonical workbook."""
+
+    path = Path(case_map_root) / "620手表全功能测试用例.xlsx"
+    try:
+        workbook = openpyxl.load_workbook(path, data_only=True, read_only=False)
+    except (OSError, ValueError, KeyError, openpyxl.utils.exceptions.InvalidFileException):
+        return {}
+    index: dict[str, dict[str, Any]] = {}
+    try:
+        for worksheet in workbook.worksheets:
+            headers = {
+                str(cell.value).strip(): int(cell.column)
+                for cell in worksheet[1]
+                if cell.value is not None and str(cell.value).strip()
+            }
+            case_id_column = headers.get("用例编号")
+            test_item_column = headers.get("测试项")
+            test_point_column = headers.get("测试点/检查项") or headers.get("测试点")
+            if not (case_id_column and test_item_column and test_point_column):
+                continue
+            merged_test_items: dict[int, Any] = {}
+            for merged_range in worksheet.merged_cells.ranges:
+                if merged_range.min_col <= test_item_column <= merged_range.max_col:
+                    value = worksheet.cell(merged_range.min_row, test_item_column).value
+                    for row_number in range(merged_range.min_row, merged_range.max_row + 1):
+                        merged_test_items[row_number] = value
+            for row_number in range(2, worksheet.max_row + 1):
+                case_id = str(worksheet.cell(row_number, case_id_column).value or "").strip()
+                if not case_id:
+                    continue
+                test_item = worksheet.cell(row_number, test_item_column).value
+                if test_item is None:
+                    test_item = merged_test_items.get(row_number)
+                index[case_id] = {
+                    "test_item": str(test_item or "").strip(),
+                    "test_point": str(
+                        worksheet.cell(row_number, test_point_column).value or ""
+                    ).strip(),
+                    "actual_result": "",
+                }
+    finally:
+        workbook.close()
+    return index
 _PROJECT_REGISTRY: ProjectRegistry | None = None
 
 
@@ -1393,6 +1467,10 @@ class TestHistoryStore:
             "reason_code": run.get("reason_code"),
             "timestamp": run.get("timestamp"),
             "project": run.get("project"),
+            "platform_id": run.get("platform_id"),
+            "requested_platform_id": run.get("requested_platform_id"),
+            "execution_adapter": run.get("execution_adapter"),
+            "resolved_execution_adapter": run.get("resolved_execution_adapter"),
             "execution_target": run.get("execution_target"),
         }
 
@@ -1583,6 +1661,17 @@ class CaseMapRepository:
         return {
             "last_run_at": latest.get("timestamp") if latest else None,
             "history_count": history_count,
+            "last_platform_id": (
+                latest.get("requested_platform_id") or latest.get("platform_id")
+                if latest
+                else None
+            ),
+            "last_execution_adapter": (
+                latest.get("resolved_execution_adapter")
+                or latest.get("execution_adapter")
+                if latest
+                else None
+            ),
             "latest_verdict": normalized_verdict,
             "latest_workflow_status": latest.get("workflow_status") if latest else None,
             "latest_execution_status": latest.get("execution_status") if latest else None,
@@ -1612,7 +1701,8 @@ class CaseMapRepository:
             key: row.get(key)
             for key in (
                 "project", "case_id", "sheet", "file_sheet", "last_run_at",
-                "history_count", "latest_verdict", "latest_workflow_status",
+                "history_count", "last_platform_id", "last_execution_adapter",
+                "latest_verdict", "latest_workflow_status",
                 "latest_execution_status", "latest_evidence_status",
                 "latest_mapping_status", "latest_reason_code",
             )
@@ -1620,17 +1710,26 @@ class CaseMapRepository:
 
     def _source_catalog_fingerprint(self, project_meta: dict[str, Any]) -> tuple[tuple[str, int, int], ...]:
         root = _case_catalog_root(self.paths, project_meta)
-        return tuple(
+        entries = [
             (str(path.relative_to(root)).replace("\\", "/"), path.stat().st_size, path.stat().st_mtime_ns)
             for path in _case_catalog_files(self.paths, project_meta)
-        )
+        ]
+        if str(project_meta.get("platform_id") or "") == "w30":
+            workbook = self.paths.case_map / "620手表全功能测试用例.xlsx"
+            if workbook.is_file():
+                entries.append((
+                    str(workbook.relative_to(self.paths.root)).replace("\\", "/"),
+                    workbook.stat().st_size,
+                    workbook.stat().st_mtime_ns,
+                ))
+        return tuple(entries)
 
     @staticmethod
     def _source_catalog_signature(
         fingerprint: tuple[tuple[str, int, int], ...],
     ) -> str:
         encoded = json.dumps(
-            fingerprint,
+            {"schema_version": 2, "files": fingerprint},
             ensure_ascii=False,
             separators=(",", ":"),
         ).encode("utf-8")
@@ -1649,7 +1748,9 @@ class CaseMapRepository:
                 source_rows = self._source_rows(project_id)
                 stable_fields = {
                     "case_id", "sheet", "file_sheet", "title", "priority",
+                    "test_item", "test_point",
                     "precondition_text", "steps_text", "expected_text",
+                    "actual_result",
                     "verification_points", "setup", "actions", "collect", "unable",
                     "mapping_status", "block_reason_code", "batch_id", "note",
                     "automation_maturity", "blockers",
@@ -2363,20 +2464,37 @@ class CaseMapRepository:
         history_index = self.history.summary_index(project=project)
         case_map_root = _case_catalog_root(self.paths, project_meta)
         externally_explored_ids = _external_explored_ids(self.paths, project)
+        platform_id = str(project_meta.get("platform_id") or "")
+        functional_index = (
+            _functional_case_metadata_579()
+            if platform_id == "579"
+            else _functional_case_metadata_w30(self.paths.case_map)
+            if platform_id == "w30"
+            else {}
+        )
         for path in _case_catalog_files(self.paths, project_meta):
             source_file_sha256 = hashlib.sha256(path.read_bytes()).hexdigest().upper()
             for item in _case_entries(self.paths, path.stem, project):
                 case_id = str(item.get("case_id") or "").strip()
                 if not case_id:
                     continue
+                source_ref = item.get("source_ref", {}) if isinstance(item.get("source_ref"), dict) else {}
+                functional = (
+                    functional_index.get(str(source_ref.get("functional_case_id") or ""))
+                    or functional_index.get(case_id)
+                    or {}
+                )
                 row = {
                     "case_id": case_id,
                     "sheet": str(item.get("sheet") or path.stem),
                     "file_sheet": path.stem,
                     "priority": str(item.get("priority") or ""),
+                    "test_item": str(item.get("test_item") or functional.get("test_item") or ""),
+                    "test_point": str(item.get("test_point") or functional.get("test_point") or ""),
                     "precondition_text": str(item.get("precondition_text") or ""),
                     "steps_text": str(item.get("steps_text") or ""),
                     "expected_text": str(item.get("expected_text") or ""),
+                    "actual_result": str(item.get("actual_result") or functional.get("actual_result") or ""),
                     "verification_points": [
                         str(point) for point in item.get("verification_points", [])
                         if str(point).strip()
@@ -2402,8 +2520,7 @@ class CaseMapRepository:
                     ] if isinstance(item.get("blockers"), list) else [],
                     "platform_automation": copy.deepcopy(item.get("platform_automation", {}))
                     if isinstance(item.get("platform_automation"), dict) else {},
-                    "source_ref": copy.deepcopy(item.get("source_ref", {}))
-                    if isinstance(item.get("source_ref"), dict) else {},
+                    "source_ref": copy.deepcopy(source_ref),
                     "execution_ref": copy.deepcopy(item.get("execution_ref", {}))
                     if isinstance(item.get("execution_ref"), dict) else {},
                     "_source_file": str(path.relative_to(self.paths.root)).replace("\\", "/"),
@@ -2587,7 +2704,8 @@ class CaseMapRepository:
                     word in " ".join(
                         str(row.get(field, ""))
                         for field in (
-                            "case_id", "sheet", "priority", "precondition_text",
+                            "case_id", "sheet", "test_item", "test_point",
+                            "priority", "precondition_text",
                             "steps_text", "expected_text", "verification_points",
                             "mapping_status", "note",
                         )
@@ -3882,7 +4000,7 @@ class CaseTestManager:
             str(screenshot),
         ]
         execution_adapter = str(project_meta.get("execution_adapter") or "")
-        if execution_adapter:
+        if execution_adapter in EXPLICIT_TEST_CLI_ADAPTERS:
             child_args.extend(("--execution-adapter", execution_adapter))
         with self._lock:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))
@@ -5769,13 +5887,13 @@ def _excel_style_table(
     )
 
 def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository | None = None) -> bytes:
-    """生成标准 9 列表头的 Excel 测试用例工作簿。"""
+    """生成包含完整测试语义的 Excel 测试用例工作簿。"""
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "自动化测试用例_v1"
     headers = [
-        "模块/Sheet", "用例编号", "优先级", "前置条件", "测试步骤", "预期结果",
-        "不可自动化", "固化状态", "备注",
+        "模块/Sheet", "用例编号", "测试项", "测试点", "优先级", "前置条件",
+        "操作步骤", "预期结果", "实际结果", "不可自动化", "固化状态", "备注",
     ]
     ws.append(headers)
     
@@ -5792,10 +5910,13 @@ def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository |
         ws.append([
             str(item.get("sheet") or item.get("file_sheet") or ""),
             case_id,
+            str(item.get("test_item") or ""),
+            str(item.get("test_point") or ""),
             str(item.get("priority") or ""),
             str(item.get("precondition_text") or ""),
             str(item.get("steps_text") or ""),
             str(item.get("expected_text") or ""),
+            str(item.get("actual_result") or ""),
             "是" if item.get("unable") else "否",
             str(item.get("mapping_status") or ""),
             str(item.get("note") or ""),
@@ -5804,11 +5925,11 @@ def _export_cases_xlsx(paths: AppPaths, project: str, cases: CaseMapRepository |
     _excel_style_table(
         ws,
         widths={
-            "A": 18, "B": 16, "C": 10, "D": 28, "E": 46,
-            "F": 46, "G": 12, "H": 14, "I": 30,
+            "A": 18, "B": 16, "C": 18, "D": 32, "E": 10, "F": 28,
+            "G": 46, "H": 46, "I": 28, "J": 12, "K": 14, "L": 30,
         },
-        wrap_columns={4, 5, 6, 9},
-        center_columns={1, 2, 3, 7, 8},
+        wrap_columns={3, 4, 6, 7, 8, 9, 12},
+        center_columns={1, 2, 5, 10, 11},
     )
 
     buf = io.BytesIO()
@@ -5852,12 +5973,18 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
                     temp_map["case_id"] = c_idx
                 elif any(k in cell for k in ["优先级", "priority"]):
                     temp_map["priority"] = c_idx
+                elif any(k in cell for k in ["测试项", "test_item"]):
+                    temp_map["test_item"] = c_idx
+                elif any(k in cell for k in ["测试点", "test_point"]):
+                    temp_map["test_point"] = c_idx
                 elif any(k in cell for k in ["前置条件", "前置", "precondition"]):
                     temp_map["precondition_text"] = c_idx
                 elif any(k in cell for k in ["操作步骤", "测试步骤", "步骤", "steps"]):
                     temp_map["steps_text"] = c_idx
                 elif any(k in cell for k in ["预期结果", "预期", "expected"]):
                     temp_map["expected_text"] = c_idx
+                elif any(k in cell for k in ["实际结果", "actual_result"]):
+                    temp_map["actual_result"] = c_idx
                 elif any(k in cell for k in ["不可自动化", "unable"]):
                     temp_map["unable"] = c_idx
                 elif any(k in cell for k in ["固化状态", "mapping_status"]):
@@ -5881,9 +6008,12 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
                 continue
             
             priority = str(row[col_map["priority"]]).strip() if "priority" in col_map and col_map["priority"] < len(row) and row[col_map["priority"]] is not None else "P1"
+            test_item = str(row[col_map["test_item"]]).strip() if "test_item" in col_map and col_map["test_item"] < len(row) and row[col_map["test_item"]] is not None else ""
+            test_point = str(row[col_map["test_point"]]).strip() if "test_point" in col_map and col_map["test_point"] < len(row) and row[col_map["test_point"]] is not None else ""
             precondition = str(row[col_map["precondition_text"]]).strip() if "precondition_text" in col_map and col_map["precondition_text"] < len(row) and row[col_map["precondition_text"]] is not None else ""
             steps = str(row[col_map["steps_text"]]).strip() if "steps_text" in col_map and col_map["steps_text"] < len(row) and row[col_map["steps_text"]] is not None else ""
             expected = str(row[col_map["expected_text"]]).strip() if "expected_text" in col_map and col_map["expected_text"] < len(row) and row[col_map["expected_text"]] is not None else ""
+            actual_result = str(row[col_map["actual_result"]]).strip() if "actual_result" in col_map and col_map["actual_result"] < len(row) and row[col_map["actual_result"]] is not None else ""
             note = str(row[col_map["note"]]).strip() if "note" in col_map and col_map["note"] < len(row) and row[col_map["note"]] is not None else ""
             unable_raw = str(row[col_map["unable"]]).strip() if "unable" in col_map and col_map["unable"] < len(row) and row[col_map["unable"]] is not None else ""
             unable = unable_raw in {"是", "true", "True", "1", "Y", "yes"}
@@ -5893,9 +6023,12 @@ def _parse_excel_cases(file_base64: str) -> list[dict[str, Any]]:
                 "case_id": case_id,
                 "sheet": sheet,
                 "priority": priority,
+                "test_item": test_item,
+                "test_point": test_point,
                 "precondition_text": precondition,
                 "steps_text": steps,
                 "expected_text": expected,
+                "actual_result": actual_result,
                 "verification_points": [expected] if expected else [],
                 "setup": [],
                 "actions": [],

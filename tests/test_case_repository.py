@@ -32,6 +32,8 @@ def case(case_id: str = "CASE-001", *, platforms: list[str] | None = None) -> di
         "case_id": case_id,
         "sheet": "计时器",
         "priority": "P1",
+        "test_item": "计时",
+        "test_point": "点击开始后计时持续递增",
         "precondition_text": "设备在主表盘",
         "steps_text": "1. 打开计时器\n2. 点击开始",
         "expected_text": "计时开始运行",
@@ -48,6 +50,8 @@ def test_manual_579_case_is_manageable_but_not_silently_runnable(tmp_path: Path)
     assert stored is not None
     assert stored["source_locked"] is False
     assert stored["applicable_platforms"] == ["579"]
+    assert stored["test_item"] == "计时"
+    assert stored["test_point"] == "点击开始后计时持续递增"
     assert stored["platform_automation"]["579"]["runnable"] is False
     assert stored["platform_automation"]["579"]["blocker"] == "CASE_PLATFORM_MAPPING_MISSING"
 

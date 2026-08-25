@@ -495,6 +495,7 @@ function icon(name, size = 20) {
     defects: '<path d="M8 4h8M9 2v4m6-4v4M5 10h14M4 14h16M6 18h12"/><rect x="6" y="6" width="12" height="15" rx="6"/>',
     environments: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/>',
     check: '<path d="m5 12 4 4L19 6"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
     warning: '<path d="M12 3 2.5 20h19Z"/><path d="M12 9v4m0 3h.01"/>',
     refresh: '<path d="M20 6v5h-5M4 18v-5h5"/><path d="M18 9a7 7 0 0 0-12-3L4 8m2 7a7 7 0 0 0 12 3l2-2"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
@@ -1801,18 +1802,47 @@ function testRows(items, query, state, returnTo = '/cases') {
     const sourceLocked = Boolean(row.source_locked || row.is_frozen_source);
     const platforms = (row.applicable_platforms || []).map(platformId => PLATFORM_PROFILES[platformId]?.platform_label || platformId).join(' / ');
     const revision = Number(row.current_revision || 1);
-    return `<tr class="test-row-shell${selected ? ' is-selected' : ''}">
+    const testItem = String(row.test_item || '').trim() || '待补充';
+    const testPoint = String(row.test_point || '').trim() || '待补充';
+    const actualResult = String(row.actual_result || '').trim()
+      || (Number(row.history_count || 0) > 0
+        ? workspaceVerdictLabel(row.last_product_verdict || row.latest_verdict)
+        : '尚未运行');
+    return `<tr class="test-row-shell case-summary-row${selected ? ' is-selected' : ''}" data-case-expand tabindex="0" aria-expanded="false">
       <td><label class="table-checkbox" title="${escapeHtml(`选择 ${caseId} 创建精确批次`)}"><input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''}></label></td>
-      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
-      <td class="case-purpose-cell"><strong>${escapeHtml(row.steps_text || row.expected_text || '未填写测试步骤')}</strong><small>${escapeHtml(row.expected_text || '未填写预期结果')}</small></td>
+      <td class="case-id-cell"><span class="case-expand-chevron" aria-hidden="true">›</span><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
+      <td class="case-summary-text"><strong>${escapeHtml(testItem)}</strong></td>
+      <td class="case-summary-text"><strong>${escapeHtml(testPoint)}</strong></td>
       <td><span class="chip chip-status priority-${escapeHtml(String(row.priority || '').toLowerCase())}">${escapeHtml(row.priority || '未分级')}</span></td>
       <td>${maturityChip(row)}<small>${escapeHtml(platforms ? `适用平台：${platforms}` : '未指定适用平台')}</small></td>
       <td>${caseStatusChip(row)}</td>
       <td><time>${row.last_run_at ? formatTime(row.last_run_at) : '—'}</time>${row.history_count ? `<small>${Number(row.history_count)} 次</small>` : ''}</td>
-      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="${sourceLocked ? '创建新版本' : '编辑用例'} ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" data-applicable-platforms="${escapeHtml(JSON.stringify(row.applicable_platforms || []))}" data-workflow-state="${escapeHtml(row.workflow_state || 'ACTIVE')}" data-source-locked="${sourceLocked ? 'true' : 'false'}" aria-label="${sourceLocked ? '为冻结用例创建新版本' : '编辑用例'} ${escapeHtml(caseId)}">${sourceLocked ? '版' : '✎'}</button></td>
+      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="${sourceLocked ? '创建新版本' : '编辑用例'} ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-test-item="${escapeHtml(row.test_item || '')}" data-test-point="${escapeHtml(row.test_point || '')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" data-applicable-platforms="${escapeHtml(JSON.stringify(row.applicable_platforms || []))}" data-workflow-state="${escapeHtml(row.workflow_state || 'ACTIVE')}" data-source-locked="${sourceLocked ? 'true' : 'false'}" aria-label="${sourceLocked ? '为冻结用例创建新版本' : '编辑用例'} ${escapeHtml(caseId)}">${sourceLocked ? '版' : '✎'}</button></td>
+    </tr>
+    <tr class="case-detail-row" hidden>
+      <td colspan="9">
+        <section class="case-inline-detail" aria-label="用例 ${escapeHtml(caseId)} 完整详情">
+          <div class="case-detail-field"><span>测试项</span><p>${escapeHtml(testItem)}</p></div>
+          <div class="case-detail-field"><span>测试点</span><p>${escapeHtml(testPoint)}</p></div>
+          <div class="case-detail-field"><span>前置条件</span><p>${escapeHtml(row.precondition_text || '无')}</p></div>
+          <div class="case-detail-field is-wide"><span>操作步骤</span><p>${escapeHtml(row.steps_text || '未填写')}</p></div>
+          <div class="case-detail-field is-wide"><span>预期结果</span><p>${escapeHtml(row.expected_text || '未填写')}</p></div>
+          <div class="case-detail-field"><span>实际结果</span><p>${escapeHtml(actualResult)}</p></div>
+        </section>
+      </td>
     </tr>`;
   }).join('');
-  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试点</th><th>优先级</th><th>自动化成熟度</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试项</th><th>测试点</th><th>优先级</th><th>自动化成熟度</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function toggleCaseInlineDetail(summaryRow) {
+  if (!summaryRow?.matches('[data-case-expand]')) return;
+  const detailRow = summaryRow.nextElementSibling;
+  if (!detailRow?.classList.contains('case-detail-row')) return;
+  const expanded = summaryRow.getAttribute('aria-expanded') === 'true';
+  summaryRow.setAttribute('aria-expanded', String(!expanded));
+  summaryRow.classList.toggle('is-expanded', !expanded);
+  detailRow.hidden = expanded;
 }
 
 function testCaseSelectionKey(sheet, caseId) {
@@ -2104,7 +2134,7 @@ async function renderTests() {
         </div>
         <div class="search-box case-search-box">
           ${icon('search', 18)}
-          <input id="test-search" type="search" value="${escapeHtml(initial.query)}" placeholder="搜索用例编号、模块、步骤" autocomplete="off">
+          <input id="test-search" type="search" value="${escapeHtml(initial.query)}" placeholder="搜索用例编号、测试项、测试点、模块" autocomplete="off">
           <button id="clear-test-search" class="clear-search" type="button" aria-label="清空搜索">清空</button>
         </div>
         <div class="case-toolbar-actions">
@@ -2236,6 +2266,16 @@ async function renderTests() {
               <div id="case-input-platforms" class="platform-applicability-options">${platformApplicabilityMarkup(initial.project, [initialPlatform], 'case-applicable-platform')}</div>
             </fieldset>
             <label for="case-input-workflow"><span>用例状态</span><select id="case-input-workflow"><option value="DRAFT">草稿</option><option value="REVIEWING">评审中</option><option value="ACTIVE" selected>生效</option></select></label>
+          </div>
+          <div class="case-semantic-fields">
+            <div>
+              <label for="case-input-test-item">测试项 *</label>
+              <input id="case-input-test-item" type="text" class="input" placeholder="例如：入口" required>
+            </div>
+            <div>
+              <label for="case-input-test-point">测试点 *</label>
+              <input id="case-input-test-point" type="text" class="input" placeholder="例如：点击入口进入计算器页面" required>
+            </div>
           </div>
           <div>
             <label for="case-input-precondition" style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">前置条件</label>
@@ -2749,6 +2789,8 @@ async function renderTests() {
   const caseInputId = document.querySelector('#case-input-id');
   const caseInputSheet = document.querySelector('#case-input-sheet');
   const caseInputPriority = document.querySelector('#case-input-priority');
+  const caseInputTestItem = document.querySelector('#case-input-test-item');
+  const caseInputTestPoint = document.querySelector('#case-input-test-point');
   const caseInputPrecondition = document.querySelector('#case-input-precondition');
   const caseInputSteps = document.querySelector('#case-input-steps');
   const caseInputExpected = document.querySelector('#case-input-expected');
@@ -2781,6 +2823,8 @@ async function renderTests() {
       }
       if (caseInputSheet) caseInputSheet.value = data.sheet || '';
       if (caseInputPriority) caseInputPriority.value = 'P1';
+      if (caseInputTestItem) caseInputTestItem.value = '';
+      if (caseInputTestPoint) caseInputTestPoint.value = '';
       if (caseInputPrecondition) caseInputPrecondition.value = '';
       if (caseInputSteps) caseInputSteps.value = '';
       if (caseInputExpected) caseInputExpected.value = '';
@@ -2796,6 +2840,8 @@ async function renderTests() {
       }
       if (caseInputSheet) caseInputSheet.value = data.sheet || '';
       if (caseInputPriority) caseInputPriority.value = data.priority || 'P1';
+      if (caseInputTestItem) caseInputTestItem.value = data.test_item || '';
+      if (caseInputTestPoint) caseInputTestPoint.value = data.test_point || '';
       if (caseInputPrecondition) caseInputPrecondition.value = data.precondition_text || '';
       if (caseInputSteps) caseInputSteps.value = data.steps_text || '';
       if (caseInputExpected) caseInputExpected.value = data.expected_text || '';
@@ -2823,6 +2869,8 @@ async function renderTests() {
           case_id: editBtn.dataset.caseId,
           sheet: editBtn.dataset.sheet,
           priority: editBtn.dataset.priority,
+          test_item: editBtn.dataset.testItem,
+          test_point: editBtn.dataset.testPoint,
           precondition_text: editBtn.dataset.precondition,
           steps_text: editBtn.dataset.steps,
           expected_text: editBtn.dataset.expected,
@@ -2831,7 +2879,18 @@ async function renderTests() {
           workflow_state: editBtn.dataset.workflowState || 'ACTIVE',
           source_locked: editBtn.dataset.sourceLocked === 'true',
         });
+        return;
       }
+      const summaryRow = e.target.closest('[data-case-expand]');
+      if (!summaryRow || e.target.closest('a, button, input, label, select')) return;
+      toggleCaseInlineDetail(summaryRow);
+    });
+    list.addEventListener('keydown', e => {
+      if (!['Enter', ' '].includes(e.key) || e.target.closest('a, button, input, label, select')) return;
+      const summaryRow = e.target.closest('[data-case-expand]');
+      if (!summaryRow) return;
+      e.preventDefault();
+      toggleCaseInlineDetail(summaryRow);
     });
   }
 
@@ -2843,6 +2902,8 @@ async function renderTests() {
       const caseId = caseInputId.value.trim();
       const sheet = caseInputSheet.value.trim();
       const priority = caseInputPriority.value;
+      const test_item = caseInputTestItem.value.trim();
+      const test_point = caseInputTestPoint.value.trim();
       const precondition_text = caseInputPrecondition.value.trim();
       const steps_text = caseInputSteps.value.trim();
       const expected_text = caseInputExpected.value.trim();
@@ -2860,6 +2921,13 @@ async function renderTests() {
       if (!sheet) {
         if (caseEditErrorBox) {
           caseEditErrorBox.textContent = '所属模块不能为空';
+          caseEditErrorBox.style.display = 'block';
+        }
+        return;
+      }
+      if (!test_item || !test_point) {
+        if (caseEditErrorBox) {
+          caseEditErrorBox.textContent = '测试项和测试点为必填项，且必须分别描述验证主题与具体检查目标';
           caseEditErrorBox.style.display = 'block';
         }
         return;
@@ -2895,6 +2963,8 @@ async function renderTests() {
             case_id: caseId,
             sheet,
             priority,
+            test_item,
+            test_point,
             precondition_text,
             steps_text,
             expected_text,
@@ -3239,11 +3309,14 @@ async function renderTest(sheet, caseId) {
     <div class="detail-grid">
       <div class="stack">
         <section class="panel">
-          <header class="panel-head"><div><h2>用例内容</h2><p>操作步骤和预期结果</p></div></header>
+          <header class="panel-head"><div><h2>用例内容</h2><p>完整测试语义与最近实际结果</p></div></header>
           <div class="panel-body case-text-grid">
+            ${caseText('测试项', testCase.test_item || '待补充')}
+            ${caseText('测试点', testCase.test_point || '待补充')}
             ${caseText('前置条件', testCase.precondition_text)}
             ${caseText('操作步骤', testCase.steps_text)}
             ${caseText('预期结果', testCase.expected_text)}
+            ${caseText('实际结果', testCase.actual_result || (latest ? workspaceVerdictLabel(latest.product_verdict || latest.verdict) : '尚未运行'))}
             ${verificationPoints(testCase.verification_points)}
           </div>
         </section>
@@ -5485,6 +5558,10 @@ function reportQuery(project, filters = {}) {
   return query;
 }
 
+function reportRangeLabel(filters = {}) {
+  return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;
+}
+
 function buildSnapshotReport(items = [], filters = {}) {
   const now = Date.now();
   const fromTime = filters.period === '24h' ? now - 24 * 60 * 60 * 1000 : filters.from ? new Date(`${filters.from}T00:00:00`).getTime() : 0;
@@ -5754,6 +5831,9 @@ function environmentCheckPresentation(item = {}, status = 'unchecked') {
   if (['pass', 'ready'].includes(status)) {
     return {label, cause: copy.pass, action: '', summary: copy.pass, detail};
   }
+  if (status === 'checking') {
+    return {label, cause: '正在检查', action: '', summary: '正在读取本机状态…', detail: ''};
+  }
   if (status === 'unchecked') {
     return {label, cause: '尚未检查', action: '', summary: '尚未检查', detail: ''};
   }
@@ -5780,10 +5860,18 @@ function environmentCheckRows(checks = [], isHardware = false) {
     ['llm', '模型服务']
   ];
   const normalized = checks.length ? checks : defaults.map(([key, label]) => ({key, label, status: 'unchecked', detail: '尚未执行环境检查'}));
-  return `<div class='environment-check-list'>${normalized.map(item => {
+  return `<div class='environment-check-list' aria-live='polite'>${normalized.map(item => {
     const status = String(item.status || 'unchecked').toLowerCase();
-    const statusLabel = {pass: '可用', ready: '可用', warning: '需处理', fail: '不可用', error: '不可用', unchecked: '未检查'}[status] || '未检查';
-    const iconName = ['pass', 'ready'].includes(status) ? 'check' : 'warning';
+    const statusLabel = {pass: '可用', ready: '可用', checking: '检查中', warning: '需处理', fail: '不可用', error: '不可用', unchecked: '未检查'}[status] || '未检查';
+    const statusIcon = status === 'checking'
+      ? `<span class='environment-check-spinner' aria-hidden='true'></span>`
+      : ['pass', 'ready'].includes(status)
+        ? icon('check', 17)
+        : ['fail', 'error'].includes(status)
+          ? icon('close', 17)
+          : status === 'warning'
+            ? icon('warning', 17)
+            : `<span class='environment-check-unchecked' aria-hidden='true'>—</span>`;
     const presentation = environmentCheckPresentation(item, status);
     const diagnostics = presentation.detail && presentation.detail !== presentation.summary
       ? `<details class='inline-diagnostics'><summary>诊断信息</summary><pre><code>${escapeHtml(presentation.detail)}</code></pre></details>`
@@ -5792,8 +5880,37 @@ function environmentCheckRows(checks = [], isHardware = false) {
     const content = isProblem
       ? `<div class='environment-check-detail'><p class='check-cause'><span class='check-field-label'>问题原因：</span>${escapeHtml(presentation.cause)}</p>${presentation.action ? `<p class='check-action'><span class='check-field-label'>处理方法：</span>${escapeHtml(presentation.action)}</p>` : ''}${diagnostics}</div>`
       : `<div class='environment-check-detail'><p>${escapeHtml(presentation.summary)}</p>${diagnostics}</div>`;
-    return `<div class='environment-check-row is-${escapeHtml(status)}'><i>${icon(iconName, 17)}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span>${content}</div>`;
+    return `<div class='environment-check-row is-${escapeHtml(status)}' data-environment-check-key='${escapeHtml(item.key || '')}' data-environment-check-label='${escapeHtml(presentation.label)}'><i aria-label='${escapeHtml(statusLabel)}'>${statusIcon}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span>${content}</div>`;
   }).join('')}</div>`;
+}
+
+function setEnvironmentChecksLoading(root, isHardware = false) {
+  const list = root.querySelector('.environment-check-list');
+  if (!list) return;
+  const checks = [...list.querySelectorAll('[data-environment-check-key]')].map(row => ({
+    key: row.dataset.environmentCheckKey,
+    label: row.dataset.environmentCheckLabel,
+    status: 'checking'
+  }));
+  list.outerHTML = environmentCheckRows(checks, isHardware);
+  const score = root.querySelector('.readiness-score strong');
+  if (score) score.textContent = '检查中…';
+}
+
+function setEnvironmentChecksFailed(root, error, isHardware = false) {
+  const list = root.querySelector('.environment-check-list');
+  if (!list) return;
+  const detail = String(error?.diagnosticMessage || error?.message || '环境检查请求失败');
+  const checks = [...list.querySelectorAll('[data-environment-check-key]')].map(row => ({
+    key: row.dataset.environmentCheckKey,
+    label: row.dataset.environmentCheckLabel,
+    status: 'error',
+    code: error?.code || 'PREFLIGHT_INTERNAL_ERROR',
+    detail
+  }));
+  list.outerHTML = environmentCheckRows(checks, isHardware);
+  const score = root.querySelector('.readiness-score strong');
+  if (score) score.textContent = `0 / ${checks.length}`;
 }
 
 function environmentLogRows(items = [], health = {label: '尚未检查'}) {
@@ -6193,16 +6310,24 @@ function EnvironmentPage(project = currentProject()) {
       root.querySelector('[data-environment-check]')?.addEventListener('click', async event => {
         const button = event.currentTarget;
         const idleMarkup = button.innerHTML;
+        const checkingStartedAt = performance.now();
+        const minimumLoadingMs = 450;
         button.disabled = true;
         button.setAttribute('aria-busy', 'true');
         button.innerHTML = `${icon('refresh', 16)} 正在检查…`;
+        setEnvironmentChecksLoading(root, profile.execution_target === 'hardware');
         const environmentId = profile.target_id;
         try {
           const response = await api(`/api/environments/${encodeURIComponent(environmentId)}/check`, {method: 'POST', body: '{}'});
+          const remainingLoadingMs = minimumLoadingMs - (performance.now() - checkingStartedAt);
+          if (remainingLoadingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingLoadingMs));
           const refreshedHealth = environmentHealth(response?.result);
           await route();
           showToast(`环境检查完成：${refreshedHealth.label}`, refreshedHealth.status === 'ready' ? 'success' : 'warning');
         } catch (error) {
+          const remainingLoadingMs = minimumLoadingMs - (performance.now() - checkingStartedAt);
+          if (remainingLoadingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingLoadingMs));
+          setEnvironmentChecksFailed(root, error, profile.execution_target === 'hardware');
           button.disabled = false;
           button.removeAttribute('aria-busy');
           button.innerHTML = idleMarkup;

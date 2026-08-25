@@ -15,14 +15,14 @@
 | Web 统一入口 | 已完成 | 直接启动 `frontend/server.py`，不依赖 `desktop_qt.py` |
 | 项目新增与快捷切换 | 已完成 | 顶部提供“新增项目”和“当前项目”快捷选择 |
 | 用例平台入口 | 已完成 | 进入用例管理后先选择 W30 或 579，再加载对应项目与用例 |
-| 统一用例管理 | 已完成 | 支持新增、编辑版本、Excel 导入/导出、复制、归档、恢复和审计 |
+| 统一用例管理 | 已完成 | 支持测试项/测试点、完整详情展开、新增、版本、Excel 导入/导出、归档和审计 |
 | W30 原执行链兼容 | 已完成 | Simulator、SuperCom、MTP 和原 W30 Case Map 继续保留 |
 | W30 换机自适应 | 已完成 | 自动继承/安装运行时档案、识别唯一 SuperCom 串口及真实 MTP 存储卷 |
 | 579 平台适配框架 | 已完成 | O2 的 APP Bridge 链路与 Z1640 的 PC-BLE 链路作为独立目标并存 |
 | 579 实机动作 | 默认关闭 | 必须完成受控 Canary 并由授权人员显式开启 |
 | W30 计算器探索式真机链路 | 已验证 | 已按“表盘 → 菜单 → 滚动查找 → 点击计算器”走通 |
 | W30 计算器正式 Runner | 当前受阻 | 缺少真机隔离工作区配置；现有 `CALC_001` 仍是直接进入页面的固化映射 |
-| 自动化回归 | 已通过 | `808 passed, 17 skipped, 9812 subtests passed` |
+| 自动化回归 | 已通过 | `812 passed, 17 skipped, 9812 subtests passed` |
 
 ## 2. 整改后的统一执行流程
 
@@ -106,7 +106,10 @@ APP Bridge ACK 或命令 ACK 只证明动作已交付，不能单独作为产品
 - 支持编辑并创建新版本、复制、归档、恢复、导出和跨端迁移入口。
 - 冻结来源用例不直接覆盖，编辑操作显示为“创建新版本”。
 - 新建与编辑表单支持适用平台、生命周期状态、前置条件、步骤、预期结果和备注。
-- 用例列表展示来源、当前版本、适用平台、成熟度、最近结果和最近运行。
+- 用例列表按“用例编号、测试项、测试点、优先级、自动化成熟度、最近结果、最近运行、操作”展示。
+- 点击用例行可就地展开测试项、测试点、前置条件、操作步骤、预期结果和实际结果，列表不再把步骤和预期结果混写成测试点。
+- 579 冻结用例从功能用例 Catalog 恢复测试项和测试点；W30 从标准功能测试工作簿读取并兼容合并单元格续值，避免大批量显示“待补充”。
+- 新建、编辑、搜索及统一用例仓库完整保存 `test_item`、`test_point` 和 `actual_result`。
 - `AUTO_READY`、`NEED_REVIEW`、`MANUAL_REQUIRED`、`UNSUPPORTED` 等状态已改为“自动化就绪”“待评审”“需人工执行”“暂不支持”等中文文案。
 
 ### 5.4 运行选择
@@ -121,6 +124,7 @@ APP Bridge ACK 或命令 ACK 只证明动作已交付，不能单独作为产品
 - “大模型”“ONES”“系统更新”均为可进入的独立页签。
 - 环境就绪状态只应来自真实检查结果，没有检查结果时显示“尚未检查”。
 - 点击“立即检查”会重置按钮状态并执行一次全新检查，完成后使用本次返回结果刷新状态和提示。
+- 检查过程中每个检查项先进入独立 Loading 状态；完成后成功显示绿色勾，失败显示红色叉，未执行项保持中性状态。
 - Simulator 只有真实启动、GUI 命令和截图探测通过后才显示相应能力可用；检查结果按配置签名缓存。
 - W30 真机会独立收集档案、SuperCom、USB/PnP、MTP、GUI_PING 和模型服务六项结果，单项失败
   不再遮蔽其他设备状态。
@@ -161,6 +165,8 @@ project_data/case_management.sqlite3
 ## 7. Excel 导入与版本控制
 
 - 只接受 `.xlsx`。
+- 标准导出为 12 列：模块、用例编号、测试项、测试点、优先级、前置条件、操作步骤、预期结果、实际结果、不可自动化、固化状态、备注。
+- 导入兼容“测试步骤/操作步骤”“测试点/检查项”等常见表头，并保留旧 9 列工作簿兼容性。
 - 导入前必须选择适用平台。
 - 先预览，再用 `batch_id`、`preview_token` 和源文件 SHA 提交。
 - 编号冲突必须显式选择“跳过”或“创建新版本”，不静默覆盖。
@@ -362,10 +368,10 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 2026-08-25 当前结果：
 
 ```text
-764 passed, 16 skipped, 9702 subtests passed in 44.58s
+812 passed, 17 skipped, 9812 subtests passed in 47.39s
 ```
 
-覆盖范围包括前端页面与静态资源、项目/平台路由、579 动作注册表、探索 CLI、平台运行时、统一用例仓库、Excel 导入、Wheel 构建审计、双平台集成逻辑、运行时档案自动安装、SuperCom 端口自动发现、独立环境检查及 Windows MTP 卷标/文件名兼容。
+覆盖范围包括前端页面与静态资源、项目/平台路由、579 动作注册表、探索 CLI、平台运行时、统一用例仓库、测试项/测试点语义补全、Excel 导入导出、测试报告、W30/579 执行器分流、Wheel 构建审计、双平台集成逻辑、运行时档案自动安装、SuperCom 端口自动发现、独立环境检查及 Windows MTP 卷标/文件名兼容。
 
 同日 6202 真机验证结果：
 
@@ -445,6 +451,24 @@ USB 重新枚举可能影响前台页面的产品行为仍由 Runner 的状态�
 W30 真机六项检查会完整返回，Simulator 真实启动失败时命令和截图明确显示未检查或失败。579 继续
 按 APP Bridge、BLE、COM3/O1、O2 与实机动作门禁返回平台专属状态。
 
+### 已解决：用例语义与详情展示不完整
+
+用例管理不再把“操作步骤 + 预期结果”拼接后冒充测试点。列表使用独立测试项、测试点列，点击整行可展开
+完整用例详情。579 从功能 Catalog 补齐语义；W30 从标准功能测试工作簿按用例编号匹配，并对合并单元格
+进行向下续值。Excel 导入、导出和 SQLite 统一用例库同步支持新增字段，人工新增用例必须填写测试项和测试点。
+
+### 已解决：测试报告页面变量缺失
+
+报告页已恢复 `reportRangeLabel`，支持最近 24 小时和自定义日期范围中文展示，不再因
+`reportRangeLabel is not defined` 导致整页读取失败。
+
+### 已解决：W30 真机执行器参数冲突
+
+W30 项目注册表中的 `w30_cli` 是平台内部编排标识，不是子测试 CLI 的可选适配器。服务端现在只对
+`watch_ble` 和 `watch_579_ble` 传入显式 `--execution-adapter`，W30 模拟器、W30 真机和候选回放继续使用
+默认 W30 链路，避免任务在首个动作前以退出码 2 失败。最近运行摘要同时保留平台和执行器元数据，W30
+记录不再被前端误标为“旧记录”。历史失败记录继续保留，重新运行后由最新结果自然更新。
+
 ## 16. 当前代码改动清单
 
 本轮工作区主要变更如下：
@@ -455,15 +479,15 @@ W30 真机六项检查会完整返回，Simulator 真实启动失败时命令和
 | `src/agent_loop_system/tools/llm_config.py` | 移除源码内置 API Key，敏感凭据仅从环境变量读取 |
 | `pyproject.toml`、`uv.lock` | 补齐串口、图像、Excel、BLE/WinRT 依赖和 CLI 入口 |
 | `frontend/index.html` | 新增全局项目切换、新增项目和设置入口 |
-| `frontend/app.js` | 双平台入口、用例管理、项目切换、运行路由、中文状态、环境中心和报告交互 |
-| `frontend/server.py` | 项目/平台 API、统一用例 API、导入、绑定、任务、环境和报告后端 |
-| `frontend/styles.css` | 平台入口、项目对话框、用例管理和环境中心样式 |
+| `frontend/app.js` | 双平台入口、用例语义列/详情展开、项目切换、报告日期文案及环境检查逐项状态 |
+| `frontend/server.py` | W30/579 执行器分流、平台运行摘要、W30/579 语义补全、12 列 Excel 和各业务 API |
+| `frontend/styles.css` | 平台入口、项目对话框、可展开用例详情和环境检查 Loading/结果样式 |
 | `config/projects.v1.json` | 四个内置项目及目标注册 |
 | `src/agent_loop_system/projects/` | 项目注册与校验 |
 | `src/agent_loop_system/platforms/` | 平台合同、注册表和 579 适配器 |
 | `src/agent_loop_system/platform_data/` | 平台 profile、579 Catalog、绑定和恢复数据 |
 | `src/agent_loop_system/exploration_core/` | 统一探索合同、动作注册表、运行时和 CLI |
-| `src/agent_loop_system/case_management/` | SQLite 统一用例仓库和版本审计 |
+| `src/agent_loop_system/case_management/` | SQLite 统一用例仓库、测试项/测试点/实际结果持久化和版本审计 |
 | `src/agent_loop_system/reproduction.py` | 执行复现流程的双平台兼容 |
 | `src/agent_loop_system/tools/agent.py` | Agent 工具侧的平台解析与门禁 |
 | `src/agent_loop_system/tools/case_map.py` | 多项目 Case Map 与统一映射读取 |
@@ -476,7 +500,7 @@ W30 真机六项检查会完整返回，Simulator 真实启动失败时命令和
 | `case_map/6202_simulator_case_map/` | 6202 模拟器映射 |
 | `case_map/620C_simulator_case_map/` | 620C 模拟器映射 |
 | `tools/` | 579 资产导入、用例迁移、Wheel 构建和审计工具 |
-| `tests/` | 双平台、统一用例、Excel、CLI、注册表、前端和打包回归 |
+| `tests/` | 双平台、统一用例语义、Excel、报告、环境检查状态、执行器分流、CLI、前端和打包回归 |
 
 ## 17. 相关文档
 

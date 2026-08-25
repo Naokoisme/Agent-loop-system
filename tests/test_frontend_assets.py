@@ -208,6 +208,21 @@ class FrontendAssetsTest(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertNotIn(text, primary_markup)
 
+    def test_case_list_uses_semantic_columns_and_expandable_full_details(self) -> None:
+        for token in (
+            "<th>测试项</th><th>测试点</th>",
+            'data-case-expand tabindex="0" aria-expanded="false"',
+            "function toggleCaseInlineDetail(summaryRow)",
+            "case-detail-row",
+            "case-inline-detail",
+            "测试项和测试点为必填项",
+            "actual_result",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("row.steps_text || row.expected_text || '未填写测试步骤'", self.javascript)
+        for token in (".case-summary-row", ".case-inline-detail", ".case-detail-field"):
+            self.assertIn(token, self.stylesheet)
+
     def test_errors_keep_raw_diagnostics_behind_product_summaries(self) -> None:
         for token in (
             "function issuePresentation(",
@@ -284,6 +299,27 @@ class FrontendAssetsTest(unittest.TestCase):
             with self.subTest(token=token):
                 self.assertNotIn(token, check_copy)
         for token in (".environment-check-detail", ".environment-log .inline-diagnostics", ".check-field-label"):
+            self.assertIn(token, self.stylesheet)
+
+    def test_environment_checks_show_loading_then_success_or_failure_icons(self) -> None:
+        for token in (
+            "function setEnvironmentChecksLoading(root, isHardware = false)",
+            "function setEnvironmentChecksFailed(root, error, isHardware = false)",
+            "status: 'checking'",
+            "checking: '检查中'",
+            "environment-check-spinner",
+            "icon('check', 17)",
+            "icon('close', 17)",
+            "const minimumLoadingMs = 450",
+            "setEnvironmentChecksLoading(root, profile.execution_target === 'hardware')",
+            "setEnvironmentChecksFailed(root, error, profile.execution_target === 'hardware')",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            ".environment-check-row.is-checking > i",
+            ".environment-check-spinner",
+            "@keyframes environment-check-spin",
+        ):
             self.assertIn(token, self.stylesheet)
 
     def test_bluetooth_is_a_top_level_workbench_not_a_settings_manager(self) -> None:
@@ -434,6 +470,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "function reportDatePresetRange(value)",
             "function activeReportDatePreset(filters = {})",
             "function reportQuery(project, filters = {})",
+            "function reportRangeLabel(filters = {})",
+            "return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;",
             "query.set('period', '24h')",
             "data-report-period=",
             "aria-label='快捷时间段'",
