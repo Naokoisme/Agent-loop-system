@@ -16,6 +16,9 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_hidden_attribute_always_hides_interactive_controls(self) -> None:
         self.assertIn("[hidden] { display: none !important; }", self.stylesheet)
 
+    def test_document_reserves_vertical_scrollbar_space_for_stable_navigation(self) -> None:
+        self.assertIn("scrollbar-gutter: stable;", self.stylesheet)
+
     def test_source_location_panel_is_collapsible_and_large_results_start_closed(self) -> None:
         self.assertIn('<details class="panel collapsible-panel"', self.javascript)
         self.assertIn("<div><h2>诊断信息</h2><p>源码位置</p></div>", self.javascript)
@@ -545,8 +548,8 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
 
     def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
-        self.assertIn('/assets/styles.css?v=20260825-3', self.index)
-        self.assertIn('/assets/app.js?v=20260825-3', self.index)
+        self.assertIn('/assets/styles.css?v=20260825-5', self.index)
+        self.assertIn('/assets/app.js?v=20260825-5', self.index)
 
     def test_run_status_tabs_are_real_links_with_script_free_fallback(self) -> None:
         for token in (
@@ -641,6 +644,10 @@ class FrontendAssetsTest(unittest.TestCase):
             "证据不完整",
             "本次记录没有保存执行步骤。下面仅显示运行计划，不能证明已经执行。",
             "item.checkpoint_index",
+            "原始执行日志",
+            "`${logBase}/execution.log${logQuery}`",
+            "`${logBase}/stderr.log${logQuery}`",
+            "`${logBase}/events.jsonl${logQuery}`",
         ):
             self.assertIn(token, self.javascript)
         for token in (".command-trace-list", ".command-trace-item", ".trace-meta"):

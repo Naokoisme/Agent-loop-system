@@ -1516,6 +1516,52 @@ class FrontendDataTest(unittest.TestCase):
         run_dir = self.test_history._run_dir("计算器", "CALC_001", run_id)
         self.assertEqual((run_dir / "screenshot-01.bmp").read_bytes(), b"BM-one")
         self.assertEqual((run_dir / "screenshot-02.bmp").read_bytes(), b"BM-two")
+        self.assertEqual((run_dir / "stdout.log").read_text(encoding="utf-8"), "done")
+        self.assertEqual((run_dir / "stderr.log").read_text(encoding="utf-8"), "")
+        events = [
+            json.loads(line)
+            for line in (run_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(events[0]["status"], "started")
+        self.assertEqual(events[-1]["status"], "finished")
+        self.assertTrue(any(event["status"] == "evidence_captured" for event in events))
+        self.assertEqual(
+            set(record["log_urls"]),
+            {"stdout.log", "stderr.log", "events.jsonl"},
+        )
+
+    def test_agent_test_history_serves_persisted_raw_log(self) -> None:
+        run_id = self.test_history.create(
+            job={
+                "sheet": "计算器",
+                "case_id": "CALC_001",
+                "project": "620C_W6830",
+                "started_at": "2026-08-25T10:00:00+08:00",
+                "finished_at": "2026-08-25T10:00:05+08:00",
+                "case": self.cases.get("计算器", "CALC_001"),
+            },
+            result={"verdict": "ERROR", "reason": "执行器异常"},
+            stdout="runner output",
+            stderr="runner failure",
+        )
+        _, base = self._server()
+        url = (
+            f"{base}/api/test-history/{quote('计算器')}/CALC_001/{run_id}/log/stderr.log"
+            "?project=620C_W6830"
+        )
+        with urlopen(url, timeout=3) as response:
+            self.assertEqual(response.read().decode("utf-8"), "runner failure")
+            self.assertIn("attachment", response.headers.get("Content-Disposition", ""))
+        bundle_url = (
+            f"{base}/api/test-history/{quote('计算器')}/CALC_001/{run_id}/log/execution.log"
+            "?project=620C_W6830"
+        )
+        with urlopen(bundle_url, timeout=3) as response:
+            bundle = response.read().decode("utf-8")
+        self.assertIn("===== 标准输出 stdout =====", bundle)
+        self.assertIn("runner output", bundle)
+        self.assertIn("runner failure", bundle)
+        self.assertIn("===== 阶段事件 events.jsonl =====", bundle)
 
     def test_defect_detail_exposes_local_description_image(self) -> None:
         self._write_defect(
@@ -2334,6 +2380,13 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(snapshot["verdict"], "CANNOT_VERIFY")
         self.assertEqual(snapshot["completed"], 0)
         self.assertEqual(snapshot["reason_code"], "SUPERCOM_NO_UART")
+        self.assertIsNotNone(snapshot["history_id"])
+        failed_record = self.test_history.get(
+            "计算器", "CALC_001", snapshot["history_id"], project="6202_W5230"
+        )
+        self.assertEqual(failed_record["execution_status"], "ERROR")
+        self.assertEqual(failed_record["reason_code"], "SUPERCOM_NO_UART")
+        self.assertIn("SuperCom", failed_record["stderr"])
         self.assertNotIn("hardware", manager._active_job_ids)
         persisted = json.loads(
             (
@@ -2343,6 +2396,32 @@ class FrontendDataTest(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         self.assertFalse(persisted["ready"])
+
+    def test_unhandled_single_test_exception_is_archived_as_failure(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        with patch("frontend.server.threading.Thread.start"):
+            queued = manager.start(
+                sheet="计算器",
+                case_id="CALC_001",
+                project="620C_W6830",
+            )
+
+        with patch.object(
+            manager,
+            "_run_single_body",
+            side_effect=RuntimeError("runner initialization failed"),
+        ):
+            manager._run(queued["id"])
+
+        snapshot = manager.get(queued["id"])
+        self.assertEqual(snapshot["status"], "failed")
+        self.assertIsNotNone(snapshot["history_id"])
+        record = self.test_history.get(
+            "计算器", "CALC_001", snapshot["history_id"], project="620C_W6830"
+        )
+        self.assertEqual(record["verdict"], "ERROR")
+        self.assertEqual(record["reason_code"], "UNHANDLED_EXCEPTION")
+        self.assertIn("runner initialization failed", record["stderr"])
 
     def test_hardware_batch_preflight_failure_starts_no_case_or_preparation(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
@@ -2934,6 +3013,15 @@ class FrontendDataTest(unittest.TestCase):
         self.assertIn("GUI_STATE popup is CHARGING", snapshot["error"])
         self.assertEqual(snapshot["hardware_preparation"]["status"], "failed")
         self.assertEqual(snapshot["hardware_reset"]["status"], "failed")
+        self.assertIsNotNone(snapshot["failed_history_id"])
+        failed_record = self.test_history.get(
+            "计算器",
+            "CALC_001",
+            snapshot["failed_history_id"],
+            project="6202_W5230",
+        )
+        self.assertEqual(failed_record["reason_code"], "HARDWARE_PREPARATION_FAILED")
+        self.assertIn("GUI_STATE popup is CHARGING", failed_record["stderr"])
         self.assertNotIn("hardware", manager._active_job_ids)
 
     def test_hardware_batch_interrupts_on_infrastructure_failure_and_retries_case(self) -> None:

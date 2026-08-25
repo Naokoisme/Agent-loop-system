@@ -90,6 +90,7 @@ WORKFLOW_NODES = (
 TEST_WORKFLOW_NODES = ("load", "execute", "judge", "record")
 SAFE_SEGMENT = re.compile(r"^[A-Za-z0-9_.-]+$")
 TEST_SCREENSHOT_FILE = re.compile(r"^screenshot(?:-\d{2,3})?\.bmp$")
+TEST_LOG_FILE = re.compile(r"^(?:stdout|stderr|execution)\.log$|^events\.jsonl$")
 LIVE_TEST_SCREENSHOT_FILE = re.compile(
     r"^(?:screenshot(?:-\d{2,3})?|step_\d{2,3})\.bmp$"
 )
@@ -1184,6 +1185,8 @@ class TestHistoryStore:
         run_id = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
         run_dir = self._run_dir(sheet, case_id, run_id, project=project)
         case = job.get("case") if isinstance(job.get("case"), dict) else {}
+        stdout_tail = str(stdout or "")[-MAX_LOG_CHARS:]
+        stderr_tail = str(stderr or "")[-MAX_LOG_CHARS:]
         payload = {
             "schema_version": 2,
             "id": run_id,
@@ -1212,6 +1215,9 @@ class TestHistoryStore:
             "product_verdict": result.get("product_verdict"),
             "automation_maturity": result.get("automation_maturity"),
             "infrastructure_status": result.get("infrastructure_status"),
+            "evidence_status": result.get("evidence_status"),
+            "mapping_status": result.get("mapping_status"),
+            "reason_code": result.get("reason_code") or job.get("reason_code"),
             "delivery_feedback": result.get("delivery_feedback", []),
             "observations": result.get("observations", []),
             "priority": case.get("priority", ""),
@@ -1239,8 +1245,20 @@ class TestHistoryStore:
             "terminal_json": result.get("terminal_json", []),
             "exploration_trace": result.get("exploration_trace"),
             "return_code": job.get("return_code"),
-            "stdout": stdout[-MAX_LOG_CHARS:],
-            "stderr": stderr[-MAX_LOG_CHARS:],
+            "stdout": stdout_tail,
+            "stderr": stderr_tail,
+            "log_files": {
+                "stdout": {
+                    "file": "stdout.log",
+                    "chars": len(stdout_tail),
+                    "truncated": len(str(stdout or "")) > MAX_LOG_CHARS,
+                },
+                "stderr": {
+                    "file": "stderr.log",
+                    "chars": len(stderr_tail),
+                    "truncated": len(str(stderr or "")) > MAX_LOG_CHARS,
+                },
+            },
         }
         payload.update(outcome_fields(
             payload,
@@ -1282,6 +1300,87 @@ class TestHistoryStore:
                     "file": "screenshot.bmp",
                 })
             payload["screenshots"] = archived_screenshots
+            execution_events: list[dict[str, Any]] = [{
+                "sequence": 1,
+                "timestamp": str(payload.get("started_at") or payload.get("timestamp") or ""),
+                "phase": "lifecycle",
+                "status": "started",
+                "message": "开始执行用例",
+            }]
+            for item in payload.get("command_trace", []):
+                if not isinstance(item, dict):
+                    continue
+                command = str(item.get("command") or item.get("wire") or "").strip()
+                execution_events.append({
+                    "sequence": len(execution_events) + 1,
+                    "timestamp": str(item.get("timestamp") or item.get("captured_at") or ""),
+                    "phase": str(item.get("phase") or "execute"),
+                    "status": str(
+                        item.get("status")
+                        or (
+                            "success"
+                            if item.get("ok") is True
+                            else "failed"
+                            if item.get("ok") is False
+                            else "completed"
+                        )
+                    ),
+                    "message": command or str(item.get("command_name") or "执行操作"),
+                    "data": item,
+                })
+            for phase, key in (
+                ("setup", "setup_errors"),
+                ("action", "action_errors"),
+                ("collect", "collect_errors"),
+            ):
+                for value in payload.get(key, []) or []:
+                    execution_events.append({
+                        "sequence": len(execution_events) + 1,
+                        "timestamp": str(payload.get("finished_at") or payload.get("timestamp") or ""),
+                        "phase": phase,
+                        "status": "failed",
+                        "message": str(value),
+                    })
+            for item in archived_screenshots:
+                execution_events.append({
+                    "sequence": len(execution_events) + 1,
+                    "timestamp": str(item.get("captured_at") or payload.get("finished_at") or ""),
+                    "phase": str(item.get("phase") or "collect"),
+                    "status": "evidence_captured",
+                    "message": str(item.get("label") or "采集截图"),
+                    "file": str(item.get("file") or ""),
+                })
+            for stream_name, stream_text in (("stdout", stdout_tail), ("stderr", stderr_tail)):
+                if stream_text:
+                    execution_events.append({
+                        "sequence": len(execution_events) + 1,
+                        "timestamp": str(payload.get("finished_at") or payload.get("timestamp") or ""),
+                        "phase": "process",
+                        "status": "log_captured",
+                        "message": f"已保存 {stream_name} 日志（{len(stream_text)} 字符）",
+                        "file": f"{stream_name}.log",
+                    })
+            execution_events.append({
+                "sequence": len(execution_events) + 1,
+                "timestamp": str(payload.get("finished_at") or payload.get("timestamp") or ""),
+                "phase": "lifecycle",
+                "status": "finished",
+                "message": str(payload.get("reason") or payload.get("verdict") or "执行结束"),
+            })
+            payload["execution_events"] = execution_events
+            payload["log_files"]["events"] = {
+                "file": "events.jsonl",
+                "count": len(execution_events),
+            }
+            (staging / "stdout.log").write_text(stdout_tail, encoding="utf-8")
+            (staging / "stderr.log").write_text(stderr_tail, encoding="utf-8")
+            (staging / "events.jsonl").write_text(
+                "".join(
+                    json.dumps(event, ensure_ascii=False, default=str) + "\n"
+                    for event in execution_events
+                ),
+                encoding="utf-8",
+            )
             _write_json(staging / "run.json", payload)
         project_cache = self._summary_index_cache.get(project)
         if project_cache is not None:
@@ -1583,6 +1682,15 @@ class TestHistoryStore:
         run["screenshot_urls"] = screenshot_urls
         if screenshot_urls:
             run["screenshot_url"] = screenshot_urls[-1]["url"]
+        log_urls: dict[str, str] = {}
+        for file_name in ("stdout.log", "stderr.log", "events.jsonl"):
+            if (run_dir / file_name).is_file():
+                log_urls[file_name] = (
+                    f"/api/test-history/{quote(sheet, safe='')}/{quote(case_id, safe='')}/"
+                    f"{quote(run_id, safe='')}/log/{quote(file_name, safe='')}"
+                    f"?project={quote(project, safe='')}"
+                )
+        run["log_urls"] = log_urls
         for key in (
             "project", "project_label", "execution_target", "execution_target_label"
         ):
@@ -4197,6 +4305,85 @@ class CaseTestManager:
             "screenshot": screenshot,
         }
 
+    def _archive_terminal_failure_if_missing(self, job_id: str) -> str | None:
+        """Best-effort archive for failures that happen before the normal record stage."""
+
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None or job.get("history_id"):
+                return str(job.get("history_id") or "") if job else None
+            if str(job.get("status") or "") not in {
+                "failed", "cancelled", "interrupted", "orphaned",
+            }:
+                return None
+            if not job.get("sheet") or not job.get("case_id"):
+                return None
+            snapshot = {
+                key: value
+                for key, value in job.items()
+                if key not in {"process", "current_case_data"}
+            }
+            snapshot["case"] = dict(job.get("case") or {})
+            snapshot["started_at"] = snapshot.get("started_at") or snapshot.get("created_at") or _now()
+            snapshot["finished_at"] = snapshot.get("finished_at") or _now()
+            reason = str(
+                snapshot.get("error")
+                or snapshot.get("interruption_reason")
+                or snapshot.get("reason")
+                or "测试任务异常结束"
+            )
+            reason_code = str(snapshot.get("reason_code") or "UNHANDLED_EXCEPTION")
+            status = str(snapshot.get("status") or "failed")
+            current_node = str(snapshot.get("current_node") or "load")
+
+        error_fields = {
+            "setup_errors": [reason] if current_node in {"", "load"} else [],
+            "action_errors": [reason] if current_node == "execute" else [],
+            "collect_errors": [reason] if current_node in {"judge", "record"} else [],
+        }
+        if not any(error_fields.values()):
+            error_fields["setup_errors"] = [reason]
+        result = {
+            "verdict": "CANNOT_VERIFY" if status == "cancelled" else "ERROR",
+            "reason": reason,
+            "execution_mode": str(snapshot.get("execution_mode") or "fixed_mapping"),
+            "workflow_status": "cancelled" if status == "cancelled" else status,
+            "execution_status": "ERROR",
+            "evidence_status": str(snapshot.get("evidence_status") or "PENDING"),
+            "mapping_status": str(
+                snapshot["case"].get("mapping_status") or "NOT_RECORDED"
+            ),
+            "reason_code": reason_code,
+            "infrastructure_status": str(
+                snapshot.get("infrastructure_status") or "RUNNER_ERROR"
+            ),
+            "command_trace": list(snapshot.get("command_trace") or []),
+            "terminal_json": list(snapshot.get("terminal_json") or []),
+            **error_fields,
+        }
+        try:
+            history_id = self.history.create(
+                job=snapshot,
+                result=result,
+                stdout=str(snapshot.get("stdout") or ""),
+                stderr=str(snapshot.get("stderr") or reason),
+            )
+        except BaseException as exc:
+            with self._lock:
+                job = self._jobs.get(job_id)
+                if job is not None:
+                    job["history_error"] = f"兜底测试记录保存失败: {exc}"
+                    self._persist_single_test_locked(job)
+            return None
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is not None:
+                job["history_id"] = history_id
+                if isinstance(job.get("nodes"), dict):
+                    job["nodes"]["record"] = "pass"
+                self._persist_single_test_locked(job)
+        return history_id
+
     def _run(self, job_id: str) -> None:
         promotion_context: dict[str, Any] | None = None
         promotion_needs_rollback = False
@@ -4288,6 +4475,7 @@ class CaseTestManager:
                 self._release_watch_579_lease(job_id)
             except Exception:
                 pass
+            self._archive_terminal_failure_if_missing(job_id)
 
     def _run_single_body(self, job_id: str) -> None:
         with self._lock:
@@ -4500,6 +4688,86 @@ class CaseTestManager:
             self._release_execution_slot_locked(job_id)
             self._persist_single_test_locked(job)
 
+    def _archive_batch_current_failure_if_missing(self, job_id: str) -> str | None:
+        """Archive the active batch case when orchestration stops before normal recording."""
+
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None or str(job.get("type") or "") != "batch":
+                return None
+            if str(job.get("status") or "") not in {
+                "failed", "cancelled", "interrupted", "orphaned",
+            }:
+                return None
+            case = job.get("current_case_data")
+            token = str(job.get("current_case_token") or "")
+            if not isinstance(case, dict) or not token:
+                return None
+            if job.get("current_runtime_archived"):
+                return None
+            reason = str(
+                job.get("interruption_reason")
+                or job.get("error")
+                or "批次在当前用例执行期间异常结束"
+            )
+            reason_code = str(job.get("reason_code") or "UNHANDLED_EXCEPTION")
+            started_at = str(job.get("started_at") or job.get("created_at") or _now())
+            finished_at = str(job.get("finished_at") or _now())
+            project = str(case.get("project") or job.get("project") or DEFAULT_TEST_PROJECT)
+            snapshot = {
+                "sheet": str(case.get("file_sheet") or case.get("sheet") or ""),
+                "case_id": str(case.get("case_id") or ""),
+                "project": project,
+                "requested_platform_id": case.get("requested_platform_id", job.get("requested_platform_id")),
+                "platform_id": case.get("platform_id", job.get("platform_id")),
+                "target_id": case.get("target_id", job.get("target_id")),
+                "resolved_execution_adapter": case.get("execution_adapter", job.get("resolved_execution_adapter")),
+                "case": dict(case),
+                "batch_id": job_id,
+                "batch_token": token,
+                "started_at": started_at,
+                "finished_at": finished_at,
+                "error": reason,
+            }
+        existing = self.history.batch_records(job_id).get(token)
+        if existing:
+            history_id = str(existing.get("id") or "") or None
+        else:
+            result = {
+                "verdict": "CANNOT_VERIFY" if reason_code == "USER_CANCELLED" else "ERROR",
+                "reason": reason,
+                "workflow_status": "cancelled" if reason_code == "USER_CANCELLED" else "interrupted",
+                "execution_status": "ERROR",
+                "evidence_status": "PENDING",
+                "mapping_status": str(case.get("mapping_status") or "NOT_RECORDED"),
+                "reason_code": reason_code,
+                "infrastructure_status": "RUNNER_ERROR",
+                "setup_errors": [reason],
+                "action_errors": [],
+                "collect_errors": [],
+            }
+            try:
+                history_id = self.history.create(
+                    job=snapshot,
+                    result=result,
+                    stdout="",
+                    stderr=reason,
+                )
+            except BaseException as exc:
+                with self._lock:
+                    job = self._jobs.get(job_id)
+                    if job is not None:
+                        job["history_error"] = f"批次当前用例兜底记录保存失败: {exc}"
+                        self._persist_batch_locked(job)
+                return None
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is not None:
+                job["current_runtime_archived"] = True
+                job["failed_history_id"] = history_id
+                self._persist_batch_locked(job)
+        return history_id
+
     def _run_batch(self, job_id: str) -> None:
         try:
             self._acquire_watch_579_lease(job_id)
@@ -4546,6 +4814,7 @@ class CaseTestManager:
                 self._release_watch_579_lease(job_id)
             except Exception:
                 pass
+            self._archive_batch_current_failure_if_missing(job_id)
 
     def _run_batch_body(self, job_id: str) -> None:
         with self._lock:
@@ -7625,6 +7894,56 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.app.test_history._run_dir(
                     match.group(1), match.group(2), match.group(3), project=project
                 ) / file_name
+            )
+            return
+
+        match = re.fullmatch(r"/api/test-history/([^/]+)/([^/]+)/([^/]+)/log/([^/]+)", path)
+        if match:
+            project = query.get("project", [DEFAULT_TEST_PROJECT])[0]
+            file_name = unquote(match.group(4))
+            if not TEST_LOG_FILE.fullmatch(file_name):
+                self._json({"error": "日志文件名不合法"}, HTTPStatus.BAD_REQUEST)
+                return
+            sheet, case_id, run_id = match.group(1), match.group(2), match.group(3)
+            record = self.app.test_history.get(
+                sheet, case_id, run_id, project=project
+            )
+            if record is None:
+                self._json({"error": "测试记录不存在"}, HTTPStatus.NOT_FOUND)
+                return
+            events = record.get("execution_events")
+            event_text = "".join(
+                json.dumps(event, ensure_ascii=False, default=str) + "\n"
+                for event in (events if isinstance(events, list) else [])
+            )
+            if file_name == "stdout.log":
+                content = str(record.get("stdout") or "")
+            elif file_name == "stderr.log":
+                content = str(record.get("stderr") or "")
+            elif file_name == "events.jsonl":
+                content = event_text
+            else:
+                content = "\n".join((
+                    f"用例编号：{record.get('case_id') or ''}",
+                    f"测试模块：{record.get('sheet') or ''}",
+                    f"开始时间：{record.get('started_at') or ''}",
+                    f"结束时间：{record.get('finished_at') or ''}",
+                    f"执行结果：{record.get('verdict') or ''}",
+                    f"失败原因：{record.get('reason') or record.get('error') or ''}",
+                    "",
+                    "===== 标准输出 stdout =====",
+                    str(record.get("stdout") or ""),
+                    "",
+                    "===== 错误输出 stderr =====",
+                    str(record.get("stderr") or ""),
+                    "",
+                    "===== 阶段事件 events.jsonl =====",
+                    event_text,
+                ))
+            self._serve_binary(
+                content.encode("utf-8"),
+                "text/plain; charset=utf-8",
+                f"{case_id}-{run_id}-{file_name}",
             )
             return
 

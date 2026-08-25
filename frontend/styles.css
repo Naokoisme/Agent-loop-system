@@ -31,7 +31,10 @@
 
 [hidden] { display: none !important; }
 
-html { background: var(--canvas); }
+html {
+  scrollbar-gutter: stable;
+  background: var(--canvas);
+}
 
 body {
   min-width: 320px;
@@ -1464,6 +1467,11 @@ pre, code { font-family: var(--font-ui); }
 .patch-box > strong { display: block; padding: 9px 13px; border-bottom: 1px solid var(--line); background: var(--surface-soft); font-size: 11px; }
 .patch-box pre { max-height: 360px; }
 .raw-output { max-height: 620px; }
+.test-log-panel h3 { margin: 18px 0 8px; font-size: var(--font-size-secondary); }
+.test-log-panel h3:first-of-type { margin-top: 12px; }
+.test-log-actions { justify-content: flex-end; flex-wrap: wrap; }
+.test-log-actions .button { padding: 8px 12px; }
+.test-log-actions .is-disabled { pointer-events: none; cursor: not-allowed; opacity: .45; }
 
 .notice, .verdict-reasons, .legacy-missing {
   padding: 13px 15px;

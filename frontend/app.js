@@ -4381,6 +4381,8 @@ async function renderTestHistory(sheet, caseId, runId) {
   const backLabel = returnDestinationLabel(backHref, '测试详情');
   const record = await api(`/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}?project=${encodeURIComponent(project)}`);
   if (routeToken !== routeRequestToken) return;
+  const logBase = `/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}/log`;
+  const logQuery = `?project=${encodeURIComponent(project)}`;
   document.title = `测试记录 · ${caseId} · 自动化测试`;
   app.innerHTML = `
     <a class="back-link" data-return-link href="${escapeHtml(backHref)}">← 返回${escapeHtml(backLabel)}</a>
@@ -4445,6 +4447,22 @@ async function renderTestHistory(sheet, caseId, runId) {
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>执行问题</h2><p>按测试阶段分类</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
       <div class="panel-body">${testErrorEvidence(record)}</div>
+    </details>
+    <details class="panel collapsible-panel" ${(record.stderr || record.verdict === 'ERROR') ? 'open' : ''}>
+      <summary class="panel-head"><div><h2>原始执行日志</h2><p>执行器标准输出、错误输出与阶段事件</p></div><span class="collapse-controls"><span class="chip chip-pending">${Number(record.log_files?.stdout?.chars ?? String(record.stdout || '').length) + Number(record.log_files?.stderr?.chars ?? String(record.stderr || '').length)} 字符</span><span class="collapse-action" aria-hidden="true"></span></span></summary>
+      <div class="panel-body test-log-panel">
+        <div class="panel-actions test-log-actions">
+          <a class="button button-secondary" href="${escapeHtml(`${logBase}/execution.log${logQuery}`)}" download>下载全部日志</a>
+          <a class="button button-secondary ${record.stderr ? '' : 'is-disabled'}" href="${escapeHtml(`${logBase}/stderr.log${logQuery}`)}" download aria-disabled="${record.stderr ? 'false' : 'true'}">下载错误日志</a>
+          <a class="button button-secondary ${Array.isArray(record.execution_events) && record.execution_events.length ? '' : 'is-disabled'}" href="${escapeHtml(`${logBase}/events.jsonl${logQuery}`)}" download aria-disabled="${Array.isArray(record.execution_events) && record.execution_events.length ? 'false' : 'true'}">下载阶段事件</a>
+        </div>
+        <h3>标准输出 stdout${record.log_files?.stdout?.truncated ? '（仅保留末尾 20 万字符）' : ''}</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml(record.stdout || '（无标准输出）')}</code></pre>
+        <h3>错误输出 stderr${record.log_files?.stderr?.truncated ? '（仅保留末尾 20 万字符）' : ''}</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml(record.stderr || '（无错误输出）')}</code></pre>
+        <h3>阶段事件</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml((record.execution_events || []).map(event => JSON.stringify(event)).join('\n') || '（旧记录未生成阶段事件）')}</code></pre>
+      </div>
     </details>
     <section class="panel">
       <header class="panel-head"><div><h2>${escapeHtml(screenshotLabel(record))}</h2><p>按检查点顺序显示</p></div><span class="chip chip-pending">${Array.isArray(record.screenshot_urls) ? record.screenshot_urls.length : (record.screenshot_url ? 1 : 0)} 张</span></header>
