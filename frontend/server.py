@@ -439,6 +439,42 @@ def _configured_hardware_llm_scopes(
     return tuple(scopes)
 
 
+def _run_project_hardware_preflight(
+    *,
+    project_meta: dict[str, Any],
+    environment: dict[str, str],
+    evidence_dir: Path,
+    llm_scopes: tuple[str, ...] = (),
+    watch_579_broker: Any | None = None,
+    watch_579_lease_token: str | None = None,
+) -> Any:
+    """Dispatch one hardware probe through the project's declared adapter."""
+
+    if project_meta.get("preflight_adapter") == "watch_579_ble":
+        if watch_579_broker is None:
+            raise RuntimeError("579 BLE Broker 未配置")
+        from agent_loop_system.tools.watch_579_preflight import (
+            run_watch_579_preflight,
+        )
+
+        return run_watch_579_preflight(
+            project=project_meta["project"],
+            evidence_dir=evidence_dir,
+            environment=environment,
+            broker=watch_579_broker,
+            lease_token=watch_579_lease_token,
+        )
+
+    from agent_loop_system.tools.hardware_preflight import run_hardware_preflight
+
+    return run_hardware_preflight(
+        project=project_meta["project"],
+        evidence_dir=evidence_dir,
+        environment=environment,
+        llm_scopes=llm_scopes,
+    )
+
+
 @dataclass(frozen=True)
 class AppPaths:
     root: Path
@@ -3119,31 +3155,26 @@ class CaseTestManager:
         from agent_loop_system.tools.hardware_preflight import (
             internal_error_preflight,
             persist_hardware_preflight,
-            run_hardware_preflight,
         )
 
         job_root = self.paths.runtime_jobs / job_id
         try:
+            watch_579_broker = None
+            watch_579_lease_token = None
             if project_meta.get("preflight_adapter") == "watch_579_ble":
-                from agent_loop_system.tools.watch_579_preflight import (
-                    run_watch_579_preflight,
-                )
-
                 with self._lock:
-                    lease_token = self._watch_579_lease_tokens.get(job_id, "")
-                result = run_watch_579_preflight(
-                    project=project_meta["project"],
-                    environment=environment,
-                    broker=self._watch_579_broker(),
-                    lease_token=lease_token,
-                )
-            else:
-                result = run_hardware_preflight(
-                    project=project_meta["project"],
-                    evidence_dir=job_root / "preflight-evidence",
-                    environment=environment,
-                    llm_scopes=llm_scopes,
-                )
+                    watch_579_lease_token = self._watch_579_lease_tokens.get(
+                        job_id, ""
+                    )
+                watch_579_broker = self._watch_579_broker()
+            result = _run_project_hardware_preflight(
+                project_meta=project_meta,
+                environment=environment,
+                evidence_dir=job_root / "preflight-evidence",
+                llm_scopes=llm_scopes,
+                watch_579_broker=watch_579_broker,
+                watch_579_lease_token=watch_579_lease_token,
+            )
         except Exception as exc:
             result = internal_error_preflight(
                 exc,
@@ -4725,7 +4756,6 @@ class WebApplication:
         from agent_loop_system.tools.hardware_preflight import (
             internal_error_preflight,
             persist_hardware_preflight,
-            run_hardware_preflight,
             target_busy_preflight,
         )
 
@@ -4745,12 +4775,18 @@ class WebApplication:
             else:
                 try:
                     hardware_environment = _test_process_environment(project_meta)
-                    result = run_hardware_preflight(
-                        project=project,
+                    result = _run_project_hardware_preflight(
+                        project_meta=project_meta,
                         evidence_dir=self.paths.environment_checks / project / "probe",
                         environment=hardware_environment,
                         llm_scopes=_configured_hardware_llm_scopes(
                             hardware_environment
+                        ),
+                        watch_579_broker=(
+                            self.watch_579_broker
+                            if project_meta.get("preflight_adapter")
+                            == "watch_579_ble"
+                            else None
                         ),
                     )
                 except Exception as exc:
@@ -5547,6 +5583,16 @@ def _hardware_environment_view(
         "execution_target": project_meta["execution_target"],
         "execution_target_label": project_meta["execution_target_label"],
         "ready": bool(result.ready),
+        "execution_ready": bool(
+            result.ready
+            if getattr(result, "execution_ready", None) is None
+            else result.execution_ready
+        ),
+        "observation_ready": bool(
+            result.ready
+            if getattr(result, "observation_ready", None) is None
+            else result.observation_ready
+        ),
         "status": legacy_status,
         "readiness_status": readiness,
         "last_checked_at": checked_at,

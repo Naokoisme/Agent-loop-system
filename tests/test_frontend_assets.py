@@ -296,6 +296,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "当前固件阻塞",
             "WATCH_579_EXECUTION_BLOCKED",
             "平台已阻止单条、批次和候选复跑",
+            "579 不使用 W30 真机运行档案",
+            "pageUrl('/bluetooth')",
         ):
             self.assertIn(token, self.javascript)
         for old_id in (

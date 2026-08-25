@@ -66,6 +66,18 @@ def _ready_hardware_preflight() -> HardwarePreflightResult:
     )
 
 
+def _ready_579_preflight() -> HardwarePreflightResult:
+    return HardwarePreflightResult(
+        project="579_Z1640",
+        ready=True,
+        readiness_status="ready",
+        checked_at="2026-08-25T10:30:00+08:00",
+        checks=(),
+        execution_ready=True,
+        observation_ready=False,
+    )
+
+
 def _failed_hardware_preflight(
     code: str = "SUPERCOM_NO_UART",
 ) -> HardwarePreflightResult:
@@ -4033,6 +4045,46 @@ class FrontendDataTest(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         self.assertTrue(cached["ready"])
+
+        broker = SimpleNamespace(shutdown=lambda: None)
+        application._watch_579_broker_instance = broker
+        with (
+            patch(
+                "agent_loop_system.tools.watch_579_preflight.run_watch_579_preflight",
+                return_value=_ready_579_preflight(),
+            ) as watch_579_probe,
+            patch(
+                "agent_loop_system.tools.hardware_preflight.run_hardware_preflight"
+            ) as w30_probe,
+        ):
+            with self._post_json(
+                base + "/api/environments/579_Z1640/check", {}
+            ) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertEqual(resp.status, 200)
+                self.assertTrue(data["result"]["ready"])
+                self.assertTrue(data["result"]["execution_ready"])
+                self.assertFalse(data["result"]["observation_ready"])
+            w30_probe.assert_not_called()
+            watch_579_probe.assert_called_once()
+            probe_kwargs = watch_579_probe.call_args.kwargs
+            self.assertIs(probe_kwargs["broker"], broker)
+            self.assertEqual(probe_kwargs["project"], "579_Z1640")
+            for key in (
+                "W30_HARDWARE_PROJECT",
+                "W30_HARDWARE_PROFILE_ROOT",
+                "W30_HARDWARE_PROFILE_VERSION",
+            ):
+                self.assertNotIn(key, probe_kwargs["environment"])
+        cached_579 = json.loads(
+            (
+                self.paths.environment_checks
+                / "579_Z1640"
+                / "preflight.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertTrue(cached_579["execution_ready"])
+        self.assertFalse(cached_579["observation_ready"])
 
         with (
             patch.object(
