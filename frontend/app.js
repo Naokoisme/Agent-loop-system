@@ -4864,17 +4864,23 @@ function initSystemSettings() {
   );
 
   // Tab switching
-  dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
-    tabBtn.addEventListener('click', () => {
-      const tabName = tabBtn.dataset.settingsTab;
-      dialog.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.toggle('is-active', b === tabBtn));
-      dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
-        pane.style.display = (pane.dataset.settingsPane === tabName) ? 'flex' : 'none';
-      });
-      if (tabName === 'hardware') {
-        void loadSerialPorts(hwPortSelect?.value);
-      }
+  const activateSettingsTab = tabName => {
+    const targetTab = dialog.querySelector(`.settings-tab-btn[data-settings-tab="${tabName}"]`)
+      || dialog.querySelector('.settings-tab-btn[data-settings-tab="llm"]');
+    if (!targetTab) return;
+    const activeTabName = targetTab.dataset.settingsTab;
+    dialog.querySelectorAll('.settings-tab-btn').forEach(button => {
+      button.classList.toggle('is-active', button === targetTab);
     });
+    dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
+      pane.style.display = pane.dataset.settingsPane === activeTabName ? 'flex' : 'none';
+    });
+    if (activeTabName === 'hardware') {
+      void loadSerialPorts(hwPortSelect?.value);
+    }
+  };
+  dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
+    tabBtn.addEventListener('click', () => activateSettingsTab(tabBtn.dataset.settingsTab));
   });
 
   // Password / Secret eye toggle
@@ -4955,6 +4961,9 @@ function initSystemSettings() {
   }
 
   openBtn.addEventListener('click', () => {
+    const requestedTab = openBtn.dataset.settingsInitialTab || 'llm';
+    delete openBtn.dataset.settingsInitialTab;
+    activateSettingsTab(requestedTab);
     loadSettings();
     dialog.showModal();
   });
@@ -5419,12 +5428,6 @@ function ExecutionPage(project = currentProject()) {
   }
 
   async function handleClick(event, root) {
-    const subtab = event.target.closest?.('[data-subtab]');
-    if (subtab && root.contains(subtab)) {
-      history.pushState({}, '', pageUrl('/runs', project, {view: subtab.dataset.subtab}));
-      route();
-      return;
-    }
     const pause = event.target.closest?.('[data-job-pause]');
     if (pause && root.contains(pause)) {
       if (!window.confirm('将在当前用例完成后暂停批次。继续吗？')) return;
@@ -5470,13 +5473,25 @@ function ExecutionPage(project = currentProject()) {
       const activeJob = activeJobs.find(job => job.type === 'batch') || activeJobs[0] || null;
       const jobItems = data.jobs.data?.items || [];
       const recentItems = data.recent.data?.items || [];
+      const executionTabs = [
+        {value: 'queue', label: '任务队列'},
+        {value: 'running', label: '运行中'},
+        {value: 'completed', label: '已完成'},
+        {value: 'interrupted', label: '已中断'},
+      ].map(item => ({
+        ...item,
+        href: pageUrl('/runs', project, {
+          view: item.value,
+          platform_id: platformId,
+        }),
+      }));
       const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${escapeHtml(PLATFORM_PROFILES[item.last_platform_id]?.platform_label || item.last_platform_id || '旧记录')}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
       const listArea = data.view === 'running'
         ? renderActiveExecution(activeJob, project)
         : data.jobs.data
           ? `<article class='workspace-panel'><header><div><h2>${escapeHtml({queue: '任务队列', completed: '已完成任务', interrupted: '已中断任务'}[data.view] || '任务')}</h2><p>来自任务列表接口</p></div></header>${jobItems.length ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>任务</th><th>项目</th><th>请求平台</th><th>实际适配器</th><th>状态</th><th>进度</th><th>时间</th></tr></thead><tbody>${jobItems.map(job => `<tr><td>${escapeHtml(job.id)}</td><td>${escapeHtml(job.project_label || job.project || '')}</td><td>${escapeHtml(PLATFORM_PROFILES[job.requested_platform_id]?.platform_label || job.requested_platform_id || '旧任务')}</td><td>${escapeHtml(job.resolved_execution_adapter || '旧任务未标明')}</td><td>${Components.statusChip(job.verdict || job.status, workspaceVerdictLabel(job.verdict || job.status))}</td><td>${Number(job.completed || 0)} / ${Number(job.total || 1)}</td><td>${formatTime(job.finished_at || job.started_at)}</td></tr>`).join('')}</tbody></table></div>` : Components.emptyState('当前分类没有任务')}</article>`
           : `<article class='workspace-panel'>${Components.unavailableState('任务列表暂不可用', '当前仍可查看正在运行的任务。')}</article>`;
-      return `${Components.pageHeader({title: '自动化执行', intro: '创建、监控和恢复单条或批量测试任务', actions: `<div class='platform-choice-group' aria-label='执行页平台视图'>${platformSwitchButtons(project, platformId, 'data-runs-platform')}</div><a class='button' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('runs', 17)} 新建执行任务</a><a class='button button-secondary' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('plus', 17)} 按状态创建批次</a>`})}${Components.subTabs([{value: 'queue', label: '任务队列'}, {value: 'running', label: '运行中'}, {value: 'completed', label: '已完成'}, {value: 'interrupted', label: '已中断'}], data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {platform_id: platformId}))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>平台</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
+      return `${Components.pageHeader({title: '自动化执行', intro: '创建、监控和恢复单条或批量测试任务', actions: `<div class='platform-choice-group' aria-label='执行页平台视图'>${platformSwitchButtons(project, platformId, 'data-runs-platform')}</div><a class='button' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('runs', 17)} 新建执行任务</a><a class='button button-secondary' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('plus', 17)} 按状态创建批次</a>`})}${Components.subTabs(executionTabs, data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {platform_id: platformId}))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>平台</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -5729,6 +5744,25 @@ function ReportsPage(project = currentProject()) {
         content = `<article class='workspace-panel'>${Components.unavailableState(filters.view === 'batches' ? '暂不支持查看批次报告' : '暂不支持查看单条记录列表', '可在用例详情中查看每次运行记录。')}</article>`;
       }
       const activePreset = activeReportDatePreset(filters);
+      const reportTabs = [
+        {value: 'overview', label: '报告概览'},
+        {value: 'batches', label: '批次报告'},
+        {value: 'cases', label: '单条记录'},
+        {value: 'failures', label: '失败分析'},
+      ].map(item => ({
+        ...item,
+        href: pageUrl('/reports', project, {
+          view: item.value,
+          from: filters.from,
+          to: filters.to,
+          module: filters.module,
+          platform_id: filters.platform,
+          result: filters.result,
+          maturity: filters.maturity,
+          infrastructure: filters.infrastructure,
+          ...(filters.period ? {period: filters.period} : {}),
+        }),
+      }));
       const presetButtons = REPORT_DATE_PRESETS.map(item => `<button class='report-period-option ${activePreset === item.value ? 'is-active' : ''}' type='button' data-report-period='${escapeHtml(item.value)}' aria-pressed='${activePreset === item.value}'>${escapeHtml(item.label)}</button>`).join('');
       const resultOptions = ['PASS', 'FAIL', 'ERROR', 'CANNOT_VERIFY'].map(value => `<option value='${value}' ${filters.result === value ? 'selected' : ''}>${escapeHtml(workspaceVerdictLabel(value))}</option>`).join('');
       const maturityOptions = ['AUTO_READY', 'PROMOTED', 'NEED_REVIEW', 'MANUAL_REQUIRED', 'UNSUPPORTED', 'UNMAPPED'].map(value => `<option value='${value}' ${filters.maturity === value ? 'selected' : ''}>${escapeHtml(automationMaturityLabel(value))}</option>`).join('');
@@ -5745,7 +5779,7 @@ function ReportsPage(project = currentProject()) {
           <label>基础设施<select id='report-infrastructure'><option value=''>全部状态</option>${infrastructureOptions}</select></label>
           <label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label>
         </section>
-        ${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}
+        ${Components.subTabs(reportTabs, filters.view)}
         ${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>部分统计暂不可用，当前仅显示最近结果。</span></aside>` : ''}
         <section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '通过', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '失败', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '执行异常', value: Number(metrics.execution_error || metrics.error || distribution.ERROR || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
     },
@@ -5776,10 +5810,6 @@ function ReportsPage(project = currentProject()) {
       root.querySelectorAll('[data-report-platform]').forEach(button => button.addEventListener('click', () => {
         history.pushState({}, '', pageUrl('/reports', project, {...data.filters, platform_id: button.dataset.reportPlatform, platform: undefined}));
         invalidateCaseCatalog(project);
-        route();
-      }));
-      root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module, platform_id: data.filters.platform, result: data.filters.result, maturity: data.filters.maturity, infrastructure: data.filters.infrastructure, ...(data.filters.period ? {period: data.filters.period} : {})}));
         route();
       }));
       root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
@@ -6222,9 +6252,9 @@ function EnvironmentPage(project = currentProject()) {
       const totalChecks = checks.length || 6;
       let content;
       if (data.section === 'llm') {
-        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>模型服务</h2><p>当前连接配置</p></div><button class='button' type='button' data-open-settings>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>密钥</dt><dd>${cfg.llm?.api_key ? '已配置' : '未配置'}</dd></div><div><dt>服务地址</dt><dd>${escapeHtml(cfg.llm?.base_url || '未配置')}</dd></div><div><dt>模型</dt><dd>${escapeHtml(cfg.llm?.model || '未配置')}</dd></div><div><dt>超时</dt><dd>${Number(cfg.llm?.timeout || 0) || '—'} 秒</dd></div></dl></article>`;
+        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>模型服务</h2><p>当前连接配置</p></div><button class='button' type='button' data-open-settings='llm'>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>密钥</dt><dd>${cfg.llm?.api_key ? '已配置' : '未配置'}</dd></div><div><dt>服务地址</dt><dd>${escapeHtml(cfg.llm?.base_url || '未配置')}</dd></div><div><dt>模型</dt><dd>${escapeHtml(cfg.llm?.model || '未配置')}</dd></div><div><dt>超时</dt><dd>${Number(cfg.llm?.timeout || 0) || '—'} 秒</dd></div></dl></article>`;
       } else if (data.section === 'ones') {
-        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>ONES 平台</h2><p>缺陷同步配置</p></div><button class='button' type='button' data-open-settings>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>平台地址</dt><dd>${escapeHtml(cfg.ones?.base_url || '未配置')}</dd></div><div><dt>登录状态</dt><dd>${cfg.ones?.auth_token ? '已配置' : '未配置'}</dd></div><div><dt>团队</dt><dd>${cfg.ones?.team_uuid ? '已配置' : '未配置'}</dd></div><div><dt>用户</dt><dd>${cfg.ones?.user_id ? '已配置' : '未配置'}</dd></div></dl></article>`;
+        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>ONES 平台</h2><p>缺陷同步配置</p></div><button class='button' type='button' data-open-settings='ones'>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>平台地址</dt><dd>${escapeHtml(cfg.ones?.base_url || '未配置')}</dd></div><div><dt>登录状态</dt><dd>${cfg.ones?.auth_token ? '已配置' : '未配置'}</dd></div><div><dt>团队</dt><dd>${cfg.ones?.team_uuid ? '已配置' : '未配置'}</dd></div><div><dt>用户</dt><dd>${cfg.ones?.user_id ? '已配置' : '未配置'}</dd></div></dl></article>`;
       } else if (data.section === 'updates') {
         const update = data.update.data || {};
         content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>系统更新</h2><p>检查并安装新版本</p></div>${update.update_available ? `<button class='button' type='button' data-open-update>查看新版本</button>` : ''}</header><dl class='settings-summary-grid'><div><dt>当前版本</dt><dd>${escapeHtml(update.current_version || document.querySelector('#brand-system-version')?.textContent || '—')}</dd></div><div><dt>最新版本</dt><dd>${escapeHtml(update.latest_version || '—')}</dd></div><div><dt>更新状态</dt><dd>${data.update.data ? (update.update_available ? '发现新版本' : '当前已是最新') : '暂时无法检查更新'}</dd></div></dl></article>`;
@@ -6287,7 +6317,12 @@ function EnvironmentPage(project = currentProject()) {
         history.pushState({}, '', pageUrl('/environments', project, {platform_id: platformId, target_id: profile.target_id, section: button.dataset.subtab}));
         route();
       }));
-      root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => document.querySelector('#open-system-settings')?.click()));
+      root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => {
+        const opener = document.querySelector('#open-system-settings');
+        if (!opener) return;
+        opener.dataset.settingsInitialTab = button.dataset.openSettings || 'llm';
+        opener.click();
+      }));
       root.querySelector('[data-open-update]')?.addEventListener('click', () => document.querySelector('#update-badge')?.click());
       const form = root.querySelector('#environment-config-form');
       form?.addEventListener('submit', async event => {

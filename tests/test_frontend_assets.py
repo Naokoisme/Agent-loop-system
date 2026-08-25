@@ -545,8 +545,44 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
 
     def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
-        self.assertIn('/assets/styles.css?v=20260824-3', self.index)
-        self.assertIn('/assets/app.js?v=20260824-3', self.index)
+        self.assertIn('/assets/styles.css?v=20260825-3', self.index)
+        self.assertIn('/assets/app.js?v=20260825-3', self.index)
+
+    def test_run_status_tabs_are_real_links_with_script_free_fallback(self) -> None:
+        for token in (
+            "const executionTabs = [",
+            "href: pageUrl('/runs', project, {",
+            "view: item.value,",
+            "platform_id: platformId,",
+            "Components.subTabs(executionTabs, data.view)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "pageUrl('/runs', project, {view: subtab.dataset.subtab})",
+            self.javascript,
+        )
+
+    def test_report_tabs_are_real_links_with_script_free_fallback(self) -> None:
+        for token in (
+            "const reportTabs = [",
+            "href: pageUrl('/reports', project, {",
+            "Components.subTabs(reportTabs, filters.view)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "view: button.dataset.subtab, from: data.filters.from",
+            self.javascript,
+        )
+
+    def test_environment_settings_shortcuts_open_the_matching_settings_tab(self) -> None:
+        for token in (
+            "data-open-settings='llm'",
+            "data-open-settings='ones'",
+            "const activateSettingsTab = tabName =>",
+            "const requestedTab = openBtn.dataset.settingsInitialTab || 'llm';",
+            "opener.dataset.settingsInitialTab = button.dataset.openSettings || 'llm';",
+        ):
+            self.assertIn(token, self.javascript)
 
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (
