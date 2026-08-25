@@ -3921,7 +3921,7 @@ class CaseTestManager:
             str(screenshot),
         ]
         execution_adapter = str(project_meta.get("execution_adapter") or "")
-        if execution_adapter:
+        if execution_adapter in {"watch_ble", "watch_579_ble"}:
             child_args.extend(("--execution-adapter", execution_adapter))
         with self._lock:
             candidate_replay = bool(self._jobs[job_id].get("candidate_replay"))

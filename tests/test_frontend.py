@@ -2177,6 +2177,59 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(execution["reason_code"], "OBSERVATION_UNAVAILABLE")
         self.assertEqual(execution["verdict"], "CANNOT_VERIFY")
 
+    def test_w30_default_adapter_is_not_forwarded_to_runner_cli(self) -> None:
+        manager = CaseTestManager(self.paths, self.cases, self.test_history)
+        case = self.cases.get("计算器", "CALC_001", project="6202_W5230")
+        manager._jobs["w30-default-child"] = {
+            "process": None,
+            "candidate_replay": False,
+            "cancel_requested": False,
+        }
+        captured_argv: list[str] = []
+
+        class FakeProcess:
+            pid = None
+            returncode = 0
+
+            def __init__(self, argv: list[str]) -> None:
+                captured_argv.extend(argv)
+
+            def communicate(self) -> tuple[str, str]:
+                result_file = Path(captured_argv[captured_argv.index("--result-file") + 1])
+                result_file.write_text(
+                    json.dumps({
+                        "verdict": "PASS",
+                        "reason": "W30 default Runner completed",
+                        "setup_errors": [],
+                        "action_errors": [],
+                        "collect_errors": [],
+                    }),
+                    encoding="utf-8",
+                )
+                return "", ""
+
+        with (
+            patch("frontend.server._load_test_runtime_environment"),
+            patch(
+                "frontend.server.subprocess.Popen",
+                side_effect=lambda argv, **_kwargs: FakeProcess(argv),
+            ),
+        ):
+            execution = manager._execute_case(
+                job_id="w30-default-child",
+                case=case,
+                job_dir=self.paths.runtime_jobs / "w30-default-child" / "single",
+                hardware_preflight_completed=True,
+            )
+
+        self.assertNotIn("--execution-adapter", captured_argv)
+        self.assertEqual(
+            captured_argv[captured_argv.index("--case-map-profile") + 1],
+            "6202_W5230",
+        )
+        self.assertFalse(execution["execute_failed"])
+        self.assertEqual(execution["verdict"], "PASS")
+
     def test_case_timeout_is_framework_error_not_product_fail(self) -> None:
         manager = CaseTestManager(self.paths, self.cases, self.test_history)
         case = self.cases.get("计算器", "CALC_001")

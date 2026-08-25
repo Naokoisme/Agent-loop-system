@@ -210,6 +210,19 @@ class HardwarePreflightTest(unittest.TestCase):
         usb = next(check for check in result.checks if check.key == "usb_pnp")
         self.assertEqual(usb.diagnostics["online_count"], 0)
 
+    def test_usb_pnp_probe_allows_windows_cold_start(self) -> None:
+        timeouts: list[float] = []
+
+        class CapturingMtpSystem(FakeMtpSystem):
+            def inspect_usb_devices(self, *, timeout: float = 5.0):
+                timeouts.append(timeout)
+                return super().inspect_usb_devices(timeout=timeout)
+
+        result, _session = self._run(mtp_system=CapturingMtpSystem())
+
+        self.assertTrue(result.ready)
+        self.assertEqual(timeouts, [15.0])
+
     def test_usb_probe_failure_is_internal_not_device_absence(self) -> None:
         class BrokenPnp(FakeMtpSystem):
             def inspect_usb_devices(self, *, timeout: float = 5.0):

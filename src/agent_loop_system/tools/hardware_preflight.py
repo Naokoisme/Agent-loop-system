@@ -517,7 +517,7 @@ def run_hardware_preflight(
 
     system = mtp_system or WindowsMtpSystem()
     try:
-        devices = list(system.inspect_usb_devices(timeout=5.0))
+        devices = list(system.inspect_usb_devices(timeout=15.0))
         online_devices = [
             item
             for item in devices
