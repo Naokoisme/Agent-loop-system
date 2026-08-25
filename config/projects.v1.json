@@ -1,0 +1,110 @@
+{
+  "version": "1",
+  "projects": [
+    {
+      "project_id": "620C_W6830",
+      "project_name": "620C W6830",
+      "case_catalog": {
+        "type": "w30_case_map",
+        "root": "case_map/620C_simulator_case_map",
+        "profile": "620C_W6830"
+      },
+      "allowed_platforms": [
+        "w30"
+      ],
+      "default_platform": "w30",
+      "allowed_targets": [
+        "w30.620c.simulator"
+      ],
+      "default_target": "w30.620c.simulator",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-24T11:36:12+08:00",
+      "updated_at": "2026-08-24T11:36:12+08:00"
+    },
+    {
+      "project_id": "6202_W5230_SIMULATOR",
+      "project_name": "6202 W5230",
+      "case_catalog": {
+        "type": "w30_case_map",
+        "root": "case_map/6202_simulator_case_map",
+        "profile": "6202_W5230_SIMULATOR"
+      },
+      "allowed_platforms": [
+        "w30"
+      ],
+      "default_platform": "w30",
+      "allowed_targets": [
+        "w30.6202.simulator"
+      ],
+      "default_target": "w30.6202.simulator",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-24T11:36:12+08:00",
+      "updated_at": "2026-08-24T11:36:12+08:00"
+    },
+    {
+      "project_id": "6202_W5230",
+      "project_name": "6202 W5230",
+      "case_catalog": {
+        "type": "w30_case_map",
+        "root": "case_map/6202_case_map",
+        "profile": "6202_W5230"
+      },
+      "allowed_platforms": [
+        "w30"
+      ],
+      "default_platform": "w30",
+      "allowed_targets": [
+        "w30.6202.hardware"
+      ],
+      "default_target": "w30.6202.hardware",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-24T11:36:12+08:00",
+      "updated_at": "2026-08-24T11:36:12+08:00"
+    },
+    {
+      "project_id": "579_O2",
+      "project_name": "579 O2 真机",
+      "case_catalog": {
+        "type": "manifest_579",
+        "root": "case_map/579_case_map",
+        "profile": "579_O2"
+      },
+      "allowed_platforms": [
+        "579"
+      ],
+      "default_platform": "579",
+      "allowed_targets": [
+        "579.o2"
+      ],
+      "default_target": "579.o2",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-24T11:36:12+08:00",
+      "updated_at": "2026-08-24T11:36:12+08:00"
+    },
+    {
+      "project_id": "579_Z1640",
+      "project_name": "579 Z1640 真机",
+      "case_catalog": {
+        "type": "watch_579_case_map",
+        "root": "case_map/579_case_map",
+        "profile": "579_Z1640"
+      },
+      "allowed_platforms": [
+        "579"
+      ],
+      "default_platform": "579",
+      "allowed_targets": [
+        "579.z1640"
+      ],
+      "default_target": "579.z1640",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-25T10:00:00+08:00",
+      "updated_at": "2026-08-25T10:00:00+08:00"
+    }
+  ]
+}

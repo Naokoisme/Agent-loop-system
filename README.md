@@ -1,7 +1,7 @@
 # Agent-loop-system
 
-Agent-loop-system 是面向手表固件的自动化闭环工作台：读取缺陷或测试用例，驱动 Windows
-Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结果。
+Agent-loop-system 是面向手表固件的自动化闭环工作台：可从 PRD 生成并审查测试用例，也可读取
+缺陷或已有测试用例，驱动 Windows Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结果。
 
 本仓库只保存 Agent-loop 的编排代码、测试、用例映射和稳定文档。固件源码、设备绑定、密钥
 以及运行证据都有独立边界，不应混入同一个 Git 基线。
@@ -9,7 +9,9 @@ Simulator 或真实手表，采集新鲜证据，并输出可审计的执行结�
 ## 工作流
 
 ```text
-缺陷 / 测试用例
+PRD → QA Skill → Excel → 人工审查 → 用例管理
+                              ↓
+                       缺陷 / 测试用例
         ↓
 Agent-loop Runner
         ↓
@@ -32,11 +34,41 @@ result.json + 新截图 + 日志
 | `620C_W6830` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\620C_W6830` | `case_map/620C_simulator_case_map` |
 | `6202_W5230_SIMULATOR` | Windows Simulator | `D:\Agent-loop\workspaces\firmware\6202_W5230` | `case_map/6202_simulator_case_map` |
 | `6202_W5230` | 真实手表 | `profiles/6202_W5230` 版本档案 | `case_map/6202_case_map` |
+| `579_O2` | 579 O2 真机 | APP Bridge / COM3 只读 | `case_map/579_case_map` |
+| `579_Z1640` | 579 Z1640 真机 | PC-BLE / legacy L1-L2 | `case_map/579_case_map` |
 
-三套映射相互隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。6204 真机源码位于
+各目标映射按 profile 隔离，不得跨目标复制命令、坐标、页面、截图或 verdict。`579_O2` 与
+`579_Z1640` 可以共用物理目录，但服务只会同步当前 profile 的 JSON 模块。6204 真机源码位于
 `D:\Agent-loop\workspaces\firmware\6204_W5230`；在独立构建、另行授权刷机和真机最小能力验证完成前，
 它不是可执行 Runner 目标。`D:\TOPSTEP\shenju_w30` 只作上游参考，不在其中开发、构建或
 打补丁。
+
+项目、平台、执行目标与用例目录均由注册表和统一用例库解析；前端不会通过 579 的冻结
+Manifest 类型来禁用人员新增或 Excel 导入。
+
+## 统一用例管理
+
+`case_map/*` 与 579 Manifest 是可追溯的源基线。服务首次读取项目时将其幂等同步到
+`project_data/case_management.sqlite3`；人员新增、Excel 导入、编辑版本、归档、恢复和审计都写入
+SQLite，不直接覆盖冻结源文件。冻结来源用例在网页中的编辑动作显示为“创建新版本”，历史版本和
+源 SHA 会继续保留。
+
+- W30 新增用例可以继续进入现有探索、候选复跑和 `PROMOTED` 固化流程。
+- 579 新增/导入用例默认是“未绑定”，必须完成 579 动作注册表和环境门禁后才可运行。
+- 579 O2 继续使用 APP Bridge → BLE、COM3/O1 只读与 O2 截图；579 Z1640 使用独立 PC-BLE
+  L1/L2 执行器，当前没有截图能力，且必须由用户确认手表位于亮屏表盘。
+- Excel 导入必须先选择适用平台并预览；冲突只能显式选择“跳过”或“创建新版本”。
+- 批量运行前由后端 `execution-options` 逐条返回可运行状态、中文原因、成熟度和绑定版本。
+
+迁移和源文件完整性审计：
+
+```powershell
+uv run python tools/migrate_case_store.py --output project_data/migration-audit.json
+```
+
+该工具检查源用例数、统一库来源身份、重复同步幂等性和迁移前后 JSON SHA。`project_data/` 是本机
+业务数据，不进入 Git。Agent-loop Web 服务直接由 `frontend/server.py` 启动，不需要也不会启动
+`desktop_qt.py`。
 
 普通 6202 真机探索和固化用例不会读取固件源码。它们从不可变发布目录读取
 `runtime/commands.json`、`runtime/pages.json` 和兼容性元数据，并校验发布清单、文件哈希、固件
@@ -48,6 +80,47 @@ SHA256、自动化协议版本及 Agent-loop 最低版本。源码诊断、修�
 `--runtime-metadata` 一并交给
 `scripts/publish_profile.py`。普通测试机器只需要随发布包取得 `profiles/`、匹配固件、SuperCom
 和 Windows MTP，不需要 Git、Python SDK 或固件源码。
+
+## PRD 转测试用例与人工审查
+
+一级导航中的“PRD 转测试用例”位于“用例管理”之前，页面入口为 `/prd-cases`。该功能把
+“上传 PRD → 调用固定 QA Skill 生成 → 写入并重新读取 Excel → 网页审查 → 审批 → 同步用例管理”
+收敛为一个可追踪的本地工作流：
+
+```text
+.md / .txt / .docx（≤ 20 MB）
+            ↓
+校验随包 QA Skill 与 SHA-256
+            ↓
+大模型生成固定层级用例
+            ↓
+生成 Excel、重新读取并执行质量门禁
+            ↓
+可视化逐条审查 ──驳回意见──→ 重新生成
+            ↓ 审查通过
+按审批时 workbook SHA-256 同步到用例管理
+```
+
+生成用例统一使用 `功能模块 > 功能点 > 测试项 > 测试点 > 用例详情` 层级。审查页可查看全部
+用例、质量门禁、稳定 ID、追溯信息和 Excel 下载结果，并支持逐条意见、整体意见、驳回重生成及
+审查通过。审批结果绑定当时的工作簿 SHA-256；文件内容变化后旧审批不能继续同步。
+
+同步操作具备幂等和编号冲突保护：已同步任务重复提交不会重复写入；现有用例编号冲突时不覆盖
+原记录，任务标记为“部分同步”，并明确显示未写入数量。新用例保留稳定 ID、PRD/Skill/工作簿
+哈希和任务来源，自动化成熟度默认是 `UNMAPPED`，后续仍需在用例管理中完成执行绑定。
+
+使用前需在系统配置或 `.env` 中正确配置 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和
+`OPENAI_MODEL`。源 PRD、生成工作簿、审查记录与同步状态保存在
+`project_data/prd_cases/jobs/`，属于本机业务数据且不会进入 Git。Windows 便携包内置只读 QA
+Skill ZIP，并在生成前校验固定哈希，不依赖开发机上的 `D:` 盘 Skill 路径。
+
+当前边界：仅支持 Markdown、TXT、DOCX；不解析 PDF、扫描件或图片；审查为本机页面流程，尚未
+接入远程账号权限与消息通知；质量门禁通过后的准出状态是 `READY_WITH_RISKS`，不是自动化执行
+就绪或 `STRICT_GO`。
+
+接口统一使用 `/api/prd-cases` 前缀。详细状态机、数据合同和风险边界见
+[PRD 转测试用例页签设计方案](docs/prd-to-testcase-tab-design.md)，本轮实测证据见
+[PRD 转测试用例页签验收报告](docs/prd-to-testcase-tab-acceptance-report.md)。
 
 ## 快速开始
 
@@ -64,6 +137,42 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
 浏览器入口默认为 <http://127.0.0.1:8765>。`.env.example` 只描述配置字段；复制后在本机填写
 `.env`。API key、token、账号标识、BLE 地址、COM 口和开发机绝对路径不得提交。
 
+## 换机自适应与真实环境检查
+
+W30 真机项目不再要求用户为每台电脑重复填写固定 COM 口或 MTP 存储卷名称。创建或读取项目时，
+平台会从执行目标取得 `runtime_profile_id`，校验并按需安装已发布的不可变运行时档案；环境检查会
+枚举当前 SuperCom AgentBridge 管道，并在恰好只有一个活动手表串口时自动选择实际 COM 口。
+
+6202 USB/MTP 链路按真实 Windows 对象发现：
+
+```text
+SuperCom 活动串口
+  → ZORA USB/PnP
+  → 自动识别包含 download 的 MTP 存储卷
+  → 按 System.FileName 或显示名匹配本轮 agent_capture_<seq>.bmp
+```
+
+这兼容了不同电脑上的 COM 编号变化、`storage` 与 `ZORA MTP Storage Volume` 等卷标差异，以及
+资源管理器隐藏 `.bmp` 扩展名的情况。程序不会伪造档案或在多个活动串口之间猜测：未安装 USB/MTP
+驱动、SuperCom 未运行、连接零台或多台设备、固件未暴露 `download` 时，环境中心会保留其余检查
+结果并给出具体阻断项。
+
+2026-08-25 已在 6202 真机验证：环境检查 6/6 通过；通过 COM6 的 SuperCom 共享管道完成
+`dal_usb close → SCREENSHOT_CAPTURE_FILE → dal_usb open → MTP 下载`，取得 410×502、
+618,518-byte BMP，固件回执校验通过。换机仍需安装项目依赖、SuperCom AgentBridge 和正常的
+Windows USB/MTP 驱动；把包含本修复的提交或发布包部署到新电脑后，无需再手工绑定固定卷标或 COM
+编号。
+
+## 0.4.6 双 579 执行目标兼容
+
+合并 `main` 的 0.4.6 PC-BLE 能力后，平台同时保留两条 579 链路：
+
+- `579.o2`：原 APP Bridge 适配器，保持串口只读、O2 证据与 Canary 安全门禁。
+- `579.z1640`：新增 PC-BLE legacy L1/L2 适配器、蓝牙工作台、独立预检与表盘确认门禁。
+
+项目、平台、执行目标、单条/批次运行请求均继续走动态注册表，任何一条 579 链路失败都不会静默
+回退到 W30 或另一条 579 链路。旧项目注册表会在启动时幂等补入新增内置项目，不覆盖用户项目。
+
 ## 验证层级
 
 以下事实彼此独立，不能互相代替：
@@ -77,6 +186,9 @@ uv run python frontend/server.py --host 127.0.0.1 --port 8765
    已验证基线。
 
 case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_map/README.md)。
+
+W30/579 统一平台的项目创建、快捷切换、运行平台选择与 579 安全门禁见
+[W30-579 统一平台使用说明](W30-579统一平台使用说明.md)。
 
 ## 仓库与基线边界
 
@@ -108,7 +220,10 @@ case map 的唯一数据合同和动态统计见 [case_map 数据合同](case_ma
 
 ## 文档入口
 
-- [Agent 工作边界](AGENTS.md)：必须遵守的安全和目标隔离政策。
+- [PRD 转测试用例页签设计方案](docs/prd-to-testcase-tab-design.md)：页面位置、生成链路、审查状态机、同步合同与边界。
+- [PRD 转测试用例页签验收报告](docs/prd-to-testcase-tab-acceptance-report.md)：功能、接口、回归、真实模型和 Windows 便携包验收证据。
+- [W30/579 双平台当前整改说明](README-W30-579-当前整改说明.md)：本轮全部改动、当前验证结果、真机计算器证据和待处理项总览。
+- [前端导航与页签修复验收说明](README-前端导航与页签验收.md)：本次页签跳转修复、影响范围和浏览器验收结果。
 - [case map 数据合同](case_map/README.md)：映射成熟度、外部探索账本与 Runner 选择规则。
 - [6202 Simulator 当前链路](docs/6202-simulator-current.md)：Simulator 配置与已验证事实快照。
 - [6202 真机截图概览](docs/6202-hardware-screenshot-current.md)：默认链路、已验证边界和开放阻塞。

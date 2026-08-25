@@ -24,6 +24,7 @@ from agent_loop_system.tools.mtp_screenshot import (
     MtpCaptureProvider,
     MtpSystem,
     WindowsMtpSystem,
+    restore_usb_device,
 )
 from agent_loop_system.tools.watch_ble_provider import (
     DEFAULT_BLE_SCAN_TIMEOUT,
@@ -575,6 +576,171 @@ def _restore_list_menu_style(
     )
 
 
+def _require_dial_without_popup(
+    session: Any,
+    *,
+    command_timeout: float,
+    context: str,
+) -> tuple[str, object | None, dict[str, object]]:
+    sequence = _positive_handshake_sequence()
+    state = session.send(
+        f":GUI_STATE:{sequence}",
+        request="gui_state",
+        seq=sequence,
+        timeout=command_timeout,
+        expected_type="gui_state",
+        expected_status="ok",
+    )
+    if str(state.status).lower() != "ok":
+        raise HardwareCaseResetError(
+            "RESET_STATE_UNAVAILABLE",
+            f"GUI_STATE failed {context}: {state.status}",
+        )
+    state_raw = dict(state.raw)
+    current_page = _window_name(state_raw.get("current_page"))
+    popup = state_raw.get("popup")
+    if current_page.upper() != "DIAL" or popup is not None:
+        raise HardwareCaseResetError(
+            "RESET_STATE_MISMATCH",
+            f"hardware case state did not reach DIAL with popup=null {context} "
+            f"(current_page={current_page or 'unknown'!r}, popup={popup!r})",
+        )
+    return current_page, popup, state_raw
+
+
+def _normalize_hardware_case_state(
+    session: Any,
+    *,
+    evidence_dir: str | os.PathLike[str],
+    command_timeout: float,
+    capture_timeout: float,
+    usb_timeout: float,
+    mtp_system: MtpSystem,
+    capture_provider: CaptureProvider | None,
+    menu_style_judge: Callable[[Path], tuple[str, str]],
+) -> tuple[str, object | None, dict[str, object]]:
+    """Converge an active watch session to DIAL/List without rebooting it."""
+
+    button = session.send(
+        _CLEAR_BOOT_POPUP,
+        request="button_press",
+        timeout=command_timeout,
+        expected_type="command_result",
+        expected_status="accepted",
+    )
+    _require_accepted(button, _CLEAR_BOOT_POPUP)
+    dial = session.send(
+        _ENTER_DIAL,
+        request="enter_page",
+        timeout=command_timeout,
+        expected_type="command_result",
+        expected_status="accepted",
+    )
+    _require_accepted(dial, _ENTER_DIAL)
+    _wait_for_reset_gui(
+        session,
+        command_timeout=command_timeout,
+        context="after DIAL preparation",
+    )
+    _require_dial_without_popup(
+        session,
+        command_timeout=command_timeout,
+        context="after DIAL preparation",
+    )
+
+    prepared_evidence_dir = Path(evidence_dir).resolve()
+    prepared_evidence_dir.mkdir(parents=True, exist_ok=True)
+    _restore_list_menu_style(
+        session,
+        evidence_dir=prepared_evidence_dir,
+        command_timeout=command_timeout,
+        capture_timeout=capture_timeout,
+        usb_timeout=usb_timeout,
+        mtp_system=mtp_system,
+        capture_provider=capture_provider,
+        menu_style_judge=menu_style_judge,
+    )
+    return _require_dial_without_popup(
+        session,
+        command_timeout=command_timeout,
+        context="after menu-style preparation",
+    )
+
+
+def prepare_hardware_case_state(
+    *,
+    evidence_dir: str | os.PathLike[str],
+    startup_timeout: float = 180.0,
+    command_timeout: float = 8.0,
+    usb_timeout: float = 30.0,
+    capture_timeout: float = _DEFAULT_CAPTURE_TIMEOUT,
+    serial_session: Any | None = None,
+    mtp_system: MtpSystem | None = None,
+    capture_provider: CaptureProvider | None = None,
+    menu_style_judge: Callable[[Path], tuple[str, str]] | None = None,
+    environment: Mapping[str, str] | None = None,
+) -> HardwareCaseResetResult:
+    """Soft-converge one case to a known state without rebooting the watch."""
+
+    for name, value in (
+        ("startup_timeout", startup_timeout),
+        ("command_timeout", command_timeout),
+        ("usb_timeout", usb_timeout),
+        ("capture_timeout", capture_timeout),
+    ):
+        if value <= 0:
+            raise ValueError(f"{name} must be positive")
+    settings = os.environ if environment is None else environment
+    if serial_session is None and settings.get(
+        "W30_HARDWARE_TRANSPORT", ""
+    ).strip().lower() != "supercom":
+        raise ValueError(
+            "hardware case preparation requires W30_HARDWARE_TRANSPORT=supercom"
+        )
+
+    session = serial_session or _create_hardware_serial_session(
+        evidence_dir=evidence_dir,
+        cmd_timeout=command_timeout,
+        environment=settings,
+        allow_dangerous_commands=False,
+    )
+    system = mtp_system or WindowsMtpSystem()
+    try:
+        session.start()
+        bootstrap = _activate_test_session(
+            session,
+            startup_timeout=startup_timeout,
+            command_timeout=command_timeout,
+        )
+        current_page, popup, state_raw = _normalize_hardware_case_state(
+            session,
+            evidence_dir=evidence_dir,
+            command_timeout=command_timeout,
+            capture_timeout=capture_timeout,
+            usb_timeout=usb_timeout,
+            mtp_system=system,
+            capture_provider=capture_provider,
+            menu_style_judge=menu_style_judge or _classify_menu_style,
+        )
+        result = HardwareCaseResetResult(
+            status=bootstrap.status,
+            reboot_status="not_requested",
+            gui_ping_attempts=bootstrap.gui_ping_attempts,
+            bootstrap_event_seen=bootstrap.bootstrap_event_seen,
+            current_page=current_page,
+            popup=popup,
+            state_raw=state_raw,
+        )
+    except BaseException as exc:
+        try:
+            session.stop()
+        except BaseException as cleanup_exc:
+            exc.add_note(f"hardware case preparation cleanup also failed: {cleanup_exc!r}")
+        raise
+    session.stop()
+    return result
+
+
 def reset_hardware_case_state(
     *,
     evidence_dir: str | os.PathLike[str],
@@ -588,7 +754,7 @@ def reset_hardware_case_state(
     menu_style_judge: Callable[[Path], tuple[str, str]] | None = None,
     environment: Mapping[str, str] | None = None,
 ) -> HardwareCaseResetResult:
-    """Reboot, restore List menu style, and prove DIAL before one hardware case."""
+    """Explicit engineering recovery reboot, guarded by live UART and USB."""
 
     if startup_timeout <= 0:
         raise ValueError("startup_timeout must be positive")
@@ -615,6 +781,29 @@ def reset_hardware_case_state(
     system = mtp_system or WindowsMtpSystem()
     try:
         session.start()
+
+        # A recovery reboot is never a discovery mechanism.  Prove both data
+        # plane and current host enumeration before sending the destructive
+        # command, even when this function is called outside the main runner.
+        try:
+            _wait_for_reset_gui(
+                session,
+                command_timeout=command_timeout,
+                context="before explicit recovery reboot",
+            )
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "REBOOT_UART_UNRESPONSIVE",
+                "explicit recovery reboot was blocked because GUI_PING failed",
+            ) from exc
+        try:
+            system.wait_for_usb(present=True, timeout=usb_timeout)
+        except Exception as exc:
+            raise HardwareCaseResetError(
+                "REBOOT_INITIAL_USB_ABSENT",
+                "explicit recovery reboot was blocked because USB was not present",
+            ) from exc
+
         ready_event_start_index = session.event_count
         reboot = session.send(
             _SYSTEM_REBOOT,
@@ -639,67 +828,22 @@ def reset_hardware_case_state(
             ready_event_start_index=ready_event_start_index,
         )
 
-        session.write_shell_line("dal_usb open")
         try:
-            system.wait_for_usb(present=True, timeout=usb_timeout)
+            restore_usb_device(
+                session.write_shell_line,
+                system,
+                usb_timeout=usb_timeout,
+                namespace_timeout=usb_timeout,
+            )
         except Exception as exc:
             raise HardwareCaseResetError(
                 "USB_RESTORE_FAILED",
-                "dal_usb open did not restore the watch USB/MTP device",
+                f"dal_usb open did not restore the watch USB/MTP device: {exc}",
             ) from exc
 
-        button = session.send(
-            _CLEAR_BOOT_POPUP,
-            request="button_press",
-            timeout=command_timeout,
-            expected_type="command_result",
-            expected_status="accepted",
-        )
-        _require_accepted(button, _CLEAR_BOOT_POPUP)
-        dial = session.send(
-            _ENTER_DIAL,
-            request="enter_page",
-            timeout=command_timeout,
-            expected_type="command_result",
-            expected_status="accepted",
-        )
-        _require_accepted(dial, _ENTER_DIAL)
-
-        _wait_for_reset_gui(
+        current_page, popup, state_raw = _normalize_hardware_case_state(
             session,
-            command_timeout=command_timeout,
-            context="after DIAL reset",
-        )
-
-        state_sequence = _positive_handshake_sequence()
-        state = session.send(
-            f":GUI_STATE:{state_sequence}",
-            request="gui_state",
-            seq=state_sequence,
-            timeout=command_timeout,
-            expected_type="gui_state",
-            expected_status="ok",
-        )
-        if str(state.status).lower() != "ok":
-            raise HardwareCaseResetError(
-                "RESET_STATE_UNAVAILABLE",
-                f"GUI_STATE failed after DIAL reset: {state.status}",
-            )
-        state_raw = dict(state.raw)
-        current_page = _window_name(state_raw.get("current_page"))
-        popup = state_raw.get("popup")
-        if current_page.upper() != "DIAL" or popup is not None:
-            raise HardwareCaseResetError(
-                "RESET_STATE_MISMATCH",
-                "hardware case reset did not reach DIAL with popup=null "
-                f"(current_page={current_page or 'unknown'!r}, popup={popup!r})",
-            )
-
-        reset_evidence_dir = Path(evidence_dir).resolve()
-        reset_evidence_dir.mkdir(parents=True, exist_ok=True)
-        _restore_list_menu_style(
-            session,
-            evidence_dir=reset_evidence_dir,
+            evidence_dir=evidence_dir,
             command_timeout=command_timeout,
             capture_timeout=capture_timeout,
             usb_timeout=usb_timeout,
@@ -707,31 +851,6 @@ def reset_hardware_case_state(
             capture_provider=capture_provider,
             menu_style_judge=menu_style_judge or _classify_menu_style,
         )
-
-        state_sequence = _positive_handshake_sequence()
-        state = session.send(
-            f":GUI_STATE:{state_sequence}",
-            request="gui_state",
-            seq=state_sequence,
-            timeout=command_timeout,
-            expected_type="gui_state",
-            expected_status="ok",
-        )
-        if str(state.status).lower() != "ok":
-            raise HardwareCaseResetError(
-                "RESET_STATE_UNAVAILABLE",
-                f"GUI_STATE failed after menu-style reset: {state.status}",
-            )
-        state_raw = dict(state.raw)
-        current_page = _window_name(state_raw.get("current_page"))
-        popup = state_raw.get("popup")
-        if current_page.upper() != "DIAL" or popup is not None:
-            raise HardwareCaseResetError(
-                "RESET_STATE_MISMATCH",
-                "hardware case reset did not return to DIAL with popup=null "
-                f"after menu-style reset (current_page={current_page or 'unknown'!r}, "
-                f"popup={popup!r})",
-            )
         reset_result = HardwareCaseResetResult(
             status=bootstrap.status,
             reboot_status=str(reboot.status),
@@ -1007,6 +1126,7 @@ __all__ = [
     "TestSessionBootstrapResult",
     "TestSessionStatus",
     "bootstrap_test_session",
+    "prepare_hardware_case_state",
     "query_test_session_status",
     "reset_hardware_case_state",
 ]

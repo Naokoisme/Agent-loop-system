@@ -8,10 +8,14 @@ let activeImportJobId = null;
 let repairRestoreTimer = null;
 let testPollTimer = null;
 let batchTestPollTimer = null;
+let prdCasesPollTimer = null;
 let latestBatchCandidateSummary = {};
 const selectedTestCases = new Map();
 let selectedTestProject = null;
 let currentTestPageItems = [];
+let selectedRunPlatform = '';
+let selectedRunTarget = '';
+let executionOptionsToken = 0;
 
 const PAGE_SIZE = 20;
 const IMPORT_STORAGE_KEY = 'firmware-repair-import-job';
@@ -29,30 +33,14 @@ const TEST_FILTER_LABELS = {
   explored_unsolidified: '步骤待确认',
   solidified: '可直接运行'
 };
-const DEFAULT_TEST_PROJECT = '620C_W6830';
+let DEFAULT_TEST_PROJECT = '';
 const DEFAULT_TEST_STATE = 'all';
-const TEST_PROJECTS = {
-  '620C_W6830': {
-    project: '620C_W6830',
-    projectLabel: '620C W6830',
-    target: 'simulator',
-    targetLabel: '模拟器'
-  },
-  '6202_W5230': {
-    project: '6202_W5230',
-    projectLabel: '6202 W5230',
-    target: 'hardware',
-    targetLabel: '真机'
-  },
-  '6202_W5230_SIMULATOR': {
-    project: '6202_W5230_SIMULATOR',
-    projectLabel: '6202 W5230',
-    target: 'simulator',
-    targetLabel: '模拟器'
-  }
-};
+let TEST_PROJECTS = Object.create(null);
+let PLATFORM_PROFILES = Object.create(null);
+let PLATFORM_TARGETS = Object.create(null);
+let ENVIRONMENT_PROTOCOLS = Object.create(null);
 
-/** @typedef {'620C_W6830'|'6202_W5230_SIMULATOR'|'6202_W5230'} ProjectKey */
+/** @typedef {string} ProjectKey */
 /** @typedef {'PASS'|'FAIL'|'ERROR'|'CANNOT_VERIFY'|'PENDING'|'RUNNING'} Verdict */
 /** @typedef {'unexplored'|'externally_explored'|'explored_unsolidified'|'solidified'} MaturityState */
 
@@ -69,31 +57,11 @@ const FUNCTION_CATEGORY_NAMES = Object.freeze(Object.keys(FUNCTION_CATEGORIES));
 const ALL_FUNCTION_MODULES = Object.freeze(FUNCTION_CATEGORY_NAMES.flatMap(name => FUNCTION_CATEGORIES[name]));
 const PROJECT_STORAGE_KEY = 'agent-loop-selected-project';
 const CASE_CATALOG_PAGE_SIZE = 100;
-const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/cases', '/runs', '/reports', '/defects', '/environments']);
+const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/prd-cases', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
 const caseCatalogCache = new Map();
 let activePageController = null;
 let routeRequestToken = 0;
 
-const ENVIRONMENT_PROTOCOLS = Object.freeze({
-  '620C_W6830': {
-    transport: 'socket',
-    transportLabel: '模拟器连接',
-    captureProvider: 'simulator',
-    captureLabel: '模拟器截图'
-  },
-  '6202_W5230_SIMULATOR': {
-    transport: 'socket',
-    transportLabel: '模拟器连接',
-    captureProvider: 'simulator',
-    captureLabel: '模拟器截图'
-  },
-  '6202_W5230': {
-    transport: 'supercom',
-    transportLabel: 'SuperCom',
-    captureProvider: 'mtp',
-    captureLabel: 'USB 截图'
-  }
-});
 const BATCH_CATEGORY_LABELS = {
   untested: '尚未运行',
   fail: '最近运行失败',
@@ -114,6 +82,7 @@ const TEST_WORKFLOW_NODES = ['load', 'execute', 'judge', 'record'];
 const TEST_NODE_LABELS = {
   load: '准备测试',
   reset: '准备设备',
+  prepare: '准备设备',
   execute: '执行操作',
   judge: '检查结果',
   record: '保存结果'
@@ -130,6 +99,19 @@ function imagePreviewLinkAttributes(url, label) {
   return `class="image-preview-trigger" href="${escapeHtml(url)}" data-image-preview data-image-preview-label="${escapeHtml(displayLabel)}" aria-label="${escapeHtml(`放大查看：${displayLabel}`)}"`;
 }
 
+const UNKNOWN_ISSUE = Object.freeze({
+  cause: '本次操作没有完成，平台暂时无法确定具体原因。',
+  action: '请重新操作；如再次出现，展开诊断信息并联系维护人员。'
+});
+
+const TECHNICAL_DIAGNOSTIC_PATTERN = /(?:Traceback|\b[A-Za-z_$][\w$]*(?:Error|Exception)\b|\b[A-Za-z]:[\\/]|\\\\[^\\\r\n]+\\|\/(?:Users|home|var|tmp|opt|etc)\/|https?:\/\/|\b(?:UART|MTP|PnP|GUI_PING|gui_ack)\b|\b(?:VID|PID)[_/:=-]?[0-9A-F]+\b|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b|\b[\w.-]+\.(?:json|log|txt|py|js|exe|zip)\b)/i;
+
+function safeProductCopy(value) {
+  const text = String(value ?? '').trim();
+  if (!text || TECHNICAL_DIAGNOSTIC_PATTERN.test(text)) return '';
+  return text;
+}
+
 function friendlyAgentError(value) {
   const text = String(value ?? '').trim();
   if (!text) return text;
@@ -139,42 +121,265 @@ function friendlyAgentError(value) {
   if (/识图 Agent API 出错|LLM 重试耗尽.*(APIConnectionError|LLMRetryError)/.test(text)) {
     return '图像判定服务暂时无法连接，请稍后重试。';
   }
-  return text;
+  return safeProductCopy(text);
 }
 
-const ISSUE_SUMMARIES = Object.freeze({
-  USER_CANCELLED: '任务已取消。',
-  SERVICE_RESTART: '服务已重启，本次任务未完成。',
-  ORPHAN_PROCESS: '检测到上次遗留的任务，请先停止后再试。',
-  PROCESS_TIMEOUT: '任务等待超时，请检查目标连接后重试。',
-  THREAD_START_FAILED: '任务启动失败，请稍后重试。',
-  PROCESS_EXCEPTION: '任务执行异常，请查看诊断信息。',
-  UNHANDLED_EXCEPTION: '任务执行异常，请查看诊断信息。',
-  RESULT_MISSING: '任务没有返回有效结果，请重试。',
-  HISTORY_WRITE_FAILED: '结果保存失败，请重试。',
-  HARDWARE_INFRASTRUCTURE_FAILURE: '设备连接异常，请检查连接后重试。',
-  EVIDENCE_INCOMPLETE: '证据不完整，暂时无法确认结果。'
+const ISSUE_TABLE = Object.freeze({
+  NETWORK_ERROR: {
+    cause: '平台暂时无法连接本机服务。',
+    action: '请确认平台仍在运行后重试；如已停止，请重新启动平台。'
+  },
+  USER_CANCELLED: {
+    cause: '任务已取消。',
+    action: '如需继续，请重新启动任务。'
+  },
+  SERVICE_RESTART: {
+    cause: '服务已重启，本次任务未完成。',
+    action: '请重新发起任务。'
+  },
+  ORPHAN_PROCESS: {
+    cause: '检测到上次遗留的任务。',
+    action: '请先停止上次任务后再试。'
+  },
+  PROCESS_TIMEOUT: {
+    cause: '任务在规定时间内没有完成。',
+    action: '请检查目标设备连接后重试。'
+  },
+  THREAD_START_FAILED: {
+    cause: '平台未能启动本次任务。',
+    action: '请稍后重试；如仍失败，请重新启动平台。'
+  },
+  PROCESS_EXCEPTION: {
+    cause: '任务运行过程中出现平台异常，没有得到完整结果。',
+    action: '请重新运行；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  UNHANDLED_EXCEPTION: {
+    cause: '任务运行过程中出现平台异常，没有得到完整结果。',
+    action: '请重新运行；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  RESULT_MISSING: {
+    cause: '测试程序已经结束，但没有返回可用结果。',
+    action: '请重新运行；如仍失败，保留诊断信息并联系维护人员。'
+  },
+  HISTORY_WRITE_FAILED: {
+    cause: '测试已经执行，但结果没有保存成功。',
+    action: '请确认电脑存储空间充足后重试。'
+  },
+  HARDWARE_INFRASTRUCTURE_FAILURE: {
+    cause: '测试过程中与手表的连接中断。',
+    action: '请重新执行环境检查，恢复连接后从该用例重试。'
+  },
+  HARDWARE_PREPARATION_FAILED: {
+    cause: '手表没有进入可开始测试的状态，因此用例尚未执行。',
+    action: '请重新执行环境检查，确认连接和手表界面正常后重试。'
+  },
+  EVIDENCE_INCOMPLETE: {
+    cause: '用于判断结果的截图或检查点没有收集完整。',
+    action: '请确认截图连接正常后重新运行该用例。'
+  },
+  OBSERVATION_UNAVAILABLE: {
+    cause: '动作已经执行，但当前 579 没有可用的手表截图通道。',
+    action: '查看每条 TX/L1 ACK 记录并人工确认现象；不要把本次结果当作正式通过。'
+  },
+  INVALID_RAW_COMMAND: {
+    cause: 'Cmd、Key 或 Data 的格式或长度不符合 579 协议要求。',
+    action: '检查十六进制输入；Data 可留空，非空时最多 499 字节。'
+  },
+  BLE_DEVICE_NOT_FOUND: {
+    cause: '扫描结果中没有找到已配置精确地址的手表。',
+    action: '确认手表地址、距离和广播状态后重新扫描。'
+  },
+  BLE_CONNECT_TIMEOUT: {
+    cause: '电脑未能在限定时间内连接 579 手表。',
+    action: '请关闭手机蓝牙和 ble_test 等占用方，然后手工重试。'
+  },
+  BLE_GATT_PROFILE_MISMATCH: {
+    cause: '已连接设备没有提供 579 所需的服务或写入、通知特征。',
+    action: '核对精确 MAC 和当前手表版本后重试。'
+  },
+  BLE_DISCONNECTED: {
+    cause: '579 BLE 会话已经断开。',
+    action: '恢复手表连接后重新执行当前命令；平台不会自动重发。'
+  },
+  BLE_ACK_TIMEOUT: {
+    cause: '命令写入后 5 秒内没有收到手表 L1 ACK。',
+    action: '检查手表连接和运行状态后，由你决定是否重新执行。'
+  },
+  TARGET_BUSY: {
+    cause: '579 正由自动化任务独占写入。',
+    action: '等待任务结束或取消后再从蓝牙工作台操作。'
+  },
+  PROFILE_INVALID: {
+    cause: '当前测试项目的运行配置缺失或无法读取。',
+    action: '请重新选择测试项目；如仍失败，请联系维护人员。'
+  },
+  PORT_NOT_SELECTED: {
+    cause: '当前没有发现唯一可用的 SuperCom 手表串口。',
+    action: '请在 SuperCom 中打开当前手表串口后重试，平台会自动识别，无需手动配置端口。'
+  },
+  SUPERCOM_PIPE_UNAVAILABLE: {
+    cause: '平台没有检测到 SuperCom 中已打开的手表连接。',
+    action: '请打开 SuperCom，连接当前手表对应的串口后重新检查。'
+  },
+  SUPERCOM_NO_UART: {
+    cause: '平台找到了连接入口，但没有收到手表响应。',
+    action: '请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。'
+  },
+  USB_DEVICE_NOT_PRESENT: {
+    cause: '电脑当前没有检测到手表的 USB 连接。',
+    action: '请重新插拔 USB，确认电脑能够识别手表后重试。'
+  },
+  USB_TARGET_AMBIGUOUS: {
+    cause: '电脑同时检测到多台可测试手表，无法确定目标。',
+    action: '请只保留当前要测试的一台手表后重试。'
+  },
+  MTP_NAMESPACE_NOT_READY: {
+    cause: '电脑检测到了手表，但暂时无法读取截图。',
+    action: '请重新连接 USB，并确认电脑能够打开手表存储后重试。'
+  },
+  LLM_NOT_READY: {
+    cause: '结果判定服务当前不可用。',
+    action: '请检查网络和判定服务设置后重试。'
+  },
+  TARGET_BUSY: {
+    cause: '当前手表正在执行另一个任务。',
+    action: '请等待该任务结束或停止后再检查。'
+  },
+  PREFLIGHT_INTERNAL_ERROR: {
+    cause: '环境检查没有正常完成。',
+    action: '请重新检查；如再次出现，展开诊断信息并联系维护人员。'
+  },
+  BLE_UNAVAILABLE: {
+    cause: '当前电脑的蓝牙功能不可用。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_SCAN_FAILED: {
+    cause: '电脑没有完成本次蓝牙查找。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_CONNECT_TIMEOUT: {
+    cause: '在规定时间内没有与这台手表建立连接。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  BLE_CONNECT_FAILED: {
+    cause: '电脑没有与这台手表建立可用连接。',
+    action: '请开启系统蓝牙并允许平台使用蓝牙，让手表保持亮屏且靠近电脑，确认手表未被其他设备占用后重新查找或连接。'
+  },
+  LLM_TLS_ERROR: {
+    cause: '电脑无法与判定服务建立安全连接。',
+    action: '请检查网络后重试；如仍失败，请联系维护人员检查判定服务。'
+  },
+  LLM_TIMEOUT: {
+    cause: '判定服务在规定时间内没有响应。',
+    action: '请检查网络连接，稍后重新测试。'
+  },
+  LLM_AUTH_FAILED: {
+    cause: '判定服务没有接受当前账号信息。',
+    action: '请在系统设置中重新核对判定服务账号或密钥。'
+  },
+  LLM_MODEL_NOT_FOUND: {
+    cause: '当前选择的判定模型不可用。',
+    action: '请在系统设置中重新选择或核对判定模型。'
+  },
+  LLM_QUOTA_EXCEEDED: {
+    cause: '判定服务暂时无法接受更多请求，或当前账号可用额度不足。',
+    action: '请稍后重试，并检查判定服务账号状态。'
+  },
+  LLM_REQUEST_FAILED: {
+    cause: '电脑没有完成本次判定服务连接测试。',
+    action: '请检查网络和判定服务设置后重试。'
+  }
 });
 
-function issuePresentation({fallback = '操作未完成，请重试。', status = 0, reasonCode = '', detail = ''} = {}) {
+const ISSUE_CODE_ALIASES = Object.freeze({
+  BLE_RUNTIME_UNAVAILABLE: 'BLE_UNAVAILABLE',
+  BLE_CONNECTION_TIMEOUT: 'BLE_CONNECT_TIMEOUT',
+  BLE_CONNECTION_FAILED: 'BLE_CONNECT_FAILED',
+  BLE_DISCOVERY_FAILED: 'BLE_SCAN_FAILED',
+  'SSL/TLS 握手失败': 'LLM_TLS_ERROR',
+  '网络连接超时': 'LLM_TIMEOUT',
+  'API KEY 鉴权失败': 'LLM_AUTH_FAILED',
+  '模型不存在': 'LLM_MODEL_NOT_FOUND',
+  '额度不足或频次超限': 'LLM_QUOTA_EXCEEDED',
+  '请求异常': 'LLM_REQUEST_FAILED'
+});
+
+function resolveIssueDefinition(reasonCode = '') {
+  const rawKey = String(reasonCode || '').trim();
+  if (!rawKey) return null;
+  const upper = rawKey.toUpperCase();
+  const direct = ISSUE_TABLE[upper] || ISSUE_TABLE[rawKey];
+  if (direct) return direct;
+  const aliasKey = ISSUE_CODE_ALIASES[upper] || ISSUE_CODE_ALIASES[rawKey];
+  if (aliasKey && ISSUE_TABLE[aliasKey]) return ISSUE_TABLE[aliasKey];
+  return null;
+}
+
+function knownIssueSummary(reasonCode = '') {
+  const def = resolveIssueDefinition(reasonCode);
+  return def ? def.cause : '';
+}
+
+function issuePresentation({fallback = '', status = 0, reasonCode = '', detail = '', action = ''} = {}) {
   const rawDetail = String(detail ?? '').trim();
   const code = String(reasonCode || '').trim().toUpperCase();
-  if (ISSUE_SUMMARIES[code]) return {summary: ISSUE_SUMMARIES[code], detail: rawDetail, code};
-  const friendly = friendlyAgentError(rawDetail);
-  if (friendly && friendly !== rawDetail) return {summary: friendly, detail: rawDetail, code};
-  if (status >= 500 || /Traceback|\b(?:TypeError|ValueError|KeyError|RuntimeError|FileNotFoundError)\b|服务器错误\s*[:：]/i.test(rawDetail)) {
-    return {summary: '服务暂时不可用，请稍后重试。', detail: rawDetail, code};
+  const known = resolveIssueDefinition(code || reasonCode);
+  if (known) {
+    return {
+      cause: known.cause,
+      action: known.action,
+      summary: known.cause,
+      detail: rawDetail,
+      code
+    };
   }
-  return {summary: rawDetail || fallback, detail: rawDetail, code};
+  const friendly = friendlyAgentError(rawDetail);
+  if (friendly && friendly !== rawDetail) {
+    const finalAction = safeProductCopy(action) || '请检查设置后重试。';
+    return {
+      cause: friendly,
+      action: finalAction,
+      summary: friendly,
+      detail: rawDetail,
+      code
+    };
+  }
+  const defaultCause = safeProductCopy(fallback) || UNKNOWN_ISSUE.cause;
+  const defaultAction = safeProductCopy(action) || UNKNOWN_ISSUE.action;
+  return {
+    cause: defaultCause,
+    action: defaultAction,
+    summary: defaultCause,
+    detail: rawDetail,
+    code
+  };
+}
+
+function issueNoticeHtml({reasonCode = '', detail = '', action = '', fallback = ''} = {}) {
+  const issue = issuePresentation({reasonCode, detail, action, fallback});
+  const causeHtml = `<p><strong>问题原因：</strong>${escapeHtml(issue.cause)}</p>`;
+  const actionHtml = issue.action ? `<p><strong>处理方法：</strong>${escapeHtml(issue.action)}</p>` : '';
+  const diagnosticsHtml = issue.detail ? `<details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(issue.detail)}</code></pre></details>` : '';
+  return `<div class="notice notice-error">${causeHtml}${actionHtml}</div>${diagnosticsHtml}`;
 }
 
 function productApiError(value, status = 0, reasonCode = '') {
+  return productApiPresentation(value, status, reasonCode).summary;
+}
+
+function productApiPresentation(value, status = 0, reasonCode = '') {
+  const safeFallback = status >= 400 && status < 500 ? safeProductCopy(value) : '';
+  return issuePresentation({fallback: safeFallback, status, reasonCode, detail: value});
+}
+
+function presentationFromError(error, fallback = '') {
+  if (error?.presentation) return error.presentation;
   return issuePresentation({
-    fallback: status >= 500 ? '服务暂时不可用，请稍后重试。' : `请求失败（${status || '未知状态'}）`,
-    status,
-    reasonCode,
-    detail: value
-  }).summary;
+    fallback,
+    status: Number(error?.status || 0),
+    reasonCode: error?.code || '',
+    detail: error?.diagnosticMessage || error?.message || ''
+  });
 }
 
 function showToast(message, type = '') {
@@ -201,11 +406,13 @@ async function api(url, options = {}) {
     response = await fetch(url, { ...options, headers });
   } catch (cause) {
     const diagnosticMessage = String(cause?.message || cause || '').trim();
-    const error = new Error('无法连接服务，请检查服务状态后重试。');
+    const presentation = issuePresentation({reasonCode: 'NETWORK_ERROR', detail: diagnosticMessage});
+    const error = new Error(presentation.summary);
     error.status = 0;
     error.diagnosticMessage = diagnosticMessage;
     error.code = 'NETWORK_ERROR';
     error.payload = {};
+    error.presentation = presentation;
     throw error;
   }
   let payload;
@@ -213,14 +420,71 @@ async function api(url, options = {}) {
   if (!response.ok) {
     const diagnosticMessage = payload.error || `请求失败（${response.status}）`;
     const reasonCode = payload.reason_code || payload.error_code || '';
-    const error = new Error(productApiError(diagnosticMessage, response.status, reasonCode));
+    const presentation = productApiPresentation(diagnosticMessage, response.status, reasonCode);
+    const error = new Error(presentation.summary);
     error.status = response.status;
     error.diagnosticMessage = diagnosticMessage;
     error.code = reasonCode;
     error.payload = payload;
+    error.presentation = presentation;
     throw error;
   }
   return payload;
+}
+
+function normalizeProjectProfile(project) {
+  const projectId = String(project.project_id || project.project || '');
+  const defaultTargetId = String(project.default_target || project.allowed_targets?.[0] || '');
+  const target = PLATFORM_TARGETS[defaultTargetId] || {};
+  return {
+    ...project,
+    ...target,
+    project: projectId,
+    project_id: projectId,
+    projectLabel: String(project.project_name || project.project_label || projectId),
+    project_label: String(project.project_name || project.project_label || projectId),
+    target: String(target.execution_target || 'unknown'),
+    targetLabel: String(target.execution_target_label || target.target_label || '未配置目标'),
+    platform_id: String(project.default_platform || target.platform_id || ''),
+    target_id: defaultTargetId
+  };
+}
+
+async function loadPlatformRegistries() {
+  const [platformPayload, projectPayload] = await Promise.all([
+    api('/api/platforms'),
+    api('/api/projects')
+  ]);
+  PLATFORM_PROFILES = Object.fromEntries(
+    (platformPayload.platforms || []).map(item => [String(item.platform_id), item])
+  );
+  PLATFORM_TARGETS = Object.fromEntries(
+    (platformPayload.targets || []).map(item => [String(item.target_id), item])
+  );
+  TEST_PROJECTS = Object.fromEntries(
+    (projectPayload.items || []).map(item => {
+      const normalized = normalizeProjectProfile(item);
+      return [normalized.project, normalized];
+    })
+  );
+  ENVIRONMENT_PROTOCOLS = Object.fromEntries(
+    Object.values(TEST_PROJECTS).map(project => {
+      const target = PLATFORM_TARGETS[project.target_id] || {};
+      return [project.project, {
+        transport: target.transport,
+        transportLabel: target.transport_label,
+        captureProvider: target.capture_provider,
+        captureLabel: target.capture_label,
+        serialProvider: target.serial_provider,
+        serialLabel: target.serial_label,
+        feedbackProvider: target.feedback_provider
+      }];
+    })
+  );
+  const projects = Object.values(TEST_PROJECTS);
+  if (!projects.length) throw new Error('项目注册表为空，请先检查 /api/projects');
+  DEFAULT_TEST_PROJECT = projects[0].project;
+  renderGlobalProjectControls();
 }
 
 function icon(name, size = 20) {
@@ -232,6 +496,7 @@ function icon(name, size = 20) {
     defects: '<path d="M8 4h8M9 2v4m6-4v4M5 10h14M4 14h16M6 18h12"/><rect x="6" y="6" width="12" height="15" rx="6"/>',
     environments: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/>',
     check: '<path d="m5 12 4 4L19 6"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
     warning: '<path d="M12 3 2.5 20h19Z"/><path d="M12 9v4m0 3h.01"/>',
     refresh: '<path d="M20 6v5h-5M4 18v-5h5"/><path d="M18 9a7 7 0 0 0-12-3L4 8m2 7a7 7 0 0 0 12 3l2-2"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
@@ -244,18 +509,84 @@ function icon(name, size = 20) {
 }
 
 function currentProject() {
-  const queryProject = new URLSearchParams(location.search).get('project');
-  if (queryProject && Object.hasOwn(TEST_PROJECTS, queryProject)) return queryProject;
+  const params = new URLSearchParams(location.search);
+  const queryProject = params.get('project_id') || params.get('project');
+  if (queryProject) return queryProject;
   const stored = localStorage.getItem(PROJECT_STORAGE_KEY);
-  return stored && Object.hasOwn(TEST_PROJECTS, stored) ? stored : DEFAULT_TEST_PROJECT;
+  return stored || DEFAULT_TEST_PROJECT;
 }
 
 function rememberProject(project) {
-  const normalized = Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT;
+  const normalized = String(project || '');
+  if (!Object.hasOwn(TEST_PROJECTS, normalized)) {
+    throw new Error(`项目不存在或已归档：${normalized || '空'}`);
+  }
   localStorage.setItem(PROJECT_STORAGE_KEY, normalized);
-  const select = document.querySelector('#global-target-select');
-  if (select && select.value !== normalized) select.value = normalized;
+  const button = document.querySelector('#global-project-switch');
+  if (button) button.textContent = `当前项目：${TEST_PROJECTS[normalized].projectLabel} ▾`;
   return normalized;
+}
+
+function renderGlobalProjectControls() {
+  const current = Object.hasOwn(TEST_PROJECTS, currentProject()) ? currentProject() : DEFAULT_TEST_PROJECT;
+  const button = document.querySelector('#global-project-switch');
+  if (button) button.textContent = `当前项目：${TEST_PROJECTS[current]?.projectLabel || current} ▾`;
+  renderProjectSwitchList('');
+  renderCreateProjectOptions();
+}
+
+function renderProjectSwitchList(query = '') {
+  const host = document.querySelector('#project-switch-list');
+  if (!host) return;
+  const needle = String(query).trim().toLocaleLowerCase('zh-CN');
+  const current = currentProject();
+  const projects = Object.values(TEST_PROJECTS).filter(project =>
+    !needle || `${project.projectLabel} ${project.project}`.toLocaleLowerCase('zh-CN').includes(needle)
+  );
+  host.innerHTML = projects.length ? projects.map(project => `
+    <button type="button" class="project-switch-item ${project.project === current ? 'is-current' : ''}" data-switch-project="${escapeHtml(project.project)}">
+      <span><strong>${escapeHtml(project.projectLabel)}</strong><small>${escapeHtml(project.project)}</small></span>
+      <span>${escapeHtml((project.allowed_platforms || []).map(id => PLATFORM_PROFILES[id]?.platform_label || id).join(' / '))}${project.project === current ? ' · 当前' : ''}</span>
+    </button>`).join('') : Components.emptyState('没有匹配的项目');
+}
+
+function renderCreateProjectOptions() {
+  const platformHost = document.querySelector('#create-project-platforms');
+  const targetHost = document.querySelector('#create-project-targets');
+  if (!platformHost || !targetHost) return;
+  const preferredProject = Object.hasOwn(TEST_PROJECTS, currentProject()) ? currentProject() : DEFAULT_TEST_PROJECT;
+  const preferredPlatform = currentPlatformFor(preferredProject);
+  const preferredTarget = currentTargetFor(preferredProject, preferredPlatform);
+  const platforms = Object.values(PLATFORM_PROFILES).sort((left, right) => {
+    if (left.platform_id === 'w30') return -1;
+    if (right.platform_id === 'w30') return 1;
+    return String(left.platform_label || left.platform_id).localeCompare(String(right.platform_label || right.platform_id), 'zh-CN');
+  });
+  platformHost.innerHTML = platforms.map(platform => `
+    <label><input type="checkbox" name="allowed_platforms" value="${escapeHtml(platform.platform_id)}" ${platform.platform_id === preferredPlatform ? 'checked' : ''}><span>${escapeHtml(platform.platform_label || platform.platform_id)}</span></label>`).join('');
+  targetHost.innerHTML = Object.values(PLATFORM_TARGETS).map(target => `
+    <label data-target-platform="${escapeHtml(target.platform_id)}"><input type="checkbox" name="allowed_targets" value="${escapeHtml(target.target_id)}" ${target.target_id === preferredTarget ? 'checked' : ''}><span>${escapeHtml(target.target_label || target.target_id)}</span></label>`).join('');
+  syncCreateProjectOptions();
+}
+
+function syncCreateProjectOptions() {
+  const form = document.querySelector('#create-project-form');
+  if (!form) return;
+  const platforms = [...form.querySelectorAll('input[name="allowed_platforms"]:checked')].map(input => input.value);
+  const defaultPlatform = form.querySelector('#create-project-default-platform');
+  const previousPlatform = defaultPlatform.value;
+  defaultPlatform.innerHTML = platforms.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(PLATFORM_PROFILES[id]?.platform_label || id)}</option>`).join('');
+  if (platforms.includes(previousPlatform)) defaultPlatform.value = previousPlatform;
+  form.querySelectorAll('[data-target-platform]').forEach(label => {
+    const allowed = platforms.includes(label.dataset.targetPlatform);
+    label.hidden = !allowed;
+    if (!allowed) label.querySelector('input').checked = false;
+  });
+  const targets = [...form.querySelectorAll('input[name="allowed_targets"]:checked')]
+    .map(input => input.value)
+    .filter(id => PLATFORM_TARGETS[id]?.platform_id === defaultPlatform.value);
+  const defaultTarget = form.querySelector('#create-project-default-target');
+  defaultTarget.innerHTML = targets.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(PLATFORM_TARGETS[id]?.target_label || id)}</option>`).join('');
 }
 
 function setGlobalTargetHealth(status = 'unchecked', label = '尚未检查') {
@@ -327,6 +658,7 @@ function returnDestinationLabel(returnTo, fallback = '上一页') {
     '/reports': '测试报告',
     '/defects': '缺陷队列',
     '/environments': '环境中心',
+    '/bluetooth': '蓝牙工作台',
   };
   if (labels[pathname]) return labels[pathname];
   if (pathname.startsWith('/test-batch/')) return '批次运行';
@@ -366,18 +698,74 @@ function restoreRememberedScroll() {
 }
 
 function initGlobalTargetSwitcher() {
-  const select = document.querySelector('#global-target-select');
-  if (!select || select.dataset.ready === 'true') return;
-  select.dataset.ready = 'true';
-  select.value = rememberProject(currentProject());
-  select.addEventListener('change', () => {
-    const project = rememberProject(select.value);
+  const button = document.querySelector('#global-project-switch');
+  if (!button || button.dataset.ready === 'true') return;
+  button.dataset.ready = 'true';
+  const switchDialog = document.querySelector('#project-switch-dialog');
+  const createDialog = document.querySelector('#create-project-dialog');
+  const switchToProject = projectValue => {
+    const project = rememberProject(projectValue);
     selectedTestCases.clear();
     selectedTestProject = project;
+    selectedRunPlatform = '';
+    selectedRunTarget = '';
+    invalidateCaseCatalog();
     const targetPath = TOP_LEVEL_ROUTE_PATHS.includes(location.pathname) ? location.pathname : '/cases';
-    history.pushState({}, '', pageUrl(targetPath, project));
+    const requestedPlatform = new URLSearchParams(location.search).get('platform_id');
+    const projectProfile = testProject(project);
+    const allowedPlatforms = projectProfile.allowed_platforms || [];
+    const compatiblePlatform = allowedPlatforms.includes(requestedPlatform)
+      ? requestedPlatform
+      : String(projectProfile.default_platform || allowedPlatforms[0] || '');
+    const extra = targetPath === '/cases' && compatiblePlatform
+      ? {platform_id: compatiblePlatform}
+      : {};
+    history.pushState({}, '', pageUrl(targetPath, project, extra));
+    switchDialog?.close();
     route();
+  };
+  button.addEventListener('click', () => { renderProjectSwitchList(''); switchDialog?.showModal(); });
+  document.querySelector('#open-create-project')?.addEventListener('click', () => { renderCreateProjectOptions(); createDialog?.showModal(); });
+  document.querySelector('#project-switch-create')?.addEventListener('click', () => { switchDialog?.close(); renderCreateProjectOptions(); createDialog?.showModal(); });
+  document.querySelectorAll('[data-close-project-switch]').forEach(item => item.addEventListener('click', () => switchDialog?.close()));
+  document.querySelectorAll('[data-close-create-project]').forEach(item => item.addEventListener('click', () => createDialog?.close()));
+  document.querySelector('#project-switch-search')?.addEventListener('input', event => renderProjectSwitchList(event.target.value));
+  document.querySelector('#project-switch-list')?.addEventListener('click', event => {
+    const item = event.target.closest('[data-switch-project]');
+    if (item) switchToProject(item.dataset.switchProject);
   });
+  document.querySelector('#create-project-form')?.addEventListener('change', event => {
+    if (event.target.matches('input[name="allowed_platforms"], input[name="allowed_targets"], #create-project-default-platform')) syncCreateProjectOptions();
+  });
+  document.querySelector('#create-project-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const error = form.querySelector('#create-project-error');
+    const submit = form.querySelector('[type="submit"]');
+    error.hidden = true;
+    submit.disabled = true;
+    try {
+      const data = new FormData(form);
+      const payload = {
+        project_name: String(data.get('project_name') || '').trim(),
+        project_id: String(data.get('project_id') || '').trim(),
+        allowed_platforms: data.getAll('allowed_platforms'),
+        default_platform: String(data.get('default_platform') || ''),
+        allowed_targets: data.getAll('allowed_targets'),
+        default_target: String(data.get('default_target') || '')
+      };
+      const created = await api('/api/projects', {method: 'POST', body: JSON.stringify(payload)});
+      await loadPlatformRegistries();
+      form.reset();
+      createDialog?.close();
+      showToast(`项目“${created.project_name}”已创建`, 'success');
+      switchToProject(created.project_id);
+    } catch (caught) {
+      error.textContent = caught.message;
+      error.hidden = false;
+    } finally { submit.disabled = false; }
+  });
+  rememberProject(currentProject());
 }
 
 function initPrimaryNavigation() {
@@ -486,30 +874,66 @@ async function mapWithLimit(values, limit, mapper) {
 }
 
 function invalidateCaseCatalog(project) {
-  if (project) caseCatalogCache.delete(project);
-  else caseCatalogCache.clear();
+  if (!project) {
+    caseCatalogCache.clear();
+    return;
+  }
+  for (const key of caseCatalogCache.keys()) {
+    if (key.startsWith(`${project}\u001f`)) caseCatalogCache.delete(key);
+  }
 }
 
 async function loadCaseCatalog(project = currentProject(), {force = false} = {}) {
   const normalized = testProject(project).project;
-  if (force) invalidateCaseCatalog(normalized);
-  if (caseCatalogCache.has(normalized)) return await caseCatalogCache.get(normalized);
+  const platformId = currentPlatformFor(normalized);
+  const cacheKey = `${normalized}\u001f${platformId}`;
+  if (force) invalidateCaseCatalog();
+  if (caseCatalogCache.has(cacheKey)) return await caseCatalogCache.get(cacheKey);
   const pending = (async () => {
-    const first = await api(`/api/tests?project=${encodeURIComponent(normalized)}&page=1&page_size=${CASE_CATALOG_PAGE_SIZE}`);
+    const first = await api(`/api/tests?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&page=1&page_size=${CASE_CATALOG_PAGE_SIZE}`);
     const pages = Array.from({length: Math.max(0, Number(first.total_pages || 1) - 1)}, (_, index) => index + 2);
-    const payloads = await mapWithLimit(pages, 6, page => api(`/api/tests?project=${encodeURIComponent(normalized)}&page=${page}&page_size=${CASE_CATALOG_PAGE_SIZE}`));
+    const payloads = await mapWithLimit(pages, 6, page => api(`/api/tests?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&page=${page}&page_size=${CASE_CATALOG_PAGE_SIZE}`));
     return {
       ...first,
       items: [...(first.items || []), ...payloads.flatMap(payload => payload.items || [])]
     };
   })();
-  caseCatalogCache.set(normalized, pending);
+  caseCatalogCache.set(cacheKey, pending);
   try {
     return await pending;
   } catch (error) {
-    caseCatalogCache.delete(normalized);
+    caseCatalogCache.delete(cacheKey);
     throw error;
   }
+}
+
+async function loadCaseOverview(project = currentProject()) {
+  const normalized = testProject(project).project;
+  const platformId = currentPlatformFor(normalized);
+  return await api(`/api/tests/overview?project_id=${encodeURIComponent(normalized)}&platform_id=${encodeURIComponent(platformId)}&limit=20`);
+}
+
+async function loadCasePage(project, {query = '', page = 1, state = 'all', category = 'all', module = ''} = {}) {
+  const normalized = testProject(project).project;
+  const platformId = currentPlatformFor(normalized);
+  const params = new URLSearchParams({
+    project_id: normalized,
+    platform_id: platformId,
+    q: query,
+    page: String(page),
+    page_size: String(PAGE_SIZE),
+    state
+  });
+  const modules = module
+    ? [module]
+    : (category !== 'all' ? (FUNCTION_CATEGORIES[category] || []) : []);
+  modules.forEach(name => params.append('module', name));
+  const request = new URLSearchParams(params);
+  modules.forEach(name => {
+    if (!request.getAll('module').includes(name)) request.append('module', name);
+  });
+  const payload = await api(`/api/tests?${request.toString()}`);
+  return payload;
 }
 
 function moduleCategory(moduleName) {
@@ -583,7 +1007,13 @@ const Components = Object.freeze({
     return `<div class="progress-ring" style="--progress:${safe}" role="img" aria-label="${escapeHtml(label)} ${safe}%"><div><strong>${safe}%</strong><span>${escapeHtml(label)}</span></div></div>`;
   },
   subTabs(items, active) {
-    return `<nav class="workspace-subtabs" aria-label="页面分类">${items.map(item => `<button type="button" class="${item.value === active ? 'is-active' : ''}" data-subtab="${escapeHtml(item.value)}" ${item.disabled ? 'disabled' : ''}>${escapeHtml(item.label)}</button>`).join('')}</nav>`;
+    return `<nav class="workspace-subtabs" aria-label="页面分类">${items.map(item => {
+      const className = item.value === active ? 'is-active' : '';
+      if (item.href) {
+        return `<a href="${escapeHtml(item.href)}" class="${className}" ${item.value === active ? 'aria-current="page"' : ''}>${escapeHtml(item.label)}</a>`;
+      }
+      return `<button type="button" class="${className}" data-subtab="${escapeHtml(item.value)}" ${item.disabled ? 'disabled' : ''}>${escapeHtml(item.label)}</button>`;
+    }).join('')}</nav>`;
   },
   emptyState(title, message = '') {
     return `<div class="workspace-empty"><strong>${escapeHtml(title)}</strong>${message ? `<p>${escapeHtml(message)}</p>` : ''}</div>`;
@@ -637,8 +1067,19 @@ function resultChip(value) {
 }
 
 function maturityChip(row = {}) {
+  const maturity = String(row.automation_maturity || row.mapping_status || '').toUpperCase();
+  if (maturity === 'AUTO_READY') return '<span class="chip chip-solidified">自动化就绪</span>';
+  if (maturity === 'NEED_REVIEW') return '<span class="chip chip-unsolidified">待评审</span>';
+  if (maturity === 'MANUAL_REQUIRED') return '<span class="chip chip-warning">需人工执行</span>';
+  if (maturity === 'UNSUPPORTED') return '<span class="chip chip-fail">暂不支持</span>';
   if (row.is_promoted || row.maturity_state === 'solidified') {
     return '<span class="chip chip-solidified">可直接运行</span>';
+  }
+  if (row.is_execution_blocked || row.mapping_status === 'BLOCKED') {
+    return '<span class="chip chip-fail">当前固件阻塞</span>';
+  }
+  if (row.is_execution_ready || row.mapping_status === 'EXECUTION_READY') {
+    return '<span class="chip chip-unsolidified">动作可运行</span>';
   }
   if (row.external_explored || row.maturity_state === 'explored_unsolidified') {
     return '<span class="chip chip-unsolidified">步骤待确认</span>';
@@ -646,32 +1087,164 @@ function maturityChip(row = {}) {
   return '<span class="chip chip-unexplored">待生成步骤</span>';
 }
 
+function automationMaturityLabel(value) {
+  return ({
+    AUTO_READY: '自动化就绪',
+    PROMOTED: '已固化',
+    NEED_REVIEW: '待评审',
+    MANUAL_REQUIRED: '需人工执行',
+    UNSUPPORTED: '暂不支持',
+    UNMAPPED: '未绑定',
+  })[String(value || '').toUpperCase()] || String(value || '未知');
+}
+
+function caseSourceLabel(value) {
+  return ({
+    MANIFEST_579: '579 冻结基线',
+    W30_CASE_MAP: 'W30 Case Map 基线',
+    MANUAL: '人员新增',
+    EXCEL: 'Excel 导入',
+    CLONE: '复制创建',
+  })[String(value || '').toUpperCase()] || '统一用例库';
+}
+
+function platformApplicabilityMarkup(projectId, selected = [], inputName = 'case-applicable-platform') {
+  const project = testProject(projectId);
+  const active = new Set((selected || []).map(String));
+  return (project.allowed_platforms || []).map(platformId => {
+    const label = PLATFORM_PROFILES[platformId]?.platform_label || platformId;
+    return `<label class="platform-applicability-option"><input type="checkbox" name="${escapeHtml(inputName)}" value="${escapeHtml(platformId)}" ${active.has(platformId) ? 'checked' : ''}><span>${escapeHtml(label)}</span></label>`;
+  }).join('');
+}
+
+function selectedPlatformValues(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
+}
+
 function caseStatusChip(row = {}) {
-  if (row.is_promoted || row.maturity_state === 'solidified') {
-    const historyCount = Number(row.history_count || 0);
-    const rawVerdict = String(row.latest_verdict || 'PENDING').toUpperCase();
-    const normalized = historyCount > 0
-      ? ({SKIP: 'CANNOT_VERIFY'}[rawVerdict] || (
-        ['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict) ? rawVerdict : 'ERROR'
-      ))
-      : 'PENDING';
-    const presentation = resultPresentation(normalized);
-    return `<span class="${presentation.className}">${presentation.label}</span>`;
-  }
-  return maturityChip(row);
+  const historyCount = Math.max(
+    Number(row.history_count || 0),
+    Array.isArray(row.history) ? row.history.length : 0
+  );
+  const rawVerdict = String(row.latest_verdict || 'PENDING').toUpperCase();
+  const normalized = historyCount > 0
+    ? ({SKIP: 'CANNOT_VERIFY'}[rawVerdict] || (
+      ['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict) ? rawVerdict : 'ERROR'
+    ))
+    : 'PENDING';
+  const presentation = resultPresentation(normalized);
+  const label = {
+    PASS: 'PASS',
+    FAIL: 'FAIL',
+    CANNOT_VERIFY: 'CANNOT_VERIFY',
+    ERROR: 'ERROR'
+  }[normalized] || presentation.label;
+  return `<span class="${presentation.className}">${label}</span>`;
 }
 
 function testExecutionModeLabel(value) {
   const labels = {
-    fixed_mapping: '已保存步骤',
-    candidate_mapping: '步骤验证',
-    agent_exploration: '临时探索'
+    fixed_mapping: '固化步骤',
+    candidate_mapping: '外部候选复跑',
+    agent_exploration: 'Agent-loop 临时探索',
+    '579_deterministic': '579 冻结计划'
   };
   return labels[String(value || '')] || '旧记录未标明';
 }
 
 function testProject(value = DEFAULT_TEST_PROJECT) {
-  return TEST_PROJECTS[value] || TEST_PROJECTS[DEFAULT_TEST_PROJECT];
+  const project = TEST_PROJECTS[value];
+  if (!project) throw new Error(`项目不存在或已归档：${value || '空'}`);
+  return project;
+}
+
+function currentPlatformFor(project = currentProject()) {
+  const meta = testProject(project);
+  const requested = new URLSearchParams(location.search).get('platform_id');
+  if (requested && (meta.allowed_platforms || []).includes(requested)) return requested;
+  return String(meta.default_platform || meta.platform_id || '');
+}
+
+function targetsFor(project, platformId) {
+  const meta = testProject(project);
+  return (meta.allowed_targets || [])
+    .map(targetId => PLATFORM_TARGETS[targetId])
+    .filter(target => target?.platform_id === platformId);
+}
+
+function currentTargetFor(project, platformId = currentPlatformFor(project)) {
+  const requested = new URLSearchParams(location.search).get('target_id');
+  const targets = targetsFor(project, platformId);
+  if (requested && targets.some(target => target.target_id === requested)) return requested;
+  const meta = testProject(project);
+  if (targets.some(target => target.target_id === meta.default_target)) return meta.default_target;
+  return targets[0]?.target_id || '';
+}
+
+function targetProfile(project, platformId = currentPlatformFor(project), targetId = currentTargetFor(project, platformId)) {
+  const meta = testProject(project);
+  const target = PLATFORM_TARGETS[targetId] || {};
+  return {
+    ...meta,
+    ...target,
+    project: meta.project,
+    project_id: meta.project,
+    project_label: meta.projectLabel,
+    platform_id: platformId,
+    target_id: targetId,
+    target: target.execution_target || meta.target,
+    targetLabel: target.execution_target_label || target.target_label || meta.targetLabel,
+  };
+}
+
+function platformSwitchButtons(project, activePlatform = currentPlatformFor(project), attribute = 'data-platform-view') {
+  return (testProject(project).allowed_platforms || []).map(platformId => {
+    const platform = PLATFORM_PROFILES[platformId] || {};
+    return `<button type="button" class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" ${attribute}="${escapeHtml(platformId)}">${escapeHtml(platform.platform_label || platformId)}</button>`;
+  }).join('');
+}
+
+function runPlatformSwitchButtons(project, activePlatform = currentPlatformFor(project), attribute = 'data-run-platform') {
+  const allowed = new Set(testProject(project).allowed_platforms || []);
+  const platforms = Object.values(PLATFORM_PROFILES).sort((left, right) => {
+    if (left.platform_id === 'w30') return -1;
+    if (right.platform_id === 'w30') return 1;
+    return String(left.platform_label || left.platform_id).localeCompare(String(right.platform_label || right.platform_id), 'zh-CN');
+  });
+  return platforms.map(platform => {
+    const platformId = String(platform.platform_id || '');
+    const enabled = allowed.has(platformId);
+    const title = enabled ? '' : `当前项目未启用 ${platform.platform_label || platformId}`;
+    return `<button type="button" class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" ${attribute}="${escapeHtml(platformId)}" ${enabled ? '' : 'disabled'} title="${escapeHtml(title)}">${escapeHtml(platform.platform_label || platformId)}</button>`;
+  }).join('');
+}
+
+function caseProjectsForPlatform(platformId) {
+  return Object.values(TEST_PROJECTS).filter(project =>
+    (project.allowed_platforms || []).includes(platformId)
+  );
+}
+
+function caseProjectForPlatform(platformId, preferredProject = currentProject()) {
+  const projects = caseProjectsForPlatform(platformId);
+  const preferred = projects.find(project => project.project === preferredProject);
+  if (preferred) return preferred.project;
+  const canonicalId = platformId === '579' ? '579_O2' : DEFAULT_TEST_PROJECT;
+  return projects.find(project => project.project === canonicalId)?.project || projects[0]?.project || '';
+}
+
+function caseManagementPlatformButtons(activePlatform = '') {
+  return ['w30', '579'].map(platformId => {
+    const label = platformId === 'w30' ? 'W30' : '579';
+    const project = caseProjectForPlatform(platformId);
+    if (!project) return `<span class="platform-choice is-disabled">${label}</span>`;
+    return `<form class="case-platform-switch-form" method="get" action="/cases" data-case-platform="${platformId}"><input type="hidden" name="project" value="${escapeHtml(project)}"><input type="hidden" name="platform_id" value="${platformId}"><button class="platform-choice ${platformId === activePlatform ? 'is-active' : ''}" type="submit" ${platformId === activePlatform ? 'aria-current="page"' : ''}>${label}</button></form>`;
+  }).join('');
+}
+
+function confirm579Watchface(project) {
+  if (project !== '579_Z1640') return true;
+  return window.confirm('请先确认 579 手表当前位于亮屏表盘。确认后，Runner 会直接发送侧键和触控命令；若 OTA 后侧键路径失效，请取消并停止迁移。');
 }
 
 function testTargetChip(value) {
@@ -688,7 +1261,9 @@ function isHardwareTestTarget(value) {
 }
 
 function screenshotLabel(value) {
-  return isHardwareTestTarget(value) ? '真机截图' : '模拟器截图';
+  const meta = typeof value === 'string' ? testProject(value) : value;
+  if (meta?.capture_provider === 'o2' || meta?.target_id === '579.o2' || meta?.platform_id === '579') return 'O2 手表截图';
+  return isHardwareTestTarget(meta) ? '真机截图' : '模拟器截图';
 }
 
 function screenshotGridClass(value) {
@@ -1124,16 +1699,18 @@ function testListParams() {
   const params = new URLSearchParams(location.search);
   const rawPage = Number.parseInt(params.get('page') || '1', 10);
   const state = String(params.get('state') || DEFAULT_TEST_STATE).toLowerCase();
-  const project = String(params.get('project') || currentProject());
+  const project = String(params.get('project_id') || params.get('project') || currentProject());
   const rawCategory = String(params.get('category') || 'all');
   const category = rawCategory === 'all' || Object.hasOwn(FUNCTION_CATEGORIES, rawCategory) ? rawCategory : 'all';
   const rawModule = String(params.get('module') || '');
   const module = ALL_FUNCTION_MODULES.includes(rawModule) ? rawModule : '';
+  const normalizedProject = testProject(project).project;
   return {
     query: (params.get('q') || '').trim(),
     page: Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1,
     state: Object.hasOwn(TEST_FILTER_LABELS, state) ? state : DEFAULT_TEST_STATE,
-    project: Object.hasOwn(TEST_PROJECTS, project) ? project : DEFAULT_TEST_PROJECT,
+    project: normalizedProject,
+    platform: currentPlatformFor(normalizedProject),
     category,
     module
   };
@@ -1142,6 +1719,7 @@ function testListParams() {
 function buildTestListUrl(query, page, state = DEFAULT_TEST_STATE, project = DEFAULT_TEST_PROJECT, category = 'all', module = '') {
   const params = new URLSearchParams();
   params.set('project', testProject(project).project);
+  params.set('platform_id', currentPlatformFor(project));
   if (query.trim()) params.set('q', query.trim());
   if (state !== DEFAULT_TEST_STATE) params.set('state', state);
   if (category !== 'all' && Object.hasOwn(FUNCTION_CATEGORIES, category)) params.set('category', category);
@@ -1171,10 +1749,6 @@ function testDetailHref(project, sheet, caseId, returnTo = '/cases') {
   return withTestReturn(`/test/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}`, project, returnTo);
 }
 
-function testHistoryHref(project, sheet, caseId, runId, returnTo = '/cases') {
-  return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
-}
-
 function testBatchHref(jobId, returnTo = currentRouteUrl()) {
   return withReturnContext(`/test-batch/${encodeURIComponent(jobId)}`, returnTo);
 }
@@ -1187,7 +1761,13 @@ function defectHistoryHref(number, runId, returnTo = currentRouteUrl()) {
   return withReturnContext(pageUrl(`/history/${encodeURIComponent(number)}/${encodeURIComponent(runId)}`, currentProject()), returnTo);
 }
 
-function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
+function testHistoryHref(project, sheet, caseId, runId, returnTo = '/cases') {
+  return withTestReturn(`/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}`, project, returnTo);
+}
+
+function testMetricCards(summary = null, activeState = DEFAULT_TEST_STATE) {
+  const loading = summary === null;
+  const values = summary || {};
   const maturityCards = [
     ['all', 'all', '全部用例'],
     ['unexplored', 'unexplored', '待生成步骤'],
@@ -1196,13 +1776,13 @@ function testMetricCards(summary = {}, activeState = DEFAULT_TEST_STATE) {
   ];
   const renderCards = cards => cards.map(([state, countKey, label]) => `
     <button class="metric${activeState === state ? ' is-active' : ''}" type="button" data-test-filter="${state}" aria-pressed="${activeState === state}">
-      <strong>${Number(summary[countKey] || 0)}</strong><span>${label}</span>
+      <strong>${loading ? '—' : Number(values[countKey] || 0)}</strong><span>${label}</span>
     </button>`).join('');
   return `
     <section class="test-metric-group" aria-labelledby="maturity-status-title">
       <header class="test-metric-heading">
         <div><strong id="maturity-status-title">自动化状态</strong><span>按用例当前准备情况分类</span></div>
-        <small>全部 ${Number(summary.all || 0)}</small>
+        <small>${loading ? '正在读取用例统计' : `全部 ${Number(values.all || 0)}`}</small>
       </header>
       <div class="metrics test-metric-grid maturity-metrics">${renderCards(maturityCards)}</div>
     </section>`;
@@ -1220,18 +1800,50 @@ function testRows(items, query, state, returnTo = '/cases') {
     const sheet = String(row.file_sheet || row.sheet || '');
     const caseId = String(row.case_id || '');
     const selected = selectedTestCases.has(testCaseSelectionKey(sheet, caseId));
-    return `<tr class="test-row-shell${selected ? ' is-selected' : ''}">
+    const sourceLocked = Boolean(row.source_locked || row.is_frozen_source);
+    const platforms = (row.applicable_platforms || []).map(platformId => PLATFORM_PROFILES[platformId]?.platform_label || platformId).join(' / ');
+    const revision = Number(row.current_revision || 1);
+    const testItem = String(row.test_item || '').trim() || '待补充';
+    const testPoint = String(row.test_point || '').trim() || '待补充';
+    const actualResult = String(row.actual_result || '').trim()
+      || (Number(row.history_count || 0) > 0
+        ? workspaceVerdictLabel(row.last_product_verdict || row.latest_verdict)
+        : '尚未运行');
+    return `<tr class="test-row-shell case-summary-row${selected ? ' is-selected' : ''}" data-case-expand tabindex="0" aria-expanded="false">
       <td><label class="table-checkbox" title="${escapeHtml(`选择 ${caseId} 创建精确批次`)}"><input type="checkbox" data-test-case-select data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" aria-label="选择用例 ${escapeHtml(caseId)}" ${selected ? 'checked' : ''}></label></td>
-      <td><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)}</small></td>
-      <td class="case-purpose-cell"><strong>${escapeHtml(row.steps_text || row.expected_text || '未填写测试步骤')}</strong><small>${escapeHtml(row.expected_text || '未填写预期结果')}</small></td>
+      <td class="case-id-cell"><span class="case-expand-chevron" aria-hidden="true">›</span><a class="case-id-link" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}">${escapeHtml(caseId)}</a><small>${escapeHtml(sheet)} · ${escapeHtml(caseSourceLabel(row.source_type))} · v${revision}${row.batch_id ? ` · ${escapeHtml(row.batch_id)}` : ''}</small></td>
+      <td class="case-summary-text"><strong>${escapeHtml(testItem)}</strong></td>
+      <td class="case-summary-text"><strong>${escapeHtml(testPoint)}</strong></td>
       <td><span class="chip chip-status priority-${escapeHtml(String(row.priority || '').toLowerCase())}">${escapeHtml(row.priority || '未分级')}</span></td>
-      <td>${maturityChip(row)}</td>
+      <td>${maturityChip(row)}<small>${escapeHtml(platforms ? `适用平台：${platforms}` : '未指定适用平台')}</small></td>
       <td>${caseStatusChip(row)}</td>
       <td><time>${row.last_run_at ? formatTime(row.last_run_at) : '—'}</time>${row.history_count ? `<small>${Number(row.history_count)} 次</small>` : ''}</td>
-      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="编辑用例 ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" aria-label="编辑用例 ${escapeHtml(caseId)}">✎</button></td>
+      <td class="table-actions"><a class="table-icon-action" href="${escapeHtml(testDetailHref(row.project, sheet, caseId, returnTo))}" title="查看并运行 ${escapeHtml(caseId)}" aria-label="查看并运行 ${escapeHtml(caseId)}">${icon('runs', 17)}</a><button class="table-icon-action edit-case-btn" type="button" title="${sourceLocked ? '创建新版本' : '编辑用例'} ${escapeHtml(caseId)}" data-edit-case data-sheet="${escapeHtml(sheet)}" data-case-id="${escapeHtml(caseId)}" data-priority="${escapeHtml(row.priority || 'P1')}" data-test-item="${escapeHtml(row.test_item || '')}" data-test-point="${escapeHtml(row.test_point || '')}" data-precondition="${escapeHtml(row.precondition_text || '')}" data-steps="${escapeHtml(row.steps_text || '')}" data-expected="${escapeHtml(row.expected_text || '')}" data-note="${escapeHtml(row.note || '')}" data-applicable-platforms="${escapeHtml(JSON.stringify(row.applicable_platforms || []))}" data-workflow-state="${escapeHtml(row.workflow_state || 'ACTIVE')}" data-source-locked="${sourceLocked ? 'true' : 'false'}" aria-label="${sourceLocked ? '为冻结用例创建新版本' : '编辑用例'} ${escapeHtml(caseId)}">${sourceLocked ? '版' : '✎'}</button></td>
+    </tr>
+    <tr class="case-detail-row" hidden>
+      <td colspan="9">
+        <section class="case-inline-detail" aria-label="用例 ${escapeHtml(caseId)} 完整详情">
+          <div class="case-detail-field"><span>测试项</span><p>${escapeHtml(testItem)}</p></div>
+          <div class="case-detail-field"><span>测试点</span><p>${escapeHtml(testPoint)}</p></div>
+          <div class="case-detail-field"><span>前置条件</span><p>${escapeHtml(row.precondition_text || '无')}</p></div>
+          <div class="case-detail-field is-wide"><span>操作步骤</span><p>${escapeHtml(row.steps_text || '未填写')}</p></div>
+          <div class="case-detail-field is-wide"><span>预期结果</span><p>${escapeHtml(row.expected_text || '未填写')}</p></div>
+          <div class="case-detail-field"><span>实际结果</span><p>${escapeHtml(actualResult)}</p></div>
+        </section>
+      </td>
     </tr>`;
   }).join('');
-  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试点</th><th>优先级</th><th>自动化状态</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="workspace-table-scroll"><table class="workspace-table case-table"><thead><tr><th class="checkbox-column"></th><th>用例编号</th><th>测试项</th><th>测试点</th><th>优先级</th><th>自动化成熟度</th><th>最近结果</th><th>最近运行</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function toggleCaseInlineDetail(summaryRow) {
+  if (!summaryRow?.matches('[data-case-expand]')) return;
+  const detailRow = summaryRow.nextElementSibling;
+  if (!detailRow?.classList.contains('case-detail-row')) return;
+  const expanded = summaryRow.getAttribute('aria-expanded') === 'true';
+  summaryRow.setAttribute('aria-expanded', String(!expanded));
+  summaryRow.classList.toggle('is-expanded', !expanded);
+  detailRow.hidden = expanded;
 }
 
 function testCaseSelectionKey(sheet, caseId) {
@@ -1250,6 +1862,69 @@ function selectedTestCaseList() {
     left.sheet.localeCompare(right.sheet, 'zh-CN')
     || left.case_id.localeCompare(right.case_id, 'zh-CN', {numeric: true})
   );
+}
+
+async function refreshExecutionOptions() {
+  const buttons = [...document.querySelectorAll('[data-run-platform]')];
+  const targetSelect = document.querySelector('#run-target-select');
+  const blocker = document.querySelector('#run-platform-blocker');
+  const run = document.querySelector('#run-selected-tests');
+  if (!targetSelect || !blocker || !run) return;
+  const project = selectedTestProject || currentProject();
+  const selected = selectedTestCaseList();
+  const token = ++executionOptionsToken;
+  if (!selected.length) {
+    selectedRunPlatform = currentPlatformFor(project);
+    const targets = targetsFor(project, selectedRunPlatform);
+    selectedRunTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}">${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    const allowed = new Set(testProject(project).allowed_platforms || []);
+    buttons.forEach(button => {
+      button.disabled = !allowed.has(button.dataset.runPlatform);
+      button.classList.toggle('is-active', button.dataset.runPlatform === selectedRunPlatform);
+      button.title = button.disabled ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.runPlatform]?.platform_label || button.dataset.runPlatform}` : '';
+    });
+    blocker.textContent = '勾选用例后校验平台映射';
+    run.disabled = true;
+    return;
+  }
+  run.disabled = true;
+  blocker.textContent = '正在校验所选用例的平台映射…';
+  try {
+    const params = new URLSearchParams();
+    params.set('case_ids', selected.map(item => item.case_id).join(','));
+    const payload = await api(`/api/projects/${encodeURIComponent(project)}/execution-options?${params.toString()}`);
+    if (token !== executionOptionsToken) return;
+    const options = payload.options || [];
+    let option = options.find(item => item.platform_id === selectedRunPlatform);
+    if (!option) option = options.find(item => item.platform_id === currentPlatformFor(project)) || options[0];
+    selectedRunPlatform = String(option?.platform_id || '');
+    buttons.forEach(button => {
+      const match = options.find(item => item.platform_id === button.dataset.runPlatform);
+      button.disabled = !match;
+      button.classList.toggle('is-active', button.dataset.runPlatform === selectedRunPlatform);
+      button.title = !match
+        ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.runPlatform]?.platform_label || button.dataset.runPlatform}`
+        : match.runnable ? '' : (match.blockers || []).map(item => `${item.case_id}: ${item.reason_label || item.reason}`).join('\n');
+    });
+    const targets = option?.targets || [];
+    if (!targets.some(target => target.target_id === selectedRunTarget)) selectedRunTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}" ${target.target_id === selectedRunTarget ? 'selected' : ''}>${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    targetSelect.disabled = !option?.runnable;
+    const blocked = Number(option?.blocked_count || 0);
+    blocker.textContent = option?.runnable
+      ? `${option.runnable_count} 条用例可使用 ${option.platform_label} 逻辑运行`
+      : blocked
+        ? `${blocked} 条用例在 ${option?.platform_label || '所选平台'} 被门禁阻止`
+        : '当前项目没有可用执行目标';
+    run.disabled = !option?.runnable || !selectedRunTarget;
+  } catch (error) {
+    if (token !== executionOptionsToken) return;
+    buttons.forEach(button => { button.disabled = true; });
+    targetSelect.disabled = true;
+    blocker.textContent = `平台校验失败：${error.message}`;
+    run.disabled = true;
+  }
 }
 
 function updateSelectedTestCasesUi() {
@@ -1285,9 +1960,10 @@ function updateSelectedTestCasesUi() {
   if (clear) clear.disabled = count < 1;
   const run = document.querySelector('#run-selected-tests');
   if (run) {
-    run.disabled = count < 1;
+    run.disabled = true;
     run.textContent = count ? `用已选用例创建批次（${count}）` : '用已选用例创建批次';
   }
+  void refreshExecutionOptions();
 }
 
 function selectedBatchCategories() {
@@ -1320,11 +1996,23 @@ function renderCaseCategoryTabs(activeCategory = 'all') {
   return `<button type="button" class="${activeCategory === 'all' ? 'is-active' : ''}" data-case-category="all">全部</button>${FUNCTION_CATEGORY_NAMES.map(name => `<button type="button" class="${activeCategory === name ? 'is-active' : ''}" data-case-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('')}`;
 }
 
-function renderModuleSidebar(moduleCounts = {}, catalogTotal = 0, activeCategory = 'all', activeModule = '') {
-  const counts = new Map(Object.entries(moduleCounts || {}));
+function renderModuleSidebar(itemsOrCounts = [], activeCategory = 'all', activeModule = '') {
+  const loading = itemsOrCounts === null;
+  const counts = new Map();
+  if (Array.isArray(itemsOrCounts)) {
+    for (const item of itemsOrCounts) {
+      const sheet = String(item.file_sheet || item.sheet || '未分类');
+      counts.set(sheet, (counts.get(sheet) || 0) + 1);
+    }
+  } else if (itemsOrCounts) {
+    for (const [sheet, value] of Object.entries(itemsOrCounts || {})) {
+      counts.set(sheet, Number(value || 0));
+    }
+  }
   const modules = activeCategory === 'all' ? ALL_FUNCTION_MODULES : (FUNCTION_CATEGORIES[activeCategory] || []);
+  const allTotal = [...counts.values()].reduce((total, value) => total + Number(value || 0), 0);
   const categoryTotal = modules.reduce((total, name) => total + Number(counts.get(name) || 0), 0);
-  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${activeCategory === 'all' ? Number(catalogTotal || 0) : categoryTotal}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
+  return `<button type="button" class="module-filter ${!activeModule ? 'is-active' : ''}" data-case-module=""><span>全部模块</span><strong>${loading ? '—' : (activeCategory === 'all' ? allTotal : categoryTotal)}</strong></button>${modules.map(name => `<button type="button" class="module-filter ${activeModule === name ? 'is-active' : ''}" data-case-module="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><strong>${loading ? '—' : Number(counts.get(name) || 0)}</strong></button>`).join('')}`;
 }
 
 async function refreshTests(query, page, {
@@ -1345,18 +2033,7 @@ async function refreshTests(query, page, {
     if (category !== 'all' && !Object.hasOwn(FUNCTION_CATEGORIES, category)) category = 'all';
     if (module && (!ALL_FUNCTION_MODULES.includes(module) || (category !== 'all' && !FUNCTION_CATEGORIES[category].includes(module)))) module = '';
     if (force) invalidateCaseCatalog(project);
-    const request = new URLSearchParams({
-      project,
-      q: query,
-      state,
-      page: String(page),
-      page_size: String(PAGE_SIZE)
-    });
-    const requestedModules = module
-      ? [module]
-      : (category !== 'all' ? FUNCTION_CATEGORIES[category] : []);
-    requestedModules.forEach(name => request.append('module', name));
-    const payload = await api(`/api/tests?${request.toString()}`);
+    const payload = await loadCasePage(project, {query, page, state, category, module});
     if (token !== testListRequestToken) return;
     ensureTestSelectionProject(payload.project);
     rememberProject(payload.project);
@@ -1369,7 +2046,7 @@ async function refreshTests(query, page, {
     const categoryTabs = document.querySelector('#case-category-tabs');
     if (categoryTabs) categoryTabs.innerHTML = renderCaseCategoryTabs(category);
     const moduleSidebar = document.querySelector('#case-module-sidebar');
-    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(payload.module_counts, payload.catalog_total, category, module);
+    if (moduleSidebar) moduleSidebar.innerHTML = renderModuleSidebar(payload.module_counts, category, module);
     updateBatchLaunch(payload.batch_summary);
     const returnTo = buildTestListUrl(query, payload.page || 1, selected, payload.project, category, module);
     list.innerHTML = testRows(currentTestPageItems, query, selected, returnTo);
@@ -1389,28 +2066,248 @@ async function refreshTests(query, page, {
   }
 }
 
+async function renderCasePlatformLanding() {
+  setActiveNav('cases');
+  document.title = '选择用例平台 · Agent-loop';
+  selectedTestCases.clear();
+  currentTestPageItems = [];
+  const w30Project = caseProjectForPlatform('w30');
+  const platform579Project = caseProjectForPlatform('579');
+  app.innerHTML = `
+    ${Components.pageHeader({title: '用例管理', intro: '请先选择需要管理的测试平台；选择后才会读取对应平台的项目与用例'})}
+    <section class="workspace-card case-platform-gateway" aria-labelledby="case-platform-gateway-title">
+      <header><p class="eyebrow">平台入口</p><h2 id="case-platform-gateway-title">选择用例平台</h2><p>W30 与 579 使用独立的项目范围、自动化绑定和执行链路。</p></header>
+      <div class="case-platform-gateway-grid">
+        <form class="case-platform-entry is-w30" method="get" action="/cases" data-case-platform="w30">
+          <input type="hidden" name="project" value="${escapeHtml(w30Project)}">
+          <input type="hidden" name="platform_id" value="w30">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">W30</span>
+            <strong>进入 W30 用例管理</strong>
+            <small>管理 W30 模拟器与真机项目用例，执行时使用 W30 命令链路。</small>
+          </button>
+        </form>
+        <form class="case-platform-entry is-579" method="get" action="/cases" data-case-platform="579">
+          <input type="hidden" name="project" value="${escapeHtml(platform579Project)}">
+          <input type="hidden" name="platform_id" value="579">
+          <button class="case-platform-entry-submit" type="submit">
+            <span class="case-platform-entry-code">579</span>
+            <strong>进入 579 用例管理</strong>
+            <small>管理 579 O2 用例，执行时使用 APP Bridge → BLE 与 O1/O2 证据链路。</small>
+          </button>
+        </form>
+      </div>
+    </section>`;
+}
+
+function stopPrdCasesPolling() {
+  if (prdCasesPollTimer) clearTimeout(prdCasesPollTimer);
+  prdCasesPollTimer = null;
+}
+
+function prdJobStatusLabel(status = '') {
+  return ({
+    UPLOADED: '等待生成', GENERATING: '生成中', READY_FOR_REVIEW: '待审查',
+    QUALITY_BLOCKED: '质量门禁阻断', APPROVED: '审查通过', REJECTED: '已驳回',
+    SYNCED: '已同步', SYNCED_WITH_CONFLICTS: '部分同步', FAILED: '生成失败'
+  })[String(status).toUpperCase()] || status || '未知';
+}
+
+function prdStatusClass(status = '') {
+  const value = String(status).toUpperCase();
+  if (['APPROVED', 'SYNCED'].includes(value)) return 'is-success';
+  if (value === 'SYNCED_WITH_CONFLICTS') return 'is-warning';
+  if (['REJECTED', 'QUALITY_BLOCKED', 'FAILED'].includes(value)) return 'is-error';
+  if (value === 'READY_FOR_REVIEW') return 'is-warning';
+  return 'is-progress';
+}
+
+function fileToBase64(file) {
+  return file.arrayBuffer().then(buffer => {
+    const bytes = new Uint8Array(buffer);
+    const parts = [];
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+      parts.push(String.fromCharCode(...bytes.subarray(offset, offset + 0x8000)));
+    }
+    return btoa(parts.join(''));
+  });
+}
+
+async function renderPrdCases(explicitJobId = '') {
+  stopPrdCasesPolling();
+  setActiveNav('prd-cases');
+  document.title = 'PRD 转用例 · Agent-loop';
+  const params = new URLSearchParams(location.search);
+  const selectedProject = params.get('project') || currentProject();
+  const requestedJob = explicitJobId || params.get('job') || '';
+  app.innerHTML = Components.skeletonState('正在读取 PRD 用例任务…');
+  const jobsPayload = await api('/api/prd-cases/jobs');
+  const jobs = jobsPayload.items || [];
+  const jobId = requestedJob || jobs[0]?.job_id || '';
+  let job = null;
+  let casePayload = {items: [], gate: null};
+  if (jobId) {
+    job = await api(`/api/prd-cases/jobs/${encodeURIComponent(jobId)}`);
+    if (['READY_FOR_REVIEW', 'QUALITY_BLOCKED', 'APPROVED', 'REJECTED', 'SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status)) {
+      casePayload = await api(`/api/prd-cases/jobs/${encodeURIComponent(jobId)}/cases`);
+    }
+  }
+  const cases = casePayload.items || [];
+  const gate = casePayload.gate || job?.quality_gate || null;
+  const projectOptions = Object.values(TEST_PROJECTS).map(project =>
+    `<option value="${escapeHtml(project.project)}" ${project.project === selectedProject ? 'selected' : ''}>${escapeHtml(project.projectLabel)} · ${escapeHtml(project.project)}</option>`
+  ).join('');
+  const jobItems = jobs.map(item => `
+    <button class="prd-job-item ${item.job_id === jobId ? 'is-active' : ''}" type="button" data-prd-job="${escapeHtml(item.job_id)}">
+      <span><strong>${escapeHtml(item.filename)}</strong><small>${escapeHtml(item.project_id)} · ${escapeHtml(item.created_at || '')}</small></span>
+      <span class="prd-status ${prdStatusClass(item.status)}">${escapeHtml(prdJobStatusLabel(item.status))}</span>
+    </button>`).join('');
+  const gateErrors = (gate?.errors || []).map(issue => `<li><strong>${escapeHtml(issue.case_id || '整体')}</strong> ${escapeHtml(issue.message)}</li>`).join('');
+  const gateWarnings = (gate?.warnings || []).map(issue => `<li><strong>${escapeHtml(issue.case_id || '整体')}</strong> ${escapeHtml(issue.message)}</li>`).join('');
+  const caseRows = cases.map(item => `
+    <tr class="prd-case-row" data-prd-search="${escapeHtml([item.case_id, item.functional_module, item.feature, item.test_item, item.test_point, item.title].join(' ').toLowerCase())}">
+      <td><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.priority)}</small></td>
+      <td>${escapeHtml(item.functional_module)}<small>${escapeHtml(item.feature)}</small></td>
+      <td>${escapeHtml(item.test_item)}<small>${escapeHtml(item.test_point)}</small></td>
+      <td class="prd-case-detail"><strong>${escapeHtml(item.title)}</strong><details><summary>查看步骤与预期</summary><p><b>前置条件</b>\n${escapeHtml(item.preconditions || '无')}\n\n<b>操作步骤</b>\n${escapeHtml(item.steps_text)}\n\n<b>预期结果</b>\n${escapeHtml(item.expected_text)}</p></details></td>
+      <td>${escapeHtml((item.requirement_ids || []).join(', ') || '—')}</td>
+      <td><input class="prd-row-comment" data-case-id="${escapeHtml(item.stable_id || item.case_id)}" type="text" placeholder="可填写本条审查意见" aria-label="${escapeHtml(item.case_id)} 审查意见" ${job?.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}></td>
+    </tr>`).join('');
+  const activeBody = !job ? `
+      <section class="workspace-card prd-empty"><h2>上传一份 PRD 开始生成</h2><p>系统将校验内置 xiaozhou QA Skill，生成 Excel，再从 Excel 回读全部用例供人工审查。</p></section>` : `
+      <section class="workspace-card prd-review-panel">
+        <header class="prd-review-head">
+          <div><p class="eyebrow">当前任务</p><h2>${escapeHtml(job.filename)}</h2><p>${escapeHtml(job.project_id)} · Skill ${escapeHtml((job.skill?.sha256 || '').slice(0, 12) || '待校验')}…</p></div>
+          <div class="prd-job-state"><span class="prd-status ${prdStatusClass(job.status)}">${escapeHtml(prdJobStatusLabel(job.status))}</span><strong>${Number(job.progress || 0)}%</strong><small>${escapeHtml(job.stage || '')}</small></div>
+        </header>
+        <div class="prd-progress"><i style="width:${Math.max(0, Math.min(100, Number(job.progress || 0)))}%"></i></div>
+        ${job.error ? `<div class="notice notice-error"><strong>生成失败</strong><p>${escapeHtml(job.error)}</p></div>` : ''}
+        ${gate ? `<section class="prd-gate ${gate.passed ? 'is-pass' : 'is-blocked'}"><div><strong>${gate.passed ? '质量门禁通过' : '质量门禁未通过'}</strong><span>措辞 ${escapeHtml(gate.checks?.wording || '—')} · 分类 ${escapeHtml(gate.checks?.classification || '—')} · 顺序 ${escapeHtml(gate.checks?.order || '—')} · 边界 ${escapeHtml(gate.checks?.feature_boundary || '—')} · 稳定ID ${escapeHtml(gate.checks?.stable_ids || '—')}</span></div>${gateErrors ? `<details><summary>${gate.errors.length} 个阻断项</summary><ul>${gateErrors}</ul></details>` : ''}${gateWarnings ? `<details><summary>${gate.warnings.length} 个提醒项</summary><ul>${gateWarnings}</ul></details>` : ''}</section>` : ''}
+        ${cases.length ? `<div class="prd-case-toolbar"><label class="search-box">${icon('search', 17)}<input id="prd-case-search" type="search" placeholder="搜索编号、模块、功能点、测试项"><button id="clear-prd-case-search" type="button">清空</button></label><span>Excel 回读 ${cases.length} 条</span><button class="button button-secondary" type="button" data-prd-download>下载 Excel</button></div><div class="workspace-table-scroll"><table class="workspace-table prd-case-table"><thead><tr><th>用例编号</th><th>功能模块 / 功能点</th><th>测试项 / 测试点</th><th>用例详情</th><th>需求ID</th><th>审查意见</th></tr></thead><tbody>${caseRows}</tbody></table></div>` : `<div class="prd-generating"><div class="spinner"></div><p>${escapeHtml(job.stage || '正在生成用例…')}</p></div>`}
+        ${['READY_FOR_REVIEW', 'REJECTED', 'QUALITY_BLOCKED', 'FAILED', 'APPROVED', 'SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `<footer class="prd-review-actions"><div class="prd-review-fields"><label>审查人<input id="prd-reviewer" type="text" value="${escapeHtml(job.review?.reviewer || '')}" placeholder="请输入姓名" ${job.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}></label><label>整体意见<textarea id="prd-review-comment" rows="2" placeholder="驳回时必须填写；通过时可选">${escapeHtml(job.review?.comment || '')}</textarea></label></div><div class="prd-action-buttons">${job.status === 'READY_FOR_REVIEW' ? `<button class="button button-secondary" type="button" data-prd-review="reject">驳回修改</button><button class="button" type="button" data-prd-review="approve">审查通过</button>` : ''}${['REJECTED', 'QUALITY_BLOCKED', 'FAILED'].includes(job.status) ? `<button class="button" type="button" data-prd-regenerate>按意见重新生成</button>` : ''}${job.status === 'APPROVED' ? `<button class="button" type="button" data-prd-sync>同步到用例管理</button>` : ''}${['SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `<a class="button" href="${escapeHtml(pageUrl('/cases', job.project_id, {platform_id: currentPlatformFor(job.project_id)}))}">进入用例管理</a>` : ''}</div></footer>` : ''}
+      </section>`;
+  app.innerHTML = `
+    ${Components.pageHeader({title: 'PRD 转用例', intro: '上传 PRD，按 QA Skill 生成 Excel；人工审查通过后再同步到用例管理'})}
+    <section class="prd-layout">
+      <aside class="workspace-card prd-sidebar">
+        <form id="prd-upload-form" class="prd-upload-form">
+          <div><p class="eyebrow">新建任务</p><h2>上传 PRD</h2></div>
+          <label>目标项目<select id="prd-project" required>${projectOptions}</select></label>
+          <label>执行画像<select id="prd-profile"><option value="core">核心流程</option><option value="strict">严格流程</option></select></label>
+          <label class="prd-file-drop"><input id="prd-file" type="file" accept=".md,.txt,.docx" required><strong>选择 PRD 文件</strong><span>支持 Markdown、TXT、DOCX，最大 20 MB</span></label>
+          <button class="button" type="submit">上传并生成</button>
+        </form>
+        <div class="prd-job-list"><header><strong>生成记录</strong><span>${jobs.length}</span></header>${jobItems || '<p class="empty-copy">暂无记录</p>'}</div>
+      </aside>
+      <div class="prd-main">${activeBody}</div>
+    </section>`;
+
+  app.querySelector('#prd-upload-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const file = app.querySelector('#prd-file')?.files?.[0];
+    if (!file) return showToast('请选择 PRD 文件', 'error');
+    const button = event.submitter;
+    if (button) { button.disabled = true; button.textContent = '正在上传…'; }
+    try {
+      const created = await api('/api/prd-cases/jobs', {method: 'POST', body: JSON.stringify({
+        project_id: app.querySelector('#prd-project').value,
+        execution_profile: app.querySelector('#prd-profile').value,
+        filename: file.name,
+        file_base64: await fileToBase64(file)
+      })});
+      history.replaceState({}, '', pageUrl('/prd-cases', created.project_id, {job: created.job_id}));
+      showToast('PRD 已上传，正在生成用例');
+      await renderPrdCases(created.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      if (button) { button.disabled = false; button.textContent = '上传并生成'; }
+    }
+  });
+  app.querySelectorAll('[data-prd-job]').forEach(button => button.addEventListener('click', async () => {
+    const selected = button.dataset.prdJob;
+    history.replaceState({}, '', pageUrl('/prd-cases', selectedProject, {job: selected}));
+    await renderPrdCases(selected);
+  }));
+  const search = app.querySelector('#prd-case-search');
+  const applyFilter = () => {
+    const value = String(search?.value || '').trim().toLowerCase();
+    app.querySelectorAll('.prd-case-row').forEach(row => { row.hidden = Boolean(value && !row.dataset.prdSearch.includes(value)); });
+  };
+  search?.addEventListener('input', applyFilter);
+  app.querySelector('#clear-prd-case-search')?.addEventListener('click', () => { search.value = ''; applyFilter(); });
+  app.querySelector('[data-prd-download]')?.addEventListener('click', () => {
+    startBrowserDownload(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/download`, `${String(job.filename).replace(/\.[^.]+$/, '')}-测试用例.xlsx`);
+  });
+  app.querySelectorAll('[data-prd-review]').forEach(button => button.addEventListener('click', async () => {
+    const reviewer = app.querySelector('#prd-reviewer')?.value.trim() || '';
+    const comment = app.querySelector('#prd-review-comment')?.value.trim() || '';
+    const caseComments = [...app.querySelectorAll('.prd-row-comment')].filter(input => input.value.trim()).map(input => ({stable_id: input.dataset.caseId, comment: input.value.trim()}));
+    button.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/review`, {method: 'POST', body: JSON.stringify({action: button.dataset.prdReview, reviewer, comment, case_comments: caseComments})});
+      showToast(button.dataset.prdReview === 'approve' ? '审查已通过，可以同步' : '已驳回，可按意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); button.disabled = false; }
+  }));
+  app.querySelector('[data-prd-regenerate]')?.addEventListener('click', async event => {
+    const feedback = app.querySelector('#prd-review-comment')?.value.trim() || job.review?.comment || job.error || '';
+    event.currentTarget.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/regenerate`, {method: 'POST', body: JSON.stringify({feedback})});
+      showToast('已按审查意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); event.currentTarget.disabled = false; }
+  });
+  app.querySelector('[data-prd-sync]')?.addEventListener('click', async event => {
+    event.currentTarget.disabled = true;
+    try {
+      const result = await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/sync`, {method: 'POST'});
+      showToast(`同步完成：新增 ${result.created}，更新 ${result.updated}，冲突 ${result.conflicts}`);
+      caseCatalogCache.clear();
+      await renderPrdCases(job.job_id);
+    } catch (error) { showToast(error.message, 'error'); event.currentTarget.disabled = false; }
+  });
+  if (job && ['UPLOADED', 'GENERATING'].includes(job.status)) {
+    prdCasesPollTimer = setTimeout(() => renderPrdCases(job.job_id), 1400);
+  }
+}
+
 async function renderTests() {
   setActiveNav('cases');
   document.title = '用例管理 · Agent-loop';
+  const requestedPlatform = new URLSearchParams(location.search).get('platform_id');
+  if (!['w30', '579'].includes(requestedPlatform)) return renderCasePlatformLanding();
+  const compatibleProject = caseProjectForPlatform(requestedPlatform, currentProject());
+  if (!compatibleProject) return renderCasePlatformLanding();
+  if (compatibleProject !== currentProject()) {
+    history.replaceState({}, '', pageUrl('/cases', compatibleProject, {platform_id: requestedPlatform}));
+  }
+  rememberProject(compatibleProject);
   const initial = testListParams();
   const initialProject = testProject(initial.project);
+  const initialPlatform = currentPlatformFor(initial.project);
   ensureTestSelectionProject(initial.project);
+  if (!(initialProject.allowed_platforms || []).includes(selectedRunPlatform)) {
+    selectedRunPlatform = initialPlatform;
+    selectedRunTarget = '';
+  }
   app.innerHTML = `
-    ${Components.pageHeader({title: '用例管理', intro: '管理测试用例和自动化步骤', actions: '<button id="open-case-create" class="button" type="button">' + icon('plus', 17) + ' 新建用例</button>'})}
+    ${Components.pageHeader({title: '用例管理', intro: '按功能模块组织、探索并固化自动化测试用例', actions: `<button id="open-case-create" class="button" type="button">${icon('plus', 17)} 新建用例</button>`})}
     <section id="active-test-batch" class="batch-active" hidden></section>
     <section class="workspace-card case-management-card">
+      <div class="case-platform-context"><div><span>用例平台</span><div class="platform-choice-group">${caseManagementPlatformButtons(initialPlatform)}</div></div><small>切换平台后，只加载该平台下的项目与用例</small></div>
       <nav id="case-category-tabs" class="case-category-tabs" aria-label="功能分类">${renderCaseCategoryTabs(initial.category)}</nav>
       <div class="case-toolbar" aria-label="测试用例工具">
         <div class="project-stage">
           <label class="sr-only" for="test-project">项目与目标</label>
           <select id="test-project" aria-label="选择测试项目">
-            ${Object.values(TEST_PROJECTS).map(item => `<option value="${escapeHtml(item.project)}" ${item.project === initial.project ? 'selected' : ''}>${escapeHtml(item.projectLabel)} · ${escapeHtml(item.targetLabel)}</option>`).join('')}
+            ${caseProjectsForPlatform(initialPlatform).map(item => `<option value="${escapeHtml(item.project)}" ${item.project === initial.project ? 'selected' : ''}>${escapeHtml(item.projectLabel)} · ${escapeHtml(item.targetLabel)}</option>`).join('')}
           </select>
           <small id="test-project-target">${testTargetChip(initialProject)}</small>
         </div>
         <div class="search-box case-search-box">
           ${icon('search', 18)}
-          <input id="test-search" type="search" value="${escapeHtml(initial.query)}" placeholder="搜索用例编号、模块、步骤" autocomplete="off">
+          <input id="test-search" type="search" value="${escapeHtml(initial.query)}" placeholder="搜索用例编号、测试项、测试点、模块" autocomplete="off">
           <button id="clear-test-search" class="clear-search" type="button" aria-label="清空搜索">清空</button>
         </div>
         <div class="case-toolbar-actions">
@@ -1420,9 +2317,9 @@ async function renderTests() {
         </div>
       </div>
       <div class="case-workspace-grid">
-        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar({}, 0, initial.category, initial.module)}</aside>
+        <aside id="case-module-sidebar" class="module-sidebar" aria-label="功能模块">${renderModuleSidebar(null, initial.category, initial.module)}</aside>
         <div class="case-main-column">
-          <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards({}, initial.state)}</section>
+          <section id="test-metrics" class="test-metric-groups" aria-label="测试用例统计与筛选">${testMetricCards(null, initial.state)}</section>
           <details class="batch-launch case-batch-launch">
             <summary><strong>按运行状态创建批次</strong><small id="batch-selection-note">正在统计可运行用例…</small></summary>
             <div class="batch-scope" aria-label="选择批次范围">
@@ -1439,7 +2336,8 @@ async function renderTests() {
             <div id="test-pagination"></div>
           </section>
           <section class="test-selection-bar" aria-label="精确选择测试批次">
-            <div class="test-selection-copy"><strong id="selected-test-summary">尚未选择用例</strong><label class="test-page-selector"><input id="select-test-page" type="checkbox"><span>全选当前页</span></label></div>
+            <div class="test-selection-copy"><strong id="selected-test-summary">尚未勾选用例；勾选项可跨分页保留</strong><label class="test-page-selector"><input id="select-test-page" type="checkbox"><span>全选当前页</span></label></div>
+            <div class="selected-run-routing"><span>运行平台</span><div id="run-platform-buttons" class="platform-choice-group">${runPlatformSwitchButtons(initial.project, initialPlatform, 'data-run-platform')}</div><label>执行目标<select id="run-target-select" aria-label="本次执行目标"></select></label><small id="run-platform-blocker">勾选用例后校验平台映射</small></div>
             <div class="test-selection-actions"><button id="clear-selected-tests" class="button button-secondary" type="button" disabled>清空</button><button id="run-selected-tests" class="button" type="button" disabled>运行所选</button></div>
           </section>
         </div>
@@ -1456,6 +2354,11 @@ async function renderTests() {
             <strong>目标项目：</strong>
             <span id="excel-target-project-label"></span>
           </div>
+          <fieldset class="platform-applicability-fieldset">
+            <legend>适用平台 *</legend>
+            <div id="excel-applicable-platforms" class="platform-applicability-options">${platformApplicabilityMarkup(initial.project, [initialPlatform], 'excel-applicable-platform')}</div>
+            <small>导入前必须明确选择，平台只决定后续使用哪套自动化绑定与执行逻辑。</small>
+          </fieldset>
           <div id="excel-dropzone" class="excel-upload-zone">
             <input id="excel-file-input" type="file" accept=".xlsx" style="display: none;">
             <div class="dropzone-content">
@@ -1480,8 +2383,8 @@ async function renderTests() {
                   <span>增量导入（跳过已存在）</span>
                 </label>
                 <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
-                  <input type="radio" name="excel-import-overwrite-mode" value="overwrite">
-                  <span>覆盖更新（替换同名内容）</span>
+                  <input type="radio" name="excel-import-overwrite-mode" value="revision">
+                  <span>创建新版本（保留历史和冻结基线）</span>
                 </label>
               </div>
             </div>
@@ -1528,6 +2431,23 @@ async function renderTests() {
                 <option value="P2">P2</option>
                 <option value="P3">P3</option>
               </select>
+            </div>
+          </div>
+          <div class="case-lifecycle-row">
+            <fieldset class="platform-applicability-fieldset">
+              <legend>适用平台 *</legend>
+              <div id="case-input-platforms" class="platform-applicability-options">${platformApplicabilityMarkup(initial.project, [initialPlatform], 'case-applicable-platform')}</div>
+            </fieldset>
+            <label for="case-input-workflow"><span>用例状态</span><select id="case-input-workflow"><option value="DRAFT">草稿</option><option value="REVIEWING">评审中</option><option value="ACTIVE" selected>生效</option></select></label>
+          </div>
+          <div class="case-semantic-fields">
+            <div>
+              <label for="case-input-test-item">测试项 *</label>
+              <input id="case-input-test-item" type="text" class="input" placeholder="例如：入口" required>
+            </div>
+            <div>
+              <label for="case-input-test-point">测试点 *</label>
+              <input id="case-input-test-point" type="text" class="input" placeholder="例如：点击入口进入计算器页面" required>
             </div>
           </div>
           <div>
@@ -1612,13 +2532,21 @@ async function renderTests() {
     }, 260);
   });
   projectSelect.addEventListener('change', () => {
-    const params = testListParams();
-    const state = params.state;
-    rememberProject(projectSelect.value);
-    ensureTestSelectionProject(projectSelect.value);
-    updateSelectedTestCasesUi();
-    setTestListUrl(input.value.trim(), 1, state, projectSelect.value, 'push', params.category, params.module);
-    refreshTests(input.value.trim(), 1, {state, project: projectSelect.value, category: params.category, module: params.module});
+    const project = rememberProject(projectSelect.value);
+    ensureTestSelectionProject(project);
+    selectedRunPlatform = '';
+    selectedRunTarget = '';
+    history.pushState({}, '', pageUrl('/cases', project, {platform_id: initialPlatform}));
+    route();
+  });
+  document.querySelectorAll('[data-run-platform]').forEach(button => button.addEventListener('click', () => {
+    if (button.disabled) return;
+    selectedRunPlatform = button.dataset.runPlatform;
+    selectedRunTarget = '';
+    void refreshExecutionOptions();
+  }));
+  document.querySelector('#run-target-select')?.addEventListener('change', event => {
+    selectedRunTarget = event.target.value;
   });
   document.querySelector('#clear-test-search').addEventListener('click', () => {
     clearTimeout(debounceTimer);
@@ -1663,13 +2591,23 @@ async function renderTests() {
     const cases = selectedTestCaseList();
     if (!cases.length) return;
     const projectMeta = testProject(projectSelect.value);
-    if (!window.confirm(`将在${projectMeta.targetLabel}运行已选的 ${cases.length} 条用例，包括最近已通过的用例。继续吗？`)) return;
+    const platformLabel = PLATFORM_PROFILES[selectedRunPlatform]?.platform_label || selectedRunPlatform;
+    const targetLabel = PLATFORM_TARGETS[selectedRunTarget]?.target_label || selectedRunTarget;
+    if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${cases.length}\n运行模式：确定性执行\n\n本批次只运行勾选项，平台不可用时不会自动改用另一套逻辑。`)) return;
+    if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
     try {
       const job = await api('/api/tests/run-batch', {
         method: 'POST',
-        body: JSON.stringify({project: projectSelect.value, cases}),
+        body: JSON.stringify({
+          project_id: projectSelect.value,
+          platform_id: selectedRunPlatform,
+          target_id: selectedRunTarget,
+          run_mode: 'deterministic',
+          cases,
+          watchface_ready: projectSelect.value === '579_Z1640'
+        }),
       });
       window.location.href = testBatchHref(job.id);
     } catch (error) {
@@ -1689,13 +2627,26 @@ async function renderTests() {
       return;
     }
     const projectMeta = testProject(projectSelect.value);
-    if (!window.confirm(`将在${projectMeta.targetLabel}运行 ${total} 条符合条件的用例，最近已通过的用例不会重跑。继续吗？`)) return;
+    const platformId = selectedRunPlatform || currentPlatformFor(projectSelect.value);
+    const targetId = selectedRunTarget || targetsFor(projectSelect.value, platformId)[0]?.target_id || '';
+    const platformLabel = PLATFORM_PROFILES[platformId]?.platform_label || platformId;
+    const targetLabel = PLATFORM_TARGETS[targetId]?.target_label || targetId;
+    if (!window.confirm(`项目：${projectMeta.projectLabel}\n运行平台：${platformLabel}\n执行目标：${targetLabel}\n用例数量：${total}\n范围：${labels.join('、')}\n\n最新结果已通过的用例不会重跑，平台不可用时不会自动回退。`)) return;
+    if (!confirm579Watchface(projectSelect.value)) return;
     button.disabled = true;
     button.textContent = '正在创建批次…';
     try {
       const job = await api('/api/tests/run-batch', {
         method: 'POST',
-        body: JSON.stringify({limit: 0, categories, project: projectSelect.value})
+        body: JSON.stringify({
+          limit: 0,
+          categories,
+          project_id: projectSelect.value,
+          platform_id: platformId,
+          target_id: targetId,
+          run_mode: 'deterministic',
+          watchface_ready: projectSelect.value === '579_Z1640'
+        })
       });
       window.location.href = testBatchHref(job.id);
     } catch (error) {
@@ -1773,10 +2724,14 @@ async function renderTests() {
   const excelReportBox = document.querySelector('#excel-report-box');
   let currentExcelBase64 = null;
   let currentExcelFileName = '';
+  let currentExcelFile = null;
+  let currentExcelPreview = null;
 
   function resetExcelDialog() {
     currentExcelBase64 = null;
     currentExcelFileName = '';
+    currentExcelFile = null;
+    currentExcelPreview = null;
     if (excelFileInput) excelFileInput.value = '';
     if (dropzoneTitle) dropzoneTitle.textContent = '选择或拖拽 Excel 文件（.xlsx）至此处';
     if (dropzoneFileName) dropzoneFileName.textContent = '点击选择文件';
@@ -1794,6 +2749,7 @@ async function renderTests() {
 
   function handleExcelFile(file) {
     if (!file) return;
+    currentExcelPreview = null;
     if (!file.name.toLowerCase().endsWith('.xlsx')) {
       if (excelErrorBox) {
         excelErrorBox.textContent = `仅支持 .xlsx 文件，无法导入「${file.name}」。`;
@@ -1807,6 +2763,7 @@ async function renderTests() {
       return;
     }
 
+    currentExcelFile = file;
     currentExcelFileName = file.name;
     if (dropzoneFileName) dropzoneFileName.textContent = `已选择：${file.name}`;
     if (excelPreviewBox) excelPreviewBox.style.display = 'none';
@@ -1822,13 +2779,20 @@ async function renderTests() {
       const base64Data = reader.result.split(',')[1];
       currentExcelBase64 = base64Data;
       try {
-        const resp = await fetch('/api/excel/preview', {
+        const applicablePlatforms = selectedPlatformValues('excel-applicable-platform');
+        if (!applicablePlatforms.length) {
+          throw new Error('请至少选择一个适用平台');
+        }
+        const conflictStrategy = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'revision' ? 'NEW_REVISION' : 'SKIP';
+        const resp = await fetch('/api/cases/import/preview', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            project: projectSelect.value,
-            file_name: currentExcelFileName,
+            project_id: projectSelect.value,
+            filename: currentExcelFileName,
             file_base64: currentExcelBase64,
+            applicable_platforms: applicablePlatforms,
+            conflict_strategy: conflictStrategy,
           }),
         });
         const data = await resp.json();
@@ -1839,6 +2803,7 @@ async function renderTests() {
           submitExcelBtn.disabled = true;
           return;
         }
+        currentExcelPreview = data;
         document.querySelector('#preview-new-count').textContent = String(data.new_count);
         document.querySelector('#preview-skip-count').textContent = String(data.existing_count);
         document.querySelector('#preview-total-count').textContent = String(data.total_parsed);
@@ -1848,9 +2813,11 @@ async function renderTests() {
         document.querySelector('#preview-sample-list').innerHTML = sampleHtml;
         excelPreviewBox.style.display = 'block';
 
-        if (data.new_count > 0) {
+        if (data.new_count > 0 || (conflictStrategy === 'NEW_REVISION' && data.existing_count > 0)) {
           submitExcelBtn.disabled = false;
-          submitExcelBtn.textContent = `确认导入（新增 ${data.new_count} 条）`;
+          submitExcelBtn.textContent = conflictStrategy === 'NEW_REVISION'
+            ? `确认导入（${data.new_count} 条新增，${data.existing_count} 条新版本）`
+            : `确认导入 (${data.new_count} 条新增)`;
         } else {
           submitExcelBtn.disabled = true;
           submitExcelBtn.textContent = '无需导入（无新增）';
@@ -1918,21 +2885,28 @@ async function renderTests() {
     });
   }
 
+  document.querySelectorAll('input[name="excel-import-overwrite-mode"], input[name="excel-applicable-platform"]').forEach(control => {
+    control.addEventListener('change', () => {
+      if (currentExcelFile) handleExcelFile(currentExcelFile);
+    });
+  });
+
   if (submitExcelBtn) {
     submitExcelBtn.addEventListener('click', async () => {
       if (!currentExcelBase64) return;
-      const isOverwrite = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'overwrite';
+      const createsRevision = document.querySelector('input[name="excel-import-overwrite-mode"]:checked')?.value === 'revision';
+      if (!currentExcelPreview) return;
       submitExcelBtn.disabled = true;
-      submitExcelBtn.textContent = '正在导入用例…';
+      submitExcelBtn.textContent = '正在写入统一用例库…';
       try {
-        const resp = await fetch('/api/excel/confirm', {
+        const resp = await fetch('/api/cases/import/commit', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            project: projectSelect.value,
-            file_name: currentExcelFileName,
-            file_base64: currentExcelBase64,
-            overwrite_existing: isOverwrite,
+            project_id: projectSelect.value,
+            batch_id: currentExcelPreview.batch_id,
+            preview_token: currentExcelPreview.preview_token,
+            source_sha256: currentExcelPreview.source_sha256,
           }),
         });
         const data = await resp.json();
@@ -1943,9 +2917,9 @@ async function renderTests() {
           submitExcelBtn.disabled = false;
           return;
         }
-        const summaryMsg = isOverwrite
-          ? `导入完成：新增 ${data.imported_count} 条，更新 ${data.overwritten_count || 0} 条。`
-          : `导入完成：新增 ${data.imported_count} 条，跳过 ${data.skipped_count} 条已有用例。`;
+        const summaryMsg = createsRevision
+          ? `导入成功！新增 ${data.imported_count} 条，创建新版本 ${data.new_revision_count || 0} 条。模块: ${(data.modules_updated || []).join(', ')}`
+          : `导入成功！新增 ${data.imported_count} 条用例，跳过 ${data.skipped_count} 条已有用例。模块: ${(data.modules_updated || []).join(', ')}`;
         excelReportBox.textContent = summaryMsg;
         excelReportBox.style.display = 'block';
         submitExcelBtn.textContent = '导入完成';
@@ -1988,10 +2962,14 @@ async function renderTests() {
   const caseInputId = document.querySelector('#case-input-id');
   const caseInputSheet = document.querySelector('#case-input-sheet');
   const caseInputPriority = document.querySelector('#case-input-priority');
+  const caseInputTestItem = document.querySelector('#case-input-test-item');
+  const caseInputTestPoint = document.querySelector('#case-input-test-point');
   const caseInputPrecondition = document.querySelector('#case-input-precondition');
   const caseInputSteps = document.querySelector('#case-input-steps');
   const caseInputExpected = document.querySelector('#case-input-expected');
   const caseInputNote = document.querySelector('#case-input-note');
+  const caseInputPlatforms = document.querySelector('#case-input-platforms');
+  const caseInputWorkflow = document.querySelector('#case-input-workflow');
   const caseEditErrorBox = document.querySelector('#case-edit-error');
   const caseEditSubmitBtn = document.querySelector('#submit-case-edit');
 
@@ -2005,6 +2983,10 @@ async function renderTests() {
     }
     if (caseEditModeInput) caseEditModeInput.value = mode;
     if (caseEditOrigIdInput) caseEditOrigIdInput.value = data.case_id || '';
+    const defaultPlatforms = [currentPlatformFor(projectSelect.value)];
+    let applicablePlatforms = Array.isArray(data.applicable_platforms) ? data.applicable_platforms : defaultPlatforms;
+    if (caseInputPlatforms) caseInputPlatforms.innerHTML = platformApplicabilityMarkup(projectSelect.value, applicablePlatforms, 'case-applicable-platform');
+    if (caseInputWorkflow) caseInputWorkflow.value = data.workflow_state || 'ACTIVE';
 
     if (mode === 'create') {
       if (caseDialogTitle) caseDialogTitle.textContent = '添加测试用例';
@@ -2014,24 +2996,30 @@ async function renderTests() {
       }
       if (caseInputSheet) caseInputSheet.value = data.sheet || '';
       if (caseInputPriority) caseInputPriority.value = 'P1';
+      if (caseInputTestItem) caseInputTestItem.value = '';
+      if (caseInputTestPoint) caseInputTestPoint.value = '';
       if (caseInputPrecondition) caseInputPrecondition.value = '';
       if (caseInputSteps) caseInputSteps.value = '';
       if (caseInputExpected) caseInputExpected.value = '';
       if (caseInputNote) caseInputNote.value = '';
       if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = '保存用例';
     } else {
-      if (caseDialogTitle) caseDialogTitle.textContent = `编辑测试用例（${data.case_id || ''}）`;
+      if (caseDialogTitle) caseDialogTitle.textContent = data.source_locked
+        ? `为冻结用例创建新版本 (${data.case_id || ''})`
+        : `编辑测试用例 (${data.case_id || ''})`;
       if (caseInputId) {
         caseInputId.value = data.case_id || '';
-        caseInputId.readOnly = false;
+        caseInputId.readOnly = true;
       }
       if (caseInputSheet) caseInputSheet.value = data.sheet || '';
       if (caseInputPriority) caseInputPriority.value = data.priority || 'P1';
+      if (caseInputTestItem) caseInputTestItem.value = data.test_item || '';
+      if (caseInputTestPoint) caseInputTestPoint.value = data.test_point || '';
       if (caseInputPrecondition) caseInputPrecondition.value = data.precondition_text || '';
       if (caseInputSteps) caseInputSteps.value = data.steps_text || '';
       if (caseInputExpected) caseInputExpected.value = data.expected_text || '';
       if (caseInputNote) caseInputNote.value = data.note || '';
-      if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = '保存修改';
+      if (caseEditSubmitBtn) caseEditSubmitBtn.textContent = data.source_locked ? '创建新版本' : '保存新版本';
     }
     caseEditDialog.showModal();
   }
@@ -2054,12 +3042,28 @@ async function renderTests() {
           case_id: editBtn.dataset.caseId,
           sheet: editBtn.dataset.sheet,
           priority: editBtn.dataset.priority,
+          test_item: editBtn.dataset.testItem,
+          test_point: editBtn.dataset.testPoint,
           precondition_text: editBtn.dataset.precondition,
           steps_text: editBtn.dataset.steps,
           expected_text: editBtn.dataset.expected,
           note: editBtn.dataset.note,
+          applicable_platforms: JSON.parse(editBtn.dataset.applicablePlatforms || '[]'),
+          workflow_state: editBtn.dataset.workflowState || 'ACTIVE',
+          source_locked: editBtn.dataset.sourceLocked === 'true',
         });
+        return;
       }
+      const summaryRow = e.target.closest('[data-case-expand]');
+      if (!summaryRow || e.target.closest('a, button, input, label, select')) return;
+      toggleCaseInlineDetail(summaryRow);
+    });
+    list.addEventListener('keydown', e => {
+      if (!['Enter', ' '].includes(e.key) || e.target.closest('a, button, input, label, select')) return;
+      const summaryRow = e.target.closest('[data-case-expand]');
+      if (!summaryRow) return;
+      e.preventDefault();
+      toggleCaseInlineDetail(summaryRow);
     });
   }
 
@@ -2071,14 +3075,18 @@ async function renderTests() {
       const caseId = caseInputId.value.trim();
       const sheet = caseInputSheet.value.trim();
       const priority = caseInputPriority.value;
+      const test_item = caseInputTestItem.value.trim();
+      const test_point = caseInputTestPoint.value.trim();
       const precondition_text = caseInputPrecondition.value.trim();
       const steps_text = caseInputSteps.value.trim();
       const expected_text = caseInputExpected.value.trim();
       const note = caseInputNote.value.trim();
+      const applicable_platforms = selectedPlatformValues('case-applicable-platform');
+      const workflow_state = caseInputWorkflow?.value || 'ACTIVE';
 
-      if (!caseId || !/^[A-Za-z0-9_]+$/.test(caseId)) {
+      if (!caseId || !/^[A-Za-z0-9_.-]+$/.test(caseId)) {
         if (caseEditErrorBox) {
-          caseEditErrorBox.textContent = '用例编号格式错误：只能包含字母、数字和下划线';
+          caseEditErrorBox.textContent = '用例编号格式错误：只能包含字母、数字、点、下划线和连字符';
           caseEditErrorBox.style.display = 'block';
         }
         return;
@@ -2090,9 +3098,23 @@ async function renderTests() {
         }
         return;
       }
+      if (!test_item || !test_point) {
+        if (caseEditErrorBox) {
+          caseEditErrorBox.textContent = '测试项和测试点为必填项，且必须分别描述验证主题与具体检查目标';
+          caseEditErrorBox.style.display = 'block';
+        }
+        return;
+      }
       if (!steps_text || !expected_text) {
         if (caseEditErrorBox) {
           caseEditErrorBox.textContent = '操作步骤和预期结果为必填项';
+          caseEditErrorBox.style.display = 'block';
+        }
+        return;
+      }
+      if (!applicable_platforms.length) {
+        if (caseEditErrorBox) {
+          caseEditErrorBox.textContent = '请至少选择一个适用平台';
           caseEditErrorBox.style.display = 'block';
         }
         return;
@@ -2105,30 +3127,25 @@ async function renderTests() {
       if (caseEditErrorBox) caseEditErrorBox.style.display = 'none';
 
       try {
-        const endpoint = mode === 'create' ? '/api/cases/create' : '/api/cases/update';
-        const payload = mode === 'create' ? {
-          project: projectSelect.value,
+        const endpoint = mode === 'create'
+          ? '/api/cases'
+          : `/api/cases/${encodeURIComponent(origId)}/revisions`;
+        const payload = {
+          project_id: projectSelect.value,
           case: {
             case_id: caseId,
             sheet,
             priority,
+            test_item,
+            test_point,
             precondition_text,
             steps_text,
             expected_text,
             note,
-          }
-        } : {
-          project: projectSelect.value,
-          orig_case_id: origId,
-          case: {
-            case_id: caseId,
-            sheet,
-            priority,
-            precondition_text,
-            steps_text,
-            expected_text,
-            note,
-          }
+            applicable_platforms,
+            workflow_state,
+          },
+          change_summary: mode === 'create' ? '网页新增' : '网页编辑创建新版本',
         };
 
         const resp = await fetch(endpoint, {
@@ -2144,12 +3161,12 @@ async function renderTests() {
           }
           if (caseEditSubmitBtn) {
             caseEditSubmitBtn.disabled = false;
-            caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存修改';
+            caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存新版本';
           }
           return;
         }
 
-        showToast(mode === 'create' ? `用例 ${caseId} 已添加` : `用例 ${caseId} 已更新`);
+        showToast(mode === 'create' ? `用例 ${caseId} 添加成功！` : `用例 ${caseId} 已创建新版本！`);
         caseEditDialog.close();
         invalidateCaseCatalog(projectSelect.value);
         const params = testListParams();
@@ -2162,7 +3179,7 @@ async function renderTests() {
       } finally {
         if (caseEditSubmitBtn) {
           caseEditSubmitBtn.disabled = false;
-          caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存修改';
+          caseEditSubmitBtn.textContent = mode === 'create' ? '保存用例' : '保存新版本';
         }
       }
     });
@@ -2411,7 +3428,7 @@ function testResultReason(record = {}, fallback = '未记录判定理由') {
   const workflowStatus = String(record.workflow_status || record.status || '').toLowerCase();
   const verdict = String(record.verdict || '').toUpperCase();
   if ((!workflowStatus || workflowStatus === 'completed') && ['PASS', 'FAIL', 'CANNOT_VERIFY'].includes(verdict)) {
-    return friendlyAgentError(detail || fallback);
+    return friendlyAgentError(detail || fallback) || fallback;
   }
   return issuePresentation({
     fallback,
@@ -2437,36 +3454,50 @@ async function renderTest(sheet, caseId) {
   const routeToken = routeRequestToken;
   const project = testListParams().project;
   const projectMeta = testProject(project);
+  let detailPlatform = currentPlatformFor(project);
+  let detailTarget = '';
   const returnTo = testReturnUrl();
   const returnLabel = returnDestinationLabel(returnTo, '用例管理');
-  const testCase = await api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}`);
+  const [testCase, executionOptions] = await Promise.all([
+    api(`/api/tests/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}?project=${encodeURIComponent(project)}&platform_id=${encodeURIComponent(detailPlatform)}`),
+    api(`/api/projects/${encodeURIComponent(project)}/execution-options?case_ids=${encodeURIComponent(caseId)}`)
+  ]);
   if (routeToken !== routeRequestToken) return;
-  document.title = `${testCase.case_id} · 测试详情`;
+  document.title = `${testCase.case_id} · Agent 测试`;
   const latest = testCase.history?.[0];
   const initialVerdict = latest?.verdict || 'PENDING';
-  const usesFixedMapping = Boolean(testCase.is_promoted);
+  const usesFixedMapping = Boolean(testCase.is_fixed_runnable || testCase.is_promoted);
+  const executionOnly579 = project === '579_Z1640';
+  const executionBlocked = Boolean(testCase.is_execution_blocked || testCase.mapping_status === 'BLOCKED');
+  const blockReasonCode = testCase.block_reason_code || 'WATCH_579_EXECUTION_BLOCKED';
   app.innerHTML = `
     <a class="back-link test-list-back-link" data-return-link href="${escapeHtml(returnTo)}">← 返回${escapeHtml(returnLabel)}</a>
     <header class="page-header">
       <div>
         <p class="eyebrow">${escapeHtml(testCase.sheet)} · 自动化测试 · ${escapeHtml(testCase.execution_target_label)}</p>
         <h1 class="page-title detail-title">${escapeHtml(testCase.case_id)}</h1>
-        <div class="meta-line">${testTargetChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${caseStatusChip({...testCase, latest_verdict: initialVerdict})}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
+        <div class="meta-line">${testTargetChip(testCase)}<span class="chip chip-status">${escapeHtml(testCase.priority || '未分级')}</span>${testCase.batch_id ? `<span class="chip chip-status">${escapeHtml(testCase.batch_id)}</span>` : ''}${caseStatusChip({...testCase, latest_verdict: initialVerdict})}<span class="muted small">${testCase.history?.length || 0} 次历史运行</span></div>
       </div>
     </header>
     <div class="detail-grid">
       <div class="stack">
         <section class="panel">
-          <header class="panel-head"><div><h2>用例内容</h2><p>操作步骤和预期结果</p></div></header>
+          <header class="panel-head"><div><h2>用例内容</h2><p>完整测试语义与最近实际结果</p></div></header>
           <div class="panel-body case-text-grid">
+            ${caseText('测试项', testCase.test_item || '待补充')}
+            ${caseText('测试点', testCase.test_point || '待补充')}
             ${caseText('前置条件', testCase.precondition_text)}
             ${caseText('操作步骤', testCase.steps_text)}
             ${caseText('预期结果', testCase.expected_text)}
+            ${caseText('实际结果', testCase.actual_result || (latest ? workspaceVerdictLabel(latest.product_verdict || latest.verdict) : '尚未运行'))}
             ${verificationPoints(testCase.verification_points)}
           </div>
         </section>
-        ${usesFixedMapping ? `<details class="panel collapsible-panel">
-          <summary class="panel-head"><div><h2>自动化步骤</h2><p>已保存，可直接运行</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
+        ${executionBlocked ? `<section class="panel">
+          <header class="panel-head"><div><h2>当前固件入口阻塞</h2><p>${escapeHtml(blockReasonCode)}</p></div></header>
+          <div class="panel-body command-phases"><div class="notice notice-warning"><strong>本批计算器用例暂不可启动</strong><p>真机已确认菜单右滑能够返回表盘，但当前 OTA 固件不响应表盘侧键入口。平台已阻止单条、批次和候选复跑，且不会退回 08/96。</p></div></div>
+        </section>` : usesFixedMapping ? `<details class="panel collapsible-panel">
+          <summary class="panel-head"><div><h2>自动化步骤</h2><p>${testCase.is_execution_ready ? '动作已保存，观察证据待补齐' : '已保存，可直接运行'}</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
           <div class="panel-body command-phases">${commandPhase('准备环境', '运行前', testCase.setup)}${commandPhase('执行操作', '测试步骤', testCase.actions)}${commandPhase('采集证据', '检查结果', testCase.collect)}</div>
         </details>` : `<section class="panel">
           <header class="panel-head"><div><h2>首次运行</h2><p>本次将根据用例内容尝试执行</p></div></header>
@@ -2477,14 +3508,21 @@ async function renderTest(sheet, caseId) {
       <aside class="panel repair-panel">
         <header class="panel-head"><div><h2>启动测试</h2><p>${escapeHtml(testCase.project_label)} · ${escapeHtml(testCase.execution_target_label)}</p></div></header>
         <form id="test-run-form" class="panel-body">
+          <div class="detail-run-routing">
+            <span>本次运行平台</span>
+            <div class="platform-choice-group">${runPlatformSwitchButtons(project, detailPlatform, 'data-detail-platform')}</div>
+            <label>执行目标<select id="detail-run-target" aria-label="本次执行目标"></select></label>
+            <small id="detail-run-blocker">正在校验平台映射…</small>
+          </div>
           <ul class="run-notes">
-            <li>${usesFixedMapping ? '按已保存步骤运行' : '根据用例内容尝试执行'}</li>
-            <li>在每个检查点采集${escapeHtml(screenshotLabel(testCase))}</li>
-            <li>根据截图判定并保存结果</li>
+            <li>${executionBlocked ? `已阻止执行：${escapeHtml(blockReasonCode)}` : usesFixedMapping ? '按已保存步骤运行' : '根据用例内容尝试执行'}</li>
+            ${executionOnly579
+              ? '<li>记录每条 TX 与 L1 ACK，不将 ACK 当作业务效果</li><li>当前无截图通道，结果固定为观察不完整</li>'
+              : `<li>在每个检查点采集${escapeHtml(screenshotLabel(testCase))}</li><li>根据截图判定并保存结果</li>`}
           </ul>
-          <button id="test-run-button" class="button button-wide" type="submit">启动测试</button>
+          <button id="test-run-button" class="button button-wide" type="submit" ${executionBlocked ? 'disabled' : ''}>${executionBlocked ? '当前固件入口阻塞' : '启动测试'}</button>
           <button id="test-cancel-button" class="button button-danger button-wide" type="button" hidden>取消当前测试</button>
-          ${!usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">验证并保存步骤</button>` : ''}
+          ${!executionBlocked && !usesFixedMapping && testCase.history?.length ? `<button id="test-promote-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">验证并保存步骤</button>` : ''}
           ${project === '6202_W5230' ? `<button id="test-migrate-button" class="button button-secondary button-wide" type="button" style="margin-top: 8px;">从 6202 模拟器迁移</button>` : ''}
           <p class="form-note">当前目标一次只能运行一个测试或修复任务。</p>
         </form>
@@ -2501,6 +3539,34 @@ async function renderTest(sheet, caseId) {
       <header class="panel-head"><div><h2>测试历史</h2><p>每次运行的结果和截图</p></div></header>
       <div id="test-history-body" class="panel-body">${testHistoryRows(testCase.history, project, sheet, caseId, returnTo)}</div>
     </section>`;
+
+  const detailOptions = executionOptions.options || [];
+  const applyDetailOption = platformId => {
+    detailPlatform = String(platformId || '');
+    const option = detailOptions.find(item => item.platform_id === detailPlatform);
+    const targetSelect = document.querySelector('#detail-run-target');
+    const blocker = document.querySelector('#detail-run-blocker');
+    const runButton = document.querySelector('#test-run-button');
+    document.querySelectorAll('[data-detail-platform]').forEach(button => {
+      const match = detailOptions.find(item => item.platform_id === button.dataset.detailPlatform);
+      button.disabled = !match;
+      button.classList.toggle('is-active', button.dataset.detailPlatform === detailPlatform);
+      button.title = !match
+        ? `当前项目未启用 ${PLATFORM_PROFILES[button.dataset.detailPlatform]?.platform_label || button.dataset.detailPlatform}`
+        : match.runnable ? '' : (match.blockers || []).map(item => `${item.case_id}: ${item.reason}`).join('\n');
+    });
+    const targets = option?.targets || [];
+    if (!targets.some(target => target.target_id === detailTarget)) detailTarget = targets[0]?.target_id || '';
+    targetSelect.innerHTML = targets.map(target => `<option value="${escapeHtml(target.target_id)}" ${target.target_id === detailTarget ? 'selected' : ''}>${escapeHtml(target.target_label || target.target_id)}</option>`).join('');
+    targetSelect.disabled = !option?.runnable;
+    blocker.textContent = option?.runnable
+      ? `将使用 ${option.platform_label} 逻辑运行`
+      : (option?.blockers || []).map(item => item.reason_label || item.reason).join('；') || '当前平台没有可用执行目标';
+    runButton.disabled = !option?.runnable || !detailTarget;
+  };
+  document.querySelectorAll('[data-detail-platform]').forEach(button => button.addEventListener('click', () => applyDetailOption(button.dataset.detailPlatform)));
+  document.querySelector('#detail-run-target')?.addEventListener('change', event => { detailTarget = event.target.value; });
+  applyDetailOption(detailPlatform);
 
   const promoteBtn = document.querySelector('#test-promote-button');
   if (promoteBtn) {
@@ -2559,24 +3625,32 @@ async function renderTest(sheet, caseId) {
 
   document.querySelector('#test-run-form').addEventListener('submit', async event => {
       event.preventDefault();
+      if (executionBlocked) {
+        showToast(`${blockReasonCode}: 当前固件入口阻塞`, 'warning');
+        return;
+      }
+      if (!confirm579Watchface(project)) return;
       const button = document.querySelector('#test-run-button');
       button.disabled = true;
       button.textContent = '正在启动…';
       try {
         const job = await api('/api/tests/run', {
           method: 'POST',
-          body: JSON.stringify({project, sheet, case_id: caseId})
+          body: JSON.stringify({
+            project_id: project,
+            platform_id: detailPlatform,
+            target_id: detailTarget,
+            sheet,
+            case_id: caseId,
+            watchface_ready: project === '579_Z1640'
+          })
         });
         updateTestWorkflow({});
         const chip = document.querySelector('#test-job-chip');
         chip.className = 'chip chip-running';
         chip.textContent = '正在启动';
-        document.querySelector('#test-job-message').textContent = `正在启动${projectMeta.targetLabel}测试…`;
-        const cancelButton = document.querySelector('#test-cancel-button');
-        if (cancelButton) {
-          cancelButton.hidden = false;
-          cancelButton.dataset.jobId = job.id;
-        }
+        document.querySelector('#test-job-message').textContent = `任务 ${job.id} 已创建，正在启动 ${PLATFORM_PROFILES[detailPlatform]?.platform_label || detailPlatform} / ${PLATFORM_TARGETS[detailTarget]?.target_label || detailTarget} 链路…`;
+        showToast(`测试任务 ${job.id} 已启动`);
         pollTestJob(job.id, project, sheet, caseId);
       } catch (error) {
         showToast(error.message, error.status === 409 ? 'warning' : 'error');
@@ -2658,7 +3732,11 @@ async function restoreActiveTest(project, sheet, caseId) {
   } catch (error) {
     button.disabled = false;
     button.textContent = '启动测试';
-    message.textContent = `暂时无法读取任务状态：${error.message}`;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
   }
 }
 
@@ -2683,7 +3761,7 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
       chip.className = job.status === 'orphaned' ? 'chip chip-warning' : 'chip chip-running';
       if (job.status === 'orphaned') {
         chip.textContent = '上次任务未结束';
-        message.textContent = issuePresentation({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason}).summary;
+        message.innerHTML = issueNoticeHtml({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason});
       } else if (job.status === 'finalizing') {
         chip.textContent = isPromotionFlow ? '正在保存步骤' : '保存结果中';
         message.textContent = isPromotionFlow ? '测试已结束，正在验证并保存自动化步骤…' : '测试已结束，正在保存结果…';
@@ -2712,6 +3790,14 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
     const evidenceLink = job.history_id
       ? `<a href="${escapeHtml(testHistoryHref(project, sheet, caseId, job.history_id, currentRouteUrl()))}">查看本次测试证据 →</a>`
       : '';
+    const interruptionStatus = String(job.workflow_status || job.status || '').toLowerCase();
+    const isInterrupted = ['failed', 'interrupted', 'orphaned'].includes(interruptionStatus)
+      || Boolean(job.error || job.interruption_reason);
+    const jobIssue = isInterrupted ? issuePresentation({
+      reasonCode: job.reason_code,
+      detail: job.interruption_reason || job.error,
+      fallback: '本次测试没有正常完成。'
+    }) : null;
     if (isPromotionFlow) {
       const promotionIssues = Array.isArray(job.promotion_issues) ? job.promotion_issues.filter(Boolean) : [];
       if (job.promotion_status === 'promoted') {
@@ -2727,7 +3813,9 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
         promoteButton.textContent = '验证并保存步骤';
       }
     } else {
-      if (job.history_id) {
+      if (isInterrupted) {
+        message.innerHTML = `${issueNoticeHtml({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '本次测试没有正常完成。'})}${evidenceLink}`;
+      } else if (job.history_id) {
         message.innerHTML = `测试已结束。${evidenceLink}`;
       } else if (job.status === 'cancelled') {
         message.textContent = '测试已取消，本次没有保存结果。';
@@ -2747,7 +3835,7 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
     document.querySelector('#test-history-body').innerHTML = testHistoryRows(detail.history, project, sheet, caseId, testReturnUrl());
     if (!isPromotionFlow) {
       if (job.status === 'cancelled') showToast('测试任务已取消', 'warning');
-      else if (job.workflow_status && job.workflow_status !== 'completed') showToast('测试流程执行异常，请查看原因', 'error');
+      else if (jobIssue) showToast(jobIssue.summary, 'error');
       else if (job.verdict === 'PASS') showToast('测试通过');
       else if (job.verdict === 'CANNOT_VERIFY') showToast('测试无法验证，请查看判定理由和证据', 'warning');
       else showToast(job.verdict === 'ERROR' ? '测试执行异常' : '测试未通过', 'error');
@@ -2755,7 +3843,11 @@ async function pollTestJob(jobId, project, sheet, caseId, promotionFlow = false)
   } catch (error) {
     chip.className = 'chip chip-fail';
     chip.textContent = '状态读取失败';
-    message.textContent = error.message;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
     button.disabled = false;
     button.textContent = '重新启动';
   }
@@ -2834,13 +3926,19 @@ function updateBatchView(job) {
   const current = document.querySelector('#batch-current-case');
   if (current) {
     const item = job.current_case;
-    current.innerHTML = item ? `
+    const isInterrupted = Boolean(job.status === 'interrupted' || job.status === 'orphaned' || job.status === 'failed' || job.resume_available || job.interruption_reason || job.error);
+    const batchIssue = isInterrupted ? issuePresentation({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '批次已中断。'}) : null;
+    current.innerHTML = isInterrupted
+      ? `<div class="notice notice-error"><p><strong>问题原因：</strong>${escapeHtml(batchIssue.cause)}</p>${batchIssue.action ? `<p><strong>处理方法：</strong>${escapeHtml(batchIssue.action)}</p>` : ''}${job.resume_available ? `<p><strong>可从第 ${completed + 1} 条继续。</strong></p>` : ''}</div>${(job.interruption_reason || job.error) ? `<details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(job.interruption_reason || job.error)}</code></pre></details>` : ''}`
+      : item ? `
       <div class="batch-case-head"><div><span>当前用例 ${Number(job.current_index || 0)} / ${total}</span><strong>${escapeHtml(item.case_id)}</strong><small>${escapeHtml(item.sheet)} · ${escapeHtml(item.priority || '未分级')}</small></div>${resultChip('RUNNING')}</div>
       <div class="batch-case-grid">
         <div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '启动中')}</strong></div>
       </div>
       <p>${escapeHtml(item.expected_text || '未填写预期结果')}</p>`
-      : `<div class="notice">${job.status === 'completed' ? '全部用例已完成。' : job.resume_available ? `<strong>${escapeHtml(testResultReason(job, '批次已中断'))} 可从第 ${completed + 1} 条继续。</strong>` : '正在准备下一条用例…'}</div>`;
+      : job.status === 'completed'
+        ? '<div class="notice">全部用例已完成。</div>'
+        : '<div class="notice">正在准备下一条用例…</div>';
   }
   const target = document.querySelector('#batch-target');
   if (target) target.innerHTML = testTargetChip(job);
@@ -2874,7 +3972,11 @@ async function pollBatchTest(jobId) {
     if (active) batchTestPollTimer = setTimeout(() => pollBatchTest(jobId), 2000);
   } catch (error) {
     const current = document.querySelector('#batch-current-case');
-    if (current) current.innerHTML = `<div class="notice notice-error">批次状态读取失败：${escapeHtml(error.message)}</div>`;
+    if (current) current.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取批次状态。'
+    });
   }
 }
 
@@ -3178,7 +4280,11 @@ async function restoreActiveRepair(defectNumber) {
   } catch (error) {
     button.disabled = false;
     button.textContent = '启动修复';
-    message.textContent = `暂时无法读取任务状态：${error.message}`;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
   }
 }
 
@@ -3197,7 +4303,7 @@ async function pollJob(jobId, defectNumber) {
       chip.className = job.status === 'orphaned' ? 'chip chip-warning' : 'chip chip-running';
       if (job.status === 'orphaned') {
         chip.textContent = '上次任务未结束';
-        message.textContent = issuePresentation({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason}).summary;
+        message.innerHTML = issueNoticeHtml({reasonCode: job.reason_code || 'ORPHAN_PROCESS', detail: job.interruption_reason});
       } else if (job.status === 'finalizing') {
         chip.textContent = '保存结果中';
         message.textContent = '修复已结束，正在保存结果…';
@@ -3214,9 +4320,31 @@ async function pollJob(jobId, defectNumber) {
       setTimeout(() => pollJob(jobId, defectNumber), 2000);
       return;
     }
-    setResultChip(chip, job.verdict);
-    if (job.history_id) {
-      message.innerHTML = `修复已结束。<a href="${escapeHtml(defectHistoryHref(defectNumber, job.history_id))}">查看本次修复证据 →</a>`;
+    const interruptionStatus = String(job.workflow_status || job.status || '').toLowerCase();
+    const isInterrupted = job.status !== 'cancelled' && (
+      ['failed', 'interrupted', 'orphaned'].includes(interruptionStatus)
+      || (Boolean(job.workflow_status) && interruptionStatus !== 'completed')
+      || String(job.verdict || '').toUpperCase() === 'ERROR'
+      || Boolean(job.error || job.interruption_reason)
+    );
+    const jobIssue = isInterrupted ? issuePresentation({
+      reasonCode: job.reason_code,
+      detail: job.interruption_reason || job.error,
+      fallback: '本次任务没有正常完成。'
+    }) : null;
+    if (isInterrupted) {
+      chip.className = 'chip chip-fail';
+      chip.textContent = '执行异常';
+    } else {
+      setResultChip(chip, job.verdict);
+    }
+    const evidenceLink = job.history_id
+      ? `<a href="${escapeHtml(defectHistoryHref(defectNumber, job.history_id))}">查看本次修复证据 →</a>`
+      : '';
+    if (isInterrupted) {
+      message.innerHTML = `${issueNoticeHtml({reasonCode: job.reason_code, detail: job.interruption_reason || job.error, fallback: '本次任务没有正常完成。'})}${evidenceLink}`;
+    } else if (job.history_id) {
+      message.innerHTML = `修复已结束。${evidenceLink}`;
     } else if (job.status === 'cancelled') {
       message.textContent = '修复已取消，本次没有保存结果。';
     } else {
@@ -3233,14 +4361,18 @@ async function pollJob(jobId, defectNumber) {
     const historyPayload = await api(`/api/history/${encodeURIComponent(defectNumber)}`);
     document.querySelector('#history-body').innerHTML = historyRows(historyPayload.history, defectNumber);
     if (job.status === 'cancelled') showToast('修复任务已取消', 'warning');
-    else if (job.workflow_status && job.workflow_status !== 'completed') showToast('修复流程执行异常，请查看原因', 'error');
+    else if (jobIssue) showToast(jobIssue.summary, 'error');
     else if (job.verdict === 'PASS') showToast('修复与验证均已通过');
     else if (job.verdict === 'CANNOT_VERIFY') showToast('无法验证，请查看测试命令和证据', 'warning');
     else showToast('修复未通过，请查看失败原因和证据', 'error');
   } catch (error) {
     chip.className = 'chip chip-fail';
     chip.textContent = '状态读取失败';
-    message.textContent = error.message;
+    message.innerHTML = issueNoticeHtml({
+      reasonCode: error.code,
+      detail: error.diagnosticMessage || error.message,
+      fallback: '暂时无法读取任务状态。'
+    });
     button.disabled = false;
     button.textContent = '重新启动';
   }
@@ -3360,7 +4492,7 @@ async function renderHistory(number, runId) {
         <div class="kv"><span>代码是否保留</span><strong>${escapeHtml(codeRetention(record))}</strong></div>
         <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
         <div class="kv"><span>结束时间</span><strong>${formatTime(record.finished_at)}</strong></div>
-      </div>${record.error ? `<div class="notice notice-error">${escapeHtml(issuePresentation({reasonCode: record.reason_code, detail: record.error}).summary)}</div><details class="inline-diagnostics"><summary>诊断信息</summary><pre><code>${escapeHtml(record.error)}</code></pre></details>` : ''}</div>
+      </div>${(record.error || record.interruption_reason) ? issueNoticeHtml({reasonCode: record.reason_code, detail: record.error || record.interruption_reason}) : ''}</div>
     </section>
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>执行详情</h2><p>各阶段最终状态</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
@@ -3422,6 +4554,8 @@ async function renderTestHistory(sheet, caseId, runId) {
   const backLabel = returnDestinationLabel(backHref, '测试详情');
   const record = await api(`/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}?project=${encodeURIComponent(project)}`);
   if (routeToken !== routeRequestToken) return;
+  const logBase = `/api/test-history/${encodeURIComponent(sheet)}/${encodeURIComponent(caseId)}/${encodeURIComponent(runId)}/log`;
+  const logQuery = `?project=${encodeURIComponent(project)}`;
   document.title = `测试记录 · ${caseId} · 自动化测试`;
   app.innerHTML = `
     <a class="back-link" data-return-link href="${escapeHtml(backHref)}">← 返回${escapeHtml(backLabel)}</a>
@@ -3438,14 +4572,19 @@ async function renderTestHistory(sheet, caseId, runId) {
       <div class="panel-body">
         <div class="kv-grid">
           <div class="kv"><span>测试项目</span><strong>${escapeHtml(record.project_label)}</strong></div>
+          <div class="kv"><span>请求平台</span><strong>${escapeHtml(PLATFORM_PROFILES[record.requested_platform_id || record.platform_id]?.platform_label || record.requested_platform_id || record.platform_id || '旧记录未标明')}</strong></div>
+          <div class="kv"><span>实际执行适配器</span><strong>${escapeHtml(record.resolved_execution_adapter || record.execution_adapter || '旧记录未标明')}</strong></div>
           <div class="kv"><span>执行目标</span><strong>${escapeHtml(record.execution_target_label)}</strong></div>
           <div class="kv"><span>测试模块</span><strong>${escapeHtml(record.sheet)}</strong></div>
           <div class="kv"><span>用例编号</span><strong>${escapeHtml(record.case_id)}</strong></div>
           <div class="kv"><span>执行方式</span><strong>${escapeHtml(testExecutionModeLabel(record.execution_mode))}</strong></div>
+          <div class="kv"><span>产品结果</span><strong>${escapeHtml(record.product_verdict || record.verdict || '未记录')}</strong></div>
+          <div class="kv"><span>自动化成熟度</span><strong>${escapeHtml(record.automation_maturity || record.mapping_status || '旧记录未标明')}</strong></div>
+          <div class="kv"><span>基础设施状态</span><strong>${escapeHtml(record.infrastructure_status || '旧记录未标明')}</strong></div>
           <div class="kv"><span>优先级</span><strong>${escapeHtml(record.priority || '未分级')}</strong></div>
           <div class="kv"><span>开始时间</span><strong>${formatTime(record.started_at)}</strong></div>
           <div class="kv"><span>结束时间</span><strong>${formatTime(record.finished_at)}</strong></div>
-        </div>
+        </div>${(record.error || record.interruption_reason || (record.verdict === 'ERROR' && record.reason)) ? issueNoticeHtml({reasonCode: record.reason_code, detail: record.error || record.interruption_reason || record.reason}) : ''}
       </div>
     </section>
     <section class="panel">
@@ -3456,6 +4595,7 @@ async function renderTestHistory(sheet, caseId, runId) {
       <header class="panel-head"><div><h2>证据完整性</h2><p>检查操作、检查点和截图是否齐全</p></div></header>
       <div class="panel-body">${evidenceContractEvidence(record)}</div>
     </section>
+    ${(record.requested_platform_id || record.platform_id) === '579' ? `<details class="panel collapsible-panel"><summary class="panel-head"><div><h2>579 三链路证据</h2><p>APP Bridge 仅代表动作交付；O1/O2 才用于设备效果判断</p></div><span class="collapse-controls"><span class="chip chip-pending">交付 ${Array.isArray(record.delivery_feedback) ? record.delivery_feedback.length : 0} / 观察 ${Array.isArray(record.observations) ? record.observations.length : 0}</span><span class="collapse-action" aria-hidden="true"></span></span></summary><div class="panel-body"><h3>APP Bridge 反馈</h3><pre class="code-block raw-output"><code>${escapeHtml(JSON.stringify(record.delivery_feedback || [], null, 2))}</code></pre><h3>COM3/O1 与 O2 只读观察</h3><pre class="code-block raw-output"><code>${escapeHtml(JSON.stringify(record.observations || [], null, 2))}</code></pre></div></details>` : ''}
     <section class="panel">
       <header class="panel-head"><div><h2>用例内容</h2><p>本次运行使用的步骤和预期结果</p></div></header>
       <div class="panel-body case-text-grid">
@@ -3480,6 +4620,22 @@ async function renderTestHistory(sheet, caseId, runId) {
     <details class="panel collapsible-panel">
       <summary class="panel-head"><div><h2>执行问题</h2><p>按测试阶段分类</p></div><span class="collapse-controls"><span class="collapse-action" aria-hidden="true"></span></span></summary>
       <div class="panel-body">${testErrorEvidence(record)}</div>
+    </details>
+    <details class="panel collapsible-panel" ${(record.stderr || record.verdict === 'ERROR') ? 'open' : ''}>
+      <summary class="panel-head"><div><h2>原始执行日志</h2><p>执行器标准输出、错误输出与阶段事件</p></div><span class="collapse-controls"><span class="chip chip-pending">${Number(record.log_files?.stdout?.chars ?? String(record.stdout || '').length) + Number(record.log_files?.stderr?.chars ?? String(record.stderr || '').length)} 字符</span><span class="collapse-action" aria-hidden="true"></span></span></summary>
+      <div class="panel-body test-log-panel">
+        <div class="panel-actions test-log-actions">
+          <a class="button button-secondary" href="${escapeHtml(`${logBase}/execution.log${logQuery}`)}" download>下载全部日志</a>
+          <a class="button button-secondary ${record.stderr ? '' : 'is-disabled'}" href="${escapeHtml(`${logBase}/stderr.log${logQuery}`)}" download aria-disabled="${record.stderr ? 'false' : 'true'}">下载错误日志</a>
+          <a class="button button-secondary ${Array.isArray(record.execution_events) && record.execution_events.length ? '' : 'is-disabled'}" href="${escapeHtml(`${logBase}/events.jsonl${logQuery}`)}" download aria-disabled="${Array.isArray(record.execution_events) && record.execution_events.length ? 'false' : 'true'}">下载阶段事件</a>
+        </div>
+        <h3>标准输出 stdout${record.log_files?.stdout?.truncated ? '（仅保留末尾 20 万字符）' : ''}</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml(record.stdout || '（无标准输出）')}</code></pre>
+        <h3>错误输出 stderr${record.log_files?.stderr?.truncated ? '（仅保留末尾 20 万字符）' : ''}</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml(record.stderr || '（无错误输出）')}</code></pre>
+        <h3>阶段事件</h3>
+        <pre class="code-block raw-output"><code>${escapeHtml((record.execution_events || []).map(event => JSON.stringify(event)).join('\n') || '（旧记录未生成阶段事件）')}</code></pre>
+      </div>
     </details>
     <section class="panel">
       <header class="panel-head"><div><h2>${escapeHtml(screenshotLabel(record))}</h2><p>按检查点顺序显示</p></div><span class="chip chip-pending">${Array.isArray(record.screenshot_urls) ? record.screenshot_urls.length : (record.screenshot_url ? 1 : 0)} 张</span></header>
@@ -3541,17 +4697,32 @@ function initSystemSettings() {
   const bleTimeout = () => {
     const value = Number(hwBleScanTimeout?.value || 15);
     if (!Number.isFinite(value) || value < 1 || value > 60) {
-      throw new Error('BLE 超时必须是 1 到 60 秒之间的数字');
+      throw new Error('查找和连接超时必须是 1 到 60 秒之间的数字');
     }
     return value;
   };
-  const setBleConnectionStatus = (tone, title, detail) => {
+  const setBleConnectionStatus = (tone, title, detail, diagnostic = '') => {
     if (!bleConnectionStatus) return;
     bleConnectionStatus.dataset.tone = tone;
     const titleNode = bleConnectionStatus.querySelector('strong');
     const detailNode = bleConnectionStatus.querySelector('small');
+    const diagnosticNode = bleConnectionStatus.querySelector('[data-ble-diagnostics]');
+    const diagnosticCode = diagnosticNode?.querySelector('code');
     if (titleNode) titleNode.textContent = title;
     if (detailNode) detailNode.textContent = detail;
+    if (diagnosticNode) {
+      diagnosticNode.hidden = !diagnostic;
+      diagnosticNode.open = false;
+    }
+    if (diagnosticCode) diagnosticCode.textContent = diagnostic;
+  };
+  const setBleIssue = issue => {
+    setBleConnectionStatus(
+      'error',
+      `问题原因：${issue.cause}`,
+      `处理方法：${issue.action}`,
+      issue.detail
+    );
   };
   const refreshSelectedBleStatus = () => {
     const address = String(hwBleAddress?.value || '').trim();
@@ -3584,7 +4755,8 @@ function initSystemSettings() {
   };
   const bleDeviceRow = (device, kind) => {
     const address = String(device.address || '').trim();
-    const name = String(device.name || '').trim() || '未命名手表';
+    const rawName = String(device.name || '').trim();
+    const name = rawName || '未命名设备';
     const selected = bleAddressKey(address) === bleAddressKey(hwBleAddress?.value);
     const remembered = bleRememberedDevices.some(item => bleAddressKey(item.address) === bleAddressKey(address));
     const hasRssi = device.rssi !== null && device.rssi !== undefined && Number.isFinite(Number(device.rssi));
@@ -3592,7 +4764,7 @@ function initSystemSettings() {
       ? (hasRssi ? `信号 ${Number(device.rssi)} dBm` : '信号强度未知')
       : `最近连接 ${device.last_connected_at ? formatTime(device.last_connected_at) : '时间未知'}`;
     const actions = kind === 'discovered'
-      ? `<button class="ble-device-action is-primary" type="button" data-ble-action="connect" data-address="${escapeHtml(address)}" data-name="${escapeHtml(name === '未命名手表' ? '' : name)}" ${bleBusy ? 'disabled' : ''}>${remembered ? '重新连接' : '连接'}</button>`
+      ? `<button class="ble-device-action is-primary" type="button" data-ble-action="connect" data-address="${escapeHtml(address)}" data-name="${escapeHtml(rawName)}" ${bleBusy ? 'disabled' : ''}>${remembered ? '重新连接' : '连接'}</button>`
       : `<button class="ble-device-action" type="button" data-ble-action="select" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>${selected ? '当前目标' : '设为目标'}</button><button class="ble-device-action is-danger" type="button" data-ble-action="delete" data-address="${escapeHtml(address)}" ${bleBusy ? 'disabled' : ''}>删除</button>`;
     return `<article class="ble-device-card ${selected ? 'is-selected' : ''}">
       <div class="ble-device-card-copy"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(address)}</code><small>${escapeHtml(meta)} · ${kind === 'discovered' ? '未连接' : '已保存'}</small></div>
@@ -3603,12 +4775,12 @@ function initSystemSettings() {
     const query = bleSearchInput?.value || '';
     const discovered = bleDiscoveredDevices.filter(device => bleDeviceMatches(device, query));
     const remembered = bleRememberedDevices.filter(device => bleDeviceMatches(device, query));
-    if (bleDiscoveredCount) bleDiscoveredCount.textContent = `${discovered.length} 台`;
-    if (bleRememberedCount) bleRememberedCount.textContent = `${remembered.length} 台`;
+    if (bleDiscoveredCount) bleDiscoveredCount.textContent = `${discovered.length} 个`;
+    if (bleRememberedCount) bleRememberedCount.textContent = `${remembered.length} 个`;
     if (bleDiscoveredList) {
       const emptyText = !bleHasScanned
-        ? '点击“扫描设备”开始发现'
-        : (bleDiscoveredDevices.length && query ? '没有匹配名称或地址的发现设备' : '本次扫描未发现匹配手表');
+        ? '点击“查找设备”开始'
+        : (bleDiscoveredDevices.length && query ? '没有找到匹配名称或地址的设备' : '本次未发现蓝牙设备');
       bleDiscoveredList.innerHTML = discovered.length
         ? discovered.map(device => bleDeviceRow(device, 'discovered')).join('')
         : `<div class="ble-device-empty">${escapeHtml(emptyText)}</div>`;
@@ -3632,10 +4804,11 @@ function initSystemSettings() {
     } catch (error) {
       bleRememberedDevices = [];
       bleRememberedLoaded = false;
+      const issue = presentationFromError(error, '无法读取已保存的蓝牙设备。');
       if (bleRememberedList) {
-        bleRememberedList.innerHTML = `<div class="ble-device-empty">读取连接记录失败：${escapeHtml(error.message)}</div>`;
+        bleRememberedList.innerHTML = `<div class="ble-device-empty">${escapeHtml(issue.cause)}</div>`;
       }
-        setBleConnectionStatus('error', '无法读取蓝牙设备记录', error.message);
+      setBleIssue(issue);
     }
   }
   bleSearchInput?.addEventListener('input', renderBleDevices);
@@ -3775,17 +4948,18 @@ function initSystemSettings() {
       const timeout = bleTimeout();
       setBleBusy(true);
       bleScanButton.textContent = '正在查找…';
-      setBleConnectionStatus('pending', '正在查找附近的手表', '查找过程不会连接设备');
+      setBleConnectionStatus('pending', '正在查找附近的蓝牙设备', '查找过程不会连接任何设备');
       const query = String(bleSearchInput?.value || '').trim();
       const data = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(timeout)}&q=${encodeURIComponent(query)}`);
       bleDiscoveredDevices = Array.isArray(data.items) ? data.items : [];
       bleHasScanned = true;
       renderBleDevices();
       refreshSelectedBleStatus();
-      showToast(`发现 ${bleDiscoveredDevices.length} 台手表`);
+      showToast(`找到 ${bleDiscoveredDevices.length} 个蓝牙设备`);
     } catch (error) {
-      setBleConnectionStatus('error', '查找手表失败', error.message);
-      showToast(error.message, 'error');
+      const issue = presentationFromError(error, '电脑没有完成本次蓝牙查找。');
+      setBleIssue(issue);
+      showToast(issue.summary, 'error');
     } finally {
       setBleBusy(false);
       bleScanButton.textContent = originalText;
@@ -3808,7 +4982,12 @@ function initSystemSettings() {
           method: 'POST',
           body: JSON.stringify({address, name, timeout: bleTimeout()}),
         });
-        if (!data.verified) throw new Error(productApiError(data.error || '手表连接失败', 500, data.reason_code));
+        if (!data.verified) {
+          const issue = issuePresentation({reasonCode: data.reason_code || 'BLE_CONNECT_FAILED', detail: data.error});
+          const connectionError = new Error(issue.summary);
+          connectionError.presentation = issue;
+          throw connectionError;
+        }
         if (hwBleAddress) hwBleAddress.value = data.device?.address || address;
         await loadRememberedBleDevices();
         const verifiedName = data.device?.name || name || '未命名手表';
@@ -3836,8 +5015,9 @@ function initSystemSettings() {
         showToast('已删除设备记录');
       }
     } catch (error) {
-      setBleConnectionStatus('error', action === 'connect' ? '手表连接失败' : '操作失败', error.message);
-      showToast(error.message, 'error');
+      const issue = presentationFromError(error, action === 'connect' ? '电脑没有与这台手表建立可用连接。' : '本次蓝牙操作没有完成。');
+      setBleIssue(issue);
+      showToast(issue.summary, 'error');
     } finally {
       setBleBusy(false);
       renderBleDevices();
@@ -3849,19 +5029,49 @@ function initSystemSettings() {
     element.textContent = text;
     element.dataset.tone = tone;
   };
+  const setLlmTestStatus = (tone, summary, action = '', diagnostic = '') => {
+    if (!llmTestStatus) return;
+    llmTestStatus.dataset.tone = tone;
+    const summaryNode = llmTestStatus.querySelector('[data-llm-test-summary]');
+    const actionNode = llmTestStatus.querySelector('[data-llm-test-action]');
+    const diagnosticNode = llmTestStatus.querySelector('[data-llm-test-diagnostics]');
+    const diagnosticCode = diagnosticNode?.querySelector('code');
+    if (summaryNode) summaryNode.textContent = summary;
+    if (actionNode) {
+      actionNode.textContent = action;
+      actionNode.hidden = !action;
+    }
+    if (diagnosticNode) {
+      diagnosticNode.hidden = !diagnostic;
+      diagnosticNode.open = false;
+    }
+    if (diagnosticCode) diagnosticCode.textContent = diagnostic;
+  };
+  const setLlmTestIssue = issue => setLlmTestStatus(
+    'warning',
+    `问题原因：${issue.cause}`,
+    `处理方法：${issue.action}`,
+    issue.detail
+  );
 
   // Tab switching
-  dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
-    tabBtn.addEventListener('click', () => {
-      const tabName = tabBtn.dataset.settingsTab;
-      dialog.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.toggle('is-active', b === tabBtn));
-      dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
-        pane.style.display = (pane.dataset.settingsPane === tabName) ? 'flex' : 'none';
-      });
-      if (tabName === 'hardware') {
-        void loadSerialPorts(hwPortSelect?.value);
-      }
+  const activateSettingsTab = tabName => {
+    const targetTab = dialog.querySelector(`.settings-tab-btn[data-settings-tab="${tabName}"]`)
+      || dialog.querySelector('.settings-tab-btn[data-settings-tab="llm"]');
+    if (!targetTab) return;
+    const activeTabName = targetTab.dataset.settingsTab;
+    dialog.querySelectorAll('.settings-tab-btn').forEach(button => {
+      button.classList.toggle('is-active', button === targetTab);
     });
+    dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
+      pane.style.display = pane.dataset.settingsPane === activeTabName ? 'flex' : 'none';
+    });
+    if (activeTabName === 'hardware') {
+      void loadSerialPorts(hwPortSelect?.value);
+    }
+  };
+  dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
+    tabBtn.addEventListener('click', () => activateSettingsTab(tabBtn.dataset.settingsTab));
   });
 
   // Password / Secret eye toggle
@@ -3932,10 +5142,7 @@ function initSystemSettings() {
       if (hwBaud) hwBaud.value = cfg.hardware?.baudrate || 1500000;
       if (hwTrans) hwTrans.value = cfg.hardware?.transport || 'supercom';
       if (hwCap) hwCap.value = cfg.hardware?.capture_provider || 'mtp';
-      if (hwBleAddress) hwBleAddress.value = cfg.hardware?.ble_address || '';
-      if (hwBleScanTimeout) hwBleScanTimeout.value = cfg.hardware?.ble_scan_timeout || 15;
       await loadSerialPorts();
-      await loadRememberedBleDevices();
     } catch (err) {
       if (errorBox) {
         errorBox.textContent = `读取配置失败：${err.message}`;
@@ -3945,6 +5152,9 @@ function initSystemSettings() {
   }
 
   openBtn.addEventListener('click', () => {
+    const requestedTab = openBtn.dataset.settingsInitialTab || 'llm';
+    delete openBtn.dataset.settingsInitialTab;
+    activateSettingsTab(requestedTab);
     loadSettings();
     dialog.showModal();
   });
@@ -3958,18 +5168,19 @@ function initSystemSettings() {
     btnTestLlm.addEventListener('click', async () => {
       btnTestLlm.disabled = true;
       btnTestLlm.textContent = '正在测试…';
-      setLlmSignal(llmTestStatus, '正在测试连接…', 'pending');
+      setLlmTestStatus('pending', '正在测试连接…');
       try {
         const resp = await fetch('/api/config/test-llm', { method: 'POST' });
         const data = await resp.json();
         if (data.ok) {
-          setLlmSignal(llmTestStatus, `连接成功 · ${data.latency_ms}ms`, 'success');
+          setLlmTestStatus('success', `连接成功 · ${data.latency_ms}ms`);
         } else {
           const detail = data.error || data.message || '未知错误';
-          setLlmSignal(llmTestStatus, productApiError(detail, 500, data.error_category), 'warning');
+          const reasonCode = data.error_code || data.reason_code || data.error_category || '';
+          setLlmTestIssue(issuePresentation({reasonCode, detail, status: resp.status}));
         }
       } catch (err) {
-        setLlmSignal(llmTestStatus, `连接失败：${productApiError(err.message || err, 500)}`, 'warning');
+        setLlmTestIssue(issuePresentation({reasonCode: 'LLM_REQUEST_FAILED', detail: err?.message || err}));
       } finally {
         btnTestLlm.disabled = false;
         btnTestLlm.textContent = '测试连接';
@@ -4067,8 +5278,6 @@ function initSystemSettings() {
           baudrate: Number(document.querySelector('#cfg-hw-baudrate')?.value) || 1500000,
           transport: document.querySelector('#cfg-hw-transport')?.value || 'supercom',
           capture_provider: document.querySelector('#cfg-hw-capture')?.value || 'mtp',
-          ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim(),
-          ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15,
         },
       };
 
@@ -4105,29 +5314,32 @@ function workspaceVerdictLabel(value) {
 
 function environmentHealth(item = null) {
   const raw = String(item?.status || item?.readiness_status || 'unchecked').toLowerCase();
-  if (['ready', 'pass', 'healthy'].includes(raw)) return {status: 'ready', label: '可用'};
-  if (['partial', 'warning', 'degraded'].includes(raw)) return {status: 'partial', label: '部分可用'};
-  if (['error', 'fail', 'failed', 'unhealthy'].includes(raw)) return {status: 'error', label: '不可用'};
+  if (['ready', 'pass', 'healthy'].includes(raw)) return {status: 'ready', label: '就绪'};
+  if (['partial', 'warning', 'degraded'].includes(raw)) return {status: 'partial', label: '部分就绪'};
+  if (['blocked'].includes(raw)) return {status: 'error', label: '受门禁阻止'};
+  if (['error', 'fail', 'failed', 'unhealthy'].includes(raw)) return {status: 'error', label: '检查失败'};
   return {status: 'unchecked', label: '尚未检查'};
 }
 
-function renderEnvironmentTargetCard(profile, environmentItem = null, selectedProject = currentProject()) {
+function renderEnvironmentTargetCard(profile, environmentItem = null, selectedProject = currentProject(), selectedTarget = '') {
   const project = String(profile.project || '');
-  const protocol = ENVIRONMENT_PROTOCOLS[project] || {
-    transport: profile.transport || 'unknown',
-    transportLabel: profile.transport || '未知',
-    captureProvider: profile.capture_provider || 'unknown',
-    captureLabel: profile.capture_provider || '未知'
+  const projectProtocol = ENVIRONMENT_PROTOCOLS[project] || {};
+  const protocol = {
+    transport: profile.transport || projectProtocol.transport || 'unknown',
+    transportLabel: profile.transport_label || projectProtocol.transportLabel || profile.transport || '未知',
+    captureProvider: profile.capture_provider || projectProtocol.captureProvider || 'unknown',
+    captureLabel: profile.capture_label || projectProtocol.captureLabel || profile.capture_provider || '未知'
   };
   const health = environmentHealth(environmentItem);
   const status = health.status;
   const statusLabel = health.label;
   const iconName = profile.execution_target === 'hardware' ? 'environments' : 'runs';
-  return `<article class='target-health-card is-${escapeHtml(status)} ${project === selectedProject ? 'is-selected' : ''}'>
+  const selected = selectedTarget ? profile.target_id === selectedTarget : project === selectedProject;
+  return `<article class='target-health-card is-${escapeHtml(status)} ${selected ? 'is-selected' : ''}'>
     <div class='target-health-icon'>${icon(iconName, 23)}</div>
     <div class='target-health-copy'><div><strong>${escapeHtml(profile.project_label || project)}</strong><span>${escapeHtml(profile.execution_target_label || '')}</span></div><p class='health-status'><i></i>${escapeHtml(statusLabel)}</p></div>
-    <dl><div><dt>连接方式</dt><dd>${escapeHtml(protocol.transportLabel)}</dd></div><div><dt>截图方式</dt><dd>${escapeHtml(protocol.captureLabel)}</dd></div><div><dt>最后检查</dt><dd>${environmentItem?.last_checked_at ? formatTime(environmentItem.last_checked_at) : '—'}</dd></div></dl>
-    <a class='button button-secondary target-card-action' href='${escapeHtml(pageUrl('/environments', project))}'>查看环境</a>
+    <dl><div><dt>命令通道</dt><dd>${escapeHtml(protocol.transportLabel)}</dd></div><div><dt>截图方式</dt><dd>${escapeHtml(protocol.captureLabel)}</dd></div><div><dt>最后检查</dt><dd>${environmentItem?.last_checked_at ? formatTime(environmentItem.last_checked_at) : '—'}</dd></div></dl>
+    <a class='button button-secondary target-card-action' href='${escapeHtml(pageUrl('/environments', project, {platform_id: profile.platform_id, target_id: profile.target_id}))}'>查看环境</a>
   </article>`;
 }
 
@@ -4246,12 +5458,20 @@ function OverviewPage(project = currentProject()) {
     },
     render(data) {
       const {catalog, active, defects, repair, reports, environments, refreshedAt} = data;
-      const jobs = active.data ? activeTestJobs(active.data) : [];
+      const platformId = currentPlatformFor(project);
+      const jobs = active.data ? activeTestJobs(active.data).filter(job => !job.project || job.project === project) : [];
       const activeBatch = jobs.find(job => job.type === 'batch') || null;
-      const verdicts = catalog.verdict_summary || verdictCounts([]);
+      const verdicts = catalog.verdict_counts || {};
       const recentExceptions = catalog.recent_exceptions || [];
-      const recentCases = catalog.recent_items || [];
-      const profiles = catalog.projects || Object.values(TEST_PROJECTS);
+      const recentCases = catalog.recent_cases || [];
+      const projectMeta = testProject(project);
+      const profiles = targetsFor(project, platformId).map(target => ({
+        ...projectMeta,
+        ...target,
+        project,
+        project_label: projectMeta.projectLabel,
+        platform_id: platformId,
+      }));
       const environmentItems = environments.data?.items || [];
       const total = Number(catalog.summary?.all || 0);
       const completed = activeBatch ? Number(activeBatch.completed || 0) : 0;
@@ -4266,13 +5486,16 @@ function OverviewPage(project = currentProject()) {
       const defectSummary = defects.data?.summary || {};
       const defectValue = key => defectAvailable ? Number(defectSummary[key] || 0) : '—';
       const repairJob = repair.data?.job || null;
-      return `${Components.pageHeader({title: '项目总览', intro: '查看测试状态、最近结果和环境情况', updatedAt: formatTime(refreshedAt), actions: `<button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
-        <section class='workspace-panel environment-overview-panel'><header><div><h2>环境状态</h2><p>查看各测试目标是否可用</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project))}'>查看环境</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.id === profile.project || item.project === profile.project), project)).join('')}</div></section>
-        <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '可直接运行', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最近通过', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最近失败', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最近执行异常', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
-        <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按最近结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
-        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '测试结果汇总' : reportPending ? '正在读取统计数据' : '最近测试结果'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable && !reportPending ? Components.unavailableState('暂无趋势数据', '当前仅显示最近测试结果。') : ''}</article></section>
-        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>ONES 缺陷</h2><p>${defects.pending ? '正在读取缺陷' : '缺陷状态和当前修复任务'}</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看缺陷</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${defectValue('all')}</strong></div><div><span>已通过</span><strong>${defectValue('passed')}</strong></div><div><span>失败</span><strong>${defectValue('failed')}</strong></div><div><span>待处理</span><strong>${defectValue('pending')}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? '运行中' : '无'}</strong></div></div></section>
-        <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日概览</h2><p>${reportAvailable ? '今日统计' : reportPending ? '正在读取统计数据' : '暂无统计数据'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
+      const maturity = catalog.automation_maturity_counts || {};
+      const platformSummary = platformId === '579' ? `<section class='workspace-panel platform-summary-panel'><header><div><h2>579 自动化成熟度与链路</h2><p>APP 交付与设备效果证据分开显示</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project, {platform_id: '579', target_id: '579.o2'}))}'>检查 579 环境</a></header><div class='digest-items'><div><span>${automationMaturityLabel('AUTO_READY')}</span><strong>${Number(maturity.AUTO_READY || 0)}</strong></div><div><span>${automationMaturityLabel('NEED_REVIEW')}</span><strong>${Number(maturity.NEED_REVIEW || 0)}</strong></div><div><span>${automationMaturityLabel('MANUAL_REQUIRED')}</span><strong>${Number(maturity.MANUAL_REQUIRED || 0)}</strong></div><div><span>${automationMaturityLabel('UNSUPPORTED')}</span><strong>${Number(maturity.UNSUPPORTED || 0)}</strong></div><div><span>控制链</span><strong>APP Bridge</strong></div><div><span>观察链</span><strong>COM3/O1 + O2</strong></div></div></section>` : '';
+      return `${Components.pageHeader({title: '项目总览', intro: '实时掌握测试执行状态、用例质量与环境健康度', updatedAt: formatTime(refreshedAt), actions: `<div class='platform-choice-group'>${platformSwitchButtons(project, platformId, 'data-overview-platform')}</div><button class='button button-secondary' type='button' data-overview-refresh>${icon('refresh', 17)} 刷新</button>`})}
+        ${platformSummary}
+        <section class='workspace-panel environment-overview-panel'><header><div><h2>环境就绪状态</h2><p>协议来自项目配置；就绪状态只采用真实环境检查结果</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/environments', project, {platform_id: platformId}))}'>环境中心 ›</a></header><div class='target-health-grid'>${profiles.map(profile => renderEnvironmentTargetCard(profile, environmentItems.find(item => item.target_id === profile.target_id || item.id === profile.target_id || item.project === profile.project), project, currentTargetFor(project, platformId))).join('')}</div></section>
+        <section class='workspace-kpi-grid' data-overview-live='metrics'>${Components.metricCard({label: '用例总数', value: total.toLocaleString('zh-CN'), hint: '当前项目', tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '已固化', value: Number(catalog.summary?.solidified || 0).toLocaleString('zh-CN'), hint: total ? `${(Number(catalog.summary?.solidified || 0) * 100 / total).toFixed(1)}%` : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '运行中', value: String(jobs.length), hint: jobs.length ? '活动任务' : '当前空闲', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '最新结果 PASS', value: verdicts.PASS.toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '最新结果 FAIL', value: verdicts.FAIL.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '最新结果 ERROR', value: verdicts.ERROR.toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}</section>
+        <section class='overview-primary-grid' data-overview-live='primary'>${activeBatchHtml}<article class='workspace-panel recent-exceptions-panel'><header><div><h2>最近异常</h2><p>按用例最近一次真实结果排序</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {view: 'failures'}))}'>查看更多</a></header>${renderCaseSnapshotRows(recentExceptions, project, 6)}</article></section>
+        <section class='overview-secondary-grid' data-overview-live='secondary'><article class='workspace-panel'><header><div><h2>最新用例</h2><p>最近发生运行的用例</p></div><a class='text-button' href='${escapeHtml(pageUrl('/cases', project))}'>全部用例</a></header>${renderCaseSnapshotRows(recentCases, project, 7)}</article><article class='workspace-panel' data-overview-deferred='report'><header><div><h2>报告概览</h2><p>${reportAvailable ? '汇总结果' : '当前用例最新结果'}</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>打开报告</a></header>${renderDistributionDonut(reportCounts)}${!reportAvailable ? Components.unavailableState('趋势数据暂不可用', '当前可继续查看最近一次测试结果。') : ''}</article></section>
+        <section class='workspace-panel defect-overview-strip' data-overview-deferred='defects'><header><div><h2>ONES 缺陷概览</h2><p>缺陷队列与当前自动修复任务</p></div><a class='button button-secondary' href='${escapeHtml(pageUrl('/defects', project))}'>查看 ONES 缺陷</a></header><div class='digest-items'><div><span>全部缺陷</span><strong>${Number(defectSummary.all || 0)}</strong></div><div><span>已通过</span><strong>${Number(defectSummary.passed || 0)}</strong></div><div><span>失败</span><strong>${Number(defectSummary.failed || 0)}</strong></div><div><span>待处理</span><strong>${Number(defectSummary.pending || 0)}</strong></div><div><span>当前修复任务</span><strong>${repairJob ? escapeHtml(repairJob.id || '运行中') : '无'}</strong></div></div></section>
+        <section class='workspace-panel daily-digest' data-overview-deferred='daily'><header><div><h2>今日运营概览</h2><p>${reportAvailable ? '测试数据汇总' : '部分统计暂不可用'}</p></div></header><div class='digest-items'><div><span>运行批次</span><strong>${reportAvailable ? Number(reports.data.metrics?.batches || 0) : '—'}</strong></div><div><span>通过率</span><strong>${reportAvailable ? `${Number(reports.data.metrics?.pass_rate || 0).toFixed(1)}%` : '—'}</strong></div><div><span>缺陷修复</span><strong>${reportAvailable ? Number(reports.data.metrics?.repairs || 0) : '—'}</strong></div><div><span>无法验证</span><strong>${reportAvailable ? Number(reports.data.metrics?.cannot_verify || 0) : '—'}</strong></div></div></section>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -4284,6 +5507,11 @@ function OverviewPage(project = currentProject()) {
         invalidateCaseCatalog(project);
         route();
       });
+      root.querySelectorAll('[data-overview-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/overview', project, {platform_id: button.dataset.overviewPlatform}));
+        invalidateCaseCatalog(project);
+        route();
+      }));
       void loadDeferredSections(root);
       scheduleRefresh(root);
     },
@@ -4310,11 +5538,32 @@ function renderWorkflowStepper(job = {}) {
 
 function renderExecutionEvidence(job = {}) {
   const screenshots = Array.isArray(job.live_screenshots) ? job.live_screenshots : [];
-  if (!screenshots.length) return Components.emptyState('尚无实时截图', '截图检查点生成后会自动显示。');
-  return `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => {
-    const label = item.label || `检查点 ${index + 1}`;
+  const is579 = String(job.requested_platform_id || job.platform_id || '') === '579';
+  const screenshotCards = `<div class='execution-evidence-grid'>${screenshots.slice(-4).map((item, index) => {
+    const label = item.label || `${is579 ? 'O2 ' : ''}检查点 ${index + 1}`;
     return `<figure><a ${imagePreviewLinkAttributes(item.url || '#', label)}><img src='${escapeHtml(item.url || '')}' alt='${escapeHtml(label)}'></a><figcaption>${escapeHtml(label)}</figcaption></figure>`;
   }).join('')}</div>`;
+  if (!is579) {
+    if (!screenshots.length) return Components.emptyState('尚无实时截图', '截图检查点生成后会自动显示。');
+    return screenshotCards;
+  }
+  const deliveries = Array.isArray(job.delivery_feedback) ? job.delivery_feedback : [];
+  const observations = Array.isArray(job.observations) ? job.observations : [];
+  const o1 = observations.filter(item => item.kind === 'o1_log_observation');
+  const o2 = observations.filter(item => item.kind === 'o2_screenshot');
+  const status = items => items.length ? `${items.length} 条` : '等待证据';
+  return `<div class='execution-link-evidence'>
+    <div><span>APP Bridge / BLE 交付</span><strong>${escapeHtml(status(deliveries))}</strong><small>仅代表动作交付，不等于产品 PASS</small></div>
+    <div><span>COM3 / O1 只读日志</span><strong>${escapeHtml(status(o1))}</strong><small>串口仅观察，禁止写入</small></div>
+    <div><span>O2 手表截图</span><strong>${escapeHtml(status(o2.length ? o2 : screenshots))}</strong><small>截图新鲜度与设备效果用于最终判定</small></div>
+  </div>${screenshots.length ? screenshotCards : ''}`;
+}
+
+function executionRouteMeta(job = {}) {
+  const requested = String(job.requested_platform_id || job.platform_id || 'w30');
+  const adapter = String(job.resolved_execution_adapter || job.execution_adapter || '旧任务未标明');
+  const target = PLATFORM_TARGETS[job.target_id]?.target_label || job.execution_target_label || job.target_id || '旧任务未标明';
+  return `<div class='execution-route-meta'><span>请求平台 <strong>${escapeHtml(PLATFORM_PROFILES[requested]?.platform_label || requested)}</strong></span><span>实际适配器 <strong>${escapeHtml(adapter)}</strong></span><span>执行目标 <strong>${escapeHtml(target)}</strong></span>${job.product_verdict ? `<span>产品结果 <strong>${escapeHtml(job.product_verdict)}</strong></span>` : ''}${job.automation_maturity ? `<span>成熟度 <strong>${escapeHtml(job.automation_maturity)}</strong></span>` : ''}${job.infrastructure_status ? `<span>基础设施 <strong>${escapeHtml(job.infrastructure_status)}</strong></span>` : ''}</div>`;
 }
 
 function renderActiveExecution(job, project) {
@@ -4325,7 +5574,7 @@ function renderActiveExecution(job, project) {
   const counts = job.verdict_counts || {};
   const currentCase = job.current_case || {case_id: job.case_id, sheet: job.sheet};
   const isActive = ['queued', 'running', 'finalizing'].includes(String(job.status));
-  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='${escapeHtml(testBatchHref(job.id))}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header><div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>通过 ${Number(counts.PASS || 0)}</span><span class='is-fail'>失败 ${Number(counts.FAIL || 0)}</span><span class='is-error'>执行异常 ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>最新截图</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
+  return `<article class='workspace-panel execution-main-panel' data-execution-live='task'><header><div><h2>${escapeHtml(job.type === 'batch' ? `${testProject(job.project || project).projectLabel} 批次执行` : `用例 ${job.case_id || ''}`)}</h2>${Components.statusChip(isActive ? 'RUNNING' : job.verdict || job.status, isActive ? '运行中' : workspaceVerdictLabel(job.verdict || job.status))}</div><div class='panel-actions'>${job.type === 'batch' ? `<a class='button button-secondary' href='${escapeHtml(testBatchHref(job.id))}'>查看详情</a>` : ''}${isActive && job.type === 'batch' ? `<button class='button button-secondary' type='button' data-job-pause='${escapeHtml(job.id)}'>${icon('pause', 16)} 暂停批次</button>` : ''}${job.resume_available ? `<button class='button' type='button' data-job-resume='${escapeHtml(job.id)}'>继续运行</button>` : ''}</div></header>${executionRouteMeta(job)}<div class='active-run-grid'><div class='active-run-progress'>${Components.progressRing(percent)}<div><strong>${completed.toLocaleString('zh-CN')} / ${total.toLocaleString('zh-CN')}</strong><div class='batch-progress-track'><div class='batch-progress-bar' style='width:${percent}%'></div></div><div class='inline-verdicts'><span class='is-pass'>通过 ${Number(counts.PASS || 0)}</span><span class='is-fail'>失败 ${Number(counts.FAIL || 0)}</span><span class='is-error'>执行异常 ${Number(counts.ERROR || 0)}</span><span class='is-cannot'>无法验证 ${Number(counts.CANNOT_VERIFY || 0)}</span></div></div></div><div class='current-case-card'><span>当前用例</span><strong>${escapeHtml(currentCase?.case_id || '正在准备')}</strong><small>${escapeHtml(currentCase?.sheet || testProject(job.project || project).targetLabel)}</small><div><span>当前阶段</span><strong>${escapeHtml(TEST_NODE_LABELS[job.current_node] || job.current_node || '等待调度')}</strong></div>${renderWorkflowStepper(job)}</div><aside class='live-evidence-card'><h3>最新证据</h3>${renderExecutionEvidence(job)}</aside></div></article>`;
 }
 
 function ExecutionPage(project = currentProject()) {
@@ -4370,12 +5619,6 @@ function ExecutionPage(project = currentProject()) {
   }
 
   async function handleClick(event, root) {
-    const subtab = event.target.closest?.('[data-subtab]');
-    if (subtab && root.contains(subtab)) {
-      history.pushState({}, '', pageUrl('/runs', project, {view: subtab.dataset.subtab}));
-      route();
-      return;
-    }
     const pause = event.target.closest?.('[data-job-pause]');
     if (pause && root.contains(pause)) {
       if (!window.confirm('将在当前用例完成后暂停批次。继续吗？')) return;
@@ -4407,25 +5650,39 @@ function ExecutionPage(project = currentProject()) {
   const controller = {
     async load() {
       const view = ['queue', 'running', 'completed', 'interrupted'].includes(new URLSearchParams(location.search).get('view')) ? new URLSearchParams(location.search).get('view') : 'running';
+      const platformId = currentPlatformFor(project);
       const [recent, active, jobs] = await Promise.all([
-        optionalApi(`/api/tests/recent?project=${encodeURIComponent(project)}&limit=8`),
+        optionalApi(`/api/tests/recent?project=${encodeURIComponent(project)}&platform_id=${encodeURIComponent(platformId)}&limit=8`),
         optionalApi('/api/tests/active'),
         optionalApi(`/api/tests/jobs?project=${encodeURIComponent(project)}&status=${encodeURIComponent(view)}&page=1&page_size=20`)
       ]);
       return {recent, active, jobs, view};
     },
     render(data) {
+      const platformId = currentPlatformFor(project);
       const activeJobs = data.active.data ? activeTestJobs(data.active.data).filter(job => !job.project || job.project === project) : [];
       const activeJob = activeJobs.find(job => job.type === 'batch') || activeJobs[0] || null;
       const jobItems = data.jobs.data?.items || [];
       const recentItems = data.recent.data?.items || [];
-      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
+      const executionTabs = [
+        {value: 'queue', label: '任务队列'},
+        {value: 'running', label: '运行中'},
+        {value: 'completed', label: '已完成'},
+        {value: 'interrupted', label: '已中断'},
+      ].map(item => ({
+        ...item,
+        href: pageUrl('/runs', project, {
+          view: item.value,
+          platform_id: platformId,
+        }),
+      }));
+      const recentResults = recentItems.map(item => `<tr><td>${formatTime(item.last_run_at)}</td><td><a class='case-id-link' href='${escapeHtml(testDetailHref(project, item.file_sheet || item.sheet, item.case_id, currentRouteUrl()))}'>${escapeHtml(item.case_id)}</a></td><td>${escapeHtml(item.sheet)}</td><td>${escapeHtml(PLATFORM_PROFILES[item.last_platform_id]?.platform_label || item.last_platform_id || '旧记录')}</td><td>${Components.statusChip(item.latest_verdict, workspaceVerdictLabel(item.latest_verdict))}</td><td>${Number(item.history_count || 0)} 次</td></tr>`).join('');
       const listArea = data.view === 'running'
         ? renderActiveExecution(activeJob, project)
         : data.jobs.data
-          ? `<article class='workspace-panel'><header><div><h2>${escapeHtml({queue: '任务队列', completed: '已完成任务', interrupted: '已中断任务'}[data.view] || '任务')}</h2><p>按最近更新时间排列</p></div></header>${jobItems.length ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>任务</th><th>项目</th><th>状态</th><th>进度</th><th>时间</th></tr></thead><tbody>${jobItems.map(job => `<tr><td>${escapeHtml(job.id)}</td><td>${escapeHtml(job.project_label || job.project || '')}</td><td>${Components.statusChip(job.verdict || job.status, workspaceVerdictLabel(job.verdict || job.status))}</td><td>${Number(job.completed || 0)} / ${Number(job.total || 1)}</td><td>${formatTime(job.finished_at || job.started_at)}</td></tr>`).join('')}</tbody></table></div>` : Components.emptyState('当前分类没有任务')}</article>`
+          ? `<article class='workspace-panel'><header><div><h2>${escapeHtml({queue: '任务队列', completed: '已完成任务', interrupted: '已中断任务'}[data.view] || '任务')}</h2><p>来自任务列表接口</p></div></header>${jobItems.length ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>任务</th><th>项目</th><th>请求平台</th><th>实际适配器</th><th>状态</th><th>进度</th><th>时间</th></tr></thead><tbody>${jobItems.map(job => `<tr><td>${escapeHtml(job.id)}</td><td>${escapeHtml(job.project_label || job.project || '')}</td><td>${escapeHtml(PLATFORM_PROFILES[job.requested_platform_id]?.platform_label || job.requested_platform_id || '旧任务')}</td><td>${escapeHtml(job.resolved_execution_adapter || '旧任务未标明')}</td><td>${Components.statusChip(job.verdict || job.status, workspaceVerdictLabel(job.verdict || job.status))}</td><td>${Number(job.completed || 0)} / ${Number(job.total || 1)}</td><td>${formatTime(job.finished_at || job.started_at)}</td></tr>`).join('')}</tbody></table></div>` : Components.emptyState('当前分类没有任务')}</article>`
           : `<article class='workspace-panel'>${Components.unavailableState('任务列表暂不可用', '当前仍可查看正在运行的任务。')}</article>`;
-      return `${Components.pageHeader({title: '自动化执行', intro: '查看测试任务和最近结果', actions: `<a class='button' href='${escapeHtml(pageUrl('/cases', project))}'>${icon('runs', 17)} 新建测试</a>`})}${Components.subTabs([{value: 'queue', label: '任务队列'}, {value: 'running', label: '运行中'}, {value: 'completed', label: '已完成'}, {value: 'interrupted', label: '已中断'}], data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
+      return `${Components.pageHeader({title: '自动化执行', intro: '创建、监控和恢复单条或批量测试任务', actions: `<div class='platform-choice-group' aria-label='执行页平台视图'>${platformSwitchButtons(project, platformId, 'data-runs-platform')}</div><a class='button' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('runs', 17)} 新建执行任务</a><a class='button button-secondary' href='${escapeHtml(pageUrl('/cases', project, {platform_id: platformId}))}'>${icon('plus', 17)} 按状态创建批次</a>`})}${Components.subTabs(executionTabs, data.view)}<section class='workspace-kpi-grid is-four' data-execution-live='metrics'>${Components.metricCard({label: '运行中', value: String(activeJobs.filter(job => ['queued', 'running', 'finalizing'].includes(job.status)).length), tone: 'green', iconName: 'runs'})}${Components.metricCard({label: '队列中', value: data.jobs.data ? String(Number(data.jobs.data.summary?.queued || 0)) : '—', tone: 'amber', iconName: 'runs'})}${Components.metricCard({label: '今日完成', value: data.jobs.data ? String(Number(data.jobs.data.summary?.completed_today || 0)) : '—', tone: 'green', iconName: 'check'})}${Components.metricCard({label: '执行异常', value: data.jobs.data ? String(Number(data.jobs.data.summary?.error || 0)) : '—', tone: 'red', iconName: 'warning'})}</section>${listArea}<article class='workspace-panel execution-results-panel' data-execution-live='results'><header><div><h2>最近结果</h2><p>每条用例的最近一次结果</p></div><a class='text-button' href='${escapeHtml(pageUrl('/reports', project, {platform_id: platformId}))}'>测试报告</a></header>${recentResults ? `<div class='workspace-table-scroll'><table class='workspace-table'><thead><tr><th>时间</th><th>用例</th><th>模块</th><th>平台</th><th>结果</th><th>历史</th></tr></thead><tbody>${recentResults}</tbody></table></div>` : Components.emptyState('暂无运行结果')}</article>`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -4433,6 +5690,11 @@ function ExecutionPage(project = currentProject()) {
       mountedRoot = root;
       clickHandler = event => { void handleClick(event, root); };
       root.addEventListener('click', clickHandler);
+      root.querySelectorAll('[data-runs-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/runs', project, {view: data.view, platform_id: button.dataset.runsPlatform}));
+        invalidateCaseCatalog(project);
+        route();
+      }));
       scheduleRefresh(root);
     },
     destroy() {
@@ -4475,7 +5737,11 @@ function reportParams() {
   const defaults = reportDatePresetRange(period || '7d');
   const from = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('from') || '') ? params.get('from') : defaults.from;
   const to = !period && /^\d{4}-\d{2}-\d{2}$/.test(params.get('to') || '') ? params.get('to') : defaults.to;
-  return {view, module, from, to, period};
+  const platform = currentPlatformFor(currentProject());
+  const result = ['PASS', 'FAIL', 'ERROR', 'CANNOT_VERIFY'].includes(params.get('result')) ? params.get('result') : '';
+  const maturity = ['AUTO_READY', 'PROMOTED', 'NEED_REVIEW', 'MANUAL_REQUIRED', 'UNSUPPORTED', 'UNMAPPED'].includes(params.get('maturity')) ? params.get('maturity') : '';
+  const infrastructure = ['READY', 'ENV_BLOCKED', 'OBSERVATION_INCOMPLETE', 'CLEANUP_REQUIRED', 'RUNNER_ERROR', 'CAPABILITY_MISSING', 'UNKNOWN'].includes(params.get('infrastructure')) ? params.get('infrastructure') : '';
+  return {view, module, from, to, period, platform, result, maturity, infrastructure};
 }
 
 function activeReportDatePreset(filters = {}) {
@@ -4491,6 +5757,10 @@ function reportQuery(project, filters = {}) {
   const query = new URLSearchParams({project, from: filters.from, to: filters.to});
   if (filters.period === '24h') query.set('period', '24h');
   if (filters.module) query.set('module', filters.module);
+  if (filters.platform) query.set('platform_id', filters.platform);
+  if (filters.result) query.set('result', filters.result);
+  if (filters.maturity) query.set('maturity', filters.maturity);
+  if (filters.infrastructure) query.set('infrastructure', filters.infrastructure);
   return query;
 }
 
@@ -4505,6 +5775,10 @@ function buildSnapshotReport(items = [], filters = {}) {
   const executed = items.filter(item => {
     if (!item.last_run_at) return false;
     if (filters.module && String(item.file_sheet || item.sheet) !== filters.module) return false;
+    if (filters.platform && String(item.last_platform_id || item.platform_id) !== filters.platform) return false;
+    if (filters.result && String(item.last_product_verdict || item.latest_verdict).toUpperCase() !== filters.result) return false;
+    if (filters.maturity && String(item.last_automation_maturity || item.automation_maturity || item.mapping_status).toUpperCase() !== filters.maturity) return false;
+    if (filters.infrastructure && String(item.last_infrastructure_status || 'UNKNOWN').toUpperCase() !== filters.infrastructure) return false;
     const time = new Date(item.last_run_at).getTime();
     return Number.isFinite(time) && time >= fromTime && time <= toTime;
   });
@@ -4651,7 +5925,7 @@ function ReportsPage(project = currentProject()) {
       const metrics = report.metrics || {};
       const distribution = report.distribution || metrics;
       const insight = report.insight ? reportInsightPresentation(report.insight) : null;
-      const reportReturnTo = currentRouteUrl();
+      const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module, platform_id: filters.platform, result: filters.result, maturity: filters.maturity, infrastructure: filters.infrastructure});
       let content;
       if (filters.view === 'overview') {
         content = `<section class='report-chart-grid'><article class='workspace-panel'><header><div><h2>结果趋势</h2><p>执行数量和通过率</p></div><span class='chip chip-pending'>${escapeHtml(reportRangeLabel(filters))}</span></header>${renderTrendChart(report.trend)}</article><article class='workspace-panel'><header><div><h2>结果分布</h2><p>产品结果与执行异常分开统计</p></div></header>${renderDistributionDonut(distribution)}</article></section><section class='report-detail-grid'><article class='workspace-panel'><header><div><h2>失败较多的模块</h2><p>仅统计产品功能失败</p></div></header>${renderFailureModules(report.top_fail_modules || [])}</article><article class='workspace-panel'><header><div><h2>执行异常较多的模块</h2><p>测试未能正常完成</p></div></header>${renderExecutionErrorModules(report.top_execution_error_modules || [])}</article></section><article class='workspace-panel'><header><div><h2>最近失败与执行异常</h2><p>当前筛选范围</p></div></header>${renderRecentFailures(report.recent_failures || [], project, reportReturnTo)}</article>${insight ? `<aside class='report-insight'>${icon('reports', 22)}<div><strong>${escapeHtml(insight.title)}</strong><p>${escapeHtml(insight.description)}</p></div></aside>` : Components.unavailableState('暂无分析结论')}`;
@@ -4661,8 +5935,44 @@ function ReportsPage(project = currentProject()) {
         content = `<article class='workspace-panel'>${Components.unavailableState(filters.view === 'batches' ? '暂不支持查看批次报告' : '暂不支持查看单条记录列表', '可在用例详情中查看每次运行记录。')}</article>`;
       }
       const activePreset = activeReportDatePreset(filters);
+      const reportTabs = [
+        {value: 'overview', label: '报告概览'},
+        {value: 'batches', label: '批次报告'},
+        {value: 'cases', label: '单条记录'},
+        {value: 'failures', label: '失败分析'},
+      ].map(item => ({
+        ...item,
+        href: pageUrl('/reports', project, {
+          view: item.value,
+          from: filters.from,
+          to: filters.to,
+          module: filters.module,
+          platform_id: filters.platform,
+          result: filters.result,
+          maturity: filters.maturity,
+          infrastructure: filters.infrastructure,
+          ...(filters.period ? {period: filters.period} : {}),
+        }),
+      }));
       const presetButtons = REPORT_DATE_PRESETS.map(item => `<button class='report-period-option ${activePreset === item.value ? 'is-active' : ''}' type='button' data-report-period='${escapeHtml(item.value)}' aria-pressed='${activePreset === item.value}'>${escapeHtml(item.label)}</button>`).join('');
-      return `${Components.pageHeader({title: '测试报告', intro: '查看测试结果、趋势和证据', actions: `<button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前暂无可导出的完整报告"'}>${icon('reports', 17)} 导出报告</button>`})}<section class='report-filter-bar'><label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label><label>目标<strong>${escapeHtml(testProject(project).targetLabel)}</strong></label><label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label><label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label><div class='report-period-field'><span>快捷筛选</span><div class='report-period-options' role='group' aria-label='快捷时间段'>${presetButtons}</div></div><label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label></section>${Components.subTabs([{value: 'overview', label: '报告概览'}, {value: 'batches', label: '批次报告'}, {value: 'cases', label: '单条记录'}, {value: 'failures', label: '失败分析'}], filters.view)}${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>部分统计暂不可用，当前仅显示最近结果。</span></aside>` : ''}<section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '通过', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '失败', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '执行异常', value: Number(metrics.execution_error || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
+      const resultOptions = ['PASS', 'FAIL', 'ERROR', 'CANNOT_VERIFY'].map(value => `<option value='${value}' ${filters.result === value ? 'selected' : ''}>${escapeHtml(workspaceVerdictLabel(value))}</option>`).join('');
+      const maturityOptions = ['AUTO_READY', 'PROMOTED', 'NEED_REVIEW', 'MANUAL_REQUIRED', 'UNSUPPORTED', 'UNMAPPED'].map(value => `<option value='${value}' ${filters.maturity === value ? 'selected' : ''}>${escapeHtml(automationMaturityLabel(value))}</option>`).join('');
+      const infrastructureOptions = ['READY', 'ENV_BLOCKED', 'OBSERVATION_INCOMPLETE', 'CLEANUP_REQUIRED', 'RUNNER_ERROR', 'CAPABILITY_MISSING', 'UNKNOWN'].map(value => `<option value='${value}' ${filters.infrastructure === value ? 'selected' : ''}>${escapeHtml(value)}</option>`).join('');
+      return `${Components.pageHeader({title: '测试报告', intro: '查看测试结果、趋势和证据', actions: `<div class='platform-choice-group' aria-label='报告平台筛选'>${platformSwitchButtons(project, filters.platform, 'data-report-platform')}</div><button class='button button-secondary' type='button' data-report-export ${summary.data ? '' : 'disabled title="当前暂无可导出的完整报告"'}>${icon('reports', 17)} 导出报告</button>`})}
+        <section class='report-filter-bar'>
+          <label>项目<strong>${escapeHtml(testProject(project).projectLabel)}</strong></label>
+          <label>平台<strong>${escapeHtml(PLATFORM_PROFILES[filters.platform]?.platform_label || filters.platform)}</strong></label>
+          <label>开始日期<input id='report-from' type='date' value='${escapeHtml(filters.from)}'></label>
+          <label>结束日期<input id='report-to' type='date' value='${escapeHtml(filters.to)}'></label>
+          <div class='report-period-field'><span>快捷筛选</span><div class='report-period-options' role='group' aria-label='快捷时间段'>${presetButtons}</div></div>
+          <label>产品结果<select id='report-result'><option value=''>全部结果</option>${resultOptions}</select></label>
+          <label>自动化成熟度<select id='report-maturity'><option value=''>全部成熟度</option>${maturityOptions}</select></label>
+          <label>基础设施<select id='report-infrastructure'><option value=''>全部状态</option>${infrastructureOptions}</select></label>
+          <label>模块<select id='report-module'><option value=''>全部模块</option>${ALL_FUNCTION_MODULES.map(name => `<option value='${escapeHtml(name)}' ${filters.module === name ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}</select></label>
+        </section>
+        ${Components.subTabs(reportTabs, filters.view)}
+        ${!summary.data ? `<aside class='data-source-banner'>${icon('warning', 18)}<span>部分统计暂不可用，当前仅显示最近结果。</span></aside>` : ''}
+        <section class='workspace-kpi-grid is-six'>${Components.metricCard({label: '已运行用例', value: Number(metrics.total || 0).toLocaleString('zh-CN'), tone: 'blue', iconName: 'cases'})}${Components.metricCard({label: '通过', value: Number(metrics.pass || distribution.PASS || 0).toLocaleString('zh-CN'), tone: 'green', iconName: 'check'})}${Components.metricCard({label: '失败', value: Number(metrics.fail || distribution.FAIL || 0).toLocaleString('zh-CN'), tone: 'red', iconName: 'warning'})}${Components.metricCard({label: '执行异常', value: Number(metrics.execution_error || metrics.error || distribution.ERROR || 0).toLocaleString('zh-CN'), tone: 'amber', iconName: 'warning'})}${Components.metricCard({label: '无法验证', value: Number(metrics.cannot_verify || distribution.CANNOT_VERIFY || 0).toLocaleString('zh-CN'), tone: 'gray', iconName: 'warning'})}${Components.metricCard({label: '通过率', value: `${Number(metrics.pass_rate || 0).toFixed(1)}%`, tone: 'green', iconName: 'reports'})}</section>${content}`;
     },
     mount(root, data) {
       rememberProject(project);
@@ -4670,20 +5980,27 @@ function ReportsPage(project = currentProject()) {
         const from = root.querySelector('#report-from')?.value || data.filters.from;
         const to = root.querySelector('#report-to')?.value || data.filters.to;
         const module = root.querySelector('#report-module')?.value || '';
-        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module, ...(preservePeriod && data.filters.period ? {period: data.filters.period} : {})}));
+        const result = root.querySelector('#report-result')?.value || '';
+        const maturity = root.querySelector('#report-maturity')?.value || '';
+        const infrastructure = root.querySelector('#report-infrastructure')?.value || '';
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from, to, module, platform_id: data.filters.platform, result, maturity, infrastructure, ...(preservePeriod && data.filters.period ? {period: data.filters.period} : {})}));
         route();
       };
       root.querySelector('#report-from')?.addEventListener('change', () => applyFilters());
       root.querySelector('#report-to')?.addEventListener('change', () => applyFilters());
       root.querySelector('#report-module')?.addEventListener('change', () => applyFilters({preservePeriod: true}));
+      root.querySelector('#report-result')?.addEventListener('change', applyFilters);
+      root.querySelector('#report-maturity')?.addEventListener('change', applyFilters);
+      root.querySelector('#report-infrastructure')?.addEventListener('change', applyFilters);
       root.querySelectorAll('[data-report-period]').forEach(button => button.addEventListener('click', () => {
         const period = button.dataset.reportPeriod || '7d';
         const range = reportDatePresetRange(period);
-        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from: range.from, to: range.to, module: data.filters.module, ...(period === '24h' ? {period} : {})}));
+        history.pushState({}, '', pageUrl('/reports', project, {view: data.filters.view, from: range.from, to: range.to, module: data.filters.module, platform_id: data.filters.platform, result: data.filters.result, maturity: data.filters.maturity, infrastructure: data.filters.infrastructure, ...(period === '24h' ? {period} : {})}));
         route();
       }));
-      root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/reports', project, {view: button.dataset.subtab, from: data.filters.from, to: data.filters.to, module: data.filters.module, ...(data.filters.period ? {period: data.filters.period} : {})}));
+      root.querySelectorAll('[data-report-platform]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/reports', project, {...data.filters, platform_id: button.dataset.reportPlatform, platform: undefined}));
+        invalidateCaseCatalog(project);
         route();
       }));
       root.querySelector('[data-report-export]:not(:disabled)')?.addEventListener('click', () => {
@@ -4703,28 +6020,55 @@ function environmentSection() {
 }
 
 const ENVIRONMENT_CHECK_COPY = Object.freeze({
-  source: {label: '项目文件', pass: '项目文件可用', warning: '项目文件需要配置', fail: '项目文件不可用'},
-  profile: {label: '真机配置', pass: '真机配置可用', warning: '真机配置需要完善', fail: '真机配置不可用'},
-  config: {label: '用例配置', pass: '用例配置可用', warning: '用例配置需要完善', fail: '用例配置不可用'},
-  artifact: {label: '测试程序', pass: '测试程序可用', warning: '测试程序尚未准备好', fail: '测试程序不可用'},
-  command: {label: '操作能力', pass: '操作能力可用', warning: '操作能力需要检查', fail: '操作能力不可用'},
-  capture: {label: '截图能力', pass: '截图能力可用', warning: '截图能力需要检查', fail: '截图能力不可用'},
-  llm: {label: '模型服务', pass: '模型服务可用', warning: '模型服务尚未配置或不可用', fail: '模型服务不可用'}
+  source: {label: '项目文件', pass: '项目文件可用', warning: '项目文件需要配置', fail: '项目文件不可用', action: '请在系统设置中配置项目路径。'},
+  profile: {label: '真机配置', pass: '真机配置可用', warning: '真机配置需要完善', fail: '真机配置不可用', action: '请重新选择测试项目；如仍失败，请联系维护人员。'},
+  supercom_pipe: {label: '手表连接', pass: '手表连接可用', warning: '手表连接需要检查', fail: '手表连接不可用', action: '请打开 SuperCom，连接当前手表对应的串口后重新检查。'},
+  usb_pnp: {label: 'USB 连接', pass: '手表已通过 USB 连接', warning: 'USB 连接需要检查', fail: 'USB 连接不可用', action: '请重新插拔 USB，确认电脑能够识别手表后重试。'},
+  mtp_namespace: {label: '截图读取', pass: '可以读取手表截图', warning: '截图读取需要检查', fail: '暂时无法读取手表截图', action: '请重新连接 USB，并确认电脑能够打开手表存储后重试。'},
+  gui_ping: {label: '手表响应', pass: '手表可以接收测试操作', warning: '手表响应需要检查', fail: '手表暂未响应测试操作', action: '请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。'},
+  target_busy: {label: '当前手表', pass: '当前手表可用', warning: '当前手表需要检查', fail: '当前手表正在使用中', action: '请等待该任务结束或停止后再检查。'},
+  internal: {label: '环境检查', pass: '环境检查可用', warning: '环境检查需要重试', fail: '环境检查未完成', action: '请重新检查；如再次出现，展开诊断信息并联系维护人员。'},
+  config: {label: '用例配置', pass: '用例配置可用', warning: '用例配置需要完善', fail: '用例配置不可用', action: '请在系统设置中检查用例配置。'},
+  artifact: {label: '测试程序', pass: '测试程序可用', warning: '测试程序尚未准备好', fail: '测试程序不可用', action: '请在系统设置中检查测试程序路径或重新准备测试程序。'},
+  command: {label: '操作能力', pass: '操作能力可用', warning: '操作能力需要检查', fail: '操作能力不可用', action: '请在系统设置中检查设备连接与操作设置。'},
+  capture: {label: '截图能力', pass: '截图能力可用', warning: '截图能力需要检查', fail: '截图能力不可用', action: '请在系统设置中检查截图连接设置。'},
+  llm: {label: '模型服务', pass: '模型服务可用', warning: '模型服务尚未配置或不可用', fail: '模型服务不可用', action: '请在系统设置中检查网络和模型服务配置。'}
 });
 
 function environmentCheckPresentation(item = {}, status = 'unchecked') {
   const key = String(item.key || '');
   const copy = ENVIRONMENT_CHECK_COPY[key] || {
-    label: item.label || key || '检查项',
+    label: safeProductCopy(item.label) || '检查项',
     pass: '当前可用',
     warning: '需要检查',
-    fail: '当前不可用'
+    fail: '当前不可用',
+    action: '请检查相关配置后重试。'
   };
-  const detail = String(item.detail || '').trim();
-  if (['pass', 'ready'].includes(status)) return {label: copy.label, summary: copy.pass, detail};
-  if (status === 'unchecked') return {label: copy.label, summary: '尚未检查', detail: ''};
-  if (status === 'warning') return {label: copy.label, summary: copy.warning, detail};
-  return {label: copy.label, summary: copy.fail, detail};
+  const diagnosticPayload = item.diagnostics && typeof item.diagnostics === 'object' && Object.keys(item.diagnostics).length
+    ? JSON.stringify(item.diagnostics, null, 2)
+    : '';
+  const detail = [String(item.detail || '').trim(), diagnosticPayload].filter(Boolean).join('\n\n');
+  const label = copy.label;
+  if (['pass', 'ready'].includes(status)) {
+    return {label, cause: copy.pass, action: '', summary: copy.pass, detail};
+  }
+  if (status === 'checking') {
+    return {label, cause: '正在检查', action: '', summary: '正在读取本机状态…', detail: ''};
+  }
+  if (status === 'unchecked') {
+    return {label, cause: '尚未检查', action: '', summary: '尚未检查', detail: ''};
+  }
+  const fallbackCause = status === 'warning' ? copy.warning : copy.fail;
+  const known = resolveIssueDefinition(item.code);
+  const cause = known ? known.cause : fallbackCause;
+  const action = known?.action || safeProductCopy(item.action) || copy.action;
+  return {
+    label,
+    cause,
+    action,
+    summary: cause,
+    detail
+  };
 }
 
 function environmentCheckRows(checks = [], isHardware = false) {
@@ -4737,16 +6081,57 @@ function environmentCheckRows(checks = [], isHardware = false) {
     ['llm', '模型服务']
   ];
   const normalized = checks.length ? checks : defaults.map(([key, label]) => ({key, label, status: 'unchecked', detail: '尚未执行环境检查'}));
-  return `<div class='environment-check-list'>${normalized.map(item => {
+  return `<div class='environment-check-list' aria-live='polite'>${normalized.map(item => {
     const status = String(item.status || 'unchecked').toLowerCase();
-    const statusLabel = {pass: '可用', ready: '可用', warning: '需处理', fail: '不可用', error: '不可用', unchecked: '未检查'}[status] || '未检查';
-    const iconName = ['pass', 'ready'].includes(status) ? 'check' : 'warning';
+    const statusLabel = {pass: '可用', ready: '可用', checking: '检查中', warning: '需处理', fail: '不可用', error: '不可用', unchecked: '未检查'}[status] || '未检查';
+    const statusIcon = status === 'checking'
+      ? `<span class='environment-check-spinner' aria-hidden='true'></span>`
+      : ['pass', 'ready'].includes(status)
+        ? icon('check', 17)
+        : ['fail', 'error'].includes(status)
+          ? icon('close', 17)
+          : status === 'warning'
+            ? icon('warning', 17)
+            : `<span class='environment-check-unchecked' aria-hidden='true'>—</span>`;
     const presentation = environmentCheckPresentation(item, status);
     const diagnostics = presentation.detail && presentation.detail !== presentation.summary
       ? `<details class='inline-diagnostics'><summary>诊断信息</summary><pre><code>${escapeHtml(presentation.detail)}</code></pre></details>`
       : '';
-    return `<div class='environment-check-row is-${escapeHtml(status)}'><i>${icon(iconName, 17)}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span><div class='environment-check-detail'><p>${escapeHtml(presentation.summary)}</p>${diagnostics}</div></div>`;
+    const isProblem = ['warning', 'fail', 'error'].includes(status);
+    const content = isProblem
+      ? `<div class='environment-check-detail'><p class='check-cause'><span class='check-field-label'>问题原因：</span>${escapeHtml(presentation.cause)}</p>${presentation.action ? `<p class='check-action'><span class='check-field-label'>处理方法：</span>${escapeHtml(presentation.action)}</p>` : ''}${diagnostics}</div>`
+      : `<div class='environment-check-detail'><p>${escapeHtml(presentation.summary)}</p>${diagnostics}</div>`;
+    return `<div class='environment-check-row is-${escapeHtml(status)}' data-environment-check-key='${escapeHtml(item.key || '')}' data-environment-check-label='${escapeHtml(presentation.label)}'><i aria-label='${escapeHtml(statusLabel)}'>${statusIcon}</i><strong>${escapeHtml(presentation.label)}</strong><span>${escapeHtml(statusLabel)}</span>${content}</div>`;
   }).join('')}</div>`;
+}
+
+function setEnvironmentChecksLoading(root, isHardware = false) {
+  const list = root.querySelector('.environment-check-list');
+  if (!list) return;
+  const checks = [...list.querySelectorAll('[data-environment-check-key]')].map(row => ({
+    key: row.dataset.environmentCheckKey,
+    label: row.dataset.environmentCheckLabel,
+    status: 'checking'
+  }));
+  list.outerHTML = environmentCheckRows(checks, isHardware);
+  const score = root.querySelector('.readiness-score strong');
+  if (score) score.textContent = '检查中…';
+}
+
+function setEnvironmentChecksFailed(root, error, isHardware = false) {
+  const list = root.querySelector('.environment-check-list');
+  if (!list) return;
+  const detail = String(error?.diagnosticMessage || error?.message || '环境检查请求失败');
+  const checks = [...list.querySelectorAll('[data-environment-check-key]')].map(row => ({
+    key: row.dataset.environmentCheckKey,
+    label: row.dataset.environmentCheckLabel,
+    status: 'error',
+    code: error?.code || 'PREFLIGHT_INTERNAL_ERROR',
+    detail
+  }));
+  list.outerHTML = environmentCheckRows(checks, isHardware);
+  const score = root.querySelector('.readiness-score strong');
+  if (score) score.textContent = `0 / ${checks.length}`;
 }
 
 function environmentLogRows(items = [], health = {label: '尚未检查'}) {
@@ -4757,6 +6142,270 @@ function environmentLogRows(items = [], health = {label: '尚未检查'}) {
       : `环境检查完成：${health.label}`;
     return `<li><time>${formatTime(item.at || item.timestamp)}</time><div><span>${escapeHtml(summary)}</span>${detail ? `<details class='inline-diagnostics'><summary>诊断信息</summary><pre><code>${escapeHtml(detail)}</code></pre></details>` : ''}</div></li>`;
   }).join('')}</ol>`;
+}
+
+function mount579EnvironmentConfig(root, cfg = {}) {
+  const form = root.querySelector('#environment-config-form');
+  if (!form) return;
+  form.innerHTML = `
+    <div class='environment-safety-notice'><strong>579 无界面链路</strong><p>动作仅经 ADB → APP Bridge → BLE 下发；COM3 只用于 O1/O2 观察，网页不提供串口写入或原始命令入口。</p></div>
+    <label><span>控制链</span><input type='text' value='ADB → APP Bridge → BLE' readonly></label>
+    <label><span>串口观察</span><input type='text' value='${escapeHtml(cfg.serial_mode === 'read_only' ? `${cfg.com_port || 'COM3'}（严格只读）` : 'COM3（严格只读）')}' readonly></label>
+    <label><span>截图方式</span><input type='text' value='O2 手表截图' readonly></label>
+    <label><span>设备反馈</span><input type='text' value='APP Bridge 回执 + O1/O2 设备效果证据' readonly></label>
+    <label><span>579 配置启用</span><select name='enabled'><option value='false' ${cfg.enabled ? '' : 'selected'}>关闭</option><option value='true' ${cfg.enabled ? 'selected' : ''}>启用配置</option></select></label>
+    <label><span>ADB 路径</span><input name='adb_path' type='text' value='${escapeHtml(cfg.adb_path || '')}' placeholder='例如 adb 或 adb.exe 绝对路径'></label>
+    <label><span>APP 包名</span><input name='app_package' type='text' value='${escapeHtml(cfg.app_package || '')}' placeholder='APP Bridge 包名'></label>
+    <label><span>Bridge 组件</span><input name='bridge_component' type='text' value='${escapeHtml(cfg.bridge_component || '')}' placeholder='可选，完整组件名'></label>
+    <label><span>Bridge Action</span><input name='bridge_action' type='text' value='${escapeHtml(cfg.bridge_action || '')}' placeholder='广播 Action'></label>
+    <label><span>COM 端口</span><input name='com_port' type='text' value='${escapeHtml(cfg.com_port || 'COM3')}'></label>
+    <label><span>只读波特率</span><input name='com_baudrate' type='number' min='1' value='${escapeHtml(cfg.com_baudrate || 1500000)}'></label>
+    <label><span>证据目录</span><input name='artifact_root' type='text' value='${escapeHtml(cfg.artifact_root || '')}' placeholder='留空使用任务证据目录'></label>
+    <label><span>实机动作门禁</span><input type='text' value='${cfg.device_actions_enabled ? '已由受控授权开启' : '默认关闭，等待受控 Canary 授权'}' readonly></label>
+    <div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit'>保存 579 配置</button></div>`;
+}
+
+function BluetoothPage() {
+  let pollTimer = null;
+  let destroyed = false;
+  let eventCursor = 0;
+  let events = [];
+  let devices = [];
+  let latestStatus = null;
+
+  const calculatorData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 54 50 5F 43 4C 49 43 4B 3A 35 31 2C 31 35 36 2C 31 20 3B';
+  const buttonData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 42 55 54 54 4F 4E 5F 50 52 45 53 53 3A 31 2C 31 2C 30 3B';
+
+  return {
+    async load() {
+      const [config, status, remembered] = await Promise.all([
+        api('/api/config'),
+        optionalApi('/api/hardware/579/status'),
+        optionalApi('/api/hardware/ble/remembered'),
+      ]);
+      latestStatus = status.data;
+      return {config, status, remembered};
+    },
+    render(data) {
+      const initialPurpose = currentProject() === '6202_W5230' ? '6202' : '579';
+      const address579 = data.config.hardware_579?.ble_address || '';
+      const address6202 = data.config.hardware?.ble_address || '';
+      const remembered = data.remembered.data?.items || [];
+      return `${Components.pageHeader({title: '蓝牙工作台', intro: '管理独立蓝牙目标、复用 579 GATT 连接并发送原始命令'})}
+        <section class="bluetooth-workbench-grid" data-bluetooth-workbench data-purpose="${initialPurpose}" data-address-579="${escapeHtml(address579)}" data-address-6202="${escapeHtml(address6202)}">
+          <article class="workspace-panel bluetooth-device-panel">
+            <header><div><h2>设备与连接</h2><p>扫描结果只用于精确选择地址，不按名称猜测目标。</p></div><span id="bt-lease-chip" class="chip chip-pending">手工可用</span></header>
+            <div class="bluetooth-form-grid">
+              <label><span>用途</span><select id="bt-purpose" data-ble-mutable><option value="579" ${initialPurpose === '579' ? 'selected' : ''}>579 指令执行</option><option value="6202" ${initialPurpose === '6202' ? 'selected' : ''}>6202 BLE 截图</option></select></label>
+              <label><span>扫描超时（秒）</span><input id="bt-timeout" type="number" min="1" max="60" value="${Number(data.config.hardware_579?.ble_scan_timeout || data.config.hardware?.ble_scan_timeout || 15)}" data-ble-mutable></label>
+              <label class="bluetooth-address-field"><span>精确目标地址</span><input id="bt-address" type="text" value="${escapeHtml(initialPurpose === '579' ? address579 : address6202)}" placeholder="例如 41:42:72:6A:93:2D" autocomplete="off" data-ble-mutable></label>
+            </div>
+            <div class="bluetooth-actions">
+              <input id="bt-search" type="search" placeholder="按名称或地址过滤" autocomplete="off" data-ble-mutable>
+              <button id="bt-scan" class="button button-secondary" type="button" data-ble-mutable>扫描</button>
+              <button id="bt-save-target" class="button button-secondary" type="button" data-ble-mutable>保存目标</button>
+              <button id="bt-connect" class="button" type="button" data-ble-mutable>连接</button>
+              <button id="bt-disconnect" class="button button-secondary" type="button" data-ble-mutable>断开</button>
+            </div>
+            <div id="bt-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite"><span class="ble-connection-dot" aria-hidden="true"></span><div><strong>正在读取连接状态</strong><small></small></div></div>
+            <div id="bt-device-list" class="bluetooth-device-list">${remembered.length ? remembered.map(item => `<button type="button" class="bluetooth-device-choice" data-device-address="${escapeHtml(item.address)}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address)}</code><small>6202 已记住设备</small></button>`).join('') : '<div class="ble-device-empty">点击“扫描”查找附近设备</div>'}</div>
+          </article>
+
+          <article id="bt-command-panel" class="workspace-panel bluetooth-command-panel">
+            <header><div><h2>579 原始命令</h2><p>Cmd / Key / Data 由后端规范化并封包。</p></div><span class="chip chip-warning">effect_verified=false</span></header>
+            <div class="notice notice-warning bluetooth-risk"><p><strong>风险说明：</strong>此处不设命令白名单，也不对高风险 Cmd/Key 二次确认。仅发送你明确了解的命令；L1 ACK 只证明传输回执，不证明手表业务效果。</p></div>
+            <div class="bluetooth-presets" aria-label="已验证预置">
+              <button type="button" class="button button-secondary" data-bt-preset="find" data-ble-mutable>查找手表 02/3B</button>
+              <button type="button" class="button button-secondary" data-bt-preset="calc" data-ble-mutable>计算器点击 0→1</button>
+              <button type="button" class="button button-secondary" data-bt-preset="button" data-ble-mutable>侧键短按</button>
+            </div>
+            <div class="bluetooth-command-fields">
+              <label><span>Cmd</span><input id="bt-cmd" value="02" placeholder="02 或 0x02" autocomplete="off" data-ble-mutable></label>
+              <label><span>Key</span><input id="bt-key" value="3B" placeholder="3B 或 0x3b" autocomplete="off" data-ble-mutable></label>
+              <label class="bluetooth-data-field"><span>Data（HEX，可留空）</span><textarea id="bt-data" rows="5" placeholder="连续 HEX 或空格/逗号分隔" data-ble-mutable></textarea></label>
+            </div>
+            <div class="bluetooth-actions"><button id="bt-preview" class="button button-secondary" type="button">生成预览</button><button id="bt-send" class="button" type="button" data-ble-mutable>发送并等待 L1 ACK</button></div>
+            <dl id="bt-preview-result" class="bluetooth-packet-preview"><div><dt>规范化命令</dt><dd>尚未生成</dd></div><div><dt>完整 Packet</dt><dd>—</dd></div></dl>
+          </article>
+        </section>
+        <article class="workspace-panel bluetooth-log-panel"><header><div><h2>579 TX / RX 日志</h2><p>cursor 增量轮询；包含 L1 ACK、设备主动上报与主机 ACK。</p></div><button id="bt-clear-log" class="button button-secondary" type="button">清空显示</button></header><ol id="bt-event-log" class="bluetooth-event-log"><li><span>等待 Broker 事件…</span></li></ol></article>`;
+    },
+    mount(root, data) {
+      const workbench = root.querySelector('[data-bluetooth-workbench]');
+      const purpose = root.querySelector('#bt-purpose');
+      const address = root.querySelector('#bt-address');
+      const timeout = root.querySelector('#bt-timeout');
+      const search = root.querySelector('#bt-search');
+      const list = root.querySelector('#bt-device-list');
+      const statusBox = root.querySelector('#bt-status');
+      const commandPanel = root.querySelector('#bt-command-panel');
+      const eventLog = root.querySelector('#bt-event-log');
+      const cmd = root.querySelector('#bt-cmd');
+      const key = root.querySelector('#bt-key');
+      const rawData = root.querySelector('#bt-data');
+      const previewResult = root.querySelector('#bt-preview-result');
+      let namesByAddress = new Map();
+      devices = (data.remembered.data?.items || []).map(item => ({...item, rssi: null}));
+      for (const item of devices) namesByAddress.set(String(item.address || '').toLowerCase(), item.name || '');
+
+      const configuredAddress = selectedPurpose => selectedPurpose === '579'
+        ? workbench.dataset.address579
+        : workbench.dataset.address6202;
+      const scanTimeout = () => {
+        const value = Number(timeout.value);
+        if (!Number.isFinite(value) || value < 1 || value > 60) throw new Error('扫描超时必须在 1 到 60 秒之间');
+        return value;
+      };
+      const leaseActive = () => Boolean(latestStatus?.lease?.active);
+      const setStatus = (tone, title, detail = '') => {
+        statusBox.dataset.tone = tone;
+        statusBox.querySelector('strong').textContent = title;
+        statusBox.querySelector('small').textContent = detail;
+      };
+      const applyLease = () => {
+        const active = leaseActive();
+        const chip = root.querySelector('#bt-lease-chip');
+        chip.className = `chip ${active ? 'chip-running' : 'chip-pending'}`;
+        chip.textContent = active ? `自动化占用 · ${latestStatus.lease.owner || '任务'}` : '手工可用';
+        root.querySelectorAll('[data-ble-mutable]').forEach(control => { control.disabled = active; });
+      };
+      const renderConnection = () => {
+        const is579 = purpose.value === '579';
+        commandPanel.hidden = !is579;
+        root.querySelector('#bt-disconnect').hidden = !is579;
+        if (is579) {
+          if (latestStatus?.connected) setStatus('success', `${latestStatus.name || '579 手表'} · ${latestStatus.address}`, 'GATT ready；Notify 已订阅');
+          else if (latestStatus?.last_error) setStatus('error', latestStatus.last_error.reason_code || '连接异常', latestStatus.last_error.message || '');
+          else setStatus('neutral', '579 尚未连接', '连接后 Broker 会保持并复用这一条 GATT 会话');
+        } else {
+          setStatus('neutral', '6202 按需连接', '连接检查后会断开；运行截图时按已保存地址重新连接');
+        }
+        applyLease();
+      };
+      const renderDevices = () => {
+        const query = String(search.value || '').trim().toLowerCase();
+        const filtered = devices.filter(item => !query || String(item.address || '').toLowerCase().includes(query) || String(item.name || '').toLowerCase().includes(query));
+        list.innerHTML = filtered.length ? filtered.map(item => `<button type="button" class="bluetooth-device-choice ${String(item.address || '').toLowerCase() === String(address.value || '').toLowerCase() ? 'is-selected' : ''}" data-device-address="${escapeHtml(item.address || '')}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable ${leaseActive() ? 'disabled' : ''}><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address || '')}</code><small>${item.rssi === null || item.rssi === undefined ? 'RSSI 未知' : `${Number(item.rssi)} dBm`}</small></button>`).join('') : '<div class="ble-device-empty">没有匹配的扫描结果</div>';
+      };
+      const renderEvents = () => {
+        eventLog.innerHTML = events.length ? events.map(item => `<li><time>${escapeHtml(String(item.at || ''))}</time><strong>${escapeHtml(item.kind || 'EVENT')}</strong><code>${escapeHtml(JSON.stringify(item))}</code></li>`).join('') : '<li><span>等待 Broker 事件…</span></li>';
+        eventLog.scrollTop = eventLog.scrollHeight;
+      };
+      const saveTarget = async () => {
+        const value = String(address.value || '').trim();
+        if (!value) throw new Error('请先填写或选择精确目标地址');
+        if (purpose.value === '579') {
+          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware_579: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
+          workbench.dataset.address579 = value;
+        } else {
+          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
+          workbench.dataset.address6202 = value;
+        }
+      };
+      const preview = async () => {
+        const result = await api('/api/hardware/579/preview', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
+        cmd.value = result.cmd;
+        key.value = result.key;
+        rawData.value = result.data_hex;
+        previewResult.innerHTML = `<div><dt>规范化命令</dt><dd><code>Cmd=${escapeHtml(result.cmd)} · Key=${escapeHtml(result.key)} · Data=${escapeHtml(result.data_hex || '空')} · ${Number(result.packet_length)} B</code></dd></div><div><dt>完整 Packet</dt><dd><code>${escapeHtml(result.packet_hex)}</code></dd></div>`;
+        return result;
+      };
+      const poll = async () => {
+        if (destroyed) return;
+        try {
+          const [status, eventBatch] = await Promise.all([
+            api('/api/hardware/579/status'),
+            api(`/api/hardware/579/events?after=${eventCursor}&limit=200`),
+          ]);
+          latestStatus = status;
+          const incoming = eventBatch.items || [];
+          if (incoming.length) {
+            events = [...events, ...incoming].slice(-300);
+            eventCursor = Number(eventBatch.next_cursor || eventCursor);
+            renderEvents();
+          }
+          renderConnection();
+          renderDevices();
+        } catch (error) {
+          if (purpose.value === '579') setStatus('error', 'Broker 状态读取失败', error.message);
+        } finally {
+          if (!destroyed) pollTimer = setTimeout(poll, 1000);
+        }
+      };
+
+      purpose.addEventListener('change', () => {
+        address.value = configuredAddress(purpose.value) || '';
+        renderConnection();
+        renderDevices();
+      });
+      address.addEventListener('input', renderDevices);
+      search.addEventListener('input', renderDevices);
+      list.addEventListener('click', event => {
+        const choice = event.target.closest('[data-device-address]');
+        if (!choice || leaseActive()) return;
+        address.value = choice.dataset.deviceAddress || '';
+        namesByAddress.set(address.value.toLowerCase(), choice.dataset.deviceName || '');
+        renderDevices();
+      });
+      root.querySelector('#bt-scan').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          const result = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(scanTimeout())}&q=${encodeURIComponent(search.value.trim())}`);
+          devices = result.items || [];
+          renderDevices();
+          showToast(`找到 ${devices.length} 个蓝牙设备`);
+        } catch (error) { showToast(error.message, 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-save-target').addEventListener('click', async () => {
+        try { await saveTarget(); showToast('蓝牙目标已保存'); } catch (error) { showToast(error.message, 'error'); }
+      });
+      root.querySelector('#bt-connect').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          const value = String(address.value || '').trim();
+          if (!value) throw new Error('请先填写或选择精确目标地址');
+          if (purpose.value === '579') {
+            latestStatus = await api('/api/hardware/579/connect', {method: 'POST', body: JSON.stringify({address: value, timeout: scanTimeout()})});
+            workbench.dataset.address579 = latestStatus.address || value;
+          } else {
+            await api('/api/hardware/ble/connect', {method: 'POST', body: JSON.stringify({address: value, name: namesByAddress.get(value.toLowerCase()) || '', timeout: scanTimeout()})});
+            workbench.dataset.address6202 = value;
+          }
+          renderConnection();
+          showToast('蓝牙目标连接成功');
+        } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-disconnect').addEventListener('click', async () => {
+        try { latestStatus = await api('/api/hardware/579/disconnect', {method: 'POST', body: '{}'}); renderConnection(); showToast('579 BLE 已断开'); } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+      });
+      root.querySelectorAll('[data-bt-preset]').forEach(button => button.addEventListener('click', () => {
+        const preset = button.dataset.btPreset;
+        cmd.value = preset === 'find' ? '02' : '04';
+        key.value = preset === 'find' ? '3B' : '05';
+        rawData.value = preset === 'find' ? '' : preset === 'calc' ? calculatorData : buttonData;
+        preview().catch(error => showToast(error.message, 'error'));
+      }));
+      root.querySelector('#bt-preview').addEventListener('click', () => preview().catch(error => showToast(error.message, 'error')));
+      root.querySelector('#bt-send').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          await preview();
+          const result = await api('/api/hardware/579/send', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
+          showToast(result.transport_acked ? '收到 L1 ACK；请人工确认手表业务现象' : '未收到 L1 ACK', result.transport_acked ? 'success' : 'warning');
+        } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        finally { applyLease(); }
+      });
+      root.querySelector('#bt-clear-log').addEventListener('click', () => { events = []; renderEvents(); });
+      renderConnection();
+      void poll();
+    },
+    destroy() {
+      destroyed = true;
+      if (pollTimer) clearTimeout(pollTimer);
+    }
+  };
 }
 
 function EnvironmentPage(project = currentProject()) {
@@ -4771,10 +6420,13 @@ function EnvironmentPage(project = currentProject()) {
       return {projects, config, environments, update, section: environmentSection()};
     },
     render(data) {
-      const profiles = data.projects.items || [];
-      const profile = profiles.find(item => item.project === project) || testProject(project);
+      const platformId = currentPlatformFor(project);
+      const targetId = currentTargetFor(project, platformId);
+      const projectMeta = testProject(project);
+      const profiles = (projectMeta.allowed_targets || []).map(id => targetProfile(project, PLATFORM_TARGETS[id]?.platform_id, id));
+      const profile = targetProfile(project, platformId, targetId);
       const environmentItems = data.environments.data?.items || [];
-      const environmentItem = environmentItems.find(item => item.id === project || item.project === project) || null;
+      const environmentItem = environmentItems.find(item => item.id === project || item.project === project || item.target_id === profile.target_id) || null;
       const targetHealth = environmentHealth(environmentItem);
       const cfg = data.config.data || {};
       const protocol = ENVIRONMENT_PROTOCOLS[project];
@@ -4791,28 +6443,77 @@ function EnvironmentPage(project = currentProject()) {
       const totalChecks = checks.length || 6;
       let content;
       if (data.section === 'llm') {
-        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>模型服务</h2><p>当前连接配置</p></div><button class='button' type='button' data-open-settings>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>密钥</dt><dd>${cfg.llm?.api_key ? '已配置' : '未配置'}</dd></div><div><dt>服务地址</dt><dd>${escapeHtml(cfg.llm?.base_url || '未配置')}</dd></div><div><dt>模型</dt><dd>${escapeHtml(cfg.llm?.model || '未配置')}</dd></div><div><dt>超时</dt><dd>${Number(cfg.llm?.timeout || 0) || '—'} 秒</dd></div></dl></article>`;
+        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>模型服务</h2><p>当前连接配置</p></div><button class='button' type='button' data-open-settings='llm'>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>密钥</dt><dd>${cfg.llm?.api_key ? '已配置' : '未配置'}</dd></div><div><dt>服务地址</dt><dd>${escapeHtml(cfg.llm?.base_url || '未配置')}</dd></div><div><dt>模型</dt><dd>${escapeHtml(cfg.llm?.model || '未配置')}</dd></div><div><dt>超时</dt><dd>${Number(cfg.llm?.timeout || 0) || '—'} 秒</dd></div></dl></article>`;
       } else if (data.section === 'ones') {
-        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>ONES 平台</h2><p>缺陷同步配置</p></div><button class='button' type='button' data-open-settings>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>平台地址</dt><dd>${escapeHtml(cfg.ones?.base_url || '未配置')}</dd></div><div><dt>登录状态</dt><dd>${cfg.ones?.auth_token ? '已配置' : '未配置'}</dd></div><div><dt>团队</dt><dd>${cfg.ones?.team_uuid ? '已配置' : '未配置'}</dd></div><div><dt>用户</dt><dd>${cfg.ones?.user_id ? '已配置' : '未配置'}</dd></div></dl></article>`;
+        content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>ONES 平台</h2><p>缺陷同步配置</p></div><button class='button' type='button' data-open-settings='ones'>打开系统设置</button></header><dl class='settings-summary-grid'><div><dt>平台地址</dt><dd>${escapeHtml(cfg.ones?.base_url || '未配置')}</dd></div><div><dt>登录状态</dt><dd>${cfg.ones?.auth_token ? '已配置' : '未配置'}</dd></div><div><dt>团队</dt><dd>${cfg.ones?.team_uuid ? '已配置' : '未配置'}</dd></div><div><dt>用户</dt><dd>${cfg.ones?.user_id ? '已配置' : '未配置'}</dd></div></dl></article>`;
       } else if (data.section === 'updates') {
         const update = data.update.data || {};
         content = `<article class='workspace-panel settings-summary-panel'><header><div><h2>系统更新</h2><p>检查并安装新版本</p></div>${update.update_available ? `<button class='button' type='button' data-open-update>查看新版本</button>` : ''}</header><dl class='settings-summary-grid'><div><dt>当前版本</dt><dd>${escapeHtml(update.current_version || document.querySelector('#brand-system-version')?.textContent || '—')}</dd></div><div><dt>最新版本</dt><dd>${escapeHtml(update.latest_version || '—')}</dd></div><div><dt>更新状态</dt><dd>${data.update.data ? (update.update_available ? '发现新版本' : '当前已是最新') : '暂时无法检查更新'}</dd></div></dl></article>`;
       } else {
         const canManage = Boolean(data.environments.data);
-        content = `<section class='target-health-grid environment-page-targets'>${profiles.map(item => renderEnvironmentTargetCard(item, environmentItems.find(env => env.id === item.project || env.project === item.project), project)).join('')}</section><section class='environment-main-grid'><article class='workspace-panel environment-config-panel'><header><div><h2>当前测试目标</h2><p>${escapeHtml(profile.project_label || project)} · ${escapeHtml(profile.execution_target_label || '')}</p></div>${Components.statusChip(targetHealth.status === 'ready' ? 'PASS' : targetHealth.status === 'error' ? 'ERROR' : 'PENDING', targetHealth.label)}</header><form id='environment-config-form'><label><span>连接方式</span><input type='text' value='${escapeHtml(protocol?.transportLabel || profile.transport || '未知')}' readonly></label><label><span>截图方式</span><input type='text' value='${escapeHtml(protocol?.captureLabel || profile.capture_provider || '未知')}' readonly></label><details class='environment-advanced'><summary>高级设置</summary><div class='environment-advanced-fields'>${project === '6202_W5230' ? `<label><span>SuperCom 管道</span><input type='text' value='${escapeHtml(profile.pipe_name || `\\\\.\\pipe\\SuperCom.AgentBridge.${cfg.hardware?.port || 'COM端口'}`)}' readonly></label>` : ''}${isHardware ? `<label><span>运行档案目录</span><input name='profile_root' type='text' value='${escapeHtml(runtimeProfileRoot)}' placeholder='例如 D:\\Agent-loop\\profiles' ${canManage ? '' : 'readonly'}></label><label><span>档案版本</span><input name='profile_version' type='text' value='${escapeHtml(runtimeProfileVersion)}' placeholder='留空自动选择' ${canManage ? '' : 'readonly'}></label>` : `<label><span>源码目录</span><input name='source_root' type='text' value='${escapeHtml(sourceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>工作区目录</span><input name='workspace_root' type='text' value='${escapeHtml(workspaceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>`}${profile.execution_target === 'simulator' ? `<label><span>构建目录</span><input name='build_directory' type='text' value='${escapeHtml(buildDirectory)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>模拟器程序</span><input name='artifact_path' type='text' value='${escapeHtml(artifactPath)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>` : ''}</div></details><div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit' ${canManage ? '' : 'disabled title="暂不支持修改环境配置"'}>保存配置</button></div></form>${!canManage ? Components.unavailableState('暂不支持修改环境配置', '当前以只读方式显示已有配置。') : ''}</article><article class='workspace-panel environment-check-panel'><header><div><h2>环境检查</h2><p>检查操作、截图和必要服务是否可用</p></div><span class='readiness-score'>可用项 <strong>${checks.length ? `${readyChecks} / ${totalChecks}` : '—'}</strong></span></header>${environmentCheckRows(checks, isHardware)}<div class='environment-form-actions'><button class='button' type='button' data-environment-check ${canManage ? '' : 'disabled title="暂不支持环境检查"'}>${icon('refresh', 16)} 立即检查</button></div></article></section><article class='workspace-panel environment-log-panel'><header><div><h2>检查记录</h2><p>最近的环境检查结果</p></div></header>${environmentItem?.logs?.length ? environmentLogRows(environmentItem.logs, targetHealth) : Components.emptyState('尚无检查记录', '执行环境检查后，详细过程会显示在这里。')}</article>`;
+        content = `
+          <section class='target-health-grid environment-page-targets'>${profiles.map(item => renderEnvironmentTargetCard(item, environmentItems.find(env => env.id === item.project || env.project === item.project || env.target_id === item.target_id), project)).join('')}</section>
+          <section class='environment-main-grid'>
+            <article class='workspace-panel environment-config-panel'>
+              <header><div><h2>当前测试目标</h2><p>${escapeHtml(profile.project_label || project)} · ${escapeHtml(profile.execution_target_label || '')}</p></div>${Components.statusChip(targetHealth.status === 'ready' ? 'PASS' : targetHealth.status === 'error' ? 'ERROR' : 'PENDING', targetHealth.label)}</header>
+              <form id='environment-config-form'>
+                <label><span>连接方式</span><input type='text' value='${escapeHtml(protocol?.transportLabel || profile.transport_label || profile.transport || '未知')}' readonly></label>
+                <label><span>截图方式</span><input type='text' value='${escapeHtml(protocol?.captureLabel || profile.capture_label || profile.capture_provider || '未知')}' readonly></label>
+                <details class='environment-advanced'><summary>高级设置</summary><div class='environment-advanced-fields'>
+                  ${project === '6202_W5230' ? `<label><span>SuperCom 管道</span><input type='text' value='${escapeHtml(profile.pipe_name || `\\\\.\\pipe\\SuperCom.AgentBridge.${cfg.hardware?.port || 'COM端口'}`)}' readonly></label>` : ''}
+                  ${isHardware ? `<label><span>运行档案目录</span><input name='profile_root' type='text' value='${escapeHtml(runtimeProfileRoot)}' placeholder='例如 D:\\Agent-loop\\profiles' ${canManage ? '' : 'readonly'}></label><label><span>档案版本</span><input name='profile_version' type='text' value='${escapeHtml(runtimeProfileVersion)}' placeholder='留空自动选择' ${canManage ? '' : 'readonly'}></label>` : `<label><span>源码目录</span><input name='source_root' type='text' value='${escapeHtml(sourceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>工作区目录</span><input name='workspace_root' type='text' value='${escapeHtml(workspaceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>`}
+                  ${profile.execution_target === 'simulator' ? `<label><span>构建目录</span><input name='build_directory' type='text' value='${escapeHtml(buildDirectory)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>模拟器程序</span><input name='artifact_path' type='text' value='${escapeHtml(artifactPath)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>` : ''}
+                </div></details>
+                <div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit' ${canManage ? '' : 'disabled title="暂不支持修改环境配置"'}>保存配置</button></div>
+              </form>
+              ${!canManage ? Components.unavailableState('暂不支持修改环境配置', '当前以只读方式显示已有配置。') : ''}
+            </article>
+            <article class='workspace-panel environment-check-panel'>
+              <header><div><h2>环境检查</h2><p>检查操作、截图和必要服务是否可用</p></div><span class='readiness-score'>可用项 <strong>${checks.length ? `${readyChecks} / ${totalChecks}` : '—'}</strong></span></header>
+              ${environmentCheckRows(checks, isHardware)}
+              <div class='environment-form-actions'><button class='button' type='button' data-environment-check ${canManage ? '' : 'disabled title="暂不支持环境检查"'}>${icon('refresh', 16)} 立即检查</button></div>
+            </article>
+          </section>
+          <article class='workspace-panel environment-log-panel'><header><div><h2>检查记录</h2><p>最近的环境检查结果</p></div></header>${environmentItem?.logs?.length ? environmentLogRows(environmentItem.logs, targetHealth) : Components.emptyState('尚无检查记录', '执行环境检查后，详细过程会显示在这里。')}</article>`;
+        content = `<div class='environment-platform-switch'><span>平台视图</span><div class='platform-choice-group'>${platformSwitchButtons(project, platformId, 'data-environment-platform')}</div></div>` + content;
       }
-      return `${Components.pageHeader({title: '环境中心', intro: '查看和设置测试目标、模型服务与外部平台'})}${Components.subTabs([{value: 'targets', label: '测试目标'}, {value: 'llm', label: '模型服务'}, {value: 'ones', label: 'ONES'}, {value: 'updates', label: '系统更新'}], data.section)}${content}`;
+      const environmentTabHref = section => pageUrl('/environments', project, {platform_id: platformId, target_id: targetId, section});
+      return `${Components.pageHeader({title: '环境中心', intro: '统一管理模拟器、真机、模型服务和外部平台连接'})}${Components.subTabs([{value: 'targets', label: '测试目标', href: environmentTabHref('targets')}, {value: 'llm', label: '大模型', href: environmentTabHref('llm')}, {value: 'ones', label: 'ONES', href: environmentTabHref('ones')}, {value: 'updates', label: '系统更新', href: environmentTabHref('updates')}], data.section)}${content}`;
     },
     mount(root, data) {
       rememberProject(project);
-      const currentEnvironment = data.environments.data?.items?.find(item => item.id === project || item.project === project);
+      const platformId = currentPlatformFor(project);
+      const profile = targetProfile(project, platformId, currentTargetFor(project, platformId));
+      const is579 = profile.platform_id === '579';
+      const currentEnvironment = data.environments.data?.items?.find(item => item.id === project || item.project === project || item.target_id === profile.target_id);
       const health = environmentHealth(currentEnvironment);
       setGlobalTargetHealth(health.status, health.label);
-      root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
-        history.pushState({}, '', pageUrl('/environments', project, {section: button.dataset.subtab}));
+      if (is579) {
+        mount579EnvironmentConfig(root, data.config.data?.platform_579 || {});
+      } else {
+        root.querySelectorAll('#environment-config-form label').forEach(label => {
+          const field = label.querySelector('span')?.textContent;
+          const input = label.querySelector('input');
+          if (field === '连接方式' && input) input.value = profile.transport_label || profile.transport || '未知';
+          if (field === '截图方式' && input) input.value = profile.capture_label || profile.capture_provider || '未知';
+        });
+      }
+      root.querySelectorAll('[data-environment-platform]').forEach(button => button.addEventListener('click', () => {
+        const nextPlatform = button.dataset.environmentPlatform;
+        const nextTarget = targetsFor(project, nextPlatform)[0]?.target_id || '';
+        history.pushState({}, '', pageUrl('/environments', project, {platform_id: nextPlatform, target_id: nextTarget}));
         route();
       }));
-      root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => document.querySelector('#open-system-settings')?.click()));
+      root.querySelectorAll('[data-subtab]').forEach(button => button.addEventListener('click', () => {
+        history.pushState({}, '', pageUrl('/environments', project, {platform_id: platformId, target_id: profile.target_id, section: button.dataset.subtab}));
+        route();
+      }));
+      root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => {
+        const opener = document.querySelector('#open-system-settings');
+        if (!opener) return;
+        opener.dataset.settingsInitialTab = button.dataset.openSettings || 'llm';
+        opener.click();
+      }));
       root.querySelector('[data-open-update]')?.addEventListener('click', () => document.querySelector('#update-badge')?.click());
       const form = root.querySelector('#environment-config-form');
       form?.addEventListener('submit', async event => {
@@ -4821,14 +6522,43 @@ function EnvironmentPage(project = currentProject()) {
         button.disabled = true;
         try {
           const values = Object.fromEntries(new FormData(form).entries());
-          await api(`/api/environments/${encodeURIComponent(project)}`, {method: 'PUT', body: JSON.stringify({paths: values})});
+          if (is579) {
+            values.enabled = values.enabled === 'true';
+            values.com_baudrate = Number(values.com_baudrate || 1500000);
+          }
+          const environmentId = profile.target_id;
+          const payload = is579 ? {platform_579: values} : {paths: values};
+          await api(`/api/environments/${encodeURIComponent(environmentId)}`, {method: 'PUT', body: JSON.stringify(payload)});
           showToast('环境配置已保存', 'success');
           route();
         } catch (error) { button.disabled = false; showToast(error.message, 'error'); }
       });
       root.querySelector('[data-environment-check]')?.addEventListener('click', async event => {
-        event.currentTarget.disabled = true;
-        try { await api(`/api/environments/${encodeURIComponent(project)}/check`, {method: 'POST', body: '{}'}); showToast('环境检查已启动'); route(); } catch (error) { event.currentTarget.disabled = false; showToast(error.message, 'error'); }
+        const button = event.currentTarget;
+        const idleMarkup = button.innerHTML;
+        const checkingStartedAt = performance.now();
+        const minimumLoadingMs = 450;
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.innerHTML = `${icon('refresh', 16)} 正在检查…`;
+        setEnvironmentChecksLoading(root, profile.execution_target === 'hardware');
+        const environmentId = profile.target_id;
+        try {
+          const response = await api(`/api/environments/${encodeURIComponent(environmentId)}/check`, {method: 'POST', body: '{}'});
+          const remainingLoadingMs = minimumLoadingMs - (performance.now() - checkingStartedAt);
+          if (remainingLoadingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingLoadingMs));
+          const refreshedHealth = environmentHealth(response?.result);
+          await route();
+          showToast(`环境检查完成：${refreshedHealth.label}`, refreshedHealth.status === 'ready' ? 'success' : 'warning');
+        } catch (error) {
+          const remainingLoadingMs = minimumLoadingMs - (performance.now() - checkingStartedAt);
+          if (remainingLoadingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingLoadingMs));
+          setEnvironmentChecksFailed(root, error, profile.execution_target === 'hardware');
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          button.innerHTML = idleMarkup;
+          showToast(error.message, 'error');
+        }
       });
     },
     destroy() {}
@@ -4843,6 +6573,7 @@ async function route() {
     stopRepairRestore();
     stopTestPolling();
     stopBatchTestPolling();
+    stopPrdCasesPolling();
     app.onclick = null;
     initGlobalTargetSwitcher();
     let parts = location.pathname.split('/').filter(Boolean).map(decodeURIComponent);
@@ -4863,6 +6594,7 @@ async function route() {
       history.replaceState({}, '', `/cases${location.search}`);
       return await renderTests();
     }
+    if (parts[0] === 'prd-cases' && parts.length === 1) return await renderPrdCases();
     if (parts[0] === 'cases' && parts.length === 1) return await renderTests();
     if (parts[0] === 'runs' && parts.length === 1) {
       setActiveNav('runs');
@@ -4880,6 +6612,11 @@ async function route() {
       document.title = '环境中心 · Agent-loop';
       return await mountPageController(EnvironmentPage(project));
     }
+    if (parts[0] === 'bluetooth' && parts.length === 1) {
+      setActiveNav('bluetooth');
+      document.title = '蓝牙工作台 · Agent-loop';
+      return await mountPageController(BluetoothPage());
+    }
     if (parts[0] === 'test' && parts[1] && parts[2] && parts.length === 3) return await renderTest(parts[1], parts[2]);
     if (parts[0] === 'test-batch' && parts[1] && parts.length === 2) return await renderTestBatch(parts[1]);
     if (parts[0] === 'test-history' && parts[1] && parts[2] && parts[3] && parts.length === 4) return await renderTestHistory(parts[1], parts[2], parts[3]);
@@ -4894,11 +6631,15 @@ async function route() {
 }
 
 initSystemSettings();
-initGlobalTargetSwitcher();
-initImagePreview();
 initPrimaryNavigation();
+initImagePreview();
 window.addEventListener('popstate', route);
-route();
+loadPlatformRegistries()
+  .then(() => {
+    initGlobalTargetSwitcher();
+    return route();
+  })
+  .catch(renderError);
 
 
   // ==========================================

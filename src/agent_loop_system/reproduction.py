@@ -8,12 +8,21 @@ import hashlib
 import json
 import os
 from datetime import datetime, timedelta, timezone
-from enum import StrEnum
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from agent_loop_system.exploration_core.contracts import (
+    DeviceSession,
+    ReproductionAction,
+    ReproductionDecision,
+    ReproductionOutcome,
+    ReproductionTrace,
+    StepObservation,
+    TreeStatus,
+)
+from agent_loop_system.exploration_core.runtime import PlatformExplorationRuntime
 
+from agent_loop_system.runtime_root import RuntimePaths
 from agent_loop_system.tools.command_protocol import (
     collect_command_json,
     load_current_command_capabilities,
@@ -34,122 +43,6 @@ _COMMAND_FAILURE_STATUSES = {
     "unavailable",
     "unsupported",
 }
-
-
-class DeviceSession(Protocol):
-    """模拟器与真机复用的最小会话合同。"""
-
-    last_capture_metadata: dict[str, Any] | None
-
-    def start(self) -> None: ...
-
-    def send(self, content: str, **kwargs: Any) -> CommandResult: ...
-
-    def lines_since(self, start_index: int) -> list[str]: ...
-
-    def capture_screenshot(self, output_path: str) -> bool: ...
-
-    def stop(self) -> None: ...
-
-
-class ReproductionAction(StrEnum):
-    """复现 Agent 每轮唯一允许返回的动作。"""
-
-    EXECUTE = "EXECUTE"
-    OBSERVE_AGAIN = "OBSERVE_AGAIN"
-    READY_TO_JUDGE = "READY_TO_JUDGE"
-    BLOCKED = "BLOCKED"
-
-
-class ReproductionOutcome(StrEnum):
-    """交互式复现的结构化终止状态。"""
-
-    DEFECT_REPRODUCED = "DEFECT_REPRODUCED"
-    CURRENT_CONFORMS = "CURRENT_CONFORMS"
-    TARGET_NOT_REACHED = "TARGET_NOT_REACHED"
-    REFERENCE_AMBIGUOUS = "REFERENCE_AMBIGUOUS"
-    CAPABILITY_MISSING = "CAPABILITY_MISSING"
-    COMMAND_RUNTIME_ERROR = "COMMAND_RUNTIME_ERROR"
-    SYSTEM_ERROR = "SYSTEM_ERROR"
-
-
-class TreeStatus(StrEnum):
-    """GUI_TREE 是辅助证据；不可用不等于截图观察失败。"""
-
-    OK = "OK"
-    UNAVAILABLE = "UNAVAILABLE"
-    ERROR = "ERROR"
-    NOT_COLLECTED = "NOT_COLLECTED"
-
-
-class ReproductionDecision(BaseModel):
-    """同一个复现 Agent 在一轮中做出的单步决定。"""
-
-    action: ReproductionAction
-    command: str | None = None
-    reason: str = Field(min_length=1)
-
-    @model_validator(mode="after")
-    def validate_single_command(self) -> "ReproductionDecision":
-        command = self.command.strip() if self.command else None
-        if self.action == ReproductionAction.EXECUTE:
-            if not command:
-                raise ValueError("EXECUTE 必须提供一条业务命令")
-            self.command = command
-        elif command:
-            raise ValueError(f"{self.action.value} 不得携带命令")
-        else:
-            self.command = None
-        return self
-
-
-class StepObservation(BaseModel):
-    """执行一个动作后由普通程序采集的事实，不包含系统推理。"""
-
-    step: int = Field(ge=0)
-    decision: ReproductionDecision | None = None
-    observed_at: str | None = None
-
-    command_status: str | None = None
-    command_results: list[dict[str, Any]] = Field(default_factory=list)
-
-    screenshot_ok: bool
-    screenshot_path: str | None = None
-    capture_metadata: dict[str, Any] | None = None
-    window_id: int | None = None
-    window_name: str | None = None
-    popup_id: int | None = None
-    popup_name: str | None = None
-
-    tree_status: TreeStatus = TreeStatus.NOT_COLLECTED
-    gui_tree: list[dict[str, Any]] = Field(default_factory=list)
-    visible_texts: list[str] = Field(default_factory=list)
-    error: str | None = None
-
-    @model_validator(mode="after")
-    def validate_screenshot_evidence(self) -> "StepObservation":
-        if self.screenshot_ok and not (self.screenshot_path or "").strip():
-            raise ValueError("截图成功时必须记录 screenshot_path")
-        return self
-
-
-class ReproductionTrace(BaseModel):
-    """一次交互式复现的完整、可序列化证据。"""
-
-    task_id: str = Field(min_length=1)
-    max_steps: int = Field(default=6, ge=1)
-    started_at: str | None = None
-    finished_at: str | None = None
-    steps: list[StepObservation] = Field(default_factory=list)
-    outcome: ReproductionOutcome | None = None
-    verdict: str | None = None
-    reason: str | None = None
-
-    @model_validator(mode="after")
-    def validate_terminal_reason(self) -> "ReproductionTrace":
-        if self.outcome is not None and not (self.reason or "").strip():
-            raise ValueError("设置终止状态时必须提供 reason")
-        return self
 
 
 def _response_reason(result: CommandResult) -> str:
@@ -456,14 +349,19 @@ def interactive_reproduce(
     target: str = "simulator",
     test_case: dict[str, str] | None = None,
     build_simulator: bool = True,
+    platform_runtime: PlatformExplorationRuntime | None = None,
     hardware_runtime_profile=None,
     reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> ReproductionTrace:
     """在选定目标上按“观察→一个动作→再观察”完成缺陷复现或普通测试。
 
     simulator 保持原有的一次构建、一次会话；hardware 跳过构建，直接使用
     当前已烧录的目标固件，并从版本绑定的运行时档案加载命令与页面能力；
-    默认在首次观察前调用统一真机状态清理入口。
+    默认在首次观察前执行真实 Preflight，并调用无重启真机状态准备入口。
+    注入 ``platform_runtime`` 时复用完全相同的 Agent 判断循环，只替换平台会话、
+    能力目录、命令校验和平台提示。
     """
     from agent_loop_system.tools.agent import decide_reproduction_action
     from agent_loop_system.tools.build import BuildConfig, run_build
@@ -475,8 +373,22 @@ def interactive_reproduce(
 
     if max_actions < 1:
         raise ValueError("max_actions 必须大于 0")
-    if target not in {"simulator", "hardware"}:
+    if platform_runtime is None and target not in {"simulator", "hardware"}:
         raise ValueError(f"未知执行目标: {target}")
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
+        )
+
+    execution_target = (
+        platform_runtime.platform_id if platform_runtime is not None else target
+    )
+    target_label = (
+        platform_runtime.target_label if platform_runtime is not None else None
+    )
+    platform_guidance = (
+        platform_runtime.platform_guidance if platform_runtime is not None else None
+    )
 
     output_dir = Path(evidence_dir).resolve()
     trace = ReproductionTrace(
@@ -493,23 +405,65 @@ def interactive_reproduce(
         return trace
 
     capability_knowledge: str | None = None
+    navigation_source_root: str | None = None
+    command_normalizer = normalize_command
+    command_validator = None
     try:
-        if target == "hardware":
+        if platform_runtime is not None:
+            session = platform_runtime.session
+            capabilities = platform_runtime.capabilities
+            capability_knowledge = platform_runtime.capability_knowledge
+            navigation_source_root = platform_runtime.navigation_source_root
+            command_normalizer = platform_runtime.normalize_command
+            command_validator = platform_runtime.validate_command
+        elif target == "hardware":
+            hardware_project = str(
+                (test_case or {}).get("project")
+                or os.environ.get("W30_HARDWARE_PROJECT")
+                or "6202_W5230"
+            )
+            if not hardware_preflight_completed:
+                from agent_loop_system.tools.hardware_preflight import (
+                    require_hardware_preflight,
+                )
+                from agent_loop_system.tools.llm_config import (
+                    LLM_API_KEY_SCOPE_EXPLORATION,
+                    llm_api_key_scope,
+                )
+
+                runtime_paths = RuntimePaths.from_root()
+                with llm_api_key_scope(LLM_API_KEY_SCOPE_EXPLORATION):
+                    require_hardware_preflight(
+                        project=hardware_project,
+                        evidence_dir=output_dir / "preflight",
+                        persist_paths=(
+                            output_dir / "preflight.json",
+                            runtime_paths.environment_checks
+                            / hardware_project
+                            / "preflight.json",
+                        ),
+                    )
             from agent_loop_system.tools.hardware_runtime_profile import (
                 load_hardware_runtime_profile,
             )
             from agent_loop_system.tools.real_device import (
                 RealDeviceSession,
+                prepare_hardware_case_state,
                 reset_hardware_case_state,
             )
 
             runtime_profile = hardware_runtime_profile or load_hardware_runtime_profile(
-                project=str((test_case or {}).get("project") or "") or None,
+                project=hardware_project,
             )
             capabilities = runtime_profile.command_capabilities
             capability_knowledge = runtime_profile.agent_knowledge
             if reset_hardware:
-                reset_hardware_case_state(evidence_dir=output_dir / "hardware-reset")
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=output_dir / "hardware-preparation")
             session: DeviceSession = RealDeviceSession(evidence_dir=output_dir)
         else:
             capabilities = load_current_command_capabilities()
@@ -537,7 +491,10 @@ def interactive_reproduce(
 
     try:
         session.start()
-        if target == "simulator":
+        if platform_runtime is not None:
+            if platform_runtime.prepare_session is not None:
+                platform_runtime.prepare_session(session)
+        elif target == "simulator":
             screen_result = session.send(
                 f":DISPLAY_TIME_SET:{_REPRODUCTION_SCREEN_ON_SECONDS}"
             )
@@ -549,7 +506,7 @@ def interactive_reproduce(
             output_dir,
             trace,
             ReproductionOutcome.SYSTEM_ERROR,
-            f"{target} 会话启动失败: {exc}",
+            f"{execution_target} 会话启动失败: {exc}",
         )
 
     try:
@@ -583,10 +540,15 @@ def interactive_reproduce(
                 source_files=source_files,
                 trace=trace,
                 defect_image_paths=defect_image_paths,
-                execution_target=target,
+                execution_target=execution_target,
                 capability_knowledge=capability_knowledge,
-                navigation_source_enabled=target != "hardware",
+                navigation_source_enabled=(
+                    platform_runtime is not None or target != "hardware"
+                ),
+                navigation_source_root=navigation_source_root,
                 test_case=test_case,
+                target_label=target_label,
+                platform_guidance=platform_guidance,
             )
             if decision is None:
                 return _finish_trace(
@@ -662,11 +624,11 @@ def interactive_reproduce(
                     )
                 business_actions += 1
                 try:
-                    command = normalize_command(decision.command or "")
+                    command = command_normalizer(decision.command or "")
                     command_name = command[1:].partition(":")[0]
                     if command_name in _SYSTEM_OBSERVATION_COMMANDS:
                         raise ValueError(f"{command_name} 由系统观察负责，Agent 不得执行")
-                    if target == "hardware":
+                    if platform_runtime is None and target == "hardware":
                         from agent_loop_system.tools.hardware_target import (
                             hardware_command_allowed,
                         )
@@ -674,7 +636,10 @@ def interactive_reproduce(
                         allowed, reason = hardware_command_allowed(command_name)
                         if not allowed:
                             raise ValueError(reason or f"真机命令 {command_name} 被拒绝")
-                    validate_agent_command(command, capabilities)
+                    if command_validator is not None:
+                        command_validator(command)
+                    else:
+                        validate_agent_command(command, capabilities)
                     command_result = session.send(command)
                     if command_result.status in _COMMAND_FAILURE_STATUSES:
                         command_errors += 1

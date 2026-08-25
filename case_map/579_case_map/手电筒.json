@@ -1,0 +1,831 @@
+{
+  "profile": "579_O2",
+  "sheet": "手电筒",
+  "cases": [
+    {
+      "case_id": "FLASHLIGHT-001",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于正常表盘。\n2. 控制中心可正常打开。",
+      "steps_text": "1. 从表盘打开控制中心。\n2. 检查手电筒图标、名称和可点击区域。",
+      "expected_text": "1. 控制中心页面正常显示，无黑屏、花屏或异常弹窗。\n2. 手电筒入口完整可见，图标、名称和点击区域无遮挡。",
+      "verification_points": [
+        "控制中心页面正常显示，无黑屏、花屏或异常弹窗。",
+        "手电筒入口完整可见，图标、名称和点击区域无遮挡。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-8139CBB4F2B30258FE88",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-001",
+          "plan_sha256": "927210118B9E8B48F095F7176BB2739DD4F37C473DC51FAA8B8E1AB51EA09B54"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-001",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-8139CBB4F2B30258FE88",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "927210118B9E8B48F095F7176BB2739DD4F37C473DC51FAA8B8E1AB51EA09B54"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-002",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 控制中心已显示手电筒入口。",
+      "steps_text": "1. 点击手电筒入口。\n2. 等待页面加载并采集截图。",
+      "expected_text": "1. 点击被设备接收且页面开始切换。\n2. 进入手电筒全屏白光页，不是控制中心、表盘或其他功能页。",
+      "verification_points": [
+        "点击被设备接收且页面开始切换。",
+        "进入手电筒全屏白光页，不是控制中心、表盘或其他功能页。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-96DE22D5F7951CD4112C",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-002",
+          "plan_sha256": "C8A0CAB646253394F17919F148CE2A8B1B8DAFFFC7221DBF584746D3A39D7DB7"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-002",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-96DE22D5F7951CD4112C",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "C8A0CAB646253394F17919F148CE2A8B1B8DAFFFC7221DBF584746D3A39D7DB7"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-003",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表已进入手电筒页面。\n2. O2 截图链路可返回可解码 PNG。",
+      "steps_text": "1. 采集手电筒页面原始截图。\n2. 计算截图白色像素比例和平均亮度。",
+      "expected_text": "1. 截图尺寸和解码结果有效，画面无黑边、花屏或异常元素。\n2. 白色像素比例不低于98%，平均亮度不低于248。",
+      "verification_points": [
+        "截图尺寸和解码结果有效，画面无黑边、花屏或异常元素。",
+        "白色像素比例不低于98%，平均亮度不低于248。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-07E7E57090BB86E4C08F",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-003",
+          "plan_sha256": "EEEEA55110ECD5FA9784166A5AC907686E14F371F8E80B555EE96F35B0EE1F3E"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-003",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-07E7E57090BB86E4C08F",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "EEEEA55110ECD5FA9784166A5AC907686E14F371F8E80B555EE96F35B0EE1F3E"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-004",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 已完成一次手电筒进入和安全退出。",
+      "steps_text": "1. 从控制中心再次点击手电筒入口。\n2. 采集第二次进入后的页面截图。",
+      "expected_text": "1. 入口仍可点击且页面能再次打开。\n2. 第二次仍为完整白光页，无入口失效、残留弹窗或错页。",
+      "verification_points": [
+        "入口仍可点击且页面能再次打开。",
+        "第二次仍为完整白光页，无入口失效、残留弹窗或错页。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-2751C231D937431B9290",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-004",
+          "plan_sha256": "B3FD926178F35F9946AA06C7FB3956CDA91E1418FE8F15C169A5616C8B73DE48"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-004",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-2751C231D937431B9290",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "B3FD926178F35F9946AA06C7FB3956CDA91E1418FE8F15C169A5616C8B73DE48"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-005",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 亮度状态读取能力或校准光照夹具已就绪。\n2. 已记录进入手电筒前亮度状态。",
+      "steps_text": "1. 进入手电筒白光页。\n2. 读取固件亮度状态或光照夹具测量值。",
+      "expected_text": "1. 页面进入白光状态。\n2. 读数达到当前项目定义的最大亮度；不得仅以截图白色作为最大背光证据。",
+      "verification_points": [
+        "页面进入白光状态。",
+        "读数达到当前项目定义的最大亮度；不得仅以截图白色作为最大背光证据。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "deterministic_brightness_snapshot_restore_contract_missing",
+      "blockers": [
+        "deterministic_brightness_snapshot_restore_contract_missing"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "deterministic_brightness_snapshot_restore_contract_missing",
+          "binding_ref": "AC-B9CE84F9A5AA6615974E",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-005",
+          "plan_sha256": "E628A9CBC00E6AF705F6B99183E4A0C7483BC8AA19962F8AE046D5385FDF2E7B"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-005",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-B9CE84F9A5AA6615974E",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "E628A9CBC00E6AF705F6B99183E4A0C7483BC8AA19962F8AE046D5385FDF2E7B"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-006",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于手电筒白光页。",
+      "steps_text": "1. 在白光页执行右滑。\n2. 采集退出后的页面截图。",
+      "expected_text": "1. 右滑手势被设备接收。\n2. 页面返回控制中心且不再保持全白，无卡死或异常弹窗。",
+      "verification_points": [
+        "右滑手势被设备接收。",
+        "页面返回控制中心且不再保持全白，无卡死或异常弹窗。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-276CEF326FD959F9A4A9",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-006",
+          "plan_sha256": "6541DD6F26D2C6570F95D2978D489A9101F243E76DDC2A7BB5FF6D2577B7B2B2"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-006",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-276CEF326FD959F9A4A9",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "6541DD6F26D2C6570F95D2978D489A9101F243E76DDC2A7BB5FF6D2577B7B2B2"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-007",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 已完成进入前亮度 snapshot。\n2. 手表处于手电筒白光页。",
+      "steps_text": "1. 右滑退出到控制中心。\n2. 读取退出后的亮度状态并与 snapshot 比较。",
+      "expected_text": "1. 成功退出手电筒。\n2. 退出后亮度与进入前状态一致，restore 和 verify_restore 均成功。",
+      "verification_points": [
+        "成功退出手电筒。",
+        "退出后亮度与进入前状态一致，restore 和 verify_restore 均成功。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "deterministic_brightness_snapshot_restore_contract_missing",
+      "blockers": [
+        "deterministic_brightness_snapshot_restore_contract_missing"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "deterministic_brightness_snapshot_restore_contract_missing",
+          "binding_ref": "AC-4E31B40E855345BCC4EE",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-007",
+          "plan_sha256": "62AAB8297B1062EED6A31D0AE044CB5A0B1E2F6ABEC200643D7E964C713CC2DD"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-007",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-4E31B40E855345BCC4EE",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "62AAB8297B1062EED6A31D0AE044CB5A0B1E2F6ABEC200643D7E964C713CC2DD"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-008",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于手电筒白光页。\n2. 当前固件侧键键值已经两次探针确认。",
+      "steps_text": "1. 发送已确认的单击侧键语义动作。\n2. 采集侧键后的页面截图。",
+      "expected_text": "1. O1 日志确认设备收到目标侧键事件。\n2. 页面返回控制中心且不再保持全白；不得用右滑结果替代侧键证据。",
+      "verification_points": [
+        "O1 日志确认设备收到目标侧键事件。",
+        "页面返回控制中心且不再保持全白；不得用右滑结果替代侧键证据。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "side_key_two_pass_probe_not_passed",
+      "blockers": [
+        "side_key_two_pass_probe_not_passed"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "side_key_two_pass_probe_not_passed",
+          "binding_ref": "AC-446A526CC5E8E61B2B48",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-008",
+          "plan_sha256": "9AC44F26A3CF5C1CE3DC654E5D76405C8F62C5A07E3A755F80E8FB8C7B3CFE03"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-008",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-446A526CC5E8E61B2B48",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "9AC44F26A3CF5C1CE3DC654E5D76405C8F62C5A07E3A755F80E8FB8C7B3CFE03"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-009",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 已完成进入前亮度 snapshot。\n2. 侧键动作和亮度状态读取能力均已确认。",
+      "steps_text": "1. 在手电筒白光页单击侧键退出。\n2. 读取退出后的亮度状态并与 snapshot 比较。",
+      "expected_text": "1. 页面返回控制中心。\n2. 退出后亮度与进入前状态一致，未停留最大亮度。",
+      "verification_points": [
+        "页面返回控制中心。",
+        "退出后亮度与进入前状态一致，未停留最大亮度。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "deterministic_brightness_snapshot_restore_contract_missing",
+      "blockers": [
+        "deterministic_brightness_snapshot_restore_contract_missing"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "deterministic_brightness_snapshot_restore_contract_missing",
+          "binding_ref": "AC-DD2F838E1E7902BF2452",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-009",
+          "plan_sha256": "7B9CE53C69E247C6518F4E04F62E012B21ECD92025C5596A953473744BE822D4"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-009",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-DD2F838E1E7902BF2452",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "7B9CE53C69E247C6518F4E04F62E012B21ECD92025C5596A953473744BE822D4"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-010",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 已通过侧键退出到控制中心。",
+      "steps_text": "1. 再次点击控制中心手电筒入口。\n2. 采集重新进入后的页面。",
+      "expected_text": "1. 入口仍可操作。\n2. 重新进入完整白光页，无状态残留、错页或入口失效。",
+      "verification_points": [
+        "入口仍可操作。",
+        "重新进入完整白光页，无状态残留、错页或入口失效。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "side_key_two_pass_probe_not_passed",
+      "blockers": [
+        "side_key_two_pass_probe_not_passed"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "side_key_two_pass_probe_not_passed",
+          "binding_ref": "AC-5C81AE928D4FDB7C90C6",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-010",
+          "plan_sha256": "D1650BF7C306F26951B649E8641C71FB3AF6823FDC9EB6DC98FD4EBB2F5F82F5"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-010",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-5C81AE928D4FDB7C90C6",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "D1650BF7C306F26951B649E8641C71FB3AF6823FDC9EB6DC98FD4EBB2F5F82F5"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-011",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 手表处于手电筒白光页。\n2. 亮灭屏指令链路可用。",
+      "steps_text": "1. 发送灭屏指令并确认屏幕关闭。\n2. 等待5秒后发送亮屏指令。\n3. 采集亮屏后的页面和状态。",
+      "expected_text": "1. 屏幕进入关闭状态且未误触其他页面。\n2. 屏幕重新点亮。\n3. 记录实际落点和亮度，不预设返回手电筒或控制中心。",
+      "verification_points": [
+        "屏幕进入关闭状态且未误触其他页面。",
+        "屏幕重新点亮。",
+        "记录实际落点和亮度，不预设返回手电筒或控制中心。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "screen_cycle_two_pass_consistency_not_passed",
+      "blockers": [
+        "screen_cycle_two_pass_consistency_not_passed"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "screen_cycle_two_pass_consistency_not_passed",
+          "binding_ref": "AC-EA6497077309AE761769",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-011",
+          "plan_sha256": "55008B9FB9E443E4EDD52B689E506328D2D06D6ADA06B61EA2961688761C9840"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-011",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-EA6497077309AE761769",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "55008B9FB9E443E4EDD52B689E506328D2D06D6ADA06B61EA2961688761C9840"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-012",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 第一次熄屏亮屏探针已完成并记录结果。\n2. 已恢复到同一手电筒起始状态。",
+      "steps_text": "1. 按相同步骤再次执行灭屏、等待5秒和亮屏。\n2. 比较两次亮屏后的页面与亮度状态。",
+      "expected_text": "1. 第二次过程无异常。\n2. 两次结果一致；一致后才允许冻结正式预期，不一致则保持NEED_REVIEW。",
+      "verification_points": [
+        "第二次过程无异常。",
+        "两次结果一致；一致后才允许冻结正式预期，不一致则保持NEED_REVIEW。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "screen_cycle_two_pass_consistency_not_passed",
+      "blockers": [
+        "screen_cycle_two_pass_consistency_not_passed"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "screen_cycle_two_pass_consistency_not_passed",
+          "binding_ref": "AC-9F3506E038C293879282",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-012",
+          "plan_sha256": "280E226FB163C6AA414FCA2C738A9FF78318304726D036C8D35E4F0FD82FBF34"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-012",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-9F3506E038C293879282",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "280E226FB163C6AA414FCA2C738A9FF78318304726D036C8D35E4F0FD82FBF34"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-013",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于手电筒白光页。\n2. APP 消息注入能力可用。",
+      "steps_text": "1. 通过 APP Bridge 发送唯一标题 STAGE04_FLASHLIGHT_MSG 的测试消息。\n2. 在触发窗口内采集消息提醒页面。",
+      "expected_text": "1. 消息动作由 APP 正式桥接成功下发。\n2. 手表显示该唯一标题对应的消息提醒，不得误识别为闹钟或来电。",
+      "verification_points": [
+        "消息动作由 APP 正式桥接成功下发。",
+        "手表显示该唯一标题对应的消息提醒，不得误识别为闹钟或来电。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-DA0CA00F1E2D4B0560C3",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-013",
+          "plan_sha256": "AFAA848A9FDE29500936EB640D43AF2C790B58F3910751EFFCA65A234A154C6A"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-013",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-DA0CA00F1E2D4B0560C3",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "AFAA848A9FDE29500936EB640D43AF2C790B58F3910751EFFCA65A234A154C6A"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-014",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 消息提醒已覆盖手电筒页面。",
+      "steps_text": "1. 关闭或滑走测试消息提醒。\n2. 采集提醒消失后的页面。",
+      "expected_text": "1. 测试消息被关闭且不残留半弹窗。\n2. 页面返回完整手电筒白光页，未跳到表盘、控制中心或其他应用。",
+      "verification_points": [
+        "测试消息被关闭且不残留半弹窗。",
+        "页面返回完整手电筒白光页，未跳到表盘、控制中心或其他应用。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-625EC72BA7614B657556",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-014",
+          "plan_sha256": "34B6556726A3A273C766A550D460E6C63EFF631D0B3760EB36DBDE8D56E8DF1D"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-014",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-625EC72BA7614B657556",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "34B6556726A3A273C766A550D460E6C63EFF631D0B3760EB36DBDE8D56E8DF1D"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-015",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于手电筒白光页。\n2. APP 可创建一分钟内触发的唯一测试闹钟。",
+      "steps_text": "1. APP 创建并启用唯一测试闹钟。\n2. 等待到点并在触发窗口内采集闹钟提醒。\n3. 关闭提醒并采集回退页面。\n4. 删除测试闹钟并回读确认。",
+      "expected_text": "1. APP 回读确认测试闹钟已创建并开启。\n2. 手表显示与测试时间一致的闹钟提醒。\n3. 提醒结束后返回手电筒白光页。\n4. 测试闹钟被准确删除，无残留。",
+      "verification_points": [
+        "APP 回读确认测试闹钟已创建并开启。",
+        "手表显示与测试时间一致的闹钟提醒。",
+        "提醒结束后返回手电筒白光页。",
+        "测试闹钟被准确删除，无残留。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-43CA9D6070886DC18B1E",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-015",
+          "plan_sha256": "B26FB4D71C183BFE56133E0B82930E409E745D8DA4D882B2E174E223346B758D"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-015",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-43CA9D6070886DC18B1E",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "B26FB4D71C183BFE56133E0B82930E409E745D8DA4D882B2E174E223346B758D"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-016",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. 手表处于手电筒白光页。\n2. 受控真实呼入源或可信来电生命周期协议闭环已就绪。",
+      "steps_text": "1. 触发受控真实来电。\n2. 采集手表来电提醒页面。\n3. 结束来电并采集回退页面。",
+      "expected_text": "1. 真实来电生命周期开始，不能使用标题为来电的普通通知替代。\n2. 手表显示真实来电 UI，来源和图标符合来电语义。\n3. 来电结束后返回手电筒白光页且无通话状态残留。",
+      "verification_points": [
+        "真实来电生命周期开始，不能使用标题为来电的普通通知替代。",
+        "手表显示真实来电 UI，来源和图标符合来电语义。",
+        "来电结束后返回手电筒白光页且无通话状态残留。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "MANUAL_REQUIRED",
+      "automation_maturity": "MANUAL_REQUIRED",
+      "note": "controlled_incoming_call_fixture_missing",
+      "blockers": [
+        "controlled_incoming_call_fixture_missing"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "MANUAL_REQUIRED",
+          "runnable": false,
+          "blocker": "controlled_incoming_call_fixture_missing",
+          "binding_ref": "AC-2CAFE25C1CB2EAC0163A",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-016",
+          "plan_sha256": "A972F0914D947D4AC2B36B6485643CCBE74B6DA9E490C176B2BD016B4981110B"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-016",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-2CAFE25C1CB2EAC0163A",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "A972F0914D947D4AC2B36B6485643CCBE74B6DA9E490C176B2BD016B4981110B"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-017",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 消息与闹钟单项中断用例均已通过。\n2. 手表已恢复手电筒白光页。",
+      "steps_text": "1. 触发并关闭唯一测试消息。\n2. 确认返回手电筒后触发并关闭唯一测试闹钟。\n3. 采集最终页面。",
+      "expected_text": "1. 消息提醒正常且关闭后返回手电筒。\n2. 闹钟提醒正常且关闭后返回手电筒。\n3. 最终仍为完整白光页，无卡死、错页或提醒残留。",
+      "verification_points": [
+        "消息提醒正常且关闭后返回手电筒。",
+        "闹钟提醒正常且关闭后返回手电筒。",
+        "最终仍为完整白光页，无卡死、错页或提醒残留。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-4BD2B6E13456E8BACB2D",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-017",
+          "plan_sha256": "0072CC326F6D488DC531FE9C03A6C4844C4F8FF57475A5D2BC94E42A9439E45A"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-017",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-4BD2B6E13456E8BACB2D",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "0072CC326F6D488DC531FE9C03A6C4844C4F8FF57475A5D2BC94E42A9439E45A"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-018",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 手表电量满足测试要求。\n2. 手表处于手电筒白光页。",
+      "steps_text": "1. 采集持续点亮开始截图。\n2. 保持60秒后采集结束截图。",
+      "expected_text": "1. 开始截图为完整白光页。\n2. 60秒后仍为完整白光页，无自动退出、花屏、闪屏、卡死或异常弹窗。",
+      "verification_points": [
+        "开始截图为完整白光页。",
+        "60秒后仍为完整白光页，无自动退出、花屏、闪屏、卡死或异常弹窗。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-F6BF0933092A194A4F11",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-018",
+          "plan_sha256": "1E860529F7C080EBB95E585420475D49BD21E01D8CE4E0D214B30FE53E5BA3CA"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-018",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-F6BF0933092A194A4F11",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "1E860529F7C080EBB95E585420475D49BD21E01D8CE4E0D214B30FE53E5BA3CA"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-019",
+      "sheet": "手电筒",
+      "priority": "P1",
+      "precondition_text": "1. 控制中心和手电筒入口均可用。\n2. 使用右滑作为已验证退出路径。",
+      "steps_text": "1. 连续执行20轮进入手电筒、确认白光、右滑退出。\n2. 检查第20轮退出后的控制中心页面。",
+      "expected_text": "1. 20轮均可进入和退出，无丢触发、卡死、错页或白屏残留。\n2. 最终控制中心正常可操作，手电筒入口仍存在。",
+      "verification_points": [
+        "20轮均可进入和退出，无丢触发、卡死、错页或白屏残留。",
+        "最终控制中心正常可操作，手电筒入口仍存在。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": false,
+      "mapping_status": "AUTO_READY",
+      "automation_maturity": "AUTO_READY",
+      "note": "",
+      "blockers": [],
+      "platform_automation": {
+        "579": {
+          "maturity": "AUTO_READY",
+          "runnable": true,
+          "blocker": "",
+          "binding_ref": "AC-4D6B920002CA51B767B9",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-019",
+          "plan_sha256": "12218DB0C6823ACDFE7EAA8B34DE91F785905EDB3F837A2867968BE265C909BD"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-019",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-4D6B920002CA51B767B9",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "12218DB0C6823ACDFE7EAA8B34DE91F785905EDB3F837A2867968BE265C909BD"
+      }
+    },
+    {
+      "case_id": "FLASHLIGHT-020",
+      "sheet": "手电筒",
+      "priority": "P0",
+      "precondition_text": "1. Stage 04 当前批次所有可执行用例已结束。\n2. 已保存进入模块前亮度 snapshot。",
+      "steps_text": "1. 确认手电筒页面已退出；若仍在白光页则使用已验证右滑路径退出。\n2. 恢复进入模块前亮度设置。\n3. 确认无测试消息、闹钟、来电或白屏残留。\n4. 返回表盘并采集最终截图。",
+      "expected_text": "1. 手表不再停留手电筒白光页。\n2. 亮度 restore 和 verify_restore 成功。\n3. APP 与手表均无测试提醒残留。\n4. 表盘正常显示，环境可供下一模块使用。",
+      "verification_points": [
+        "手表不再停留手电筒白光页。",
+        "亮度 restore 和 verify_restore 成功。",
+        "APP 与手表均无测试提醒残留。",
+        "表盘正常显示，环境可供下一模块使用。"
+      ],
+      "setup": [],
+      "actions": [],
+      "collect": [],
+      "unable": true,
+      "mapping_status": "NEED_REVIEW",
+      "automation_maturity": "NEED_REVIEW",
+      "note": "deterministic_brightness_snapshot_restore_contract_missing",
+      "blockers": [
+        "deterministic_brightness_snapshot_restore_contract_missing"
+      ],
+      "platform_automation": {
+        "579": {
+          "maturity": "NEED_REVIEW",
+          "runnable": false,
+          "blocker": "deterministic_brightness_snapshot_restore_contract_missing",
+          "binding_ref": "AC-CB54B06641461EA78B01",
+          "plan_ref": "catalog/automation_cases.json#FLASHLIGHT-020",
+          "plan_sha256": "4A7F2E8D86C55782E29FAC119A557CF332141409BBDF0488668CE12D293E8671"
+        }
+      },
+      "source_ref": {
+        "functional_case_id": "FLASHLIGHT-FC-020",
+        "functional_manifest_id": "FCM-4113312B6D52DC0DFEB1",
+        "source_sha256": "66784F3CC8B250A983A921FCFA41D1BA73775357DFD40D6B8A07113C736AAEEE"
+      },
+      "execution_ref": {
+        "automation_case_id": "AC-CB54B06641461EA78B01",
+        "execution_manifest_id": "EXM-C1FC6EE5EB61458BE580",
+        "plan_sha256": "4A7F2E8D86C55782E29FAC119A557CF332141409BBDF0488668CE12D293E8671"
+      }
+    }
+  ]
+}

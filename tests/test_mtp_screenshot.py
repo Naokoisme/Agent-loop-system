@@ -93,6 +93,17 @@ class FakeMtpSystem:
     def wait_for_usb(self, *, present: bool, timeout: float) -> None:
         self.usb_states.append(present)
 
+    def inspect_usb_devices(self, *, timeout: float):
+        return [{
+            "instance_id": "USB\\VID_301A&PID_6808\\TEST",
+            "status": "OK",
+            "friendly_name": "ZORA",
+            "class": "WPD",
+        }]
+
+    def probe_namespace(self, *, timeout: float):
+        return {"device": "ZORA", "storage": "storage", "folder": "download"}
+
     def copy_capture(
         self, destination_dir: Path, *, file_name: str, timeout: float
     ) -> Path:
@@ -114,7 +125,7 @@ class RetryOpenMtpSystem(FakeMtpSystem):
         self.usb_states.append(present)
         if present:
             self.present_attempts += 1
-            if self.present_attempts == 1:
+            if self.present_attempts == 2:
                 raise MtpScreenshotTimeoutError("first USB reopen was missed")
 
 
@@ -280,7 +291,7 @@ class MtpScreenshotTest(unittest.TestCase):
             self.assertEqual(result.payload_crc32, crc32)
             self.assertEqual(result.device_uptime_ms, 4567)
             self.assertEqual(result.capture_duration_ms, 89)
-            self.assertEqual(mtp.usb_states, [False, True])
+            self.assertEqual(mtp.usb_states, [True, False, True])
             self.assertEqual(
                 transport.writes,
                 [
@@ -328,7 +339,7 @@ class MtpScreenshotTest(unittest.TestCase):
                 transport_factory=lambda: transport,
             )
 
-            self.assertEqual(mtp.usb_states, [False, True, True])
+            self.assertEqual(mtp.usb_states, [True, False, True, True])
             self.assertEqual(transport.writes[-2:], [b"dal_usb open\r\n"] * 2)
             self.assertTrue(transport.closed)
 
@@ -457,7 +468,7 @@ class MtpScreenshotTest(unittest.TestCase):
                 )
 
         self.assertEqual(mtp.copy_calls, [])
-        self.assertEqual(mtp.usb_states, [False, True])
+        self.assertEqual(mtp.usb_states, [True, False, True])
         self.assertEqual(transport.writes[-1], b"dal_usb open\r\n")
         self.assertTrue(transport.closed)
 
@@ -484,7 +495,7 @@ class MtpScreenshotTest(unittest.TestCase):
                     transport_factory=lambda: transport,
                 )
         self.assertEqual(transport.writes[-1], b"dal_usb open\r\n")
-        self.assertEqual(mtp.usb_states, [False, True])
+        self.assertEqual(mtp.usb_states, [True, False, True])
         self.assertTrue(transport.closed)
 
     def test_invalid_download_is_rejected(self) -> None:
@@ -638,6 +649,157 @@ class MtpCaptureProviderTest(unittest.TestCase):
         for invalid in (-1, 0x1_0000_0000, True, "1"):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 provider.capture(timeout=0.01, after_sequence=invalid)
+
+    def test_windows_read_only_usb_and_namespace_probes(self) -> None:
+        system = WindowsMtpSystem()
+        with mock.patch.object(
+            system,
+            "_run",
+            side_effect=[
+                json.dumps([{
+                    "instance_id": "USB\\VID_301A&PID_6808\\SERIAL",
+                    "status": "OK",
+                    "friendly_name": "ZORA",
+                    "class": "WPD",
+                }]),
+                json.dumps({
+                    "device": "ZORA",
+                    "storage": "storage",
+                    "folder": "download",
+                }),
+            ],
+        ):
+            devices = system.inspect_usb_devices()
+            namespace = system.probe_namespace()
+
+        self.assertEqual(len(devices), 1)
+        self.assertEqual(namespace["folder"], "download")
+
+    def test_windows_namespace_probe_falls_back_to_volume_containing_download(
+        self,
+    ) -> None:
+        system = WindowsMtpSystem()
+        with mock.patch.object(
+            system,
+            "_run",
+            return_value=json.dumps({
+                "device": "ZORA",
+                "storage": "ZORA MTP Storage Volume",
+                "folder": "download",
+            }),
+        ) as run:
+            namespace = system.probe_namespace()
+
+        script = run.call_args.args[0]
+        self.assertIn("$storageItems", script)
+        self.assertIn("$env:WATCH_MTP_FOLDER", script)
+        self.assertEqual(namespace["storage"], "ZORA MTP Storage Volume")
+
+    def test_windows_copy_uses_mtp_filename_when_shell_hides_extension(
+        self,
+    ) -> None:
+        system = WindowsMtpSystem()
+        with tempfile.TemporaryDirectory() as root:
+            target = Path(root) / "agent_capture_7.bmp"
+
+            def fake_run(script, **_kwargs):
+                self.assertIn("System.FileName", script)
+                target.write_bytes(b"BM" + bytes(52))
+                return ""
+
+            with mock.patch.object(system, "_run", side_effect=fake_run):
+                copied = system.copy_capture(
+                    Path(root),
+                    file_name="agent_capture_7.bmp",
+                    timeout=0.1,
+                )
+
+        self.assertEqual(copied.name, "agent_capture_7.bmp")
+
+    def test_restore_usb_retries_once_and_records_pnp_stage(self) -> None:
+        from agent_loop_system.tools.mtp_screenshot import restore_usb_device
+
+        class RetryGate(FakeMtpSystem):
+            def __init__(self) -> None:
+                super().__init__()
+                self.attempt = 0
+
+            def wait_for_usb(self, *, present: bool, timeout: float) -> None:
+                self.usb_states.append(present)
+                self.attempt += 1
+                if self.attempt == 1:
+                    raise MtpScreenshotTimeoutError("PnP absent")
+
+            def inspect_usb_devices(self, *, timeout: float):
+                return [{
+                    "instance_id": "USB\\VID_301A&PID_6808\\PRIVATE-SERIAL",
+                    "status": "OK",
+                    "friendly_name": "ZORA",
+                    "class": "WPD",
+                }]
+
+        writes: list[str] = []
+        gate = RetryGate()
+        diagnostics = restore_usb_device(
+            writes.append,
+            gate,
+            usb_timeout=0.1,
+        )
+
+        self.assertEqual(writes, ["dal_usb open", "dal_usb open"])
+        self.assertEqual([item["status"] for item in diagnostics], ["failed", "ready"])
+        self.assertEqual(diagnostics[0]["stage"], "pnp")
+        self.assertEqual(diagnostics[0]["pnp_probe_status"], "ok")
+        self.assertEqual(len(diagnostics[0]["pnp_instances"]), 1)
+        self.assertNotIn("PRIVATE-SERIAL", json.dumps(diagnostics))
+
+    def test_restore_usb_distinguishes_wpd_not_ready(self) -> None:
+        from agent_loop_system.tools.mtp_screenshot import (
+            MtpUsbRestoreError,
+            restore_usb_device,
+        )
+
+        class WpdGate(FakeMtpSystem):
+            def probe_namespace(self, *, timeout: float):
+                raise MtpScreenshotError("WPD namespace missing")
+
+        with self.assertRaises(MtpUsbRestoreError) as raised:
+            restore_usb_device(
+                lambda _line: None,
+                WpdGate(),
+                usb_timeout=0.1,
+                namespace_timeout=0.1,
+            )
+
+        self.assertEqual(len(raised.exception.attempts), 2)
+        self.assertTrue(all(
+            item["stage"] == "wpd" for item in raised.exception.attempts
+        ))
+        self.assertIn("attempts=", str(raised.exception))
+
+    def test_capture_does_not_close_usb_when_initial_presence_is_unproven(self) -> None:
+        class MissingInitialUsb(FakeMtpSystem):
+            def wait_for_usb(self, *, present: bool, timeout: float) -> None:
+                self.usb_states.append(present)
+                raise MtpScreenshotTimeoutError("initial USB absent")
+
+        transport = FakeTransport()
+        gate = MissingInitialUsb()
+        with tempfile.TemporaryDirectory() as root, self.assertRaises(
+            MtpScreenshotTimeoutError
+        ):
+            capture_mtp_screenshot(
+                Path(root) / "capture.bmp",
+                sequence=1,
+                capture_timeout=0.1,
+                usb_timeout=0.1,
+                mtp_timeout=0.1,
+                mtp_system=gate,
+                transport_factory=lambda: transport,
+            )
+
+        self.assertEqual(gate.usb_states, [True])
+        self.assertEqual(transport.writes, [])
 
 
 if __name__ == "__main__":

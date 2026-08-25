@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
-  <title>Agent-loop 自动化测试</title>
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script defer src="/assets/app.js"></script>
+  <title>Agent-loop 自动化测试平台</title>
+  <link rel="stylesheet" href="/assets/styles.css?v=20260825-6">
+  <script defer src="/assets/app.js?v=20260825-6"></script>
 </head>
 <body>
   <header class="topbar">
@@ -16,23 +16,21 @@
     </a>
     <nav class="primary-nav" aria-label="工作台一级导航">
       <a href="/tests?view=overview" data-route="/overview" data-nav="overview"><span aria-hidden="true">⌂</span>项目总览</a>
+      <a href="/prd-cases" data-route="/prd-cases" data-nav="prd-cases"><span aria-hidden="true">✦</span>PRD 转用例</a>
       <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
       <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
       <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
       <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>ONES 缺陷</a>
       <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
+      <a href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"><span aria-hidden="true">⌁</span>蓝牙工作台</a>
     </nav>
     <div class="topbar-actions">
       <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
-      <label class="global-target-picker" for="global-target-select">
-        <span class="sr-only">当前测试目标</span>
-        <select id="global-target-select" aria-label="切换全局测试目标">
-          <option value="620C_W6830">620C 模拟器</option>
-          <option value="6202_W5230_SIMULATOR">6202 模拟器</option>
-          <option value="6202_W5230">6202 真机</option>
-        </select>
+      <div class="global-target-picker" aria-label="当前项目与快捷切换">
+        <button id="global-project-switch" class="global-project-switch" type="button" aria-haspopup="dialog">当前项目：读取中… ▾</button>
         <span id="global-target-status" class="target-health-inline"><i></i><span>尚未检查</span></span>
-      </label>
+      </div>
+      <button id="open-create-project" class="button button-secondary topbar-create-project" type="button">＋ 新增项目</button>
       <button id="open-system-settings" class="icon-button settings-nav-btn" type="button" aria-label="打开系统设置" title="系统设置">⚙</button>
     </div>
   </header>
@@ -43,6 +41,35 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="project-switch-dialog" class="import-dialog project-switch-dialog" aria-labelledby="project-switch-title">
+    <header class="dialog-head">
+      <div><p class="eyebrow">快捷切换</p><h2 id="project-switch-title">选择项目</h2></div>
+      <button class="dialog-close" type="button" data-close-project-switch aria-label="关闭">×</button>
+    </header>
+    <div class="dialog-body">
+      <label class="project-search"><span class="sr-only">搜索项目</span><input id="project-switch-search" type="search" placeholder="搜索项目名称或 ID" autocomplete="off"></label>
+      <div id="project-switch-list" class="project-switch-list"></div>
+    </div>
+    <footer class="dialog-foot"><button id="project-switch-create" class="button" type="button">＋ 新增项目</button></footer>
+  </dialog>
+  <dialog id="create-project-dialog" class="import-dialog create-project-dialog" aria-labelledby="create-project-title">
+    <form id="create-project-form">
+      <header class="dialog-head">
+        <div><p class="eyebrow">项目注册表</p><h2 id="create-project-title">新增项目</h2></div>
+        <button class="dialog-close" type="button" data-close-create-project aria-label="关闭">×</button>
+      </header>
+      <div class="dialog-body project-create-fields">
+        <label><span>项目名称</span><input name="project_name" required placeholder="例如：579 回归项目"></label>
+        <label><span>项目 ID</span><input name="project_id" required pattern="[A-Za-z0-9_.-]+" placeholder="例如：watch_579_regression"></label>
+        <fieldset><legend>允许运行平台</legend><div id="create-project-platforms" class="platform-checkboxes"></div></fieldset>
+        <label><span>默认运行平台</span><select name="default_platform" id="create-project-default-platform" required></select></label>
+        <fieldset><legend>允许执行目标</legend><div id="create-project-targets" class="target-checkboxes"></div></fieldset>
+        <label><span>默认执行目标</span><select name="default_target" id="create-project-default-target" required></select></label>
+        <p id="create-project-error" class="error-banner" hidden></p>
+      </div>
+      <footer class="dialog-actions"><button class="button button-secondary" type="button" data-close-create-project>取消</button><button class="button" type="submit">创建并切换</button></footer>
+    </form>
+  </dialog>
   <dialog id="image-preview-dialog" class="image-preview-dialog" aria-labelledby="image-preview-title">
     <header class="dialog-head image-preview-head">
       <div>
@@ -91,9 +118,16 @@
                 <span>最近调用</span>
                 <strong id="llm-actual-success" class="llm-signal-value" data-tone="neutral">尚无成功记录</strong>
               </div>
-              <div class="llm-signal-row">
+              <div class="llm-signal-row is-expanded">
                 <span>连接测试</span>
-                <strong id="llm-test-status" class="llm-signal-value" data-tone="neutral" role="status" aria-live="polite">尚未执行</strong>
+                <div id="llm-test-status" class="llm-test-status" data-tone="neutral" role="status" aria-live="polite">
+                  <strong data-llm-test-summary>尚未执行</strong>
+                  <small data-llm-test-action hidden></small>
+                  <details class="inline-diagnostics" data-llm-test-diagnostics hidden>
+                    <summary>诊断信息</summary>
+                    <pre><code></code></pre>
+                  </details>
+                </div>
               </div>
             </div>
 
@@ -187,71 +221,12 @@
               </select>
             </div>
           </div>
-          <div id="cfg-hw-ble-options" class="ble-device-manager">
-            <header class="ble-device-manager-head">
-              <div>
-                <strong>手表蓝牙连接</strong>
-                <p>扫描不会连接设备，点击“连接”后才会检查手表。</p>
-              </div>
-              <span class="chip chip-pending">按需连接</span>
-            </header>
-
-            <div class="ble-target-grid">
-              <label for="cfg-hw-ble-address">
-                <span>手表地址（可选）</span>
-                <input id="cfg-hw-ble-address" type="text" class="input" placeholder="留空时自动查找手表" autocomplete="off">
-              </label>
-              <label for="cfg-hw-ble-scan-timeout">
-                <span>查找和连接超时（秒）</span>
-                <input id="cfg-hw-ble-scan-timeout" type="number" class="input" min="1" max="60" step="1" value="15">
-              </label>
+          <div class="ble-workbench-entry">
+            <div>
+              <strong>蓝牙设备与指令</strong>
+              <p>579 指令执行与 6202 BLE 截图设备已迁移到独立页面。</p>
             </div>
-
-            <div class="ble-device-search-row">
-              <label class="ble-device-search" for="ble-device-search">
-                <span aria-hidden="true">⌕</span>
-                <input id="ble-device-search" type="search" placeholder="搜索设备名称或地址" autocomplete="off">
-              </label>
-              <button id="btn-scan-ble" class="button button-secondary" type="button">查找设备</button>
-            </div>
-
-            <div id="ble-connection-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite">
-              <span class="ble-connection-dot" aria-hidden="true"></span>
-              <div>
-                <strong>未选择手表</strong>
-                <small>点击“查找设备”开始</small>
-              </div>
-            </div>
-
-            <div class="ble-device-columns">
-              <section class="ble-device-column" aria-labelledby="ble-discovered-title">
-                <header>
-                  <div>
-                    <strong id="ble-discovered-title">本次找到的设备</strong>
-                    <small>最近一次查找结果</small>
-                  </div>
-                  <span id="ble-discovered-count" class="chip chip-pending">0 台</span>
-                </header>
-                <div id="ble-discovered-list" class="ble-device-list">
-                  <div class="ble-device-empty">点击“查找设备”开始</div>
-                </div>
-              </section>
-
-              <section class="ble-device-column" aria-labelledby="ble-remembered-title">
-                <header>
-                  <div>
-                    <strong id="ble-remembered-title">已连接过的设备</strong>
-                    <small>连接成功后会保存在这里</small>
-                  </div>
-                  <span id="ble-remembered-count" class="chip chip-pending">0 台</span>
-                </header>
-                <div id="ble-remembered-list" class="ble-device-list">
-                  <div class="ble-device-empty">正在读取连接记录…</div>
-                </div>
-              </section>
-            </div>
-
-            <p class="ble-device-note">设备仅在需要时连接。删除这里只会清除连接记录，不会操作手表。</p>
+            <a class="button button-secondary" href="/bluetooth" data-route="/bluetooth">前往蓝牙工作台</a>
           </div>
         </div>
 

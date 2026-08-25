@@ -392,6 +392,9 @@ def build_exe(
         "agent_loop_system.runtime_root",
         "agent_loop_system.version",
         "agent_loop_system.internal_dispatcher",
+        "agent_loop_system.prd_cases",
+        "agent_loop_system.prd_cases.service",
+        "agent_loop_system.platform_data",
         "agent_loop_system.tools.test",
         "agent_loop_system.tools.test_batch",
         "agent_loop_system.tools.defect_store",
@@ -446,6 +449,14 @@ def build_exe(
     for hi in hidden_imports:
         cmd.extend(["--hidden-import", hi])
 
+    platform_data_src = root / "src" / "agent_loop_system" / "platform_data"
+    if not platform_data_src.is_dir():
+        raise FileNotFoundError(f"Platform package data not found: {platform_data_src}")
+    cmd.extend([
+        "--add-data",
+        f"{platform_data_src}{os.pathsep}agent_loop_system/platform_data",
+    ])
+
     cmd.append(str(entry_script))
 
     print(f"Executing PyInstaller build...")
@@ -474,6 +485,14 @@ def build_exe(
     case_map_src = root / "case_map"
     if case_map_src.exists():
         copy_release_case_map(case_map_src, target_dir / "case_map")
+
+    # Pinned, read-only QA Skill used by the PRD-to-test-case workflow.
+    qa_skill_src = root / "resources" / "skills" / "xiaozhou-portable-skill-execution-quality-20260825.zip"
+    if not qa_skill_src.is_file():
+        raise FileNotFoundError(f"Bundled QA Skill not found: {qa_skill_src}")
+    qa_skill_dst = target_dir / "resources" / "skills"
+    qa_skill_dst.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(qa_skill_src, qa_skill_dst / qa_skill_src.name)
 
     # 2. templates
     templates_src = root / "templates"
@@ -631,20 +650,20 @@ def build_exe(
     env_readme = (
         "## 2. 内部真机测试配置（.env）\n\n"
         "本包已携带可直接使用的大模型配置，无需复制或重命名 `.env.example`。\n"
-        "串口号与 BLE 设备仍按每台电脑的实际情况在系统设置中选择；已有 `.env` 的升级安装不会被覆盖。\n\n"
+        "串口号按每台电脑的实际情况在系统设置中选择，BLE 设备在独立的「蓝牙工作台」中选择；已有 `.env` 的升级安装不会被覆盖。\n\n"
         if configured_env
         else
         "## 2. 首次大模型环境配置（.env）\n\n"
         "发布包不会携带开发机的 API 密钥、ONES 身份、串口号、BLE 地址或本机路径：\n"
         "1. 将本目录下的 `.env.example` 复制一份并重命名为 `.env`。\n"
-        "2. 在 `.env` 中填写大模型凭据；ONES 与设备连接也可在系统设置中配置。\n"
+        "2. 在 `.env` 中填写大模型凭据；ONES 与串口连接可在系统设置中配置。\n"
         "3. 6202 真机探索和固化用例使用包内相对路径 `profiles`，不需要固件源码工作区。\n"
-        "4. 串口和 BLE 设备由系统设置中的实时枚举/扫描选择，不应复制开发机设备标识。\n\n"
+        "4. 串口由系统设置枚举，BLE 设备由「蓝牙工作台」精确扫描选择；不应复制开发机设备标识。\n\n"
     )
     readme_prefix = (
         "# Agent-loop 自动化测试平台（Windows x64 便携版）\n\n"
         "无需安装 Python、开发环境或编译工具链，解压后双击 `Agent-loop.exe` 即可使用。\n"
-        "已内置 6202 真机 Runtime Profile、用例库、标准模板及配套串口助手 `tools/SuperCom`。\n\n"
+        "已内置 6202 真机 Runtime Profile、579/6202 用例库、标准模板及配套串口助手 `tools/SuperCom`。\n\n"
         "---\n\n"
         "## 1. 快速上手\n\n"
         "### 场景 A：用例管理 / Excel 导入\n"
@@ -660,6 +679,11 @@ def build_exe(
         "   - 手表通过 USB 数据线连接电脑，确保 Windows 资源管理器中可识别到 MTP 手表存储设备（用于自动化截图下载）。\n"
         "3. **第三步（启动测试平台）**：\n"
         "   - 双击运行 `Agent-loop.exe`，在 Web 界面选择 `6202_W5230`，勾选需要测试的用例点击「执行用例」即可。\n\n"
+        "### 场景 C：579 PC-BLE 指令与执行自动化\n"
+        "1. 关闭手机蓝牙及其他会占用目标手表 GATT 的工具。\n"
+        "2. 打开一级页面「蓝牙工作台」，选择 `579 指令执行`，扫描并按精确 MAC 保存、连接目标手表。\n"
+        "3. 可先用查找手表或计算器预置验证传输，再选择 `579_Z1640` 运行 `EXECUTION_READY` 用例。\n"
+        "4. 当前 579 尚无截图通道；L1 ACK 只证明命令传输，结果固定标记为 `CANNOT_VERIFY`，不能视为正式 PASS。\n\n"
         "---\n\n"
     )
     readme_suffix = (

@@ -1,0 +1,111 @@
+{
+  "version": "1.0.0",
+  "platforms": [
+    {
+      "platform_id": "w30",
+      "platform_label": "W30",
+      "description": "W30 模拟器与真机执行逻辑",
+      "enabled": true
+    },
+    {
+      "platform_id": "579",
+      "platform_label": "579",
+      "description": "ADB → APP Bridge → BLE 控制，COM3/O1 与 O2 只读观察",
+      "enabled": true,
+      "live_actions_default": false
+    }
+  ],
+  "targets": [
+    {
+      "target_id": "w30.620c.simulator",
+      "platform_id": "w30",
+      "target_label": "620C W6830 模拟器",
+      "execution_target": "simulator",
+      "execution_target_label": "模拟器",
+      "execution_adapter": "w30_cli",
+      "case_catalog_adapter": "w30_case_map",
+      "health_adapter": "w30_simulator",
+      "execution_resource": "w30.simulator",
+      "transport": "socket",
+      "transport_label": "Socket 命令通道",
+      "capture_provider": "simulator",
+      "capture_label": "模拟器截图",
+      "enabled": true
+    },
+    {
+      "target_id": "w30.6202.simulator",
+      "platform_id": "w30",
+      "target_label": "6202 W5230 模拟器",
+      "execution_target": "simulator",
+      "execution_target_label": "模拟器",
+      "execution_adapter": "w30_cli",
+      "case_catalog_adapter": "w30_case_map",
+      "health_adapter": "w30_simulator",
+      "execution_resource": "w30.simulator",
+      "transport": "socket",
+      "transport_label": "Socket 命令通道",
+      "capture_provider": "simulator",
+      "capture_label": "模拟器截图",
+      "enabled": true,
+      "simulator_source_root_env": "W30_6202_SIMULATOR_SOURCE_ROOT",
+      "simulator_project": "6202_W5230",
+      "simulator_build_directory_env": "W30_6202_SIMULATOR_BUILD_DIRECTORY",
+      "simulator_artifact_path_env": "W30_6202_SIMULATOR_ARTIFACT_PATH"
+    },
+    {
+      "target_id": "w30.6202.hardware",
+      "platform_id": "w30",
+      "target_label": "6202 W5230 真机",
+      "execution_target": "hardware",
+      "execution_target_label": "真机",
+      "execution_adapter": "w30_cli",
+      "case_catalog_adapter": "w30_case_map",
+      "health_adapter": "w30_hardware",
+      "runtime_profile_id": "6202_W5230",
+      "execution_resource": "w30.hardware",
+      "transport": "supercom",
+      "transport_label": "SuperCom 命名管道",
+      "capture_provider": "mtp",
+      "capture_label": "USB MTP 截图",
+      "enabled": true
+    },
+    {
+      "target_id": "579.o2",
+      "platform_id": "579",
+      "target_label": "579 O2 真机",
+      "execution_target": "hardware",
+      "execution_target_label": "真机",
+      "execution_adapter": "platform_579",
+      "case_catalog_adapter": "manifest_579",
+      "health_adapter": "platform_579",
+      "execution_resource": "579.hardware",
+      "transport": "app_ble",
+      "transport_label": "APP Bridge → BLE",
+      "serial_provider": "com3_readonly",
+      "serial_label": "COM3 只读日志",
+      "capture_provider": "o2",
+      "capture_label": "O2 手表截图",
+      "feedback_provider": "app_bridge",
+      "enabled": true,
+      "live_status": "blocked_pending_canary"
+    },
+    {
+      "target_id": "579.z1640",
+      "platform_id": "579",
+      "target_label": "579 Z1640 真机",
+      "execution_target": "hardware",
+      "execution_target_label": "579 真机",
+      "execution_adapter": "watch_579_ble",
+      "case_catalog_adapter": "watch_579_case_map",
+      "health_adapter": "watch_579_ble",
+      "preflight_adapter": "watch_579_ble",
+      "execution_resource": "579.pc_ble",
+      "transport": "pc_ble_legacy_l1_l2",
+      "transport_label": "PC BLE / 579 L1-L2",
+      "capture_provider": "unavailable",
+      "capture_label": "暂不可用",
+      "enabled": true,
+      "live_status": "watchface_confirmation_required"
+    }
+  ]
+}

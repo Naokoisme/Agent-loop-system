@@ -16,6 +16,9 @@ class FrontendAssetsTest(unittest.TestCase):
     def test_hidden_attribute_always_hides_interactive_controls(self) -> None:
         self.assertIn("[hidden] { display: none !important; }", self.stylesheet)
 
+    def test_document_reserves_vertical_scrollbar_space_for_stable_navigation(self) -> None:
+        self.assertIn("scrollbar-gutter: stable;", self.stylesheet)
+
     def test_source_location_panel_is_collapsible_and_large_results_start_closed(self) -> None:
         self.assertIn('<details class="panel collapsible-panel"', self.javascript)
         self.assertIn("<div><h2>诊断信息</h2><p>源码位置</p></div>", self.javascript)
@@ -63,6 +66,14 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("ONES缺陷列表", self.javascript)
         self.assertNotIn("缺陷闭环", self.index)
         self.assertNotIn("缺陷闭环", self.javascript)
+
+    def test_prd_case_navigation_precedes_case_management(self) -> None:
+        prd = 'data-route="/prd-cases" data-nav="prd-cases"'
+        cases = 'data-route="/cases" data-nav="cases"'
+        self.assertIn(prd, self.index)
+        self.assertIn(cases, self.index)
+        self.assertLess(self.index.index(prd), self.index.index(cases))
+        self.assertIn("if (parts[0] === 'prd-cases'", self.javascript)
 
     def test_run_form_submits_defect_and_explicit_project_only(self) -> None:
         self.assertIn("defect: String(defect.number)", self.javascript)
@@ -208,15 +219,39 @@ class FrontendAssetsTest(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertNotIn(text, primary_markup)
 
+    def test_case_list_uses_semantic_columns_and_expandable_full_details(self) -> None:
+        for token in (
+            "<th>测试项</th><th>测试点</th>",
+            'data-case-expand tabindex="0" aria-expanded="false"',
+            "function toggleCaseInlineDetail(summaryRow)",
+            "case-detail-row",
+            "case-inline-detail",
+            "测试项和测试点为必填项",
+            "actual_result",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn("row.steps_text || row.expected_text || '未填写测试步骤'", self.javascript)
+        for token in (".case-summary-row", ".case-inline-detail", ".case-detail-field"):
+            self.assertIn(token, self.stylesheet)
+
     def test_errors_keep_raw_diagnostics_behind_product_summaries(self) -> None:
         for token in (
             "function issuePresentation(",
-            "服务暂时不可用，请稍后重试。",
-            "无法连接服务，请检查服务状态后重试。",
+            "function knownIssueSummary(",
+            "function safeProductCopy(",
+            "本次操作没有完成，平台暂时无法确定具体原因。",
+            "请重新操作；如再次出现，展开诊断信息并联系维护人员。",
+            "平台暂时无法连接本机服务。",
+            "平台找到了连接入口，但没有收到手表响应。",
+            "请确认 SuperCom 连接的是当前手表，并唤醒手表屏幕后重试。",
+            "电脑检测到了手表，但暂时无法读取截图。",
+            "请重新连接 USB，并确认电脑能够打开手表存储后重试。",
             "error.diagnosticMessage = diagnosticMessage;",
             "error.code = 'NETWORK_ERROR';",
             "error.payload = payload;",
-            "FileNotFoundError",
+            "error.presentation = presentation;",
+            "TECHNICAL_DIAGNOSTIC_PATTERN",
+            "(?:Error|Exception)",
             '<details class="import-log-details"><summary>诊断信息',
             '<details class="inline-diagnostics"><summary>诊断信息</summary>',
         ):
@@ -239,67 +274,128 @@ class FrontendAssetsTest(unittest.TestCase):
             "项目文件需要配置",
             "测试程序尚未准备好",
             "模型服务尚未配置或不可用",
-            "环境检查完成：${health.label}",
+            "正在检查…",
+            "const refreshedHealth = environmentHealth(response?.result);",
+            "环境检查完成：${refreshedHealth.label}",
             "environmentLogRows(environmentItem.logs, targetHealth)",
             "检查操作、截图和必要服务是否可用",
             "可用项",
             "<summary>诊断信息</summary>",
         ):
             self.assertIn(token, self.javascript)
-        for token in (".environment-check-detail", ".environment-log .inline-diagnostics"):
+
+        check_copy_start = self.javascript.index("const ENVIRONMENT_CHECK_COPY")
+        check_copy_end = self.javascript.index("function environmentLogRows(", check_copy_start)
+        check_copy = self.javascript[check_copy_start:check_copy_end]
+        for token in (
+            "label: '手表连接'",
+            "label: 'USB 连接'",
+            "label: '截图读取'",
+            "label: '手表响应'",
+            "resolveIssueDefinition(item.code)",
+            "问题原因：",
+            "处理方法：",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, check_copy)
+        for token in (
+            "SuperCom 管道",
+            "MTP 命名空间",
+            "UART/GUI 数据面",
+            "environment-check-code",
+            "固件",
+            "命令接口",
+            "截图服务",
+        ):
+            with self.subTest(token=token):
+                self.assertNotIn(token, check_copy)
+        for token in (".environment-check-detail", ".environment-log .inline-diagnostics", ".check-field-label"):
             self.assertIn(token, self.stylesheet)
 
-    def test_hardware_settings_expose_real_on_demand_ble_device_manager(self) -> None:
+    def test_environment_checks_show_loading_then_success_or_failure_icons(self) -> None:
         for token in (
-            '<option value="ble">通过蓝牙获取截图（实验）</option>',
+            "function setEnvironmentChecksLoading(root, isHardware = false)",
+            "function setEnvironmentChecksFailed(root, error, isHardware = false)",
+            "status: 'checking'",
+            "checking: '检查中'",
+            "environment-check-spinner",
+            "icon('check', 17)",
+            "icon('close', 17)",
+            "const minimumLoadingMs = 450",
+            "setEnvironmentChecksLoading(root, profile.execution_target === 'hardware')",
+            "setEnvironmentChecksFailed(root, error, profile.execution_target === 'hardware')",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            ".environment-check-row.is-checking > i",
+            ".environment-check-spinner",
+            "@keyframes environment-check-spin",
+        ):
+            self.assertIn(token, self.stylesheet)
+
+    def test_bluetooth_is_a_top_level_workbench_not_a_settings_manager(self) -> None:
+        for token in (
+            'href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"',
+            'id="global-project-switch"',
+            "前往蓝牙工作台",
+        ):
+            self.assertIn(token, self.index)
+
+        for token in (
+            "当前固件阻塞",
+            "WATCH_579_EXECUTION_BLOCKED",
+            "平台已阻止单条、批次和候选复跑",
+        ):
+            self.assertIn(token, self.javascript)
+        for old_id in (
             'id="cfg-hw-ble-options"',
             'id="cfg-hw-ble-address"',
             'id="cfg-hw-ble-scan-timeout"',
-            'id="ble-device-search"',
-            'placeholder="搜索设备名称或地址"',
-            'id="btn-scan-ble"',
-            'id="ble-connection-status"',
             'id="ble-discovered-list"',
             'id="ble-remembered-list"',
-            "已连接过的设备",
-            "设备仅在需要时连接",
-            "删除这里只会清除连接记录",
         ):
-            self.assertIn(token, self.index)
-        self.assertIn(
-            '<div id="cfg-hw-ble-options" class="ble-device-manager">',
-            self.index,
-        )
-        self.assertIn(".ble-device-manager {\n  display: grid;", self.stylesheet)
-        self.assertNotIn("hwBleOptions.style.display", self.javascript)
+            self.assertNotIn(old_id, self.index)
         for token in (
-            "async function loadRememberedBleDevices()",
-            "api('/api/hardware/ble/remembered')",
-            "/api/hardware/ble/devices?timeout=",
-            "api('/api/hardware/ble/connect'",
-            "/api/hardware/ble/remembered/${encodeURIComponent(address)}",
-            "data-ble-action=\"connect\"",
-            "data-ble-action=\"delete\"",
-            "bleDeviceMatches",
-            "正在连接并检查手表",
-            "连接成功，已设为截图设备",
-            "cfg.hardware?.ble_address || ''",
-            "cfg.hardware?.ble_scan_timeout || 15",
-            "ble_address: (document.querySelector('#cfg-hw-ble-address')?.value || '').trim()",
-            "ble_scan_timeout: Number(document.querySelector('#cfg-hw-ble-scan-timeout')?.value) || 15",
+            "function BluetoothPage()",
+            "'/api/hardware/579/status'",
+            "'/api/hardware/579/connect'",
+            "'/api/hardware/579/disconnect'",
+            "'/api/hardware/579/preview'",
+            "'/api/hardware/579/send'",
+            "'/api/hardware/ble/connect'",
+            "hardware_579: {ble_address:",
+            "hardware: {ble_address:",
+            "data-bt-preset=\"find\"",
+            "data-bt-preset=\"calc\"",
+            "data-bt-preset=\"button\"",
+            "effect_verified=false",
+            "latestStatus?.lease?.active",
+            "data-ble-mutable",
         ):
             self.assertIn(token, self.javascript)
-        load_start = self.javascript.index("async function loadSettings()")
-        load_end = self.javascript.index("openBtn.addEventListener", load_start)
-        initial_load = self.javascript[load_start:load_end]
-        self.assertNotIn("/api/hardware/ble/devices", initial_load)
-        self.assertNotIn("/api/hardware/ble/connect", initial_load)
         for token in (
-            ".ble-device-columns",
-            ".ble-device-card.is-selected",
-            '.ble-connection-status[data-tone="success"]',
+            ".bluetooth-workbench-grid",
+            ".bluetooth-command-fields",
+            ".bluetooth-event-log",
         ):
             self.assertIn(token, self.stylesheet)
+
+    def test_ble_discovery_copy_uses_plain_device_language(self) -> None:
+        for token in (
+            "扫描结果只用于精确选择地址",
+            "找到 ${devices.length} 个蓝牙设备",
+            "没有匹配的扫描结果",
+            "未命名设备",
+            "点击“扫描”查找附近设备",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            "正在查找附近的手表",
+            "发现 ${bleDiscoveredDevices.length} 台手表",
+            "本次扫描未发现匹配手表",
+            "BLE 超时必须",
+        ):
+            self.assertNotIn(token, self.javascript)
 
     def test_hardware_settings_expose_supercom_port_selector(self) -> None:
         self.assertIn("SuperCom 端口", self.index)
@@ -336,6 +432,9 @@ class FrontendAssetsTest(unittest.TestCase):
             'id="llm-config-status"',
             'id="llm-actual-success"',
             'id="llm-test-status"',
+            "data-llm-test-summary",
+            "data-llm-test-action",
+            "data-llm-test-diagnostics",
             "配置状态",
             "最近调用",
             "连接测试",
@@ -345,8 +444,8 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "cfg.llm?.configured === true",
             "cfg.llm?.last_actual_success_at",
-            "连接失败：",
-            "setLlmSignal(llmTestStatus",
+            "setLlmTestIssue(",
+            "data-llm-test-diagnostics",
         ):
             self.assertIn(token, self.javascript)
         self.assertNotIn("已就绪 (开箱即用)", self.index)
@@ -382,6 +481,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "function reportDatePresetRange(value)",
             "function activeReportDatePreset(filters = {})",
             "function reportQuery(project, filters = {})",
+            "function reportRangeLabel(filters = {})",
+            "return filters.period === '24h' ? '最近24小时' : `${filters.from} 至 ${filters.to}`;",
             "query.set('period', '24h')",
             "data-report-period=",
             "aria-label='快捷时间段'",
@@ -405,6 +506,94 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("input.value = query", self.javascript)
         self.assertNotIn("body.search-active", self.stylesheet)
         self.assertIn(".pagination", self.stylesheet)
+
+    def test_case_management_uses_one_server_paginated_request(self) -> None:
+        for token in (
+            "async function loadCasePage(project",
+            "page_size: String(PAGE_SIZE)",
+            "modules.forEach(name => params.append('module', name))",
+            "const payload = await loadCasePage(project",
+            "renderModuleSidebar(payload.module_counts",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_case_management_requires_platform_selection_before_loading_cases(self) -> None:
+        for token in (
+            "async function renderCasePlatformLanding()",
+            "if (!['w30', '579'].includes(requestedPlatform)) return renderCasePlatformLanding();",
+            'data-case-platform="w30"',
+            'data-case-platform="579"',
+            "进入 W30 用例管理",
+            "进入 579 用例管理",
+            "caseProjectsForPlatform(initialPlatform).map",
+            "切换平台后，只加载该平台下的项目与用例",
+        ):
+            self.assertIn(token, self.javascript)
+        for selector in (
+            ".case-platform-gateway-grid",
+            ".case-platform-entry",
+            ".case-platform-context",
+        ):
+            self.assertIn(selector, self.stylesheet)
+        self.assertIn('<form class="case-platform-entry is-w30" method="get" action="/cases"', self.javascript)
+        self.assertIn('<form class="case-platform-entry is-579" method="get" action="/cases"', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="w30">', self.javascript)
+        self.assertIn('<input type="hidden" name="platform_id" value="579">', self.javascript)
+        self.assertIn('<button class="case-platform-entry-submit" type="submit">', self.javascript)
+        self.assertIn('.case-platform-entry-submit', self.stylesheet)
+        self.assertIn('<form class="case-platform-switch-form" method="get" action="/cases"', self.javascript)
+        self.assertIn('.case-platform-switch-form', self.stylesheet)
+        self.assertNotIn('data-native-navigation="true"', self.javascript)
+
+    def test_case_project_switch_keeps_or_selects_a_compatible_platform(self) -> None:
+        for token in (
+            "const requestedPlatform = new URLSearchParams(location.search).get('platform_id');",
+            "const allowedPlatforms = projectProfile.allowed_platforms || [];",
+            "allowedPlatforms.includes(requestedPlatform)",
+            "{platform_id: compatiblePlatform}",
+            "pageUrl('/cases', project, {platform_id: initialPlatform})",
+        ):
+            self.assertIn(token, self.javascript)
+
+    def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
+        self.assertIn('/assets/styles.css?v=20260825-6', self.index)
+        self.assertIn('/assets/app.js?v=20260825-6', self.index)
+
+    def test_run_status_tabs_are_real_links_with_script_free_fallback(self) -> None:
+        for token in (
+            "const executionTabs = [",
+            "href: pageUrl('/runs', project, {",
+            "view: item.value,",
+            "platform_id: platformId,",
+            "Components.subTabs(executionTabs, data.view)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "pageUrl('/runs', project, {view: subtab.dataset.subtab})",
+            self.javascript,
+        )
+
+    def test_report_tabs_are_real_links_with_script_free_fallback(self) -> None:
+        for token in (
+            "const reportTabs = [",
+            "href: pageUrl('/reports', project, {",
+            "Components.subTabs(reportTabs, filters.view)",
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertNotIn(
+            "view: button.dataset.subtab, from: data.filters.from",
+            self.javascript,
+        )
+
+    def test_environment_settings_shortcuts_open_the_matching_settings_tab(self) -> None:
+        for token in (
+            "data-open-settings='llm'",
+            "data-open-settings='ones'",
+            "const activateSettingsTab = tabName =>",
+            "const requestedTab = openBtn.dataset.settingsInitialTab || 'llm';",
+            "opener.dataset.settingsInitialTab = button.dataset.openSettings || 'llm';",
+        ):
+            self.assertIn(token, self.javascript)
 
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (
@@ -463,6 +652,10 @@ class FrontendAssetsTest(unittest.TestCase):
             "证据不完整",
             "本次记录没有保存执行步骤。下面仅显示运行计划，不能证明已经执行。",
             "item.checkpoint_index",
+            "原始执行日志",
+            "`${logBase}/execution.log${logQuery}`",
+            "`${logBase}/stderr.log${logQuery}`",
+            "`${logBase}/events.jsonl${logQuery}`",
         ):
             self.assertIn(token, self.javascript)
         for token in (".command-trace-list", ".command-trace-item", ".trace-meta"):
@@ -516,14 +709,166 @@ class FrontendAssetsTest(unittest.TestCase):
 
     def test_interrupted_batch_notice_only_emphasizes_resume_message(self) -> None:
         self.assertIn(
-            "job.resume_available ? `<strong>${escapeHtml(testResultReason(job, '批次已中断'))} 可从第 ${completed + 1} 条继续。</strong>`",
+            "问题原因：",
             self.javascript,
         )
         self.assertIn(
-            "job.status === 'completed' ? '全部用例已完成。'",
+            "处理方法：",
             self.javascript,
         )
-        self.assertIn(": '正在准备下一条用例…'", self.javascript)
+        self.assertIn(
+            "可从第 ${completed + 1} 条继续。",
+            self.javascript,
+        )
+        self.assertIn("current.innerHTML = isInterrupted", self.javascript)
+        self.assertIn(
+            "job.status === 'completed'",
+            self.javascript,
+        )
+        self.assertIn("全部用例已完成。", self.javascript)
+        self.assertIn("正在准备下一条用例…", self.javascript)
+
+    def test_single_issue_presentation_table_covers_all_codes_with_cause_and_action(self) -> None:
+        for token in (
+            "const ISSUE_TABLE",
+            "function resolveIssueDefinition(",
+            "function issueNoticeHtml(",
+            "BLE_UNAVAILABLE",
+            "BLE_RUNTIME_UNAVAILABLE",
+            "BLE_SCAN_FAILED",
+            "BLE_CONNECT_TIMEOUT",
+            "BLE_CONNECT_FAILED",
+            "LLM_TLS_ERROR",
+            "LLM_TIMEOUT",
+            "LLM_AUTH_FAILED",
+            "LLM_MODEL_NOT_FOUND",
+            "LLM_QUOTA_EXCEEDED",
+            "LLM_REQUEST_FAILED",
+            "SUPERCOM_PIPE_UNAVAILABLE",
+            "SUPERCOM_NO_UART",
+            "USB_DEVICE_NOT_PRESENT",
+            "USB_TARGET_AMBIGUOUS",
+            "MTP_NAMESPACE_NOT_READY",
+            "LLM_NOT_READY",
+            "TARGET_BUSY",
+            "PREFLIGHT_INTERNAL_ERROR",
+            "HARDWARE_PREPARATION_FAILED",
+            "平台未能启动本次任务。",
+            "请稍后重试；如仍失败，请重新启动平台。",
+            "任务在规定时间内没有完成。",
+            "请检查目标设备连接后重试。",
+            "任务运行过程中出现平台异常，没有得到完整结果。",
+            "请重新运行；如再次出现，展开诊断信息并联系维护人员。",
+            "测试程序已经结束，但没有返回可用结果。",
+            "请重新运行；如仍失败，保留诊断信息并联系维护人员。",
+            "测试已经执行，但结果没有保存成功。",
+            "请确认电脑存储空间充足后重试。",
+            "测试过程中与手表的连接中断。",
+            "请重新执行环境检查，恢复连接后从该用例重试。",
+            "手表没有进入可开始测试的状态，因此用例尚未执行。",
+            "请重新执行环境检查，确认连接和手表界面正常后重试。",
+            "用于判断结果的截图或检查点没有收集完整。",
+            "请确认截图连接正常后重新运行该用例。",
+            "电脑无法与判定服务建立安全连接。",
+            "判定服务在规定时间内没有响应。",
+            "判定服务没有接受当前账号信息。",
+            "请在系统设置中重新核对判定服务账号或密钥。",
+            "当前选择的判定模型不可用。",
+            "判定服务暂时无法接受更多请求，或当前账号可用额度不足。",
+            "本次操作没有完成，平台暂时无法确定具体原因。",
+            "请重新操作；如再次出现，展开诊断信息并联系维护人员。",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.javascript)
+
+        issue_table_start = self.javascript.index("const ISSUE_TABLE")
+        issue_table_end = self.javascript.index("const ISSUE_CODE_ALIASES", issue_table_start)
+        issue_table_block = self.javascript[issue_table_start:issue_table_end]
+        issue_entries = {
+            code: (cause, action)
+            for code, cause, action in re.findall(
+                r"^\s{2}([A-Z0-9_]+): \{\s+cause: '([^']+)',\s+action: '([^']+)'\s+\}",
+                issue_table_block,
+                re.MULTILINE,
+            )
+        }
+        for code in (
+            "THREAD_START_FAILED",
+            "PROCESS_TIMEOUT",
+            "PROCESS_EXCEPTION",
+            "UNHANDLED_EXCEPTION",
+            "RESULT_MISSING",
+            "HISTORY_WRITE_FAILED",
+            "HARDWARE_INFRASTRUCTURE_FAILURE",
+            "HARDWARE_PREPARATION_FAILED",
+            "EVIDENCE_INCOMPLETE",
+            "PROFILE_INVALID",
+            "PORT_NOT_SELECTED",
+            "SUPERCOM_PIPE_UNAVAILABLE",
+            "SUPERCOM_NO_UART",
+            "USB_DEVICE_NOT_PRESENT",
+            "USB_TARGET_AMBIGUOUS",
+            "MTP_NAMESPACE_NOT_READY",
+            "LLM_NOT_READY",
+            "TARGET_BUSY",
+            "PREFLIGHT_INTERNAL_ERROR",
+            "BLE_UNAVAILABLE",
+            "BLE_SCAN_FAILED",
+            "BLE_CONNECT_TIMEOUT",
+            "BLE_CONNECT_FAILED",
+            "LLM_TLS_ERROR",
+            "LLM_TIMEOUT",
+            "LLM_AUTH_FAILED",
+            "LLM_MODEL_NOT_FOUND",
+            "LLM_QUOTA_EXCEEDED",
+            "LLM_REQUEST_FAILED",
+        ):
+            with self.subTest(code=code):
+                self.assertIn(code, issue_entries)
+                self.assertTrue(issue_entries[code][0])
+                self.assertTrue(issue_entries[code][1])
+        issue_copy_texts = [text for values in issue_entries.values() for text in values]
+        combined_primary_copy = "\n".join(issue_copy_texts)
+        for forbidden in (
+            "安装依赖",
+            "SSL/TLS",
+            "SSL",
+            "TLS",
+            "证书握手",
+            "代理",
+            "API Key",
+            "鉴权",
+            "UART",
+            "GUI_PING",
+            "gui_ack",
+            "MTP",
+            "PnP",
+            "VID/PID",
+            "FileNotFoundError",
+            "RuntimeError",
+            "TypeError",
+            "ValueError",
+            "KeyError",
+            "固件",
+            "命令接口",
+            "截图服务",
+        ):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, combined_primary_copy)
+
+        for token in (
+            "summary: known.cause",
+            "const defaultCause = safeProductCopy(fallback) || UNKNOWN_ISSUE.cause;",
+            "known?.action || safeProductCopy(item.action) || copy.action",
+            "error.presentation = presentation;",
+        ):
+            self.assertIn(token, self.javascript)
+        for token in (
+            "action || known.action",
+            "const defaultCause = rawDetail || fallback",
+            "summary: formatIssueSummary",
+        ):
+            self.assertNotIn(token, self.javascript)
 
     def test_case_catalog_cold_start_uses_compact_server_queries(self) -> None:
         for token in (
@@ -604,7 +949,8 @@ class FrontendAssetsTest(unittest.TestCase):
             "待生成步骤",
             "${caseStatusChip(row)}",
             "caseStatusChip({...testCase, latest_verdict: initialVerdict})",
-            "const usesFixedMapping = Boolean(testCase.is_promoted);",
+            "const usesFixedMapping = Boolean(testCase.is_fixed_runnable || testCase.is_promoted);",
+            "动作已保存，观察证据待补齐",
             "本次将尝试生成自动化步骤",
             "结果只用于本次运行，不会自动保存",
             "验证并保存步骤",
@@ -616,6 +962,19 @@ class FrontendAssetsTest(unittest.TestCase):
             "? rawVerdict : 'ERROR'",
         ):
             self.assertIn(token, self.javascript)
+        self.assertIn("适用平台：${platforms}", self.javascript)
+        self.assertIn("<th>自动化成熟度</th><th>最近结果</th>", self.javascript)
+        for duplicated_label in (
+            "579 · 自动化就绪",
+            "579 · 待评审",
+            "579 · 需人工",
+            "579 · 不支持",
+        ):
+            self.assertNotIn(duplicated_label, self.javascript)
+        status_function = self.javascript.split("function caseStatusChip(row = {})", 1)[1].split(
+            "function testExecutionModeLabel", 1
+        )[0]
+        self.assertNotIn("return maturityChip(row);", status_function)
         for token in (
             "['PASS', 'FAIL', 'CANNOT_VERIFY', 'ERROR'].includes(rawVerdict)",
             "{SKIP: 'CANNOT_VERIFY'}[rawVerdict]",
@@ -678,7 +1037,7 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (
             "const historyId = item.history_id || item.run_id || '';",
             "testHistoryHref(project, sheet, caseId, historyId, returnTo)",
-            "const reportReturnTo = currentRouteUrl();",
+            "const reportReturnTo = pageUrl('/reports', project, {view: filters.view, from: filters.from, to: filters.to, module: filters.module, platform_id: filters.platform, result: filters.result, maturity: filters.maturity, infrastructure: filters.infrastructure});",
             "renderRecentFailures(report.recent_failures || [], project, reportReturnTo)",
             "const backHref = pageReturnUrl(detailFallback);",
             "const backLabel = returnDestinationLabel(backHref, '测试详情');",
@@ -710,8 +1069,12 @@ class FrontendAssetsTest(unittest.TestCase):
             "cannot_verify: '最近无法验证'",
             "error: '最近执行异常'",
             "latestBatchCandidateSummary.pass",
+            "最新结果已通过的用例不会重跑",
             "最新结果已通过的 ${Number(latestBatchCandidateSummary.pass || 0)} 条已排除",
-            "JSON.stringify({limit: 0, categories, project: projectSelect.value})",
+            "project_id: projectSelect.value",
+            "platform_id: platformId",
+            "target_id: targetId",
+            "watchface_ready: projectSelect.value === '579_Z1640'",
             "batch-resume-button",
             "/resume",
             "继续运行剩余",
@@ -733,6 +1096,28 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertIn(token, self.javascript)
         self.assertIn(".batch-active-row", self.stylesheet)
+
+    def test_environment_tabs_have_real_links_and_do_not_depend_on_click_handlers(self) -> None:
+        for token in (
+            "if (item.href)",
+            "environmentTabHref('llm')",
+            "environmentTabHref('ones')",
+            "environmentTabHref('updates')",
+            'aria-current="page"',
+        ):
+            self.assertIn(token, self.javascript)
+        self.assertIn(".workspace-subtabs a", self.stylesheet)
+
+    def test_automation_maturity_is_shown_in_chinese(self) -> None:
+        for text in ("自动化就绪", "待评审", "需人工执行", "暂不支持", "未绑定"):
+            self.assertIn(text, self.javascript)
+        for raw_label in (
+            "<span>AUTO_READY</span>",
+            "<span>NEED_REVIEW</span>",
+            "<span>MANUAL_REQUIRED</span>",
+            "<span>UNSUPPORTED</span>",
+        ):
+            self.assertNotIn(raw_label, self.javascript)
 
     def test_workspace_live_polling_updates_sections_without_rerouting(self) -> None:
         for token in (

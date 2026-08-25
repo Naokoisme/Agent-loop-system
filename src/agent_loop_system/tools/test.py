@@ -118,6 +118,8 @@ def _result_provenance(
     project_environment = (
         "W30_PROJECT"
         if normalized_target == "simulator"
+        else "WATCH_579_PROJECT"
+        if expected_project == "579_Z1640"
         else "W30_HARDWARE_PROJECT"
     )
     configured_project = os.environ.get(project_environment, "").strip()
@@ -566,26 +568,46 @@ def save_evidence(
         for item in contract_issues
         if isinstance(item, dict) and str(item.get("message") or "").strip()
     ), "")
-    execution_errors = (
-        result.setup_errors + result.action_errors + result.collect_errors
+    blocking_evidence_error = next((
+        str(item.get("message") or "").strip()
+        for item in contract_issues
+        if isinstance(item, dict)
+        and item.get("execution_blocking") is not False
+        and str(item.get("message") or "").strip()
+    ), "")
+    observation_unavailable = any(
+        isinstance(item, dict) and item.get("code") == "observation_unavailable"
+        for item in contract_issues
     )
-    execution_failure = bool(result.aborted or execution_errors or evidence_error)
+    blocking_execution_errors = result.setup_errors + result.action_errors
+    execution_errors = blocking_execution_errors + result.collect_errors
+    execution_failure = bool(
+        result.aborted or execution_errors or blocking_evidence_error
+    )
+    judgement_blocked = bool(
+        result.aborted or blocking_execution_errors or blocking_evidence_error
+    )
     reason_code = (
-        "EVIDENCE_INCOMPLETE"
-        if evidence_error
+        "OBSERVATION_UNAVAILABLE"
+        if observation_unavailable and not execution_failure
+        else "EVIDENCE_INCOMPLETE"
+        if blocking_evidence_error
         else "CASE_EXECUTION_ERROR" if execution_failure else None
     )
     if result.skipped:
         raw_verdict = "CANNOT_VERIFY"
         reason = "旧 Runner 返回了跳过结果；当前用例应重新运行"
         reason_code = "LEGACY_SKIPPED"
-    elif result.aborted or result.setup_errors or result.action_errors or evidence_error:
+    elif judgement_blocked:
         raw_verdict = "CANNOT_VERIFY"
         reason = (
             (result.setup_errors + result.action_errors)[0]
             if result.setup_errors or result.action_errors
-            else evidence_error or "准备或操作阶段未完整执行"
+            else blocking_evidence_error or "准备或操作阶段未完整执行"
         )
+    elif observation_unavailable:
+        raw_verdict = "CANNOT_VERIFY"
+        reason = evidence_error or "当前执行目标没有可用的截图观察通道"
     elif result.precomputed_verdict:
         raw_verdict = result.precomputed_verdict
         reason = result.precomputed_reason or "Agent-loop 探索已完成"
@@ -616,10 +638,13 @@ def save_evidence(
         "collect_errors": result.collect_errors,
         "workflow_status": "failed" if execution_failure else "completed",
         "execution_status": "ERROR" if execution_failure else "OK",
+        "evidence_status": str(
+            result.evidence_contract.get("status") or "NOT_RECORDED"
+        ).upper(),
         "execution_reason": (
             execution_errors[0]
             if execution_errors
-            else evidence_error or (reason if execution_failure else "")
+            else blocking_evidence_error or (reason if execution_failure else "")
         ),
         "reason_code": reason_code,
         "terminal_json": result.terminal_json,
@@ -664,6 +689,8 @@ def _run_agent_exploration(
     project: str,
     hardware_runtime_profile=None,
     reset_hardware: bool = True,
+    hardware_recovery_reboot: bool = False,
+    hardware_preflight_completed: bool = False,
 ) -> CaseRunResult:
     """没有固化映射时复用现有交互 Agent；只产出本轮证据，不回写状态数据。"""
 
@@ -701,6 +728,8 @@ def _run_agent_exploration(
         build_simulator=False,
         hardware_runtime_profile=hardware_runtime_profile,
         reset_hardware=reset_hardware,
+        hardware_recovery_reboot=hardware_recovery_reboot,
+        hardware_preflight_completed=hardware_preflight_completed,
     )
     result = CaseRunResult(
         case_id=case.case_id,
@@ -829,12 +858,15 @@ def run_single_case(
     candidate_replay: bool = False,
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None,
     reset_hardware: bool = True,
+    hardware_preflight_completed: bool = False,
+    hardware_recovery_reboot: bool = False,
 ) -> CaseRunResult:
     """加载并执行单条用例：固化映射固定跑，其他用例交给 Agent 探索。
 
     screenshot_path 不为 None 时，在每个 GUI_TREE 检查点保存一张截图；
     没有 GUI_TREE 时保存最终画面。
-    真机默认先清理到可验证的表盘状态；只有已完成同一清理入口的父流程才可关闭。
+    真机默认先做真实 Preflight，再以无重启方式收敛到可验证的表盘状态；
+    只有已完成同一门禁/准备入口的父流程才可跳过对应阶段。
     """
     load_kwargs = {"target": target}
     if case_map_profile:
@@ -848,22 +880,19 @@ def run_single_case(
     if target not in {"hardware", "simulator"}:
         raise ValueError(f"未知执行目标: {target!r}")
     if candidate_replay:
-        if case.is_promoted:
-            raise ValueError("--candidate-replay 只允许复跑尚未晋升的临时候选")
+        if case.is_fixed_runnable:
+            raise ValueError("--candidate-replay 只允许复跑尚未进入固定执行的临时候选")
         if not case.has_candidate_mapping:
             raise ValueError("--candidate-replay 要求当前用例存在非空候选 actions")
     provenance = _result_provenance(
         target=target,
         case_map_profile=case_map_profile,
     )
-    hardware_runtime_profile = None
-    if target == "hardware":
-        from agent_loop_system.tools.hardware_runtime_profile import (
-            load_hardware_runtime_profile,
-        )
-
-        hardware_runtime_profile = load_hardware_runtime_profile(
-            project=str(provenance.get("project") or "") or None,
+    if case.is_execution_ready:
+        provenance["mapping_status"] = "EXECUTION_READY"
+    if hardware_recovery_reboot and not reset_hardware:
+        raise ValueError(
+            "hardware_recovery_reboot requires hardware state preparation"
         )
     if screenshot_path is None:
         run_stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%f")
@@ -878,10 +907,44 @@ def run_single_case(
 
     scope = (
         LLM_API_KEY_SCOPE_EXPLORATION
-        if not case.is_promoted and not candidate_replay
+        if not case.is_fixed_runnable and not candidate_replay
         else LLM_API_KEY_SCOPE_FIXED
     )
     with llm_api_key_scope(scope):
+        evidence_dir = Path(screenshot_path).resolve().parent
+        hardware_project = str(
+            provenance.get("project") or "6202_W5230"
+        )
+        if (
+            target == "hardware"
+            and external_executor is None
+            and not hardware_preflight_completed
+        ):
+            from agent_loop_system.tools.hardware_preflight import (
+                require_hardware_preflight,
+            )
+
+            require_hardware_preflight(
+                project=hardware_project,
+                evidence_dir=evidence_dir / "preflight",
+                persist_paths=(
+                    evidence_dir / "preflight.json",
+                    _RUNTIME_PATHS.environment_checks
+                    / hardware_project
+                    / "preflight.json",
+                ),
+            )
+
+        hardware_runtime_profile = None
+        if target == "hardware" and hardware_project != "579_Z1640":
+            from agent_loop_system.tools.hardware_runtime_profile import (
+                load_hardware_runtime_profile,
+            )
+
+            hardware_runtime_profile = load_hardware_runtime_profile(
+                project=hardware_project or None,
+            )
+
         if external_executor is not None:
             if target != "hardware":
                 raise ValueError("外部真机执行器只能用于 hardware target")
@@ -890,13 +953,18 @@ def run_single_case(
                 provenance=provenance,
             )
 
-        if not case.is_promoted and not candidate_replay:
+        if not case.is_fixed_runnable and not candidate_replay:
             exploration_kwargs = {
                 "screenshot_path": screenshot_path,
                 "target": target,
                 "project": str(provenance.get("project") or ""),
                 "reset_hardware": reset_hardware,
             }
+            if target == "hardware":
+                exploration_kwargs.update({
+                    "hardware_recovery_reboot": hardware_recovery_reboot,
+                    "hardware_preflight_completed": True,
+                })
             if hardware_runtime_profile is not None:
                 exploration_kwargs["hardware_runtime_profile"] = hardware_runtime_profile
             return _stamp_result_provenance(
@@ -910,13 +978,18 @@ def run_single_case(
         if target == "hardware":
             from agent_loop_system.tools.real_device import (
                 RealDeviceSession,
+                prepare_hardware_case_state,
                 reset_hardware_case_state,
             )
 
             _validate_hardware_case_commands(case, hardware_runtime_profile)
-            evidence_dir = Path(screenshot_path).resolve().parent
             if reset_hardware:
-                reset_hardware_case_state(evidence_dir=evidence_dir / "hardware-reset")
+                preparation = (
+                    reset_hardware_case_state
+                    if hardware_recovery_reboot
+                    else prepare_hardware_case_state
+                )
+                preparation(evidence_dir=evidence_dir / "hardware-preparation")
             session = RealDeviceSession(evidence_dir=evidence_dir)
         elif target == "simulator":
             session = SimulatorSession(get_simulator_exe())
@@ -959,13 +1032,23 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--execution-adapter",
-        choices=("watch_ble",),
+        choices=("watch_ble", "watch_579_ble"),
         help="显式选择非默认真机动作适配器；普通 Runner 不使用",
     )
     parser.add_argument(
         "--skip-hardware-reset",
         action="store_true",
         help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--hardware-preflight-completed",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--hardware-recovery-reboot",
+        action="store_true",
+        help="显式工程恢复：在 UART 与初始 USB 门禁通过后重启真机",
     )
     ble_selector = parser.add_mutually_exclusive_group()
     ble_selector.add_argument("--ble-address", help="watch_ble 的目标 BLE 地址")
@@ -978,8 +1061,22 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--execution-adapter cannot be combined with --candidate-replay")
     if args.skip_hardware_reset and args.target != "hardware":
         parser.error("--skip-hardware-reset requires --target hardware")
+    if args.hardware_preflight_completed and args.target != "hardware":
+        parser.error("--hardware-preflight-completed requires --target hardware")
+    if args.hardware_recovery_reboot and args.target != "hardware":
+        parser.error("--hardware-recovery-reboot requires --target hardware")
+    if args.hardware_recovery_reboot and args.skip_hardware_reset:
+        parser.error("--hardware-recovery-reboot cannot be combined with --skip-hardware-reset")
     if (args.ble_address or args.ble_name) and args.execution_adapter != "watch_ble":
         parser.error("--ble-address/--ble-name require --execution-adapter watch_ble")
+    if args.execution_adapter == "watch_579_ble" and args.case_map_profile != "579_Z1640":
+        parser.error(
+            "--execution-adapter watch_579_ble requires --case-map-profile 579_Z1640"
+        )
+    if args.case_map_profile == "579_Z1640" and args.execution_adapter != "watch_579_ble":
+        parser.error(
+            "--case-map-profile 579_Z1640 requires --execution-adapter watch_579_ble"
+        )
 
     external_executor: Callable[[CaseEntry, str], CaseRunResult] | None = None
     if args.execution_adapter == "watch_ble":
@@ -994,6 +1091,10 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         external_executor = execute_watch_ble
+    elif args.execution_adapter == "watch_579_ble":
+        from agent_loop_system.tools.watch_579_case import run_watch_579_case
+
+        external_executor = run_watch_579_case
 
     print(
         f"[test] 加载用例: target={args.target} "
@@ -1009,6 +1110,8 @@ def main(argv: list[str] | None = None) -> int:
         candidate_replay=args.candidate_replay,
         external_executor=external_executor,
         reset_hardware=not args.skip_hardware_reset,
+        hardware_preflight_completed=args.hardware_preflight_completed,
+        hardware_recovery_reboot=args.hardware_recovery_reboot,
     )
 
     print(
@@ -1029,6 +1132,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[test] reason: {decision.reason}")
 
     print(f"[test] 证据已落盘: {evidence_path}")
+    if args.execution_adapter == "watch_579_ble":
+        # 579 is deliberately execution-only until a real observation channel
+        # exists. A successful command/ACK path is therefore a successful
+        # process even though the product verdict remains CANNOT_VERIFY.
+        saved = json.loads(Path(evidence_path).read_text(encoding="utf-8"))
+        return 0 if saved.get("execution_status") == "OK" else 1
     return 0 if decision.verdict == "PASS" else 1
 
 
