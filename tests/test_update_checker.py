@@ -58,8 +58,11 @@ def test_auto_updater_writes_quoted_restart_commands(monkeypatch, tmp_path: Path
     )
     assert "$wsh.Run(('\"' + $exePath + '\"'), 0, $false)" in script
     assert "$wsh.Run(('python \"' + $pyLauncher + '\"'), 0, $false)" in script
-    assert 'Join-Path (Join-Path $AppRoot ".runtime") "update_staging"' in script
-    assert 'Copy-Item -Path (Join-Path $src "*") -Destination $dst' in script
+    assert '"tools"' in script
+    assert "update-transaction-" in script
+    assert "trap {" in script
+    assert "Move-Item -LiteralPath $dst -Destination $backup" in script
+    assert "已恢复升级前版本" in script
 
 
 def test_manifest_source_defaults_to_official_nas(monkeypatch) -> None:
@@ -75,7 +78,7 @@ def test_current_version_falls_back_to_source_version(monkeypatch, tmp_path: Pat
     monkeypatch.delenv("AGENT_LOOP_VERSION", raising=False)
     monkeypatch.setattr(runtime_root, "resolve_app_root", lambda: tmp_path)
 
-    assert get_current_system_version() == "0.4.7"
+    assert get_current_system_version() == "0.4.8"
 
 
 def test_manifest_source_precedence(monkeypatch) -> None:

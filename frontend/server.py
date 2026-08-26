@@ -7906,6 +7906,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 })
             return
 
+        if path == "/api/system/version":
+            self._json({"current_version": get_current_system_version()})
+            return
+
         if path == "/api/defects":
             page = self._positive_int(query, "page", 1)
             page_size = self._positive_int(query, "page_size", 20, maximum=100)
@@ -8619,12 +8623,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         if path == "/api/system/upgrade":
             from agent_loop_system.tools.auto_updater import (
                 AutoUpdaterError,
+                ensure_supercom_is_closed,
                 launch_update_script,
                 prepare_upgrade,
             )
             body = self._body_json() if self.headers.get("Content-Length") else {}
             manifest_source = str(body.get("manifest_source", "")).strip() or None
             try:
+                active_jobs = self.app.test_jobs.active_jobs()
+                if active_jobs:
+                    raise AutoUpdaterError(
+                        "有测试任务正在运行，请等待任务结束后再升级",
+                        error_code="ACTIVE_TEST_JOBS",
+                    )
+                ensure_supercom_is_closed()
                 upgrade_info = prepare_upgrade(self.app.paths.root, manifest_source=manifest_source)
                 staging_dir = Path(upgrade_info["staging_dir"])
                 launch_update_script(

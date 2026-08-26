@@ -20,9 +20,57 @@ if str(SOURCE_ROOT) not in sys.path:
 
 from agent_loop_system.version import __version__
 from agent_loop_system.runtime_root import RuntimePaths, load_app_env
+from agent_loop_system.tools.companion_tools import (
+    SUPERCOM_PAYLOAD_MANIFEST,
+    SUPERCOM_SEED_RELATIVE_PATH,
+    write_supercom_payload_manifest,
+)
 
 
 RELEASE_VERSION = __version__
+
+SUPERCOM_REQUIRED_FILES = {
+    "SuperCom.exe",
+    "SuperCom.exe.config",
+    "app_config.json",
+    "user_data.sqlite",
+    "EntityFramework.dll",
+    "EntityFramework.SqlServer.dll",
+    "HtmlAgilityPack.dll",
+    "ICSharpCode.AvalonEdit.dll",
+    "ITLDG.DataCheck.dll",
+    "Microsoft.WindowsAPICodePack.dll",
+    "Microsoft.WindowsAPICodePack.Shell.dll",
+    "MihaZupan.HttpToSocks5Proxy.dll",
+    "Newtonsoft.Json.dll",
+    "SuperControls.Style.dll",
+    "SuperUtils.dll",
+    "System.Data.SQLite.dll",
+    "System.Data.SQLite.EF6.dll",
+    "System.Data.SQLite.Linq.dll",
+    "System.Reactive.dll",
+    "System.Runtime.CompilerServices.Unsafe.dll",
+    "System.Threading.Tasks.Extensions.dll",
+    "AvalonEdit/Higlighting/ComLog.xshd",
+    "AvalonEdit/Higlighting/Telnet.xshd",
+    "x64/SQLite.Interop.dll",
+    "x86/SQLite.Interop.dll",
+}
+
+RELEASE_REQUIRED_FILES = {
+    "Agent-loop.exe",
+    "frontend/index.html",
+    "frontend/app.js",
+    "frontend/styles.css",
+    "README.md",
+}
+
+RELEASE_REQUIRED_PREFIXES = {
+    "_internal/",
+    f"{SUPERCOM_SEED_RELATIVE_PATH.as_posix()}/",
+    "case_map/",
+    "profiles/",
+}
 
 
 RELEASE_ENV_SAFE_COPY_KEYS = {
@@ -299,6 +347,73 @@ def sanitize_supercom_release_db(database_path: Path) -> None:
             connection.commit()
 
 
+def resolve_supercom_release_source(
+    runtime_paths: RuntimePaths,
+    explicit_source: Path | None = None,
+) -> Path:
+    """Resolve and validate the complete SuperCom runtime payload before PyInstaller."""
+
+    candidates: list[Path] = []
+    if explicit_source is not None:
+        candidates.append(explicit_source.resolve())
+    else:
+        project = runtime_paths.tool_workspaces / "SuperCom-AgentBridge" / "SuperCom" / "bin"
+        candidates.extend((project / "Release", project / "Debug"))
+
+    source = next((candidate for candidate in candidates if candidate.is_dir()), None)
+    if source is None:
+        attempted = ", ".join(str(candidate) for candidate in candidates) or "<none>"
+        raise FileNotFoundError(
+            "SuperCom release payload not found. Pass --supercom-source explicitly; "
+            f"attempted: {attempted}"
+        )
+
+    actual = {
+        path.relative_to(source).as_posix()
+        for path in source.rglob("*")
+        if path.is_file()
+    }
+    missing = sorted(SUPERCOM_REQUIRED_FILES - actual)
+    if missing:
+        raise RuntimeError(f"SuperCom release payload is incomplete: {missing}")
+    return source
+
+
+def validate_release_contract(target_dir: Path, *, configured_env: bool) -> None:
+    """Fail closed when a Windows release is missing a mandatory component."""
+
+    actual = {
+        path.relative_to(target_dir).as_posix()
+        for path in target_dir.rglob("*")
+        if path.is_file()
+    }
+    required = RELEASE_REQUIRED_FILES | {
+        f"tools/SuperCom/{path}" for path in SUPERCOM_REQUIRED_FILES
+    }
+    required.add(f"tools/SuperCom/{SUPERCOM_PAYLOAD_MANIFEST}")
+    required.update(
+        {
+            f"{SUPERCOM_SEED_RELATIVE_PATH.as_posix()}/{path}"
+            for path in SUPERCOM_REQUIRED_FILES | {SUPERCOM_PAYLOAD_MANIFEST}
+        }
+    )
+    if configured_env:
+        required.add(".env")
+    missing = sorted(required - actual)
+    missing_prefixes = sorted(
+        prefix for prefix in RELEASE_REQUIRED_PREFIXES if not any(
+            path.startswith(prefix) for path in actual
+        )
+    )
+    if missing or missing_prefixes:
+        raise RuntimeError(
+            "Release payload contract failed: "
+            f"missing_files={missing}, missing_prefixes={missing_prefixes}"
+        )
+    if configured_env and ".env.example" in actual:
+        raise RuntimeError("Internal release must contain .env only, not .env.example")
+
+
 def calc_sha256(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -346,6 +461,7 @@ def build_exe(
     workspace_root: Path | None = None,
     output_dir: Path | None = None,
     profile_source: Path | None = None,
+    supercom_source: Path | None = None,
     release_env_source: Path | None = None,
     configured_env: bool = False,
     clean: bool = True,
@@ -359,6 +475,10 @@ def build_exe(
         )
     load_app_env(app_root=root)
     runtime_paths = RuntimePaths.from_root(root)
+    resolved_supercom_source = resolve_supercom_release_source(
+        runtime_paths,
+        supercom_source,
+    )
     target_dir = (output_dir or (root / "dist" / "agent-loop-windows-x64")).resolve()
     work_dir = root / ".work" / "pyinstaller"
     if profile_source is not None and not profile_source.resolve().is_dir():
@@ -367,6 +487,22 @@ def build_exe(
         raise FileNotFoundError(f"Release env source not found: {release_env_source}")
     if configured_env and release_env_source is None:
         raise ValueError("--configured-env requires --release-env-source")
+    source_info = get_git_source_info(root)
+    supercom_source_info = get_git_source_info(resolved_supercom_source)
+    if configured_env:
+        dirty_sources = []
+        if not source_info.get("git_commit") or source_info.get("git_dirty") is not False:
+            dirty_sources.append("Agent-loop")
+        if (
+            not supercom_source_info.get("git_commit")
+            or supercom_source_info.get("git_dirty") is not False
+        ):
+            dirty_sources.append("SuperCom")
+        if dirty_sources:
+            raise RuntimeError(
+                "Internal release requires clean committed sources: "
+                + ", ".join(dirty_sources)
+            )
 
     if clean:
         if target_dir.exists():
@@ -412,6 +548,7 @@ def build_exe(
         "agent_loop_system.tools.ones",
         "agent_loop_system.tools.update_checker",
         "agent_loop_system.tools.auto_updater",
+        "agent_loop_system.tools.companion_tools",
         "agent_loop_system.tools.designer",
         "agent_loop_system.tools.llm_config",
         "frontend.server",
@@ -526,33 +663,30 @@ def build_exe(
             shutil.copy2(src_f, frontend_dst / static_file)
 
     # 5. tools/SuperCom (F11: Built-in SuperCom-AgentBridge serial bridge tool)
-    supercom_project = runtime_paths.tool_workspaces / "SuperCom-AgentBridge"
-    supercom_src = supercom_project / "SuperCom" / "bin" / "Release"
-    if not supercom_src.exists():
-        supercom_src = supercom_project / "SuperCom" / "bin" / "Debug"
-
+    supercom_src = resolved_supercom_source
     supercom_dst = target_dir / "tools" / "SuperCom"
-    if supercom_src.exists():
-        supercom_dst.mkdir(parents=True, exist_ok=True)
-        for item in supercom_src.iterdir():
-            if item.is_file():
-                if item.suffix.lower() in [".pdb", ".xml"]:
-                    continue
-                shutil.copy2(item, supercom_dst / item.name)
-            elif item.is_dir():
-                if item.name.lower() in ["installer", "logs", "backup", "app_logs", "monitor_data", ".vs"]:
-                    continue
-                shutil.copytree(item, supercom_dst / item.name, dirs_exist_ok=True)
+    supercom_dst.mkdir(parents=True, exist_ok=True)
+    for item in supercom_src.iterdir():
+        if item.is_file():
+            if item.suffix.lower() in [".pdb", ".xml"]:
+                continue
+            shutil.copy2(item, supercom_dst / item.name)
+        elif item.is_dir():
+            if item.name.lower() in ["installer", "logs", "backup", "app_logs", "monitor_data", ".vs"]:
+                continue
+            shutil.copytree(item, supercom_dst / item.name, dirs_exist_ok=True)
 
-        # Ensure default user_data.sqlite with saved commands is included
-        user_data_db = supercom_src / "user_data.sqlite"
-        if not user_data_db.exists():
-            user_data_db = runtime_paths.supercom_data / "user_data.sqlite"
-        if not user_data_db.exists():
-            user_data_db = supercom_project / "user_data.sqlite"
-        if user_data_db.exists():
-            shutil.copy2(user_data_db, supercom_dst / "user_data.sqlite")
-            sanitize_supercom_release_db(supercom_dst / "user_data.sqlite")
+    sanitize_supercom_release_db(supercom_dst / "user_data.sqlite")
+    write_supercom_payload_manifest(
+        supercom_dst,
+        release_version=RELEASE_VERSION,
+    )
+
+    # v0.4.6/v0.4.7 update scripts omit top-level ``tools``. Keep one
+    # validated seed inside ``_internal`` so v0.4.8 can repair SuperCom on its
+    # first start after an old-version upgrade.
+    embedded_supercom_dst = target_dir / SUPERCOM_SEED_RELATIVE_PATH
+    shutil.copytree(supercom_dst, embedded_supercom_dst, dirs_exist_ok=True)
 
     # Root configuration: public/template builds get .env.example; the internal
     # hardware package gets one portable preconfigured .env and no example file.
@@ -687,13 +821,16 @@ def build_exe(
         "### ③ 数据持久化与安全升级\n"
         "- **测试记录与证据**：保存于 `evidence/` 与 `history/` 目录。\n"
         "- **用例定义与映射**：保存于 `case_map/` 目录。\n"
-        "- **升级平台**：直接覆盖核心文件即可，所有用户测试数据、证据和用例均独立安全保留。\n\n"
+        "- **SuperCom 配置**：首次启动会把旧版 `user_data.sqlite` 迁移到当前用户的稳定数据目录，后续升级程序不会覆盖。\n"
+        "- **升级平台**：使用系统内置更新入口事务替换程序文件，所有用户测试数据、证据、用例和已有 `.env` 均独立保留。\n\n"
         "---\n\n"
         "## 4. 停止服务\n\n"
         "- 在启动控制台窗口中按下 `Ctrl + C`，或直接关闭控制台窗口即可安全退出。\n"
     )
     readme_content = readme_prefix + env_readme + readme_suffix
     (target_dir / "README.md").write_text(readme_content, encoding="utf-8")
+
+    validate_release_contract(target_dir, configured_env=configured_env)
 
     # Generate Manifest
     files_manifest: list[dict[str, object]] = []
@@ -714,8 +851,18 @@ def build_exe(
         "version": RELEASE_VERSION,
         "build_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "format": "windows-x64-onedir",
+        "package_kind": "internal" if configured_env else "template",
         "entry_point": "Agent-loop.exe",
-        "source": get_git_source_info(root),
+        "source": source_info,
+        "companion_tools": {
+            "SuperCom": {
+                "source": supercom_source_info,
+                "executable_sha256": calc_sha256(supercom_dst / "SuperCom.exe"),
+                "payload_manifest_sha256": calc_sha256(
+                    supercom_dst / SUPERCOM_PAYLOAD_MANIFEST
+                ),
+            }
+        },
         "total_files": len(files_manifest),
         "files": sorted(files_manifest, key=lambda x: str(x["path"])),
     }
@@ -828,11 +975,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build PyInstaller onedir distribution")
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--profile-source", type=Path, default=None)
+    parser.add_argument("--supercom-source", type=Path, default=None)
     parser.add_argument("--release-env-source", type=Path, default=None)
-    parser.add_argument(
+    release_mode = parser.add_mutually_exclusive_group(required=True)
+    release_mode.add_argument(
         "--configured-env",
         action="store_true",
         help="Build the internal hardware package with a portable preconfigured .env",
+    )
+    release_mode.add_argument(
+        "--template-env",
+        action="store_true",
+        help="Build a template package without internal credentials",
     )
     parser.add_argument("--no-clean", dest="clean", action="store_false", default=True)
     args = parser.parse_args()
@@ -840,6 +994,7 @@ if __name__ == "__main__":
     res = build_exe(
         output_dir=args.output_dir,
         profile_source=args.profile_source,
+        supercom_source=args.supercom_source,
         release_env_source=args.release_env_source,
         configured_env=args.configured_env,
         clean=args.clean,

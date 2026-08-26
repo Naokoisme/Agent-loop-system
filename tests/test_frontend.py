@@ -4496,7 +4496,12 @@ class FrontendDataTest(unittest.TestCase):
                 data = json.loads(resp.read().decode("utf-8"))
                 self.assertEqual(resp.status, 200)
                 self.assertIn("current_version", data)
-            
+
+        with urlopen(base + "/api/system/version", timeout=3) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(data["current_version"], "0.4.8")
+
         with urlopen(base + "/api/system/heartbeat", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)

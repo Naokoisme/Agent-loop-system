@@ -20,9 +20,9 @@ DEFAULT_NAS_ROOT = r"\\nas.topstepht.com\TOPSTEP\公用文件夹\软件工具\�
 DEFAULT_MANIFEST_PATH = os.path.join(DEFAULT_NAS_ROOT, "update-manifest.json")
 
 DATA_SAFETY_NOTICE = (
-    "数据安全保证：升级版本时仅需替换主程序 Agent-loop.exe、_internal 与前端资源；"
+    "数据安全保证：升级版本时事务替换 Agent-loop 与 SuperCom 程序文件；"
     "您的用户测试用例 (case_map/)、历史测试记录 (history/)、截图证据 (evidence/) 与环境变量 (.env) "
-    "均独立存放在数据层，升级时将被完整保留，不受任何影响。"
+    "均独立存放在数据层；SuperCom 的 user_data.sqlite 会迁移到稳定用户目录并保留。"
 )
 
 

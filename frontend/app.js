@@ -6371,11 +6371,12 @@ loadPlatformRegistries()
         });
         const data = await resp.json();
         if (!resp.ok) {
-          throw new Error(productApiError(data?.error || '更新失败', resp.status, data?.reason_code));
+          throw new Error(productApiError(data?.error || '更新失败', resp.status, data?.reason_code || data?.error_code));
         }
         if (upgradeOverlayStatus) {
           upgradeOverlayStatus.textContent = '正在重启，请稍候…';
         }
+        const targetVersion = String(data.target_version || '');
 
         // 3 秒缓冲等待旧进程退出与文件覆盖
         await new Promise(r => setTimeout(r, 3000));
@@ -6385,20 +6386,23 @@ loadPlatformRegistries()
         const pollTimer = setInterval(async () => {
           attempts++;
           try {
-            const checkResp = await fetch('/api/config', { cache: 'no-store' });
+            const checkResp = await fetch('/api/system/version', { cache: 'no-store' });
             if (checkResp.ok) {
-              clearInterval(pollTimer);
-              if (upgradeOverlayStatus) upgradeOverlayStatus.textContent = '更新完成，正在刷新…';
-              setTimeout(() => {
-                window.location.reload();
-              }, 1200);
+              const versionData = await checkResp.json();
+              if (String(versionData.current_version || '') === targetVersion) {
+                clearInterval(pollTimer);
+                if (upgradeOverlayStatus) upgradeOverlayStatus.textContent = '更新完成，正在刷新…';
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1200);
+              }
             }
           } catch (_) {
-            if (attempts >= maxAttempts) {
-              clearInterval(pollTimer);
-              if (upgradeOverlayStatus) {
-                upgradeOverlayStatus.innerHTML = '<span style="font-size: 14px; margin-bottom: 6px;">更新已完成，请进入新版本。</span><button onclick="window.location.reload()" class="button button-primary" style="background:#4f46e5;color:white;padding:10px 24px;cursor:pointer;border-radius:6px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(79,70,229,0.3);margin:8px auto 0 auto;border:none;">进入工作台</button>';
-              }
+          }
+          if (attempts >= maxAttempts) {
+            clearInterval(pollTimer);
+            if (upgradeOverlayStatus) {
+              upgradeOverlayStatus.textContent = `未确认已启动目标版本 v${targetVersion}，请查看 .runtime/update.log`;
             }
           }
         }, 1500);

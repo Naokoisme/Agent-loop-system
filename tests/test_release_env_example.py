@@ -5,13 +5,24 @@ import re
 import sqlite3
 import tomllib
 
+import pytest
+
 from scripts.build_exe import (
+    RELEASE_REQUIRED_FILES,
+    SUPERCOM_REQUIRED_FILES,
     copy_release_case_map,
     find_embedded_release_secrets,
     find_release_case_map_local_paths,
+    resolve_supercom_release_source,
     sanitize_supercom_release_db,
+    validate_release_contract,
     write_internal_hardware_env,
     write_release_env_example,
+)
+from agent_loop_system.runtime_root import RuntimePaths
+from agent_loop_system.tools.companion_tools import (
+    SUPERCOM_PAYLOAD_MANIFEST,
+    SUPERCOM_SEED_RELATIVE_PATH,
 )
 
 
@@ -316,3 +327,66 @@ def test_release_supercom_database_disables_saved_auto_connect(tmp_path: Path) -
         assert connection.execute(
             "SELECT ProjectName, Commands FROM advanced_send"
         ).fetchall() == [("保留命令", "TOP5STEP:GUI_PING:;")]
+
+
+def _write_files(root: Path, relative_paths: set[str]) -> None:
+    for relative in relative_paths:
+        path = root / Path(relative)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"test")
+
+
+def test_supercom_release_source_is_explicit_and_complete(tmp_path: Path) -> None:
+    source = tmp_path / "SuperCom"
+    _write_files(source, SUPERCOM_REQUIRED_FILES)
+
+    resolved = resolve_supercom_release_source(
+        RuntimePaths.from_root(tmp_path / "app"),
+        source,
+    )
+
+    assert resolved == source.resolve()
+
+
+def test_supercom_release_source_rejects_missing_runtime_dependency(tmp_path: Path) -> None:
+    source = tmp_path / "SuperCom"
+    _write_files(source, SUPERCOM_REQUIRED_FILES - {"System.Data.SQLite.dll"})
+
+    with pytest.raises(RuntimeError, match="System.Data.SQLite.dll"):
+        resolve_supercom_release_source(
+            RuntimePaths.from_root(tmp_path / "app"),
+            source,
+        )
+
+
+def test_internal_release_contract_requires_env_and_supercom(tmp_path: Path) -> None:
+    _write_files(tmp_path, RELEASE_REQUIRED_FILES)
+    _write_files(
+        tmp_path,
+        {
+            f"tools/SuperCom/{path}"
+            for path in SUPERCOM_REQUIRED_FILES | {SUPERCOM_PAYLOAD_MANIFEST}
+        },
+    )
+    _write_files(
+        tmp_path,
+        {
+            f"{SUPERCOM_SEED_RELATIVE_PATH.as_posix()}/{path}"
+            for path in SUPERCOM_REQUIRED_FILES | {SUPERCOM_PAYLOAD_MANIFEST}
+        },
+    )
+    _write_files(
+        tmp_path,
+        {
+            "_internal/runtime.bin",
+            "case_map/default.json",
+            "profiles/6202_W5230/latest.json",
+            ".env",
+        },
+    )
+
+    validate_release_contract(tmp_path, configured_env=True)
+
+    (tmp_path / ".env").unlink()
+    with pytest.raises(RuntimeError, match=r"\.env"):
+        validate_release_contract(tmp_path, configured_env=True)

@@ -13,12 +13,22 @@ from agent_loop_system.internal_dispatcher import (
     dispatch_internal_command,
 )
 from agent_loop_system.runtime_root import load_app_env, resolve_app_root
+from agent_loop_system.tools.companion_tools import (
+    CompanionToolError,
+    ensure_supercom_installation,
+)
 
 
 def main() -> int:
     args = sys.argv[1:]
     root = resolve_app_root()
     load_app_env(app_root=root)
+    try:
+        ensure_supercom_installation(root)
+    except CompanionToolError as exc:
+        # Keep the UI reachable so the persisted bootstrap error can tell the
+        # user to close SuperCom and restart. No unvalidated payload is used.
+        print(f"[SuperCom] {exc}", file=sys.stderr)
 
     # 确保 app_root 位于 sys.path 首位，保证动态载入 frontend.server 与插件模块
     root_str = str(root)
@@ -41,4 +51,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
