@@ -8,6 +8,7 @@
 - 620C 模拟器：`D:\Agent-loop\workspaces\firmware\620C_W6830`
 - 6202 真机：`D:\Agent-loop\workspaces\firmware\6202_W5230`
 - 6204 真机：`D:\Agent-loop\workspaces\firmware\6204_W5230`
+- 620F 电子吧唧：`D:\Agent-loop\workspaces\firmware\620F_W7830_v2.6.3`
 - `D:\TOPSTEP\shenju_w30` 只作上游参考。不要在那里开发、构建或打补丁。
 - 涉及固件源码诊断、修改、构建或重新生成 Runtime Profile 的真机工程任务，必须同时使用
   `W30_HARDWARE_SOURCE_ROOT` 和 `W30_HARDWARE_WORKSPACE_ROOT`；两者必须指向同一个、
@@ -48,3 +49,16 @@
   仍未知，而且该旧 UP3 不包含本次源码移植。
 - 开始 6204 截图、构建或运行配置工作前，先读
   `docs/6204-hardware-migration-current.md`。
+
+## 620F 当前边界
+
+- 620F 当前工作区固定在正式标签 `620F_W7830_v2.6.3`，根仓提交为
+  `15dbcb30cf6349eacd319e95d4d7be2f93f5307d`；旧 `620F_W7830` 目录只作历史基线。
+- 已在本地移植 Agent-loop QuickCmd、GUI 栅栏/窗口树、测试会话、MTP 文件截图和提示窗口
+  数字参数适配，并完成 C500、Ramrun、BL1、C400、签名和 UP3/OTA 打包验证。
+- 620F 已注册项目 `620F_W7830`、真机目标 `w30.620f.hardware`、Runtime Profile
+  `v2.6.3-agentloop.2` 和独立空用例目录 `case_map/620f_case_map`；尚未刷机或做真机验证。
+  不得复用 6202/6204 的命令表、坐标、截图或证据。
+- 本地适配尚未提交或推送。构建授权不包含刷机、真机控制、提交或推送。
+- 开始 620F 基线调整、协议移植、构建或运行配置工作前，先读
+  `docs/620f-workspace-current.md`。

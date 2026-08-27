@@ -70,6 +70,23 @@
       "enabled": true
     },
     {
+      "target_id": "w30.620f.hardware",
+      "platform_id": "w30",
+      "target_label": "620F W7830 电子吧唧真机",
+      "execution_target": "hardware",
+      "execution_target_label": "真机",
+      "execution_adapter": "w30_cli",
+      "case_catalog_adapter": "w30_case_map",
+      "health_adapter": "w30_hardware",
+      "runtime_profile_id": "620F_W7830",
+      "execution_resource": "w30.hardware",
+      "transport": "supercom",
+      "transport_label": "SuperCom 命名管道",
+      "capture_provider": "mtp",
+      "capture_label": "USB MTP 截图",
+      "enabled": true
+    },
+    {
       "target_id": "579.o2",
       "platform_id": "579",
       "target_label": "579 O2 真机",

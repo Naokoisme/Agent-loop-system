@@ -7,6 +7,7 @@ from collections import deque
 from concurrent.futures import Future as ConcurrentFuture
 from datetime import datetime
 import math
+import re
 import secrets
 import threading
 from typing import Any, Callable
@@ -111,6 +112,119 @@ def _advertisement_values(discovered: object) -> list[tuple[object, object | Non
     return normalized
 
 
+BLE_WORKBENCH_PROFILES: dict[str, dict[str, Any]] = {
+    "raw": {
+        "label": "通用 RAW",
+        "service_uuid": None,
+        "write_uuid": None,
+        "notify_uuid": None,
+        "write_with_response": True,
+        "decode_579": False,
+    },
+    "579": {
+        "label": "579 L1/L2",
+        "service_uuid": WATCH_579_SERVICE_UUID,
+        "write_uuid": WATCH_579_WRITE_UUID,
+        "notify_uuid": WATCH_579_NOTIFY_UUID,
+        "write_with_response": True,
+        "decode_579": True,
+    },
+    "w30": {
+        "label": "W30 RAW",
+        "service_uuid": WATCH_579_SERVICE_UUID,
+        "write_uuid": WATCH_579_WRITE_UUID,
+        "notify_uuid": WATCH_579_NOTIFY_UUID,
+        "write_with_response": True,
+        "decode_579": False,
+    },
+}
+
+
+def _profile_name(value: object) -> str:
+    profile = str(value or "raw").strip().casefold()
+    if profile not in BLE_WORKBENCH_PROFILES:
+        raise ValueError(f"unsupported BLE protocol profile: {value}")
+    return profile
+
+
+def _optional_uuid(value: object) -> str | None:
+    normalized = str(value or "").strip().casefold()
+    if not normalized:
+        return None
+    if len(normalized) > 200:
+        raise ValueError("GATT UUID is too long")
+    return normalized
+
+
+def _raw_payload(data: object, encoding: object = "hex") -> tuple[str, bytes]:
+    mode = str(encoding or "hex").strip().casefold()
+    text = str(data or "")
+    if mode == "utf8":
+        return mode, text.encode("utf-8")
+    if mode != "hex":
+        raise Watch579InvalidRawCommand("encoding must be hex or utf8")
+    compact = re.sub(r"[\s,;:_-]+", "", text.replace("0x", "").replace("0X", ""))
+    if len(compact) % 2:
+        raise Watch579InvalidRawCommand("HEX data must contain complete bytes")
+    if compact and not re.fullmatch(r"[0-9a-fA-F]+", compact):
+        raise Watch579InvalidRawCommand("HEX data contains a non-hex character")
+    try:
+        return mode, bytes.fromhex(compact)
+    except ValueError as exc:
+        raise Watch579InvalidRawCommand(f"invalid HEX data: {exc}") from exc
+
+
+def _characteristic_uuid(value: object) -> str | None:
+    if value is None:
+        return None
+    return _optional_uuid(getattr(value, "uuid", None) or value)
+
+
+def _gatt_services_view(services: object) -> list[dict[str, Any]]:
+    """Return a conservative, JSON-safe GATT tree across Bleak versions."""
+
+    try:
+        service_items = list(services)  # type: ignore[arg-type]
+    except (TypeError, AttributeError):
+        return []
+    result: list[dict[str, Any]] = []
+    for service in service_items:
+        service_uuid = _characteristic_uuid(service)
+        if not service_uuid:
+            continue
+        characteristics: list[dict[str, Any]] = []
+        for characteristic in list(getattr(service, "characteristics", None) or []):
+            characteristic_uuid = _characteristic_uuid(characteristic)
+            if not characteristic_uuid:
+                continue
+            properties = sorted(
+                str(item).strip().casefold()
+                for item in (getattr(characteristic, "properties", None) or [])
+                if str(item).strip()
+            )
+            characteristics.append(
+                {
+                    "uuid": characteristic_uuid,
+                    "description": str(
+                        getattr(characteristic, "description", "") or ""
+                    ).strip()
+                    or None,
+                    "handle": getattr(characteristic, "handle", None),
+                    "properties": properties,
+                }
+            )
+        result.append(
+            {
+                "uuid": service_uuid,
+                "description": str(getattr(service, "description", "") or "").strip()
+                or None,
+                "handle": getattr(service, "handle", None),
+                "characteristics": characteristics,
+            }
+        )
+    return result
+
+
 class Watch579BleBroker:
     """Own one BLE event loop, one GATT connection, and one serialized writer.
 
@@ -169,6 +283,15 @@ class Watch579BleBroker:
         self._rssi: int | None = None
         self._state = "disconnected"
         self._last_error: dict[str, str] | None = None
+        self._profile = "raw"
+        self._service_uuid: str | None = None
+        self._write_uuid: str | None = None
+        self._notify_uuid: str | None = None
+        self._write_with_response = True
+        self._write_characteristic: object | None = None
+        self._notify_characteristic: object | None = None
+        self._notify_subscribed = False
+        self._gatt_services: list[dict[str, Any]] = []
         self._decoder = Watch579FrameDecoder()
         self._command_lock = asyncio.Lock()
         self._gatt_write_lock = asyncio.Lock()
@@ -179,7 +302,7 @@ class Watch579BleBroker:
         self._events: deque[dict[str, Any]] = deque(maxlen=self._event_capacity)
         self._next_cursor = 1
         self._closed = False
-        self._emit("BROKER_STARTED", message="579 BLE Broker 已启动")
+        self._emit("BROKER_STARTED", message="BLE 工作台已启动")
 
     def _call(self, coroutine, *, timeout: float | None = None):
         if not self._thread.is_alive():
@@ -292,10 +415,22 @@ class Watch579BleBroker:
             "address": self._address or None,
             "name": self._name or None,
             "rssi": self._rssi,
-            "service_uuid": WATCH_579_SERVICE_UUID,
-            "write_uuid": WATCH_579_WRITE_UUID,
-            "notify_uuid": WATCH_579_NOTIFY_UUID,
-            "write_with_response": True,
+            "profile": self._profile,
+            "profile_label": BLE_WORKBENCH_PROFILES[self._profile]["label"],
+            "profiles": {
+                name: {
+                    key: value
+                    for key, value in definition.items()
+                    if key != "decode_579"
+                }
+                for name, definition in BLE_WORKBENCH_PROFILES.items()
+            },
+            "service_uuid": self._service_uuid,
+            "write_uuid": self._write_uuid,
+            "notify_uuid": self._notify_uuid,
+            "write_with_response": self._write_with_response,
+            "notify_subscribed": self._notify_subscribed,
+            "gatt_services": [dict(item) for item in self._gatt_services],
             "lease": {
                 "active": self._lease_token is not None,
                 "owner": self._lease_owner,
@@ -326,7 +461,36 @@ class Watch579BleBroker:
 
     def connect(self, *, address: object, timeout: object = 15) -> dict[str, Any]:
         return self._call(
-            self._connect(address=address, timeout=timeout, lease_token=None)
+            self._connect(
+                address=address,
+                timeout=timeout,
+                lease_token=None,
+                profile="579",
+            )
+        )
+
+    def connect_workbench(
+        self,
+        *,
+        address: object,
+        timeout: object = 15,
+        profile: object = "raw",
+        service_uuid: object = None,
+        write_uuid: object = None,
+        notify_uuid: object = None,
+        write_with_response: object = True,
+    ) -> dict[str, Any]:
+        return self._call(
+            self._connect(
+                address=address,
+                timeout=timeout,
+                lease_token=None,
+                profile=profile,
+                service_uuid=service_uuid,
+                write_uuid=write_uuid,
+                notify_uuid=notify_uuid,
+                write_with_response=write_with_response,
+            )
         )
 
     def connect_internal(
@@ -341,6 +505,7 @@ class Watch579BleBroker:
                 address=address,
                 timeout=timeout,
                 lease_token=str(lease_token or ""),
+                profile="579",
             )
         )
 
@@ -350,15 +515,26 @@ class Watch579BleBroker:
         address: object,
         timeout: object,
         lease_token: str | None,
+        profile: object,
+        service_uuid: object = None,
+        write_uuid: object = None,
+        notify_uuid: object = None,
+        write_with_response: object = True,
     ) -> dict[str, Any]:
         wanted = str(address or "").strip()
         if not wanted:
-            raise Watch579DeviceNotFound("579 BLE address is not configured")
+            raise Watch579DeviceNotFound("BLE address is not configured")
         if len(wanted) > 200:
             raise ValueError("BLE address is too long")
         connect_timeout = _positive_timeout(
             timeout, label="connect timeout", maximum=60
         )
+        selected_profile = _profile_name(profile)
+        defaults = BLE_WORKBENCH_PROFILES[selected_profile]
+        selected_service_uuid = _optional_uuid(service_uuid) or defaults["service_uuid"]
+        selected_write_uuid = _optional_uuid(write_uuid) or defaults["write_uuid"]
+        selected_notify_uuid = _optional_uuid(notify_uuid) or defaults["notify_uuid"]
+        selected_write_response = bool(write_with_response)
         if self._lease_token:
             if not lease_token or not secrets.compare_digest(
                 lease_token, self._lease_token
@@ -366,7 +542,15 @@ class Watch579BleBroker:
                 raise Watch579TargetBusy(
                     f"579 target is owned by automation task {self._lease_owner or ''}".strip()
                 )
-        if self.connected and _address_key(self._address) == _address_key(wanted):
+        if (
+            self.connected
+            and _address_key(self._address) == _address_key(wanted)
+            and self._profile == selected_profile
+            and self._service_uuid == selected_service_uuid
+            and self._write_uuid == selected_write_uuid
+            and self._notify_uuid == selected_notify_uuid
+            and self._write_with_response == selected_write_response
+        ):
             self._emit("CONNECTION_REUSED", address=self._address)
             return await self._status()
         if self._client is not None:
@@ -374,7 +558,12 @@ class Watch579BleBroker:
 
         self._state = "scanning"
         self._last_error = None
-        self._emit("CONNECT_REQUESTED", address=wanted, timeout=connect_timeout)
+        self._emit(
+            "CONNECT_REQUESTED",
+            address=wanted,
+            timeout=connect_timeout,
+            profile=selected_profile,
+        )
         values = await self._discover(connect_timeout)
         matches = [
             (device, advertisement)
@@ -407,30 +596,16 @@ class Watch579BleBroker:
             services = getattr(client, "services", None)
             if services is None:
                 raise Watch579GattProfileMismatch("connected device exposes no GATT services")
-            service = services.get_service(WATCH_579_SERVICE_UUID)
-            write = services.get_characteristic(WATCH_579_WRITE_UUID)
-            notify = services.get_characteristic(WATCH_579_NOTIFY_UUID)
-            if service is None or write is None or notify is None:
-                missing = [
-                    value
-                    for value, found in (
-                        (WATCH_579_SERVICE_UUID, service),
-                        (WATCH_579_WRITE_UUID, write),
-                        (WATCH_579_NOTIFY_UUID, notify),
-                    )
-                    if found is None
-                ]
-                raise Watch579GattProfileMismatch(
-                    "579 GATT profile is missing: " + ", ".join(missing)
-                )
-            self._write_characteristic = write
-            self._notify_characteristic = notify
+            self._profile = selected_profile
+            self._gatt_services = _gatt_services_view(services)
             self._decoder.reset()
-            # Notify subscription is the final readiness gate and always occurs
-            # before the first write can be accepted.
-            await asyncio.wait_for(
-                client.start_notify(notify, self._notification_callback),
+            await self._configure_gatt(
+                service_uuid=selected_service_uuid,
+                write_uuid=selected_write_uuid,
+                notify_uuid=selected_notify_uuid,
+                write_with_response=selected_write_response,
                 timeout=connect_timeout,
+                require_complete=selected_profile == "579",
             )
             self._device = device
             self._address = view["address"]
@@ -442,7 +617,8 @@ class Watch579BleBroker:
                 address=self._address,
                 name=self._name or None,
                 rssi=self._rssi,
-                notify_subscribed=True,
+                profile=self._profile,
+                notify_subscribed=self._notify_subscribed,
             )
             return await self._status()
         except asyncio.TimeoutError as exc:
@@ -459,6 +635,160 @@ class Watch579BleBroker:
             raise Watch579BleError(
                 f"BLE connection failed: {exc}", reason_code="BLE_CONNECT_FAILED"
             ) from exc
+
+    async def _configure_gatt(
+        self,
+        *,
+        service_uuid: str | None,
+        write_uuid: str | None,
+        notify_uuid: str | None,
+        write_with_response: bool,
+        timeout: float,
+        require_complete: bool,
+    ) -> None:
+        client = self._client
+        if client is None or not getattr(client, "is_connected", False):
+            raise Watch579Disconnected("BLE device is not connected")
+        services = getattr(client, "services", None)
+        if services is None:
+            raise Watch579GattProfileMismatch("connected device exposes no GATT services")
+        get_service = getattr(services, "get_service", None)
+        get_characteristic = getattr(services, "get_characteristic", None)
+        service = get_service(service_uuid) if service_uuid and callable(get_service) else None
+        write = (
+            get_characteristic(write_uuid)
+            if write_uuid and callable(get_characteristic)
+            else None
+        )
+        notify = (
+            get_characteristic(notify_uuid)
+            if notify_uuid and callable(get_characteristic)
+            else None
+        )
+        missing: list[str] = []
+        if require_complete:
+            for label, value in (
+                ("service UUID", service_uuid),
+                ("write UUID", write_uuid),
+                ("notify UUID", notify_uuid),
+            ):
+                if not value:
+                    missing.append(label)
+        for value, found in (
+            (service_uuid, service),
+            (write_uuid, write),
+            (notify_uuid, notify),
+        ):
+            if value and found is None:
+                missing.append(value)
+        if missing:
+            raise Watch579GattProfileMismatch(
+                "GATT profile is missing: " + ", ".join(missing)
+            )
+
+        old_notify = self._notify_characteristic
+        if self._notify_subscribed and old_notify is not None:
+            stop_notify = getattr(client, "stop_notify", None)
+            if callable(stop_notify):
+                try:
+                    await asyncio.wait_for(stop_notify(old_notify), timeout=timeout)
+                except Exception:
+                    pass
+        self._notify_subscribed = False
+        self._service_uuid = service_uuid
+        self._write_uuid = write_uuid
+        self._notify_uuid = notify_uuid
+        self._write_with_response = bool(write_with_response)
+        self._write_characteristic = write
+        self._notify_characteristic = notify
+        self._decoder.reset()
+        if notify is not None:
+            await asyncio.wait_for(
+                client.start_notify(notify, self._notification_callback),
+                timeout=timeout,
+            )
+            self._notify_subscribed = True
+
+    def configure_workbench(
+        self,
+        *,
+        profile: object = "raw",
+        service_uuid: object = None,
+        write_uuid: object = None,
+        notify_uuid: object = None,
+        write_with_response: object = True,
+        timeout: object = 15,
+    ) -> dict[str, Any]:
+        return self._call(
+            self._configure_workbench(
+                profile=profile,
+                service_uuid=service_uuid,
+                write_uuid=write_uuid,
+                notify_uuid=notify_uuid,
+                write_with_response=write_with_response,
+                timeout=timeout,
+            )
+        )
+
+    async def _configure_workbench(
+        self,
+        *,
+        profile: object,
+        service_uuid: object,
+        write_uuid: object,
+        notify_uuid: object,
+        write_with_response: object,
+        timeout: object,
+    ) -> dict[str, Any]:
+        if self._lease_token is not None:
+            raise Watch579TargetBusy(
+                f"579 target is owned by automation task {self._lease_owner or ''}".strip()
+            )
+        if not self.connected:
+            raise Watch579Disconnected("BLE device is not connected")
+        selected_profile = _profile_name(profile)
+        defaults = BLE_WORKBENCH_PROFILES[selected_profile]
+        selected_service_uuid = _optional_uuid(service_uuid) or defaults["service_uuid"]
+        selected_write_uuid = _optional_uuid(write_uuid) or defaults["write_uuid"]
+        selected_notify_uuid = _optional_uuid(notify_uuid) or defaults["notify_uuid"]
+        configure_timeout = _positive_timeout(
+            timeout, label="configure timeout", maximum=60
+        )
+        try:
+            await self._configure_gatt(
+                service_uuid=selected_service_uuid,
+                write_uuid=selected_write_uuid,
+                notify_uuid=selected_notify_uuid,
+                write_with_response=bool(write_with_response),
+                timeout=configure_timeout,
+                require_complete=selected_profile == "579",
+            )
+        except Watch579BleError as exc:
+            self._set_error(exc.reason_code, str(exc))
+            raise
+        except asyncio.TimeoutError as exc:
+            error = Watch579ConnectTimeout("GATT notification setup timed out")
+            self._set_error(error.reason_code, str(error))
+            raise error from exc
+        except Exception as exc:
+            error = Watch579BleError(
+                f"GATT configuration failed: {exc}",
+                reason_code="BLE_GATT_CONFIG_FAILED",
+            )
+            self._set_error(error.reason_code, str(error))
+            raise error from exc
+        self._profile = selected_profile
+        self._last_error = None
+        self._emit(
+            "GATT_CONFIGURED",
+            profile=self._profile,
+            service_uuid=self._service_uuid,
+            write_uuid=self._write_uuid,
+            notify_uuid=self._notify_uuid,
+            write_with_response=self._write_with_response,
+            notify_subscribed=self._notify_subscribed,
+        )
+        return await self._status()
 
     def _set_error(self, code: str, message: str) -> None:
         self._last_error = {"reason_code": code, "message": message}
@@ -496,6 +826,10 @@ class Watch579BleBroker:
         self._address = ""
         self._name = ""
         self._rssi = None
+        self._write_characteristic = None
+        self._notify_characteristic = None
+        self._notify_subscribed = False
+        self._gatt_services = []
         self._decoder.reset()
         self._state = "disconnected"
         self._emit("DISCONNECTED", address=old_address or None)
@@ -514,6 +848,9 @@ class Watch579BleBroker:
             return
         self._client = None
         self._device = None
+        self._write_characteristic = None
+        self._notify_characteristic = None
+        self._notify_subscribed = False
         self._decoder.reset()
         self._state = "disconnected"
         pending = self._pending_ack
@@ -523,19 +860,28 @@ class Watch579BleBroker:
             )
         self._emit("DISCONNECTED", address=self._address or None, unexpected=True)
 
-    def _notification_callback(self, _sender: object, data: bytearray) -> None:
+    def _notification_callback(self, sender: object, data: bytearray) -> None:
         if self._closed:
             return
         asyncio.run_coroutine_threadsafe(
-            self._process_notification(bytes(data)), self._loop
+            self._process_notification(
+                bytes(data), sender_uuid=_characteristic_uuid(sender)
+            ),
+            self._loop,
         )
 
-    async def _process_notification(self, data: bytes) -> None:
+    async def _process_notification(
+        self, data: bytes, *, sender_uuid: str | None = None
+    ) -> None:
         self._emit(
             "RX_NOTIFY",
             byte_count=len(data),
             packet_hex=format_hex(data),
+            characteristic_uuid=sender_uuid or self._notify_uuid,
+            profile=self._profile,
         )
+        if not BLE_WORKBENCH_PROFILES[self._profile]["decode_579"]:
+            return
         try:
             frames = self._decoder.feed(data)
         except Watch579ProtocolError as exc:
@@ -594,8 +940,105 @@ class Watch579BleBroker:
 
     def _require_client(self):
         if not self.connected or self._client is None:
-            raise Watch579Disconnected("579 watch is not connected and ready")
+            raise Watch579Disconnected("BLE device is not connected and ready")
         return self._client
+
+    def _require_write_characteristic(self) -> object:
+        if self._write_characteristic is None or not self._write_uuid:
+            raise Watch579GattProfileMismatch(
+                "select a writable GATT characteristic before sending"
+            )
+        return self._write_characteristic
+
+    def preview_raw(
+        self, *, data: object = "", encoding: object = "hex"
+    ) -> dict[str, Any]:
+        mode, payload = _raw_payload(data, encoding)
+        return {
+            "encoding": mode,
+            "data": str(data or ""),
+            "data_hex": format_hex(payload),
+            "byte_count": len(payload),
+            "write_uuid": self._write_uuid,
+            "write_with_response": self._write_with_response,
+        }
+
+    def send_raw_manual(
+        self,
+        *,
+        data: object = "",
+        encoding: object = "hex",
+        write_with_response: object = None,
+    ) -> dict[str, Any]:
+        mode, payload = _raw_payload(data, encoding)
+        response = (
+            self._write_with_response
+            if write_with_response is None
+            else bool(write_with_response)
+        )
+        return self._call(
+            self._send_raw(
+                payload=payload,
+                encoding=mode,
+                write_with_response=response,
+            )
+        )
+
+    async def _send_raw(
+        self,
+        *,
+        payload: bytes,
+        encoding: str,
+        write_with_response: bool,
+    ) -> dict[str, Any]:
+        self._authorize_write(source="page", lease_token=None)
+        async with self._command_lock:
+            self._authorize_write(source="page", lease_token=None)
+            client = self._require_client()
+            characteristic = self._require_write_characteristic()
+            tx_id = uuid.uuid4().hex
+            self._emit(
+                "TX_RAW",
+                tx_id=tx_id,
+                source="page",
+                profile=self._profile,
+                characteristic_uuid=self._write_uuid,
+                encoding=encoding,
+                packet_hex=format_hex(payload),
+                byte_count=len(payload),
+                write_with_response=write_with_response,
+            )
+            try:
+                async with self._gatt_write_lock:
+                    await client.write_gatt_char(
+                        characteristic,
+                        payload,
+                        response=write_with_response,
+                    )
+            except Exception as exc:
+                if not getattr(client, "is_connected", False):
+                    error = Watch579Disconnected(
+                        f"BLE device disconnected during write: {exc}"
+                    )
+                else:
+                    error = Watch579BleError(
+                        f"BLE write failed: {exc}", reason_code="BLE_WRITE_FAILED"
+                    )
+                self._set_error(error.reason_code, str(error))
+                raise error from exc
+            self._last_error = None
+            return {
+                "tx_id": tx_id,
+                "profile": self._profile,
+                "encoding": encoding,
+                "data_hex": format_hex(payload),
+                "byte_count": len(payload),
+                "write_uuid": self._write_uuid,
+                "write_with_response": write_with_response,
+                "gatt_write_completed": True,
+                "transport_acked": False,
+                "effect_verified": False,
+            }
 
     def preview(self, *, cmd: object, key: object, data: object = "") -> dict[str, Any]:
         try:
@@ -652,6 +1095,11 @@ class Watch579BleBroker:
         async with self._command_lock:
             self._authorize_write(source=source, lease_token=lease_token)
             client = self._require_client()
+            if self._profile != "579":
+                raise Watch579GattProfileMismatch(
+                    "579 protocol send requires the 579 L1/L2 profile"
+                )
+            characteristic = self._require_write_characteristic()
             packet = encode_raw_command(command, sequence=DEFAULT_SEQUENCE)
             tx_id = uuid.uuid4().hex
             start_cursor = self._next_cursor - 1
@@ -673,7 +1121,7 @@ class Watch579BleBroker:
             try:
                 async with self._gatt_write_lock:
                     await client.write_gatt_char(
-                        self._write_characteristic,
+                        characteristic,
                         packet,
                         response=True,
                     )

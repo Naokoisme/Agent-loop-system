@@ -78,7 +78,7 @@ def test_current_version_falls_back_to_source_version(monkeypatch, tmp_path: Pat
     monkeypatch.delenv("AGENT_LOOP_VERSION", raising=False)
     monkeypatch.setattr(runtime_root, "resolve_app_root", lambda: tmp_path)
 
-    assert get_current_system_version() == "0.4.8"
+    assert get_current_system_version() == "0.4.9"
 
 
 def test_manifest_source_precedence(monkeypatch) -> None:

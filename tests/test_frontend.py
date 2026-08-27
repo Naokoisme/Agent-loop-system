@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import copy
 import errno
 import json
@@ -173,6 +174,7 @@ class FrontendDataTest(unittest.TestCase):
             self.paths.case_map / "620C_simulator_case_map",
             self.paths.case_map / "6202_case_map",
             self.paths.case_map / "6202_simulator_case_map",
+            self.paths.case_map / "620f_case_map",
             self.paths.case_map / "579_case_map",
         ):
             path.mkdir(parents=True, exist_ok=True)
@@ -299,6 +301,7 @@ class FrontendDataTest(unittest.TestCase):
                 "6202_W5230_SIMULATOR",
                 [("CALC_001", "计算器")],
             ),
+            ("620f_case_map", "620F_W7830", []),
             ("579_case_map", "579_Z1640", []),
         ):
             ledger = self.paths.case_map / directory / "external_execution_history.jsonl"
@@ -911,6 +914,7 @@ class FrontendDataTest(unittest.TestCase):
         simulator = self.cases.list(project="620C_W6830")
         hardware = self.cases.list(project="6202_W5230")
         simulator_6202 = self.cases.list(project="6202_W5230_SIMULATOR")
+        badge_620f = self.cases.list(project="620F_W7830")
         watch_579 = self.cases.list(project="579_Z1640")
 
         self.assertEqual(simulator["project_label"], "620C W6830")
@@ -927,11 +931,15 @@ class FrontendDataTest(unittest.TestCase):
             simulator_6202["items"][0]["steps_text"],
             "在 6202 模拟器点击等号",
         )
+        self.assertEqual(badge_620f["project_label"], "620F W7830 电子吧唧")
+        self.assertEqual(badge_620f["execution_target"], "hardware")
+        self.assertEqual(badge_620f["items"], [])
         self.assertEqual(watch_579["execution_target"], "hardware")
         self.assertEqual(watch_579["items"][0]["mapping_status"], "EXECUTION_READY")
         self.assertTrue(watch_579["items"][0]["is_fixed_runnable"])
         self.assertFalse(watch_579["items"][0]["is_promoted"])
-        self.assertEqual(len(hardware["projects"]), 5)
+        self.assertEqual(len(hardware["projects"]), 6)
+        self.assertIn("620F_W7830", {item["project"] for item in hardware["projects"]})
         self.assertIn("579_O2", {item["project"] for item in hardware["projects"]})
         self.assertIn("579_Z1640", {item["project"] for item in hardware["projects"]})
         with self.assertRaisesRegex(ValueError, "PROJECT_NOT_FOUND"):
@@ -1812,7 +1820,12 @@ class FrontendDataTest(unittest.TestCase):
         self.assertNotIn("items", overview)
         with urlopen(base + "/api/tests/projects", timeout=3) as response:
             projects = json.loads(response.read().decode("utf-8"))
-        self.assertEqual(len(projects["items"]), 5)
+        self.assertEqual(len(projects["items"]), 6)
+        project_620f = next(
+            item for item in projects["items"] if item["project"] == "620F_W7830"
+        )
+        self.assertEqual(project_620f["target_id"], "w30.620f.hardware")
+        self.assertEqual(project_620f["runtime_profile_id"], "620F_W7830")
         self.assertEqual(overview["catalog_total"], 2)
         self.assertEqual(overview["recent_items"], [])
         with urlopen(base + "/api/tests/recent?limit=8", timeout=3) as response:
@@ -4455,6 +4468,24 @@ class FrontendDataTest(unittest.TestCase):
             cfg = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(cfg["hardware"]["profile_root"], hardware_profile_root)
             self.assertEqual(cfg["hardware"]["profile_version"], "v30-test.1")
+
+        with self._put_json(
+            base + "/api/environments/620F_W7830",
+            {
+                "paths": {
+                    "profile_root": hardware_profile_root,
+                    "profile_version": "v2.6.3-agentloop.2",
+                }
+            },
+        ) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(data["status"], "ok")
+        with urlopen(base + "/api/config", timeout=3) as resp:
+            cfg = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(
+                cfg["hardware"]["profile_version"], "v2.6.3-agentloop.2"
+            )
             
         post_cfg = {
             "llm": {"model": "gpt-4o-mini", "timeout": 60},
@@ -4500,7 +4531,7 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/system/version", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
-            self.assertEqual(data["current_version"], "0.4.8")
+            self.assertEqual(data["current_version"], "0.4.9")
 
         with urlopen(base + "/api/system/heartbeat", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
@@ -4670,18 +4701,25 @@ class FrontendDataTest(unittest.TestCase):
                 all_data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(
                 [item["address"] for item in all_data["items"]],
-                ["42:74:DC:C8:0A:02", "11:22:33:44:55:66"],
+                [
+                    "C8:0A:00:00:00:00",
+                    "42:74:DC:C8:0A:02",
+                    "11:22:33:44:55:66",
+                ],
             )
-            self.assertTrue(all(item["name"] for item in all_data["items"]))
+            self.assertEqual(all_data["items"][0]["name"], "")
 
             query = urlencode({"q": "c8:0a", "timeout": "3"})
             with urlopen(base + f"/api/hardware/ble/devices?{query}", timeout=3) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(resp.status, 200)
-            self.assertEqual(len(data["items"]), 1)
-            self.assertEqual(data["items"][0]["address"], "42:74:DC:C8:0A:02")
-            self.assertEqual(data["items"][0]["status"], "discovered")
-            self.assertFalse(data["items"][0]["connected"])
+            self.assertEqual(len(data["items"]), 2)
+            self.assertEqual(
+                [item["address"] for item in data["items"]],
+                ["C8:0A:00:00:00:00", "42:74:DC:C8:0A:02"],
+            )
+            self.assertTrue(all(item["status"] == "discovered" for item in data["items"]))
+            self.assertTrue(all(not item["connected"] for item in data["items"]))
             self.assertEqual(
                 scan_mock.await_args_list,
                 [call(timeout=3.0), call(timeout=3.0)],
@@ -4846,6 +4884,9 @@ class FrontendDataTest(unittest.TestCase):
                 self.connected = False
                 self.lease_active = False
                 self.calls = []
+                self.profile = "raw"
+                self.write_uuid = None
+                self.notify_uuid = None
 
             def status(self):
                 return {
@@ -4853,6 +4894,15 @@ class FrontendDataTest(unittest.TestCase):
                     "connected": self.connected,
                     "ready": self.connected,
                     "address": "41:42:72:6A:93:2D" if self.connected else None,
+                    "name": "Test BLE" if self.connected else None,
+                    "profile": self.profile,
+                    "profile_label": "通用 RAW" if self.profile == "raw" else self.profile,
+                    "service_uuid": None,
+                    "write_uuid": self.write_uuid,
+                    "notify_uuid": self.notify_uuid,
+                    "write_with_response": True,
+                    "notify_subscribed": bool(self.notify_uuid),
+                    "gatt_services": [],
                     "lease": {"active": self.lease_active, "owner": "batch" if self.lease_active else None},
                     "latest_cursor": 2,
                 }
@@ -4866,6 +4916,21 @@ class FrontendDataTest(unittest.TestCase):
                 if self.lease_active:
                     raise Watch579TargetBusy("owned by batch")
                 self.connected = True
+                return self.status()
+
+            def connect_workbench(self, **kwargs):
+                self.calls.append(("workbench-connect", kwargs))
+                self.connected = True
+                self.profile = kwargs.get("profile", "raw")
+                self.write_uuid = kwargs.get("write_uuid")
+                self.notify_uuid = kwargs.get("notify_uuid")
+                return self.status()
+
+            def configure_workbench(self, **kwargs):
+                self.calls.append(("workbench-configure", kwargs))
+                self.profile = kwargs.get("profile", "raw")
+                self.write_uuid = kwargs.get("write_uuid")
+                self.notify_uuid = kwargs.get("notify_uuid")
                 return self.status()
 
             def disconnect(self):
@@ -4883,6 +4948,19 @@ class FrontendDataTest(unittest.TestCase):
                 if self.lease_active:
                     raise Watch579TargetBusy("owned by batch")
                 return {"tx_id": "tx1", "transport_acked": True, "effect_verified": False}
+
+            def preview_raw(self, *, data, encoding):
+                self.calls.append(("raw-preview", data, encoding))
+                return {"encoding": encoding, "data_hex": "01 02", "byte_count": 2}
+
+            def send_raw_manual(self, *, data, encoding, write_with_response):
+                self.calls.append(("raw-send", data, encoding, write_with_response))
+                return {
+                    "tx_id": "raw1",
+                    "gatt_write_completed": True,
+                    "transport_acked": False,
+                    "effect_verified": False,
+                }
 
             def send_internal(self, *, lease_token, cmd, key, data):
                 self.calls.append(("internal", lease_token, cmd, key, data))
@@ -4904,6 +4982,45 @@ class FrontendDataTest(unittest.TestCase):
         with urlopen(base + "/api/hardware/579/events?after=1&limit=20", timeout=3) as response:
             event_payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual(event_payload["items"][0]["kind"], "RX_TRANSPORT_ACK")
+        with urlopen(base + "/api/hardware/ble/workbench/status", timeout=3) as response:
+            workbench_status = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(workbench_status["profile"], "raw")
+
+        with self._post_json(base + "/api/hardware/ble/workbench/connect", {
+            "address": "41:42:72:6A:93:2D",
+            "name": "Test BLE",
+            "timeout": 4,
+            "profile": "raw",
+            "service_uuid": None,
+            "write_uuid": None,
+            "notify_uuid": None,
+            "write_with_response": True,
+        }) as response:
+            generic_connected = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(generic_connected["connected"])
+        with self._post_json(base + "/api/hardware/ble/workbench/configure", {
+            "profile": "raw",
+            "service_uuid": "000001ff-3c17-d293-8e48-14fe2e4da212",
+            "write_uuid": "0000ff02-0000-1000-8000-00805f9b34fb",
+            "notify_uuid": "0000ff03-0000-1000-8000-00805f9b34fb",
+            "write_with_response": True,
+        }) as response:
+            configured = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(configured["notify_subscribed"])
+        with self._post_json(base + "/api/hardware/ble/workbench/preview", {
+            "data": "01 02",
+            "encoding": "hex",
+        }) as response:
+            raw_preview = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(raw_preview["byte_count"], 2)
+        with self._post_json(base + "/api/hardware/ble/workbench/send", {
+            "data": "01 02",
+            "encoding": "hex",
+            "write_with_response": True,
+        }) as response:
+            raw_sent = json.loads(response.read().decode("utf-8"))
+        self.assertTrue(raw_sent["gatt_write_completed"])
+        self.assertFalse(raw_sent["effect_verified"])
 
         with self._post_json(base + "/api/hardware/579/preview", {"cmd": "0x02", "key": "3b", "data": ""}) as response:
             preview = json.loads(response.read().decode("utf-8"))
@@ -5062,6 +5179,60 @@ class FrontendDataTest(unittest.TestCase):
         self.assertEqual(serial_ports["configured_port"], "")
         self.assertEqual(serial_ports["selected_port"], "")
         mock_get_status.assert_called_once_with("")
+
+    def test_prd_case_http_workflow_reviews_and_syncs_to_case_management(self) -> None:
+        application, base = self._server()
+        application.prd_cases.start_threads = False
+        application.prd_cases.skill_bundle = (
+            Path(__file__).resolve().parents[1]
+            / "resources"
+            / "skills"
+            / "xiaozhou-portable-skill-execution-quality-20260825.zip"
+        )
+        application.prd_cases.generator = lambda _text, _context: [{
+            "case_id": "PRD-HTTP-001",
+            "functional_module": "账号",
+            "feature": "登录",
+            "test_item": "密码登录",
+            "test_point": "有效凭据登录",
+            "title": "有效账号和密码登录成功",
+            "priority": "P0",
+            "preconditions": "账号已注册",
+            "steps": ["打开登录页", "输入有效账号和密码", "点击登录"],
+            "expected_results": ["显示登录页", "输入内容被接受", "进入首页并显示账号头像"],
+            "test_type": "功能",
+            "requirement_ids": ["REQ-HTTP-1"],
+            "note": "",
+        }]
+        content = "# 登录需求\n用户使用有效账号和密码登录后进入首页，并显示账号头像。"
+        with self._post_json(base + "/api/prd-cases/jobs", {
+            "project_id": "620C_W6830",
+            "filename": "login.md",
+            "file_base64": base64.b64encode(content.encode()).decode(),
+        }) as response:
+            created = json.load(response)
+        application.prd_cases.run_job(created["job_id"])
+        with urlopen(base + f"/api/prd-cases/jobs/{created['job_id']}/cases", timeout=3) as response:
+            cases = json.load(response)
+        self.assertEqual(cases["items"][0]["case_id"], "PRD-HTTP-001")
+        with self._post_json(base + f"/api/prd-cases/jobs/{created['job_id']}/review", {
+            "action": "approve",
+            "reviewer": "QA",
+            "comment": "审查通过",
+            "dimensions": ["wording", "classification", "order", "feature_boundary"],
+        }) as response:
+            reviewed = json.load(response)
+        self.assertEqual(reviewed["release"]["decision"], "GO")
+        with self._post_json(base + f"/api/prd-cases/jobs/{created['job_id']}/sync", {}) as response:
+            synced = json.load(response)
+        self.assertEqual(synced["created"], 1)
+        stored = application.case_store.get_case("620C_W6830", "PRD-HTTP-001")
+        self.assertEqual(stored["source_type"], "PRD_APPROVED")
+        with urlopen(base + "/prd-cases", timeout=3) as response:
+            self.assertIn("正常", response.read().decode("utf-8"))
+        with urlopen(base + f"/api/prd-cases/jobs/{created['job_id']}/download", timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            self.assertGreater(len(response.read()), 100)
 
 
 if __name__ == "__main__":

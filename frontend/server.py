@@ -44,6 +44,7 @@ from agent_loop_system.case_management import CaseManagementRepository
 from agent_loop_system.internal_dispatcher import build_child_command
 from agent_loop_system.outcome import outcome_fields
 from agent_loop_system.platforms.registry import PlatformRegistry
+from agent_loop_system.prd_cases import PrdCaseService
 from agent_loop_system.process_lifecycle import (
     DEFAULT_TERMINATION_GRACE_SECONDS as PROCESS_TERMINATION_GRACE_SECONDS,
     communicate_process as _communicate_process,
@@ -5311,6 +5312,13 @@ class WebApplication:
         self.case_store = CaseManagementRepository(
             paths.project_data / "case_management.sqlite3"
         )
+        self.prd_cases = PrdCaseService(
+            paths.root,
+            self.case_store,
+            project_lookup=lambda project_id: self.projects.get(
+                project_id, include_archived=False
+            ),
+        )
         self.cases = CaseMapRepository(paths, self.test_history, self.case_store)
         self.jobs = JobManager(paths, self.defects, self.history)
         self.test_jobs = CaseTestManager(
@@ -6329,10 +6337,8 @@ class BleDeviceManager:
         scan_timeout = self._timeout(timeout)
         with self._operation_lock:
             devices = asyncio.run(discover_ble_devices(timeout=scan_timeout))
-        named_devices = [
-            device for device in devices if str(device.name or "").strip()
-        ]
-        named_devices.sort(
+        visible_devices = [device for device in devices if str(device.address or "").strip()]
+        visible_devices.sort(
             key=lambda device: (
                 device.rssi is None,
                 -device.rssi if device.rssi is not None else 0,
@@ -6348,7 +6354,7 @@ class BleDeviceManager:
                 "status": "discovered",
                 "connected": False,
             }
-            for device in named_devices
+            for device in visible_devices
         ]
         if query:
             needle = query.casefold()
@@ -6403,6 +6409,20 @@ class BleDeviceManager:
                 )
             )
 
+        return self.remember(address=clean_address, name=clean_name)
+
+    def remember(
+        self,
+        *,
+        address: Any,
+        name: Any = None,
+        select_for_hardware: bool = True,
+    ) -> dict[str, Any]:
+        """Remember a device after another BLE owner verified the connection."""
+
+        clean_address = self._address(address)
+        clean_name = self._name(name)
+
         connected_at = _now()
         key = self._address_key(clean_address)
         with self._store_lock:
@@ -6429,18 +6449,19 @@ class BleDeviceManager:
             ]
             self._write_unlocked([item, *remaining])
 
-        # A successful explicit connection also selects the device for later
-        # on-demand BLE screenshots. No persistent GATT connection is kept.
-        _save_system_config(
-            self.paths,
-            {"hardware": {"ble_address": clean_address}},
-        )
+        if select_for_hardware:
+            # The legacy on-demand probe also selects the device for later BLE
+            # screenshots. The generic workbench only remembers it.
+            _save_system_config(
+                self.paths,
+                {"hardware": {"ble_address": clean_address}},
+            )
         return {
             **item,
             "status": "verified",
             "verified": True,
             "connected": False,
-            "selected": True,
+            "selected": select_for_hardware,
             "connection_mode": "on_demand",
         }
 
@@ -7231,9 +7252,11 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _watch_579_failure(self, exc: BaseException) -> None:
         reason_code = str(
-            getattr(exc, "reason_code", None) or "BLE_REQUEST_FAILED"
+            getattr(exc, "reason_code", None)
+            or ("INVALID_REQUEST" if isinstance(exc, ValueError) else "BLE_REQUEST_FAILED")
         )
         status = {
+            "INVALID_REQUEST": HTTPStatus.BAD_REQUEST,
             "INVALID_RAW_COMMAND": HTTPStatus.BAD_REQUEST,
             "TARGET_BUSY": HTTPStatus.CONFLICT,
             "BLE_DEVICE_NOT_FOUND": HTTPStatus.NOT_FOUND,
@@ -7349,6 +7372,33 @@ class RequestHandler(BaseHTTPRequestHandler):
                 query=keyword,
             )
             self._json({"items": projects, "total": len(projects)})
+            return
+
+        if path == "/api/prd-cases/jobs":
+            project_id = query.get("project_id", [""])[0]
+            items = self.app.prd_cases.list_jobs(project_id=project_id)
+            self._json({"items": items, "total": len(items)})
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/cases", path)
+        if match:
+            self._json(self.app.prd_cases.get_cases(match.group(1)))
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/download", path)
+        if match:
+            job = self.app.prd_cases.get_job(match.group(1))
+            workbook = self.app.prd_cases.workbook_path(match.group(1))
+            self._serve_binary(
+                workbook.read_bytes(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                f"{Path(str(job['filename'])).stem}-测试用例.xlsx",
+            )
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})", path)
+        if match:
+            self._json(self.app.prd_cases.get_job(match.group(1)))
             return
 
         if path == "/api/tests/projects":
@@ -7839,6 +7889,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             ))
             return
 
+        if path == "/api/hardware/ble/workbench/status":
+            self._json(self.app.watch_579_broker.status())
+            return
+
+        if path == "/api/hardware/ble/workbench/events":
+            self._json(self.app.watch_579_broker.events(
+                after=query.get("after", [0])[0],
+                limit=query.get("limit", [200])[0],
+            ))
+            return
+
         if path == "/api/hardware/serial-ports":
             configured_port = os.environ.get("W30_HARDWARE_PORT", "")
             try:
@@ -7998,7 +8059,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if (
-            path in {"/", "/tests", "/overview", "/cases", "/runs", "/reports", "/defects", "/environments", "/bluetooth"}
+            path in {"/", "/tests", "/overview", "/prd-cases", "/cases", "/runs", "/reports", "/defects", "/environments", "/bluetooth"}
             or re.fullmatch(r"/(defect|history)/[^/]+(?:/[^/]+)?", path)
             or re.fullmatch(r"/test/[^/]+/[^/]+", path)
             or re.fullmatch(r"/test-batch/[^/]+", path)
@@ -8011,6 +8072,46 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _post(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/prd-cases/jobs":
+            body = self._body_json()
+            job = self.app.prd_cases.create_job(
+                project_id=str(body.get("project_id") or body.get("project") or ""),
+                filename=str(body.get("filename") or ""),
+                file_base64=str(body.get("file_base64") or ""),
+                execution_profile=str(body.get("execution_profile") or "core"),
+            )
+            self._json(job, HTTPStatus.ACCEPTED)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/review", path)
+        if match:
+            body = self._body_json()
+            result = self.app.prd_cases.review(
+                match.group(1),
+                action=str(body.get("action") or ""),
+                reviewer=str(body.get("reviewer") or ""),
+                comment=str(body.get("comment") or ""),
+                case_comments=body.get("case_comments") if isinstance(body.get("case_comments"), list) else None,
+                dimensions=body.get("dimensions") or body.get("review_dimensions"),
+            )
+            self._json(result)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/regenerate", path)
+        if match:
+            body = self._body_json()
+            result = self.app.prd_cases.regenerate(
+                match.group(1), str(body.get("feedback") or "")
+            )
+            self._json(result, HTTPStatus.ACCEPTED)
+            return
+
+        match = re.fullmatch(r"/api/prd-cases/jobs/(prd-[a-f0-9]{32})/sync", path)
+        if match:
+            result = self.app.prd_cases.sync(match.group(1))
+            self._json(result)
+            return
+
         if path == "/api/projects":
             body = self._body_json()
             project = self.app.projects.create(body)
@@ -8491,6 +8592,96 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._json({"status": "ok", "message": "系统设置已保存并生效"})
             return
 
+        if path == "/api/hardware/ble/workbench/connect":
+            body = self._body_json()
+            write_with_response = body.get("write_with_response", True)
+            if not isinstance(write_with_response, bool):
+                raise ValueError("write_with_response 必须是布尔值")
+            try:
+                result = self.app.watch_579_broker.connect_workbench(
+                    address=body.get("address"),
+                    timeout=body.get(
+                        "timeout",
+                        os.environ.get("W30_HARDWARE_BLE_SCAN_TIMEOUT", "15"),
+                    ),
+                    profile=body.get("profile", "raw"),
+                    service_uuid=body.get("service_uuid"),
+                    write_uuid=body.get("write_uuid"),
+                    notify_uuid=body.get("notify_uuid"),
+                    write_with_response=write_with_response,
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self.app.ble_devices.remember(
+                address=result.get("address") or body.get("address"),
+                name=result.get("name") or body.get("name"),
+                select_for_hardware=False,
+            )
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/workbench/configure":
+            body = self._body_json()
+            write_with_response = body.get("write_with_response", True)
+            if not isinstance(write_with_response, bool):
+                raise ValueError("write_with_response 必须是布尔值")
+            try:
+                result = self.app.watch_579_broker.configure_workbench(
+                    profile=body.get("profile", "raw"),
+                    service_uuid=body.get("service_uuid"),
+                    write_uuid=body.get("write_uuid"),
+                    notify_uuid=body.get("notify_uuid"),
+                    write_with_response=write_with_response,
+                    timeout=body.get("timeout", 15),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/workbench/disconnect":
+            try:
+                result = self.app.watch_579_broker.disconnect()
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/workbench/preview":
+            body = self._body_json()
+            try:
+                result = self.app.watch_579_broker.preview_raw(
+                    data=body.get("data", ""),
+                    encoding=body.get("encoding", "hex"),
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
+        if path == "/api/hardware/ble/workbench/send":
+            body = self._body_json()
+            write_with_response = body.get("write_with_response")
+            if write_with_response is not None and not isinstance(
+                write_with_response, bool
+            ):
+                raise ValueError("write_with_response 必须是布尔值")
+            try:
+                result = self.app.watch_579_broker.send_raw_manual(
+                    data=body.get("data", ""),
+                    encoding=body.get("encoding", "hex"),
+                    write_with_response=write_with_response,
+                )
+            except Exception as exc:
+                self._watch_579_failure(exc)
+                return
+            self._json(result)
+            return
+
         if path == "/api/hardware/579/connect":
             body = self._body_json()
             try:
@@ -8738,9 +8929,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         if match:
             requested_environment = match.group(1)
             try:
-                target_id = self.app.platforms.target(requested_environment)["target_id"]
+                target_meta = self.app.platforms.target(requested_environment)
             except ValueError:
-                target_id = _test_project(requested_environment)["target_id"]
+                project_meta = _test_project(requested_environment)
+                target_meta = self.app.platforms.target(project_meta["target_id"])
+            target_id = str(target_meta["target_id"])
             body = self._body_json()
             if target_id == "579.o2":
                 payload = body.get("platform_579", body)
@@ -8755,7 +8948,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             paths_obj = body.get("paths", {})
             if isinstance(paths_obj, dict):
                 config_update = {"simulator": {}}
-                if target_id == "w30.6202.hardware":
+                if (
+                    target_meta.get("platform_id") == "w30"
+                    and target_meta.get("execution_target") == "hardware"
+                ):
                     hardware_update = {
                         key: paths_obj[key]
                         for key in ("profile_root", "profile_version")

@@ -759,6 +759,104 @@ class CaseManagementRepository:
             ).fetchone()
         return bool(row and str(row["source_fingerprint"]) == source_fingerprint)
 
+    def sync_approved_prd_cases(
+        self,
+        project: dict[str, Any],
+        cases: Iterable[dict[str, Any]],
+        *,
+        source_ref: dict[str, Any],
+        source_sha256: str,
+    ) -> dict[str, int]:
+        """Atomically publish one approved PRD workbook into case management.
+
+        The workbook and approval metadata form a frozen source baseline.  A
+        managed edit made later in case management is never overwritten by a
+        repeated or regenerated PRD sync; such rows are reported as conflicts.
+        """
+
+        normalized = [self.normalize_case(project, raw) for raw in cases]
+        case_ids = [case["case_id"] for case in normalized]
+        duplicates = sorted({case_id for case_id in case_ids if case_ids.count(case_id) > 1})
+        if duplicates:
+            raise ValueError("PRD_SYNC_DUPLICATE_CASE_ID: " + ", ".join(duplicates))
+        source_sha = str(source_sha256 or "").strip().upper()
+        if not re.fullmatch(r"[A-F0-9]{64}", source_sha):
+            raise ValueError("PRD_SYNC_SOURCE_SHA256_INVALID")
+
+        created = updated = unchanged = conflicts = 0
+        project_id = str(project["project_id"])
+        with self._lock, self._connect() as connection:
+            for case in normalized:
+                case_ref = copy.deepcopy(source_ref)
+                case_ref["case_id"] = case["case_id"]
+                row = connection.execute(
+                    "SELECT * FROM test_cases WHERE project_id=? AND case_id=?",
+                    (project_id, case["case_id"]),
+                ).fetchone()
+                if row is None:
+                    self._insert_case(
+                        connection,
+                        project,
+                        case,
+                        source_type="PRD_APPROVED",
+                        source_locked=True,
+                        source_ref=case_ref,
+                        source_sha256=source_sha,
+                        change_type="PRD_APPROVED_IMPORT",
+                        change_summary="经人工审查通过的 PRD 生成用例",
+                    )
+                    created += 1
+                    continue
+                if row["source_type"] != "PRD_APPROVED" or bool(row["has_managed_override"]):
+                    conflicts += 1
+                    self._audit(connection, project_id, case["case_id"], "PRD_SYNC_CONFLICT", {
+                        "existing_source_type": row["source_type"],
+                        "has_managed_override": bool(row["has_managed_override"]),
+                        "job_id": source_ref.get("job_id", ""),
+                    })
+                    continue
+                current = _loads(row["current_content_json"], {})
+                if _digest(current) == _digest(case) and row["source_sha256"] == source_sha:
+                    unchanged += 1
+                    continue
+                revision = int(row["current_revision"]) + 1
+                now = _now()
+                connection.execute(
+                    """UPDATE test_cases SET sheet=?, title=?, priority=?, workflow_state=?,
+                       applicable_platforms_json=?, source_ref_json=?, source_sha256=?,
+                       source_snapshot_json=?, current_revision=?, current_content_json=?, updated_at=?
+                       WHERE project_id=? AND case_id=?""",
+                    (
+                        case["sheet"], case["title"], case["priority"], case["workflow_state"],
+                        _json(case["applicable_platforms"]), _json(case_ref), source_sha,
+                        _json(case), revision, _json(case), now, project_id, case["case_id"],
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO case_revisions VALUES (?, ?, ?, ?, ?, 'PRD_APPROVED_SYNC', ?, 'local-user', ?)",
+                    (
+                        project_id, case["case_id"], revision, _json(case), _digest(case),
+                        "重新同步经审查通过的 PRD 用例", now,
+                    ),
+                )
+                self._insert_binding_rows(connection, project, case)
+                updated += 1
+            self._audit(connection, project_id, "", "PRD_APPROVED_SYNC", {
+                "job_id": source_ref.get("job_id", ""),
+                "source_sha256": source_sha,
+                "created": created,
+                "updated": updated,
+                "unchanged": unchanged,
+                "conflicts": conflicts,
+            })
+        return {
+            "created": created,
+            "updated": updated,
+            "unchanged": unchanged,
+            "conflicts": conflicts,
+            "total": len(normalized),
+        }
+
     def preview_import(
         self,
         project: dict[str, Any],

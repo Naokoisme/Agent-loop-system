@@ -15,6 +15,7 @@ DEFAULT_HARDWARE_PROJECT = "6202_W5230"
 _APP_QUICK_CMD_PATHS = {
     "6202_W5230": Path("app/comm/TuoBu/quick_cmd/gui_comm_quick_cmd.c"),
     "6204_W5230": Path("app/comm/quick_cmd/gui_comm_quick_cmd.c"),
+    "620F_W7830": Path("app/comm/TuoBu/quick_cmd/gui_comm_quick_cmd.c"),
 }
 
 

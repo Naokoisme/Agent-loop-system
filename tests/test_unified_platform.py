@@ -31,6 +31,19 @@ def test_w30_hardware_target_owns_a_reusable_runtime_profile() -> None:
     assert target["runtime_profile_id"] == "6202_W5230"
 
 
+def test_620f_is_registered_as_an_isolated_w30_hardware_target(tmp_path: Path) -> None:
+    platforms = PlatformRegistry()
+    target = platforms.target("w30.620f.hardware")
+    assert target["runtime_profile_id"] == "620F_W7830"
+    assert target["capture_provider"] == "mtp"
+
+    project = ProjectRegistry(tmp_path, platforms).resolve("620F_W7830")
+    assert project["target_id"] == "w30.620f.hardware"
+    assert project["runtime_profile_id"] == "620F_W7830"
+    assert project["case_map_profile"] == "620F_W7830"
+    assert project["case_catalog_path"] == "case_map/620f_case_map"
+
+
 def test_new_logical_project_inherits_runtime_profile_from_target(
     tmp_path: Path,
 ) -> None:

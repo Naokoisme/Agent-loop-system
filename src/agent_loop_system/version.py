@@ -1,3 +1,3 @@
 """Single runtime and release version source."""
 
-__version__ = "0.4.8"
+__version__ = "0.4.9"

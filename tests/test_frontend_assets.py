@@ -64,6 +64,20 @@ class FrontendAssetsTest(unittest.TestCase):
         self.assertNotIn("缺陷闭环", self.index)
         self.assertNotIn("缺陷闭环", self.javascript)
 
+    def test_prd_case_navigation_precedes_case_management(self) -> None:
+        prd = 'data-route="/prd-cases" data-nav="prd-cases"'
+        cases = 'data-route="/cases" data-nav="cases"'
+        self.assertIn(prd, self.index)
+        self.assertIn(cases, self.index)
+        self.assertLess(self.index.index(prd), self.index.index(cases))
+        self.assertIn("if (parts[0] === 'prd-cases'", self.javascript)
+        for dimension in ("wording", "classification", "order", "boundary"):
+            self.assertIn(f'id="prd-dim-{dimension}">', self.javascript)
+            self.assertNotIn(f'id="prd-dim-{dimension}" checked', self.javascript)
+
+    def test_prd_project_options_include_stable_project_ids(self) -> None:
+        self.assertIn("${item.project_name || item.project_id} · ${item.project_id}", self.javascript)
+
     def test_run_form_submits_defect_and_explicit_project_only(self) -> None:
         self.assertIn("defect: String(defect.number)", self.javascript)
         self.assertIn("project: repairProject.project", self.javascript)
@@ -286,20 +300,29 @@ class FrontendAssetsTest(unittest.TestCase):
         for token in (".environment-check-detail", ".environment-log .inline-diagnostics", ".check-field-label"):
             self.assertIn(token, self.stylesheet)
 
-    def test_bluetooth_is_a_top_level_workbench_not_a_settings_manager(self) -> None:
+    def test_bluetooth_workbench_is_embedded_in_system_settings(self) -> None:
         for token in (
-            'href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"',
             'id="global-project-switch"',
-            "前往蓝牙工作台",
+            'data-settings-tab="bluetooth"',
+            'data-settings-pane="bluetooth"',
+            'id="settings-bluetooth-root"',
         ):
             self.assertIn(token, self.index)
+        for token in (
+            'href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"',
+            "前往蓝牙工作台",
+            "ble-workbench-entry",
+        ):
+            self.assertNotIn(token, self.index)
 
         for token in (
             "当前固件阻塞",
             "WATCH_579_EXECUTION_BLOCKED",
             "平台已阻止单条、批次和候选复跑",
             "579 不使用 W30 真机运行档案",
-            "pageUrl('/bluetooth')",
+            "BluetoothPage({embedded: true})",
+            "agent-loop:open-settings",
+            "data-open-bluetooth-settings",
         ):
             self.assertIn(token, self.javascript)
         for old_id in (
@@ -311,33 +334,40 @@ class FrontendAssetsTest(unittest.TestCase):
         ):
             self.assertNotIn(old_id, self.index)
         for token in (
-            "function BluetoothPage()",
-            "'/api/hardware/579/status'",
-            "'/api/hardware/579/connect'",
-            "'/api/hardware/579/disconnect'",
+            "function BluetoothPage({embedded = false} = {})",
+            "'/api/hardware/ble/workbench/status'",
+            "'/api/hardware/ble/workbench/connect'",
+            "'/api/hardware/ble/workbench/configure'",
+            "'/api/hardware/ble/workbench/disconnect'",
+            "'/api/hardware/ble/workbench/preview'",
+            "'/api/hardware/ble/workbench/send'",
             "'/api/hardware/579/preview'",
             "'/api/hardware/579/send'",
-            "'/api/hardware/ble/connect'",
-            "hardware_579: {ble_address:",
-            "hardware: {ble_address:",
+            "通用 RAW",
+            "579 L1/L2",
+            "W30 RAW",
+            "GATT 配置",
+            "BLE TX / RX 日志",
+            "显示未命名设备",
             "data-bt-preset=\"find\"",
             "data-bt-preset=\"calc\"",
             "data-bt-preset=\"button\"",
-            "effect_verified=false",
+            "ACK ≠ 效果",
             "latestStatus?.lease?.active",
             "data-ble-mutable",
         ):
             self.assertIn(token, self.javascript)
+        self.assertNotIn("currentProject() === '6202_W5230' ? '6202' : '579'", self.javascript)
         for token in (
             ".bluetooth-workbench-grid",
             ".bluetooth-command-fields",
             ".bluetooth-event-log",
+            ".bluetooth-settings-workbench",
         ):
             self.assertIn(token, self.stylesheet)
 
     def test_ble_discovery_copy_uses_plain_device_language(self) -> None:
         for token in (
-            "扫描结果只用于精确选择地址",
             "找到 ${devices.length} 个蓝牙设备",
             "没有匹配的扫描结果",
             "未命名设备",
@@ -349,6 +379,7 @@ class FrontendAssetsTest(unittest.TestCase):
             "发现 ${bleDiscoveredDevices.length} 台手表",
             "本次扫描未发现匹配手表",
             "BLE 超时必须",
+            "扫描结果只用于精确选择地址",
         ):
             self.assertNotIn(token, self.javascript)
 
@@ -516,8 +547,8 @@ class FrontendAssetsTest(unittest.TestCase):
             self.assertIn(token, self.javascript)
 
     def test_frontend_assets_are_versioned_for_external_browser_refresh(self) -> None:
-        self.assertIn('/assets/styles.css?v=20260824-3', self.index)
-        self.assertIn('/assets/app.js?v=20260824-3', self.index)
+        self.assertIn('/assets/styles.css?v=20260826-1', self.index)
+        self.assertIn('/assets/app.js?v=20260826-1', self.index)
 
     def test_metric_cards_filter_the_defect_queue_and_keep_url_state(self) -> None:
         for token in (

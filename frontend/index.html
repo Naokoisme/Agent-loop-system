@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
   <title>Agent-loop 自动化测试平台</title>
-  <link rel="stylesheet" href="/assets/styles.css?v=20260824-3">
-  <script defer src="/assets/app.js?v=20260824-3"></script>
+  <link rel="stylesheet" href="/assets/styles.css?v=20260826-1">
+  <script defer src="/assets/app.js?v=20260826-1"></script>
 </head>
 <body>
   <header class="topbar">
@@ -16,12 +16,12 @@
     </a>
     <nav class="primary-nav" aria-label="工作台一级导航">
       <a href="/tests?view=overview" data-route="/overview" data-nav="overview"><span aria-hidden="true">⌂</span>项目总览</a>
+      <a href="/prd-cases" data-route="/prd-cases" data-nav="prd-cases"><span aria-hidden="true">✦</span>PRD 转用例</a>
       <a href="/tests?view=cases" data-route="/cases" data-nav="cases"><span aria-hidden="true">▤</span>用例管理</a>
       <a href="/tests?view=runs" data-route="/runs" data-nav="runs"><span aria-hidden="true">◉</span>自动化执行</a>
       <a href="/tests?view=reports" data-route="/reports" data-nav="reports"><span aria-hidden="true">▥</span>测试报告</a>
       <a href="/tests?view=defects" data-route="/defects" data-nav="defects"><span aria-hidden="true">◴</span>ONES 缺陷</a>
       <a href="/tests?view=environments" data-route="/environments" data-nav="environments"><span aria-hidden="true">⚙</span>环境中心</a>
-      <a href="/bluetooth" data-route="/bluetooth" data-nav="bluetooth"><span aria-hidden="true">⌁</span>蓝牙工作台</a>
     </nav>
     <div class="topbar-actions">
       <button id="update-badge" class="button button-secondary update-badge" type="button" style="display: none;">发现新版本</button>
@@ -81,7 +81,7 @@
       <img id="image-preview-image" alt="">
     </div>
   </dialog>
-  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title" style="max-width: 960px; width: 94vw;">
+  <dialog id="system-settings-dialog" class="import-dialog settings-dialog" aria-labelledby="settings-dialog-title">
     <form id="system-settings-form">
       <header class="dialog-head">
         <div>
@@ -94,9 +94,10 @@
         <button type="button" class="settings-tab-btn is-active" data-settings-tab="llm">模型服务</button>
         <button type="button" class="settings-tab-btn" data-settings-tab="ones">ONES 平台</button>
         <button type="button" class="settings-tab-btn" data-settings-tab="hardware">真机连接</button>
+        <button type="button" class="settings-tab-btn" data-settings-tab="bluetooth">蓝牙工作台</button>
       </div>
 
-      <div class="dialog-body" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+      <div class="dialog-body settings-dialog-body">
         <!-- Tab 1: LLM (用户配置服务状态卡片与连通性测试) -->
         <div class="settings-tab-pane" data-settings-pane="llm" style="display: flex; flex-direction: column; gap: 14px;">
           <div class="llm-settings-card">
@@ -220,13 +221,11 @@
               </select>
             </div>
           </div>
-          <div class="ble-workbench-entry">
-            <div>
-              <strong>蓝牙设备与指令</strong>
-              <p>579 指令执行与 6202 BLE 截图设备已迁移到独立页面。</p>
-            </div>
-            <a class="button button-secondary" href="/bluetooth" data-route="/bluetooth">前往蓝牙工作台</a>
-          </div>
+        </div>
+
+        <!-- Tab 4: Bluetooth -->
+        <div class="settings-tab-pane settings-bluetooth-pane" data-settings-pane="bluetooth" style="display: none; flex-direction: column;">
+          <div id="settings-bluetooth-root" class="settings-bluetooth-root"></div>
         </div>
 
       </div>

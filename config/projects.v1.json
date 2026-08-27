@@ -65,6 +65,27 @@
       "updated_at": "2026-08-24T11:36:12+08:00"
     },
     {
+      "project_id": "620F_W7830",
+      "project_name": "620F W7830 电子吧唧",
+      "case_catalog": {
+        "type": "w30_case_map",
+        "root": "case_map/620f_case_map",
+        "profile": "620F_W7830"
+      },
+      "allowed_platforms": [
+        "w30"
+      ],
+      "default_platform": "w30",
+      "allowed_targets": [
+        "w30.620f.hardware"
+      ],
+      "default_target": "w30.620f.hardware",
+      "status": "active",
+      "built_in": true,
+      "created_at": "2026-08-26T14:57:03+08:00",
+      "updated_at": "2026-08-26T14:57:03+08:00"
+    },
+    {
       "project_id": "579_O2",
       "project_name": "579 O2 真机",
       "case_catalog": {

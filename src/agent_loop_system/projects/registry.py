@@ -42,6 +42,7 @@ class ProjectRegistry:
             self._seed("620C_W6830", "620C W6830", "w30.620c.simulator", "case_map/620C_simulator_case_map", "620C_W6830"),
             self._seed("6202_W5230_SIMULATOR", "6202 W5230", "w30.6202.simulator", "case_map/6202_simulator_case_map", "6202_W5230_SIMULATOR"),
             self._seed("6202_W5230", "6202 W5230", "w30.6202.hardware", "case_map/6202_case_map", "6202_W5230"),
+            self._seed("620F_W7830", "620F W7830 电子吧唧", "w30.620f.hardware", "case_map/620f_case_map", "620F_W7830"),
             self._seed("579_O2", "579 O2 真机", "579.o2", "case_map/579_case_map", "579_O2"),
             self._seed("579_Z1640", "579 Z1640 真机", "579.z1640", "case_map/579_case_map", "579_Z1640"),
         ]

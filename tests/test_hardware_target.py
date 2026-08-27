@@ -85,6 +85,31 @@ class HardwareTargetConfigTest(unittest.TestCase):
                 / "gui_comm_quick_cmd.c",
             )
 
+    def test_620f_uses_the_tuobu_quick_cmd_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._tree(root, project="620F_W7830")
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "W30_HARDWARE_SOURCE_ROOT": str(root),
+                    "W30_HARDWARE_WORKSPACE_ROOT": str(root),
+                    "W30_HARDWARE_PROJECT": "620F_W7830",
+                },
+                clear=True,
+            ):
+                config = HardwareTargetConfig.from_env()
+            self.assertEqual(config.project, "620F_W7830")
+            self.assertEqual(
+                config.app_quick_cmd,
+                root.resolve()
+                / "app"
+                / "comm"
+                / "TuoBu"
+                / "quick_cmd"
+                / "gui_comm_quick_cmd.c",
+            )
+
     def test_project_mismatch_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

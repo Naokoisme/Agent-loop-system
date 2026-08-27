@@ -39,15 +39,43 @@ class FakeScanner:
 
 class FakeServices:
     def __init__(self) -> None:
-        self.service = object()
-        self.write = object()
-        self.notify = object()
+        self.write = FakeCharacteristic(
+            "0000ff02-0000-1000-8000-00805f9b34fb",
+            ["write"],
+        )
+        self.notify = FakeCharacteristic(
+            "0000ff03-0000-1000-8000-00805f9b34fb",
+            ["notify"],
+        )
+        self.service = FakeService(
+            "000001ff-3c17-d293-8e48-14fe2e4da212",
+            [self.write, self.notify],
+        )
+
+    def __iter__(self):
+        return iter([self.service] if self.service is not None else [])
 
     def get_service(self, _uuid: str):
         return self.service
 
     def get_characteristic(self, uuid: str):
         return self.notify if "ff03" in uuid else self.write
+
+
+class FakeCharacteristic:
+    def __init__(self, uuid: str, properties: list[str]) -> None:
+        self.uuid = uuid
+        self.properties = properties
+        self.description = "fake characteristic"
+        self.handle = 2
+
+
+class FakeService:
+    def __init__(self, uuid: str, characteristics: list[FakeCharacteristic]) -> None:
+        self.uuid = uuid
+        self.characteristics = characteristics
+        self.description = "fake service"
+        self.handle = 1
 
 
 class FakeClient:
@@ -241,6 +269,55 @@ class Watch579BleBrokerTests(unittest.TestCase):
         with self.assertRaises(Watch579Disconnected):
             broker.send_manual(cmd="02", key="3B", data="")
         self.assertEqual(factory.instances, [])
+
+    def test_generic_raw_connect_discovers_gatt_then_sends_exact_bytes(self) -> None:
+        broker, _scanner, factory, _own = self.make_broker()
+        status = broker.connect_workbench(
+            address=self.address,
+            timeout=1,
+            profile="raw",
+        )
+        self.assertTrue(status["ready"])
+        self.assertEqual(status["profile"], "raw")
+        self.assertEqual(status["write_uuid"], None)
+        self.assertEqual(len(status["gatt_services"]), 1)
+
+        configured = broker.configure_workbench(
+            profile="raw",
+            service_uuid="000001ff-3c17-d293-8e48-14fe2e4da212",
+            write_uuid="0000ff02-0000-1000-8000-00805f9b34fb",
+            notify_uuid="0000ff03-0000-1000-8000-00805f9b34fb",
+            write_with_response=False,
+            timeout=1,
+        )
+        self.assertTrue(configured["notify_subscribed"])
+        result = broker.send_raw_manual(
+            data="01, 02 ff",
+            encoding="hex",
+            write_with_response=False,
+        )
+        self.assertTrue(result["gatt_write_completed"])
+        self.assertFalse(result["transport_acked"])
+        self.assertFalse(result["effect_verified"])
+        self.assertEqual(factory.instances[0].writes[-1], (b"\x01\x02\xff", False))
+
+    def test_w30_raw_notification_is_not_decoded_as_579(self) -> None:
+        broker, _scanner, factory, _own = self.make_broker()
+        status = broker.connect_workbench(
+            address=self.address,
+            timeout=1,
+            profile="w30",
+        )
+        self.assertEqual(status["profile"], "w30")
+        client = factory.instances[0]
+        assert client.callback is not None
+        client.callback(None, bytearray.fromhex("AB0000060AED008C020092000101"))
+        broker.status()
+        self.assertEqual(client.writes, [])
+        kinds = [item["kind"] for item in broker.events(after=0)["items"]]
+        self.assertIn("RX_NOTIFY", kinds)
+        self.assertNotIn("RX_DATA", kinds)
+        self.assertNotIn("TX_HOST_ACK", kinds)
 
 
 if __name__ == "__main__":

@@ -587,6 +587,24 @@ class MtpCaptureProviderTest(unittest.TestCase):
         self.assertEqual((frame.metadata.width, frame.metadata.height), (466, 466))
         self.assertEqual(frame.metadata.data_size, 466 * 466 * 3)
 
+    def test_provider_uses_620f_project_geometry(self) -> None:
+        serial = FakeBorrowedSession()
+        mtp = FakeMtpSystem(width=466, height=466)
+        with mock.patch.dict(
+            "os.environ", {"W30_HARDWARE_PROJECT": "620F_W7830"}
+        ):
+            provider = MtpCaptureProvider(
+                serial,
+                sequence_start=6200,
+                usb_timeout=0.1,
+                mtp_timeout=0.1,
+                mtp_system=mtp,
+            )
+            frame = provider.capture(timeout=0.01)
+
+        self.assertEqual((frame.metadata.width, frame.metadata.height), (466, 466))
+        self.assertEqual(frame.metadata.data_size, 466 * 466 * 3)
+
     def test_provider_borrows_serial_and_returns_generic_frame(self) -> None:
         serial = FakeBorrowedSession()
         mtp = FakeMtpSystem()

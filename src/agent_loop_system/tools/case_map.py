@@ -1,7 +1,7 @@
 """映射表加载 + 用例执行：查表顺序发命令 + 采集终端 JSON。
 
 映射按执行项目隔离在 ``case_map/620C_simulator_case_map``、
-``case_map/6202_case_map``、``case_map/579_case_map`` 和
+``case_map/6202_case_map``、``case_map/620f_case_map``、``case_map/579_case_map`` 和
 ``case_map/6202_simulator_case_map``，
 不得跨项目静默回退。
 实际格式为扁平三段式：setup（前置）→ actions（操作）→ collect（采集判定依据）。
@@ -33,18 +33,21 @@ CASE_MAP_PROFILE_DIRS = {
     "620C_W6830": CASE_MAP_DIR / "620C_simulator_case_map",
     "6202_W5230": CASE_MAP_DIR / "6202_case_map",
     "6202_W5230_SIMULATOR": CASE_MAP_DIR / "6202_simulator_case_map",
+    "620F_W7830": CASE_MAP_DIR / "620f_case_map",
     "579_Z1640": CASE_MAP_DIR / "579_case_map",
 }
 CASE_MAP_PROFILE_TARGETS = {
     "620C_W6830": "simulator",
     "6202_W5230": "hardware",
     "6202_W5230_SIMULATOR": "simulator",
+    "620F_W7830": "hardware",
     "579_Z1640": "hardware",
 }
 CASE_MAP_PROFILE_PROJECTS = {
     "620C_W6830": "620C_W6830",
     "6202_W5230": "6202_W5230",
     "6202_W5230_SIMULATOR": "6202_W5230",
+    "620F_W7830": "620F_W7830",
     "579_Z1640": "579_Z1640",
 }
 CASE_MAP_TARGET_DEFAULT_PROFILES = {

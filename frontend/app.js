@@ -8,6 +8,7 @@ let activeImportJobId = null;
 let repairRestoreTimer = null;
 let testPollTimer = null;
 let batchTestPollTimer = null;
+let prdCasesPollTimer = null;
 let latestBatchCandidateSummary = {};
 const selectedTestCases = new Map();
 let selectedTestProject = null;
@@ -56,7 +57,7 @@ const FUNCTION_CATEGORY_NAMES = Object.freeze(Object.keys(FUNCTION_CATEGORIES));
 const ALL_FUNCTION_MODULES = Object.freeze(FUNCTION_CATEGORY_NAMES.flatMap(name => FUNCTION_CATEGORIES[name]));
 const PROJECT_STORAGE_KEY = 'agent-loop-selected-project';
 const CASE_CATALOG_PAGE_SIZE = 100;
-const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
+const TOP_LEVEL_ROUTE_PATHS = Object.freeze(['/overview', '/prd-cases', '/cases', '/runs', '/reports', '/defects', '/environments', '/bluetooth']);
 const caseCatalogCache = new Map();
 let activePageController = null;
 let routeRequestToken = 0;
@@ -2067,6 +2068,292 @@ async function renderCasePlatformLanding() {
         </form>
       </div>
     </section>`;
+}
+
+function stopPrdCasesPolling() {
+  if (prdCasesPollTimer) clearTimeout(prdCasesPollTimer);
+  prdCasesPollTimer = null;
+}
+
+function prdJobStatusLabel(status = '') {
+  return ({
+    UPLOADED: '等待生成', GENERATING: '生成中', READY_FOR_REVIEW: '待审查',
+    QUALITY_BLOCKED: '质量门禁阻断', APPROVED: '审查通过', REJECTED: '已驳回',
+    SYNCED: '已同步', SYNCED_WITH_CONFLICTS: '部分同步', FAILED: '生成失败'
+  })[String(status).toUpperCase()] || status || '未知';
+}
+
+function prdStatusClass(status = '') {
+  const value = String(status).toUpperCase();
+  if (['APPROVED', 'SYNCED', 'READY_FOR_REVIEW'].includes(value)) return 'is-success';
+  if (['REJECTED', 'FAILED', 'QUALITY_BLOCKED'].includes(value)) return 'is-error';
+  if (['UPLOADED', 'GENERATING', 'SYNCED_WITH_CONFLICTS'].includes(value)) return 'is-warning';
+  return '';
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      const index = result.indexOf('base64,');
+      resolve(index >= 0 ? result.slice(index + 7) : result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function renderPrdCases(selectedJobId = '') {
+  stopPrdCasesPolling();
+  setActiveNav('prd-cases');
+  document.title = 'PRD 转用例 · Agent-loop';
+  const query = new URLSearchParams(location.search);
+  const selectedProject = query.get('project') || currentProject() || '620C_W6830';
+  const targetJobId = selectedJobId || query.get('job') || '';
+  const [{items: projects = []}, {items: jobs = []}] = await Promise.all([
+    api('/api/projects'),
+    api(`/api/prd-cases/jobs?project_id=${encodeURIComponent(selectedProject)}`)
+  ]);
+  const activeProjectMeta = projects.find(item => item.project_id === selectedProject) || projects[0] || {project_id: selectedProject, project_name: selectedProject};
+  rememberProject(activeProjectMeta.project_id);
+
+  let job = jobs.find(item => item.job_id === targetJobId) || jobs[0] || null;
+  if (job) {
+    try {
+      job = await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}`);
+    } catch (_) {}
+  }
+
+  const casesPayload = job ? await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/cases`) : {items: [], gate: null};
+  const cases = casesPayload.items || [];
+  const gate = casesPayload.gate || job?.quality_gate || null;
+
+  const projectOptions = projects.map(item => `<option value="${escapeHtml(item.project_id)}" ${item.project_id === selectedProject ? 'selected' : ''}>${escapeHtml(`${item.project_name || item.project_id} · ${item.project_id}`)}</option>`).join('');
+  const jobItems = jobs.map(item => `
+    <button class="prd-job-item ${job && job.job_id === item.job_id ? 'is-active' : ''}" type="button" data-prd-job="${escapeHtml(item.job_id)}">
+      <span><strong>${escapeHtml(item.filename)}</strong><small>${escapeHtml(formatTime(item.created_at))} · ${item.case_count || 0} 条</small></span>
+      <span class="prd-status ${prdStatusClass(item.status)}">${escapeHtml(prdJobStatusLabel(item.status))}</span>
+    </button>`).join('');
+
+  const savedComments = new Map((job?.review?.case_comments || []).map(c => [c.stable_id || c.case_id, c.comment]));
+
+  const caseRows = cases.map((item, index) => `
+    <tr class="prd-case-row" data-prd-search="${escapeHtml(`${item.case_id} ${item.functional_module} ${item.feature} ${item.title} ${item.steps_text} ${item.expected_text}`).toLowerCase()}">
+      <td><code>${escapeHtml(item.case_id)}</code><small>${escapeHtml(item.test_type || '功能')}</small></td>
+      <td><strong>${escapeHtml(item.functional_module)}</strong><small>${escapeHtml(item.feature)} / ${escapeHtml(item.test_item || '')}</small></td>
+      <td>${escapeHtml(item.title)}<small>${escapeHtml(item.test_point || '')}</small></td>
+      <td><span class="badge ${item.priority === 'P0' ? 'badge-fail' : 'badge-neutral'}">${escapeHtml(item.priority || 'P1')}</span></td>
+      <td class="prd-case-detail">
+        <p>${escapeHtml(item.steps_text)}</p>
+        <details><summary>查看预期与前置</summary><p><strong>前置：</strong>${escapeHtml(item.preconditions || '无')}\n\n<strong>预期：</strong>\n${escapeHtml(item.expected_text)}</p></details>
+      </td>
+      <td>
+        <input class="prd-row-comment" type="text" data-case-id="${escapeHtml(item.stable_id || item.case_id)}" value="${escapeHtml(savedComments.get(item.stable_id) || savedComments.get(item.case_id) || '')}" placeholder="单条意见" ${job && job.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}>
+      </td>
+    </tr>`).join('');
+
+  const activeBody = !job ? '<div class="workspace-card prd-empty"><p>请在左侧上传 PRD，系统将按已校验 QA Skill 设计用例并输出 Excel。</p></div>' :
+    ['UPLOADED', 'GENERATING'].includes(job.status) ? `
+      <section class="workspace-card prd-generating">
+        <p class="eyebrow">${escapeHtml(job.stage || '生成中')}</p>
+        <h2>正在通过大模型设计测试用例…</h2>
+        <p>已校验便携 QA Skill（${escapeHtml(job.skill?.sha256?.slice(0, 8) || 'pinned')}…），生成完成后将自动回读 Excel 并提供审查界面。</p>
+        <div class="progress-bar" style="width: 320px; margin-top: 14px;"><span style="width: ${Math.max(10, Number(job.progress || 10))}%;"></span></div>
+      </section>` : `
+      <section class="workspace-card prd-review-panel">
+        <header class="prd-review-head">
+          <div>
+            <p class="eyebrow">${escapeHtml(activeProjectMeta.project_name || activeProjectMeta.project_id)} · ${escapeHtml(job.execution_profile === 'strict' ? '严格画像' : '核心画像')}</p>
+            <h2>${escapeHtml(job.filename)}</h2>
+            <p>PRD SHA: <code>${escapeHtml(job.source_sha256?.slice(0, 12) || '')}…</code> · Excel SHA: <code>${escapeHtml(job.workbook_sha256?.slice(0, 12) || '')}…</code></p>
+          </div>
+          <div class="prd-job-state">
+            <span class="prd-status ${prdStatusClass(job.status)}">${escapeHtml(prdJobStatusLabel(job.status))}</span>
+            <strong>${job.case_count || cases.length} 条</strong>
+            <small>${escapeHtml(job.stage || '')}</small>
+          </div>
+        </header>
+        ${gate ? `
+          <div class="prd-gate ${gate.passed ? '' : 'is-blocked'}">
+            <div>
+              <strong>质量门禁：${gate.passed ? '已通过' : '未通过'}</strong>
+              <span>用词: ${escapeHtml(gate.checks?.wording || '-')} · 分类: ${escapeHtml(gate.checks?.classification || '-')} · 顺序: ${escapeHtml(gate.checks?.order || '-')} · 边界: ${escapeHtml(gate.checks?.feature_boundary || '-')}</span>
+            </div>
+            ${(gate.errors || []).length ? `<details open><summary>门禁拦截项 (${gate.errors.length})</summary><ul>${gate.errors.map(e => `<li><code>${escapeHtml(e.code)}</code>: ${escapeHtml(e.message)}</li>`).join('')}</ul></details>` : ''}
+          </div>` : ''}
+        <div class="prd-case-toolbar">
+          <div class="search-box">
+            ${icon('search', 16)}
+            <input id="prd-case-search" type="search" placeholder="筛选编号、模块、标题、步骤…">
+            <button id="clear-prd-case-search" type="button">清空</button>
+          </div>
+          <span>显示 ${cases.length} 条</span>
+          <button class="button button-secondary" type="button" data-prd-download>${icon('download', 15)} 导出 Excel</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table prd-case-table">
+            <thead>
+              <tr><th>用例编号</th><th>模块 / 功能</th><th>标题 / 测试点</th><th>优先级</th><th>步骤与预期</th><th>逐条审查意见</th></tr>
+            </thead>
+            <tbody>${caseRows || '<tr><td colspan="6" class="empty-copy">暂无用例行</td></tr>'}</tbody>
+          </table>
+        </div>
+        ${['READY_FOR_REVIEW', 'REJECTED', 'QUALITY_BLOCKED', 'FAILED', 'APPROVED', 'SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `
+          <footer class="prd-review-actions">
+            <div class="prd-review-fields">
+              ${job.status === 'READY_FOR_REVIEW' ? `
+                <div class="prd-dimensions-checklist">
+                  <strong>P0 审查确认：</strong>
+                  <label><input type="checkbox" id="prd-dim-wording"> 用词与可观测性</label>
+                  <label><input type="checkbox" id="prd-dim-classification"> 模块分类</label>
+                  <label><input type="checkbox" id="prd-dim-order"> 执行顺序</label>
+                  <label><input type="checkbox" id="prd-dim-boundary"> 功能边界</label>
+                </div>` : ''}
+              <label>审查人<input id="prd-reviewer" type="text" value="${escapeHtml(job.review?.reviewer || '')}" placeholder="请输入姓名" ${job.status === 'READY_FOR_REVIEW' ? '' : 'disabled'}></label>
+              <label>整体意见<textarea id="prd-review-comment" rows="2" placeholder="驳回时填写；通过时可选">${escapeHtml(job.review?.comment || '')}</textarea></label>
+            </div>
+            <div class="prd-action-buttons">
+              ${job.status === 'READY_FOR_REVIEW' ? `
+                <button class="button button-secondary" type="button" data-prd-review="reject">驳回修改</button>
+                <button class="button" type="button" data-prd-review="approve">审查通过</button>` : ''}
+              ${['REJECTED', 'QUALITY_BLOCKED', 'FAILED'].includes(job.status) ? `
+                <button class="button" type="button" data-prd-regenerate>按意见重新生成</button>` : ''}
+              ${job.status === 'APPROVED' ? `
+                <button class="button" type="button" data-prd-sync>同步到用例管理</button>` : ''}
+              ${['SYNCED', 'SYNCED_WITH_CONFLICTS'].includes(job.status) ? `
+                <a class="button" href="${escapeHtml(pageUrl('/cases', job.project_id, {platform_id: currentPlatformFor(job.project_id)}))}">进入用例管理</a>` : ''}
+            </div>
+          </footer>` : ''}
+      </section>`;
+
+  app.innerHTML = `
+    ${Components.pageHeader({title: 'PRD 转用例', intro: '上传 PRD，按 QA Skill 生成 Excel；人工审查通过后再同步到用例管理'})}
+    <section class="prd-layout">
+      <aside class="workspace-card prd-sidebar">
+        <form id="prd-upload-form" class="prd-upload-form">
+          <div><p class="eyebrow">新建任务</p><h2>上传 PRD</h2></div>
+          <label>目标项目<select id="prd-project" required>${projectOptions}</select></label>
+          <label>执行画像<select id="prd-profile"><option value="core">核心流程</option><option value="strict">严格流程</option></select></label>
+          <label class="prd-file-drop"><input id="prd-file" type="file" accept=".md,.txt,.docx" required><strong>选择 PRD 文件</strong><span>支持 Markdown、TXT、DOCX，最大 20 MB</span></label>
+          <button class="button" type="submit">上传并生成</button>
+        </form>
+        <div class="prd-job-list"><header><strong>生成记录</strong><span>${jobs.length}</span></header>${jobItems || '<p class="empty-copy">暂无记录</p>'}</div>
+      </aside>
+      <div class="prd-main">${activeBody}</div>
+    </section>`;
+
+  app.querySelector('#prd-upload-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const file = app.querySelector('#prd-file')?.files?.[0];
+    if (!file) return showToast('请选择 PRD 文件', 'error');
+    const button = event.submitter;
+    if (button) { button.disabled = true; button.textContent = '正在上传…'; }
+    try {
+      const created = await api('/api/prd-cases/jobs', {method: 'POST', body: JSON.stringify({
+        project_id: app.querySelector('#prd-project').value,
+        execution_profile: app.querySelector('#prd-profile').value,
+        filename: file.name,
+        file_base64: await fileToBase64(file)
+      })});
+      history.replaceState({}, '', pageUrl('/prd-cases', created.project_id, {job: created.job_id}));
+      showToast('PRD 已上传，正在生成用例');
+      await renderPrdCases(created.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      if (button) { button.disabled = false; button.textContent = '上传并生成'; }
+    }
+  });
+
+  app.querySelectorAll('[data-prd-job]').forEach(button => button.addEventListener('click', async () => {
+    const selected = button.dataset.prdJob;
+    history.replaceState({}, '', pageUrl('/prd-cases', selectedProject, {job: selected}));
+    await renderPrdCases(selected);
+  }));
+
+  const search = app.querySelector('#prd-case-search');
+  const applyFilter = () => {
+    const value = String(search?.value || '').trim().toLowerCase();
+    app.querySelectorAll('.prd-case-row').forEach(row => { row.hidden = Boolean(value && !row.dataset.prdSearch.includes(value)); });
+  };
+  search?.addEventListener('input', applyFilter);
+  app.querySelector('#clear-prd-case-search')?.addEventListener('click', () => { if (search) { search.value = ''; applyFilter(); } });
+
+  app.querySelector('[data-prd-download]')?.addEventListener('click', () => {
+    if (job) {
+      startBrowserDownload(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/download`, `${String(job.filename).replace(/\.[^.]+$/, '')}-测试用例.xlsx`);
+    }
+  });
+
+  app.querySelectorAll('[data-prd-review]').forEach(button => button.addEventListener('click', async () => {
+    const reviewer = app.querySelector('#prd-reviewer')?.value.trim() || '';
+    const comment = app.querySelector('#prd-review-comment')?.value.trim() || '';
+    const caseComments = [...app.querySelectorAll('.prd-row-comment')]
+      .filter(input => input.value.trim())
+      .map(input => ({stable_id: input.dataset.caseId, comment: input.value.trim()}));
+    const action = button.dataset.prdReview;
+    const body = {action, reviewer, comment, case_comments: caseComments};
+    if (action === 'approve') {
+      const dimensions = {
+        wording: app.querySelector('#prd-dim-wording')?.checked ?? true,
+        classification: app.querySelector('#prd-dim-classification')?.checked ?? true,
+        order: app.querySelector('#prd-dim-order')?.checked ?? true,
+        feature_boundary: app.querySelector('#prd-dim-boundary')?.checked ?? true
+      };
+      if (!dimensions.wording || !dimensions.classification || !dimensions.order || !dimensions.feature_boundary) {
+        return showToast('请确认全部 4 项 P0 审查维度已完成', 'error');
+      }
+      body.dimensions = dimensions;
+    }
+    button.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/review`, {method: 'POST', body: JSON.stringify(body)});
+      showToast(action === 'approve' ? '审查已通过，可以同步' : '已驳回，可按意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      button.disabled = false;
+    }
+  }));
+
+  app.querySelector('[data-prd-regenerate]')?.addEventListener('click', async event => {
+    const rowComments = [...app.querySelectorAll('.prd-row-comment')]
+      .filter(input => input.value.trim())
+      .map(input => ({stable_id: input.dataset.caseId, comment: input.value.trim()}));
+    let feedback = app.querySelector('#prd-review-comment')?.value.trim() || '';
+    if (!feedback && rowComments.length) {
+      feedback = '逐条审查意见:\n' + rowComments.map(c => `[${c.stable_id}]: ${c.comment}`).join('\n');
+    }
+    if (!feedback) {
+      feedback = job.review?.comment || job.error || '';
+    }
+    event.currentTarget.disabled = true;
+    try {
+      await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/regenerate`, {method: 'POST', body: JSON.stringify({feedback})});
+      showToast('已按审查意见重新生成');
+      await renderPrdCases(job.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      event.currentTarget.disabled = false;
+    }
+  });
+
+  app.querySelector('[data-prd-sync]')?.addEventListener('click', async event => {
+    event.currentTarget.disabled = true;
+    try {
+      const result = await api(`/api/prd-cases/jobs/${encodeURIComponent(job.job_id)}/sync`, {method: 'POST'});
+      showToast(`同步完成：新增 ${result.created}，更新 ${result.updated}，冲突 ${result.conflicts}`);
+      caseCatalogCache.clear();
+      await renderPrdCases(job.job_id);
+    } catch (error) {
+      showToast(error.message, 'error');
+      event.currentTarget.disabled = false;
+    }
+  });
+
+  if (job && ['UPLOADED', 'GENERATING'].includes(job.status)) {
+    prdCasesPollTimer = setTimeout(() => renderPrdCases(job.job_id), 1400);
+  }
 }
 
 async function renderTests() {
@@ -4404,6 +4691,9 @@ function initSystemSettings() {
   const form = document.querySelector('#system-settings-form');
   const errorBox = document.querySelector('#settings-error-box');
   const submitBtn = document.querySelector('#submit-system-settings');
+  const bluetoothRoot = dialog?.querySelector('#settings-bluetooth-root');
+  let bluetoothSettingsController = null;
+  let bluetoothSettingsLoadToken = 0;
 
   if (!dialog || !openBtn) return;
 
@@ -4790,18 +5080,51 @@ function initSystemSettings() {
     issue.detail
   );
 
+  const destroyBluetoothSettings = () => {
+    bluetoothSettingsLoadToken += 1;
+    bluetoothSettingsController?.destroy?.();
+    bluetoothSettingsController = null;
+    if (bluetoothRoot) bluetoothRoot.innerHTML = '';
+  };
+
+  const mountBluetoothSettings = async () => {
+    if (!bluetoothRoot || bluetoothSettingsController) return;
+    const controller = BluetoothPage({embedded: true});
+    const token = ++bluetoothSettingsLoadToken;
+    bluetoothSettingsController = controller;
+    bluetoothRoot.innerHTML = Components.skeletonState('正在读取蓝牙状态…');
+    try {
+      const data = await controller.load();
+      if (token !== bluetoothSettingsLoadToken || bluetoothSettingsController !== controller) return;
+      bluetoothRoot.innerHTML = controller.render(data);
+      controller.mount?.(bluetoothRoot, data);
+    } catch (error) {
+      if (token !== bluetoothSettingsLoadToken || bluetoothSettingsController !== controller) return;
+      bluetoothSettingsController = null;
+      bluetoothRoot.innerHTML = Components.errorState('蓝牙工作台读取失败', error.message, 'data-bluetooth-settings-retry');
+      bluetoothRoot.querySelector('[data-bluetooth-settings-retry]')?.addEventListener('click', () => void mountBluetoothSettings());
+    }
+  };
+
+  const activateSettingsTab = requestedTab => {
+    const buttons = [...dialog.querySelectorAll('.settings-tab-btn')];
+    const selected = buttons.find(button => button.dataset.settingsTab === requestedTab)
+      || buttons.find(button => button.classList.contains('is-active'))
+      || buttons[0];
+    const tabName = selected?.dataset.settingsTab || 'llm';
+    buttons.forEach(button => button.classList.toggle('is-active', button === selected));
+    dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
+      pane.style.display = pane.dataset.settingsPane === tabName ? 'flex' : 'none';
+    });
+    dialog.classList.toggle('is-bluetooth', tabName === 'bluetooth');
+    if (tabName === 'hardware') void loadSerialPorts(hwPortSelect?.value);
+    if (tabName === 'bluetooth') void mountBluetoothSettings();
+    else destroyBluetoothSettings();
+  };
+
   // Tab switching
   dialog.querySelectorAll('.settings-tab-btn').forEach(tabBtn => {
-    tabBtn.addEventListener('click', () => {
-      const tabName = tabBtn.dataset.settingsTab;
-      dialog.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.toggle('is-active', b === tabBtn));
-      dialog.querySelectorAll('.settings-tab-pane').forEach(pane => {
-        pane.style.display = (pane.dataset.settingsPane === tabName) ? 'flex' : 'none';
-      });
-      if (tabName === 'hardware') {
-        void loadSerialPorts(hwPortSelect?.value);
-      }
-    });
+    tabBtn.addEventListener('click', () => activateSettingsTab(tabBtn.dataset.settingsTab));
   });
 
   // Password / Secret eye toggle
@@ -4881,12 +5204,16 @@ function initSystemSettings() {
     }
   }
 
-  openBtn.addEventListener('click', () => {
-    loadSettings();
-    dialog.showModal();
-  });
+  const openSettings = requestedTab => {
+    activateSettingsTab(requestedTab);
+    void loadSettings();
+    if (!dialog.open) dialog.showModal();
+  };
+  openBtn.addEventListener('click', () => openSettings());
+  document.addEventListener('agent-loop:open-settings', event => openSettings(event.detail?.tab));
   if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
   if (cancelBtn) cancelBtn.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', destroyBluetoothSettings);
 
   // LLM Connectivity Test
   const btnTestLlm = document.querySelector('#btn-test-llm');
@@ -5831,7 +6158,7 @@ function mount579EnvironmentConfig(root, cfg = {}) {
     <div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit'>保存 579 配置</button></div>`;
 }
 
-function BluetoothPage() {
+function BluetoothPage({embedded = false} = {}) {
   let pollTimer = null;
   let destroyed = false;
   let eventCursor = 0;
@@ -5841,87 +6168,138 @@ function BluetoothPage() {
 
   const calculatorData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 54 50 5F 43 4C 49 43 4B 3A 35 31 2C 31 35 36 2C 31 20 3B';
   const buttonData = '08 54 4F 50 35 53 54 45 50 00 1C 54 4F 50 35 53 54 45 50 3A 42 55 54 54 4F 4E 5F 50 52 45 53 53 3A 31 2C 31 2C 30 3B';
+  const sharedServiceUuid = '000001ff-3c17-d293-8e48-14fe2e4da212';
+  const sharedWriteUuid = '0000ff02-0000-1000-8000-00805f9b34fb';
+  const sharedNotifyUuid = '0000ff03-0000-1000-8000-00805f9b34fb';
+  const profileDefaults = {
+    raw: {label: '通用 RAW', service_uuid: '', write_uuid: '', notify_uuid: '', write_with_response: true},
+    '579': {label: '579 L1/L2', service_uuid: sharedServiceUuid, write_uuid: sharedWriteUuid, notify_uuid: sharedNotifyUuid, write_with_response: true},
+    w30: {label: 'W30 RAW', service_uuid: sharedServiceUuid, write_uuid: sharedWriteUuid, notify_uuid: sharedNotifyUuid, write_with_response: true},
+  };
 
   return {
     async load() {
       const [config, status, remembered] = await Promise.all([
         api('/api/config'),
-        optionalApi('/api/hardware/579/status'),
+        optionalApi('/api/hardware/ble/workbench/status'),
         optionalApi('/api/hardware/ble/remembered'),
       ]);
       latestStatus = status.data;
       return {config, status, remembered};
     },
     render(data) {
-      const initialPurpose = currentProject() === '6202_W5230' ? '6202' : '579';
-      const address579 = data.config.hardware_579?.ble_address || '';
-      const address6202 = data.config.hardware?.ble_address || '';
       const remembered = data.remembered.data?.items || [];
-      return `${Components.pageHeader({title: '蓝牙工作台', intro: '管理独立蓝牙目标、复用 579 GATT 连接并发送原始命令'})}
-        <section class="bluetooth-workbench-grid" data-bluetooth-workbench data-purpose="${initialPurpose}" data-address-579="${escapeHtml(address579)}" data-address-6202="${escapeHtml(address6202)}">
+      const initialProfile = data.status.data?.connected ? (data.status.data.profile || 'raw') : 'raw';
+      const initialAddress = data.status.data?.address
+        || remembered[0]?.address
+        || data.config.hardware?.ble_address
+        || data.config.hardware_579?.ble_address
+        || '';
+      const pageHeader = embedded
+        ? ''
+        : Components.pageHeader({title: '蓝牙工作台', intro: '扫描 BLE 设备、选择 GATT 特征并收发原始数据'});
+      return `${pageHeader}<div class="${embedded ? 'bluetooth-settings-workbench' : 'bluetooth-page-workbench'}">
+        <section class="bluetooth-workbench-grid" data-bluetooth-workbench>
           <article class="workspace-panel bluetooth-device-panel">
-            <header><div><h2>设备与连接</h2><p>扫描结果只用于精确选择地址，不按名称猜测目标。</p></div><span id="bt-lease-chip" class="chip chip-pending">手工可用</span></header>
+            <header><div><h2>设备与连接</h2></div><span id="bt-lease-chip" class="chip chip-pending">手工可用</span></header>
             <div class="bluetooth-form-grid">
-              <label><span>用途</span><select id="bt-purpose" data-ble-mutable><option value="579" ${initialPurpose === '579' ? 'selected' : ''}>579 指令执行</option><option value="6202" ${initialPurpose === '6202' ? 'selected' : ''}>6202 BLE 截图</option></select></label>
+              <label><span>协议模板</span><select id="bt-profile" data-ble-mutable><option value="raw" ${initialProfile === 'raw' ? 'selected' : ''}>通用 RAW</option><option value="579" ${initialProfile === '579' ? 'selected' : ''}>579 L1/L2</option><option value="w30" ${initialProfile === 'w30' ? 'selected' : ''}>W30 RAW</option></select></label>
               <label><span>扫描超时（秒）</span><input id="bt-timeout" type="number" min="1" max="60" value="${Number(data.config.hardware_579?.ble_scan_timeout || data.config.hardware?.ble_scan_timeout || 15)}" data-ble-mutable></label>
-              <label class="bluetooth-address-field"><span>精确目标地址</span><input id="bt-address" type="text" value="${escapeHtml(initialPurpose === '579' ? address579 : address6202)}" placeholder="例如 41:42:72:6A:93:2D" autocomplete="off" data-ble-mutable></label>
+              <label class="bluetooth-address-field"><span>目标地址</span><input id="bt-address" type="text" value="${escapeHtml(initialAddress)}" placeholder="扫描后选择，或粘贴蓝牙地址" autocomplete="off" data-ble-mutable></label>
             </div>
-            <div class="bluetooth-actions">
-              <input id="bt-search" type="search" placeholder="按名称或地址过滤" autocomplete="off" data-ble-mutable>
-              <button id="bt-scan" class="button button-secondary" type="button" data-ble-mutable>扫描</button>
-              <button id="bt-save-target" class="button button-secondary" type="button" data-ble-mutable>保存目标</button>
-              <button id="bt-connect" class="button" type="button" data-ble-mutable>连接</button>
-              <button id="bt-disconnect" class="button button-secondary" type="button" data-ble-mutable>断开</button>
+            <div class="bluetooth-actions bluetooth-device-actions">
+              <div class="bluetooth-device-filter-row">
+                <input id="bt-search" type="search" placeholder="按名称或地址过滤" autocomplete="off" data-ble-mutable>
+                <label class="bluetooth-unnamed-toggle"><input id="bt-show-unnamed" type="checkbox" data-ble-mutable><span>显示未命名设备</span></label>
+              </div>
+              <div class="bluetooth-device-action-buttons">
+                <button id="bt-scan" class="button button-secondary" type="button" data-ble-mutable>扫描</button>
+                <button id="bt-connect" class="button" type="button" data-ble-mutable>连接</button>
+                <button id="bt-disconnect" class="button button-secondary" type="button" data-ble-mutable>断开</button>
+              </div>
             </div>
             <div id="bt-status" class="ble-connection-status" data-tone="neutral" role="status" aria-live="polite"><span class="ble-connection-dot" aria-hidden="true"></span><div><strong>正在读取连接状态</strong><small></small></div></div>
-            <div id="bt-device-list" class="bluetooth-device-list">${remembered.length ? remembered.map(item => `<button type="button" class="bluetooth-device-choice" data-device-address="${escapeHtml(item.address)}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address)}</code><small>6202 已记住设备</small></button>`).join('') : '<div class="ble-device-empty">点击“扫描”查找附近设备</div>'}</div>
+            <div id="bt-device-list" class="bluetooth-device-list">${remembered.length ? remembered.map(item => `<button type="button" class="bluetooth-device-choice" data-device-address="${escapeHtml(item.address)}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address)}</code></button>`).join('') : '<div class="ble-device-empty">点击“扫描”查找附近设备</div>'}</div>
           </article>
 
           <article id="bt-command-panel" class="workspace-panel bluetooth-command-panel">
-            <header><div><h2>579 原始命令</h2><p>Cmd / Key / Data 由后端规范化并封包。</p></div><span class="chip chip-warning">effect_verified=false</span></header>
-            <div class="notice notice-warning bluetooth-risk"><p><strong>风险说明：</strong>此处不设命令白名单，也不对高风险 Cmd/Key 二次确认。仅发送你明确了解的命令；L1 ACK 只证明传输回执，不证明手表业务效果。</p></div>
-            <div class="bluetooth-presets" aria-label="已验证预置">
+            <header><div><h2 id="bt-command-title">原始数据收发</h2><p id="bt-profile-hint">连接后选择可写和通知特征</p></div><span id="bt-result-chip" class="chip chip-warning">写入 ≠ 效果</span></header>
+            <section class="bluetooth-gatt-section" aria-labelledby="bt-gatt-heading">
+              <div class="bluetooth-section-heading"><strong id="bt-gatt-heading">GATT 配置</strong><button id="bt-apply-gatt" class="button button-secondary" type="button" data-ble-mutable>应用配置</button></div>
+              <div class="bluetooth-command-fields bluetooth-gatt-fields">
+                <label class="bluetooth-data-field"><span>Service UUID（可选）</span><input id="bt-service-uuid" list="bt-service-options" placeholder="通用模式可先留空连接" autocomplete="off" data-ble-mutable><datalist id="bt-service-options"></datalist></label>
+                <label><span>写入特征 UUID</span><input id="bt-write-uuid" list="bt-write-options" placeholder="选择 Write 特征" autocomplete="off" data-ble-mutable><datalist id="bt-write-options"></datalist></label>
+                <label><span>通知特征 UUID（可选）</span><input id="bt-notify-uuid" list="bt-notify-options" placeholder="选择 Notify 特征" autocomplete="off" data-ble-mutable><datalist id="bt-notify-options"></datalist></label>
+                <label><span>写入方式</span><select id="bt-write-response" data-ble-mutable><option value="true">Write with response</option><option value="false">Write without response</option></select></label>
+              </div>
+              <div id="bt-gatt-tree" class="bluetooth-gatt-tree"><p>连接后显示设备的服务和特征。</p></div>
+            </section>
+            <div id="bt-579-notice" class="notice notice-warning bluetooth-risk" hidden><p>L1 ACK 只表示协议层收到数据，不代表业务效果成功；效果仍需人工或截图确认。</p></div>
+            <div id="bt-579-fields" hidden>
+              <div class="bluetooth-presets" aria-label="579 预置命令">
               <button type="button" class="button button-secondary" data-bt-preset="find" data-ble-mutable>查找手表 02/3B</button>
               <button type="button" class="button button-secondary" data-bt-preset="calc" data-ble-mutable>计算器点击 0→1</button>
               <button type="button" class="button button-secondary" data-bt-preset="button" data-ble-mutable>侧键短按</button>
+              </div>
+              <div class="bluetooth-command-fields">
+                <label><span>Cmd</span><input id="bt-cmd" value="02" placeholder="02 或 0x02" autocomplete="off" data-ble-mutable></label>
+                <label><span>Key</span><input id="bt-key" value="3B" placeholder="3B 或 0x3b" autocomplete="off" data-ble-mutable></label>
+                <label class="bluetooth-data-field"><span>Data（HEX，可留空）</span><textarea id="bt-579-data" rows="3" placeholder="连续 HEX 或空格/逗号分隔" data-ble-mutable></textarea></label>
+              </div>
             </div>
-            <div class="bluetooth-command-fields">
-              <label><span>Cmd</span><input id="bt-cmd" value="02" placeholder="02 或 0x02" autocomplete="off" data-ble-mutable></label>
-              <label><span>Key</span><input id="bt-key" value="3B" placeholder="3B 或 0x3b" autocomplete="off" data-ble-mutable></label>
-              <label class="bluetooth-data-field"><span>Data（HEX，可留空）</span><textarea id="bt-data" rows="5" placeholder="连续 HEX 或空格/逗号分隔" data-ble-mutable></textarea></label>
+            <div id="bt-raw-fields">
+              <div class="bluetooth-command-fields">
+                <label><span>数据格式</span><select id="bt-raw-encoding" data-ble-mutable><option value="hex">HEX</option><option value="utf8">UTF-8 文本</option></select></label>
+                <label class="bluetooth-data-field"><span>发送内容</span><textarea id="bt-raw-data" rows="4" placeholder="例如 AB 00 01，或切换为 UTF-8 文本" data-ble-mutable></textarea></label>
+              </div>
             </div>
-            <div class="bluetooth-actions"><button id="bt-preview" class="button button-secondary" type="button">生成预览</button><button id="bt-send" class="button" type="button" data-ble-mutable>发送并等待 L1 ACK</button></div>
-            <dl id="bt-preview-result" class="bluetooth-packet-preview"><div><dt>规范化命令</dt><dd>尚未生成</dd></div><div><dt>完整 Packet</dt><dd>—</dd></div></dl>
+            <div class="bluetooth-actions"><button id="bt-preview" class="button button-secondary" type="button">生成预览</button><button id="bt-send" class="button" type="button" data-ble-mutable>发送原始数据</button></div>
+            <dl id="bt-preview-result" class="bluetooth-packet-preview"><div><dt>待发送数据</dt><dd>尚未生成</dd></div><div><dt>HEX</dt><dd>—</dd></div></dl>
           </article>
         </section>
-        <article class="workspace-panel bluetooth-log-panel"><header><div><h2>579 TX / RX 日志</h2><p>cursor 增量轮询；包含 L1 ACK、设备主动上报与主机 ACK。</p></div><button id="bt-clear-log" class="button button-secondary" type="button">清空显示</button></header><ol id="bt-event-log" class="bluetooth-event-log"><li><span>等待 Broker 事件…</span></li></ol></article>`;
+        <article class="workspace-panel bluetooth-log-panel"><header><div><h2>BLE TX / RX 日志</h2><p>保留原始字节和协议事件，方便排查</p></div><button id="bt-clear-log" class="button button-secondary" type="button">清空显示</button></header><ol id="bt-event-log" class="bluetooth-event-log"><li><span>等待 BLE 事件…</span></li></ol></article>
+      </div>`;
     },
     mount(root, data) {
-      const workbench = root.querySelector('[data-bluetooth-workbench]');
-      const purpose = root.querySelector('#bt-purpose');
+      const profile = root.querySelector('#bt-profile');
       const address = root.querySelector('#bt-address');
       const timeout = root.querySelector('#bt-timeout');
       const search = root.querySelector('#bt-search');
+      const showUnnamed = root.querySelector('#bt-show-unnamed');
       const list = root.querySelector('#bt-device-list');
       const statusBox = root.querySelector('#bt-status');
-      const commandPanel = root.querySelector('#bt-command-panel');
       const eventLog = root.querySelector('#bt-event-log');
       const cmd = root.querySelector('#bt-cmd');
       const key = root.querySelector('#bt-key');
-      const rawData = root.querySelector('#bt-data');
+      const data579 = root.querySelector('#bt-579-data');
+      const rawData = root.querySelector('#bt-raw-data');
+      const rawEncoding = root.querySelector('#bt-raw-encoding');
       const previewResult = root.querySelector('#bt-preview-result');
+      const serviceUuid = root.querySelector('#bt-service-uuid');
+      const writeUuid = root.querySelector('#bt-write-uuid');
+      const notifyUuid = root.querySelector('#bt-notify-uuid');
+      const writeResponse = root.querySelector('#bt-write-response');
+      const gattTree = root.querySelector('#bt-gatt-tree');
+      let gattSignature = '';
       let namesByAddress = new Map();
       devices = (data.remembered.data?.items || []).map(item => ({...item, rssi: null}));
       for (const item of devices) namesByAddress.set(String(item.address || '').toLowerCase(), item.name || '');
 
-      const configuredAddress = selectedPurpose => selectedPurpose === '579'
-        ? workbench.dataset.address579
-        : workbench.dataset.address6202;
       const scanTimeout = () => {
         const value = Number(timeout.value);
         if (!Number.isFinite(value) || value < 1 || value > 60) throw new Error('扫描超时必须在 1 到 60 秒之间');
         return value;
       };
+      const connectionPayload = () => ({
+        address: String(address.value || '').trim(),
+        name: namesByAddress.get(String(address.value || '').trim().toLowerCase()) || '',
+        timeout: scanTimeout(),
+        profile: profile.value,
+        service_uuid: String(serviceUuid.value || '').trim() || null,
+        write_uuid: String(writeUuid.value || '').trim() || null,
+        notify_uuid: String(notifyUuid.value || '').trim() || null,
+        write_with_response: writeResponse.value === 'true',
+      });
       const leaseActive = () => Boolean(latestStatus?.lease?.active);
       const setStatus = (tone, title, detail = '') => {
         statusBox.dataset.tone = tone;
@@ -5935,53 +6313,81 @@ function BluetoothPage() {
         chip.textContent = active ? `自动化占用 · ${latestStatus.lease.owner || '任务'}` : '手工可用';
         root.querySelectorAll('[data-ble-mutable]').forEach(control => { control.disabled = active; });
       };
+      const renderProfile = () => {
+        const is579 = profile.value === '579';
+        root.querySelector('#bt-579-fields').hidden = !is579;
+        root.querySelector('#bt-579-notice').hidden = !is579;
+        root.querySelector('#bt-raw-fields').hidden = is579;
+        root.querySelector('#bt-command-title').textContent = is579 ? '579 协议命令' : '原始数据收发';
+        root.querySelector('#bt-profile-hint').textContent = is579
+          ? '按 579 L1/L2 组包，并等待 L1 ACK'
+          : profile.value === 'w30'
+            ? '使用 W30 常用 GATT UUID，数据按原样发送和显示'
+            : '先连接设备，再从实际 GATT 服务中选择写入与通知特征';
+        root.querySelector('#bt-result-chip').textContent = is579 ? 'ACK ≠ 效果' : '写入 ≠ 效果';
+        root.querySelector('#bt-send').textContent = is579 ? '发送并等待 L1 ACK' : '发送原始数据';
+      };
       const renderConnection = () => {
-        const is579 = purpose.value === '579';
-        commandPanel.hidden = !is579;
-        root.querySelector('#bt-disconnect').hidden = !is579;
-        if (is579) {
-          if (latestStatus?.connected) setStatus('success', `${latestStatus.name || '579 手表'} · ${latestStatus.address}`, 'GATT ready；Notify 已订阅');
-          else if (latestStatus?.last_error) setStatus('error', latestStatus.last_error.reason_code || '连接异常', latestStatus.last_error.message || '');
-          else setStatus('neutral', '579 尚未连接', '连接后 Broker 会保持并复用这一条 GATT 会话');
+        if (latestStatus?.connected) {
+          const template = latestStatus.profile_label || profileDefaults[latestStatus.profile]?.label || latestStatus.profile || 'RAW';
+          const writeDetail = latestStatus.write_uuid ? `Write ${latestStatus.write_uuid}` : '尚未选择写入特征';
+          const notifyDetail = latestStatus.notify_subscribed ? 'Notify 已订阅' : '未订阅 Notify';
+          setStatus('success', `${latestStatus.name || '未命名设备'} · ${latestStatus.address}`, `${template} · ${writeDetail} · ${notifyDetail}`);
+        } else if (latestStatus?.last_error) {
+          setStatus('error', latestStatus.last_error.reason_code || '连接异常', latestStatus.last_error.message || '');
         } else {
-          setStatus('neutral', '6202 按需连接', '连接检查后会断开；运行截图时按已保存地址重新连接');
+          setStatus('neutral', '尚未连接', '扫描并选择设备；通用 RAW 可先留空 UUID，连接后查看 GATT');
         }
         applyLease();
       };
       const renderDevices = () => {
         const query = String(search.value || '').trim().toLowerCase();
-        const filtered = devices.filter(item => !query || String(item.address || '').toLowerCase().includes(query) || String(item.name || '').toLowerCase().includes(query));
+        const filtered = devices
+          .filter(item => showUnnamed.checked || String(item.name || '').trim())
+          .filter(item => !query || String(item.address || '').toLowerCase().includes(query) || String(item.name || '').toLowerCase().includes(query));
         list.innerHTML = filtered.length ? filtered.map(item => `<button type="button" class="bluetooth-device-choice ${String(item.address || '').toLowerCase() === String(address.value || '').toLowerCase() ? 'is-selected' : ''}" data-device-address="${escapeHtml(item.address || '')}" data-device-name="${escapeHtml(item.name || '')}" data-ble-mutable ${leaseActive() ? 'disabled' : ''}><strong>${escapeHtml(item.name || '未命名设备')}</strong><code>${escapeHtml(item.address || '')}</code><small>${item.rssi === null || item.rssi === undefined ? 'RSSI 未知' : `${Number(item.rssi)} dBm`}</small></button>`).join('') : '<div class="ble-device-empty">没有匹配的扫描结果</div>';
       };
       const renderEvents = () => {
-        eventLog.innerHTML = events.length ? events.map(item => `<li><time>${escapeHtml(String(item.at || ''))}</time><strong>${escapeHtml(item.kind || 'EVENT')}</strong><code>${escapeHtml(JSON.stringify(item))}</code></li>`).join('') : '<li><span>等待 Broker 事件…</span></li>';
+        eventLog.innerHTML = events.length ? events.map(item => `<li><time>${escapeHtml(String(item.at || ''))}</time><strong>${escapeHtml(item.kind || 'EVENT')}</strong><code>${escapeHtml(JSON.stringify(item))}</code></li>`).join('') : '<li><span>等待 BLE 事件…</span></li>';
         eventLog.scrollTop = eventLog.scrollHeight;
       };
-      const saveTarget = async () => {
-        const value = String(address.value || '').trim();
-        if (!value) throw new Error('请先填写或选择精确目标地址');
-        if (purpose.value === '579') {
-          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware_579: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
-          workbench.dataset.address579 = value;
-        } else {
-          await api('/api/config', {method: 'POST', body: JSON.stringify({hardware: {ble_address: value, ble_scan_timeout: scanTimeout()}})});
-          workbench.dataset.address6202 = value;
-        }
+      const renderGatt = () => {
+        const services = latestStatus?.gatt_services || [];
+        const nextSignature = JSON.stringify(services);
+        if (nextSignature === gattSignature) return;
+        gattSignature = nextSignature;
+        const characteristics = services.flatMap(service => (service.characteristics || []).map(characteristic => ({...characteristic, service_uuid: service.uuid})));
+        root.querySelector('#bt-service-options').innerHTML = services.map(item => `<option value="${escapeHtml(item.uuid || '')}">${escapeHtml(item.description || '')}</option>`).join('');
+        root.querySelector('#bt-write-options').innerHTML = characteristics.filter(item => (item.properties || []).some(value => String(value).startsWith('write'))).map(item => `<option value="${escapeHtml(item.uuid || '')}">${escapeHtml((item.properties || []).join(', '))}</option>`).join('');
+        root.querySelector('#bt-notify-options').innerHTML = characteristics.filter(item => (item.properties || []).some(value => ['notify', 'indicate'].includes(String(value)))).map(item => `<option value="${escapeHtml(item.uuid || '')}">${escapeHtml((item.properties || []).join(', '))}</option>`).join('');
+        gattTree.innerHTML = services.length ? services.map(service => `<details><summary><code>${escapeHtml(service.uuid || '')}</code><span>${escapeHtml(service.description || '')}</span></summary><ul>${(service.characteristics || []).map(characteristic => {
+          const properties = characteristic.properties || [];
+          const canWrite = properties.some(value => String(value).startsWith('write'));
+          const canNotify = properties.some(value => ['notify', 'indicate'].includes(String(value)));
+          return `<li><div><code>${escapeHtml(characteristic.uuid || '')}</code><small>${escapeHtml(properties.join(' · ') || '属性未知')}</small></div><span>${canWrite ? `<button type="button" class="button button-secondary" data-gatt-write="${escapeHtml(characteristic.uuid || '')}" data-gatt-service="${escapeHtml(service.uuid || '')}">用于写入</button>` : ''}${canNotify ? `<button type="button" class="button button-secondary" data-gatt-notify="${escapeHtml(characteristic.uuid || '')}" data-gatt-service="${escapeHtml(service.uuid || '')}">用于通知</button>` : ''}</span></li>`;
+        }).join('')}</ul></details>`).join('') : '<p>连接后显示设备的服务和特征。</p>';
       };
       const preview = async () => {
-        const result = await api('/api/hardware/579/preview', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
-        cmd.value = result.cmd;
-        key.value = result.key;
-        rawData.value = result.data_hex;
-        previewResult.innerHTML = `<div><dt>规范化命令</dt><dd><code>Cmd=${escapeHtml(result.cmd)} · Key=${escapeHtml(result.key)} · Data=${escapeHtml(result.data_hex || '空')} · ${Number(result.packet_length)} B</code></dd></div><div><dt>完整 Packet</dt><dd><code>${escapeHtml(result.packet_hex)}</code></dd></div>`;
+        const is579 = profile.value === '579';
+        const result = is579
+          ? await api('/api/hardware/579/preview', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: data579.value})})
+          : await api('/api/hardware/ble/workbench/preview', {method: 'POST', body: JSON.stringify({encoding: rawEncoding.value, data: rawData.value})});
+        if (is579) {
+          cmd.value = result.cmd;
+          key.value = result.key;
+          data579.value = result.data_hex;
+          previewResult.innerHTML = `<div><dt>579 命令</dt><dd><code>Cmd=${escapeHtml(result.cmd)} · Key=${escapeHtml(result.key)} · Data=${escapeHtml(result.data_hex || '空')} · ${Number(result.packet_length)} B</code></dd></div><div><dt>完整 Packet</dt><dd><code>${escapeHtml(result.packet_hex)}</code></dd></div>`;
+        } else {
+          previewResult.innerHTML = `<div><dt>待发送数据</dt><dd><code>${Number(result.byte_count)} B · ${escapeHtml(String(result.encoding || '').toUpperCase())}</code></dd></div><div><dt>HEX</dt><dd><code>${escapeHtml(result.data_hex || '空')}</code></dd></div>`;
+        }
         return result;
       };
       const poll = async () => {
         if (destroyed) return;
         try {
           const [status, eventBatch] = await Promise.all([
-            api('/api/hardware/579/status'),
-            api(`/api/hardware/579/events?after=${eventCursor}&limit=200`),
+            api('/api/hardware/ble/workbench/status'),
+            api(`/api/hardware/ble/workbench/events?after=${eventCursor}&limit=200`),
           ]);
           latestStatus = status;
           const incoming = eventBatch.items || [];
@@ -5991,21 +6397,30 @@ function BluetoothPage() {
             renderEvents();
           }
           renderConnection();
+          renderGatt();
           renderDevices();
         } catch (error) {
-          if (purpose.value === '579') setStatus('error', 'Broker 状态读取失败', error.message);
+          setStatus('error', 'BLE 状态读取失败', error.message);
         } finally {
           if (!destroyed) pollTimer = setTimeout(poll, 1000);
         }
       };
 
-      purpose.addEventListener('change', () => {
-        address.value = configuredAddress(purpose.value) || '';
-        renderConnection();
-        renderDevices();
+      const applyProfileDefaults = () => {
+        const defaults = profileDefaults[profile.value] || profileDefaults.raw;
+        serviceUuid.value = defaults.service_uuid;
+        writeUuid.value = defaults.write_uuid;
+        notifyUuid.value = defaults.notify_uuid;
+        writeResponse.value = String(defaults.write_with_response);
+        renderProfile();
+      };
+      profile.addEventListener('change', () => {
+        applyProfileDefaults();
+        previewResult.innerHTML = '<div><dt>待发送数据</dt><dd>尚未生成</dd></div><div><dt>HEX</dt><dd>—</dd></div>';
       });
       address.addEventListener('input', renderDevices);
       search.addEventListener('input', renderDevices);
+      showUnnamed.addEventListener('change', renderDevices);
       list.addEventListener('click', event => {
         const choice = event.target.closest('[data-device-address]');
         if (!choice || leaseActive()) return;
@@ -6019,38 +6434,53 @@ function BluetoothPage() {
           const result = await api(`/api/hardware/ble/devices?timeout=${encodeURIComponent(scanTimeout())}&q=${encodeURIComponent(search.value.trim())}`);
           devices = result.items || [];
           renderDevices();
-          showToast(`找到 ${devices.length} 个蓝牙设备`);
+          const unnamedCount = devices.filter(item => !String(item.name || '').trim()).length;
+          showToast(unnamedCount && !showUnnamed.checked ? `找到 ${devices.length} 个蓝牙设备，已隐藏 ${unnamedCount} 个未命名设备` : `找到 ${devices.length} 个蓝牙设备`);
         } catch (error) { showToast(error.message, 'error'); }
         finally { applyLease(); }
-      });
-      root.querySelector('#bt-save-target').addEventListener('click', async () => {
-        try { await saveTarget(); showToast('蓝牙目标已保存'); } catch (error) { showToast(error.message, 'error'); }
       });
       root.querySelector('#bt-connect').addEventListener('click', async event => {
         event.currentTarget.disabled = true;
         try {
-          const value = String(address.value || '').trim();
-          if (!value) throw new Error('请先填写或选择精确目标地址');
-          if (purpose.value === '579') {
-            latestStatus = await api('/api/hardware/579/connect', {method: 'POST', body: JSON.stringify({address: value, timeout: scanTimeout()})});
-            workbench.dataset.address579 = latestStatus.address || value;
-          } else {
-            await api('/api/hardware/ble/connect', {method: 'POST', body: JSON.stringify({address: value, name: namesByAddress.get(value.toLowerCase()) || '', timeout: scanTimeout()})});
-            workbench.dataset.address6202 = value;
-          }
+          const payload = connectionPayload();
+          if (!payload.address) throw new Error('请先填写或选择目标地址');
+          latestStatus = await api('/api/hardware/ble/workbench/connect', {method: 'POST', body: JSON.stringify(payload)});
+          if (latestStatus.service_uuid) serviceUuid.value = latestStatus.service_uuid;
+          if (latestStatus.write_uuid) writeUuid.value = latestStatus.write_uuid;
+          if (latestStatus.notify_uuid) notifyUuid.value = latestStatus.notify_uuid;
           renderConnection();
+          renderGatt();
           showToast('蓝牙目标连接成功');
         } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
         finally { applyLease(); }
       });
       root.querySelector('#bt-disconnect').addEventListener('click', async () => {
-        try { latestStatus = await api('/api/hardware/579/disconnect', {method: 'POST', body: '{}'}); renderConnection(); showToast('579 BLE 已断开'); } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        try { latestStatus = await api('/api/hardware/ble/workbench/disconnect', {method: 'POST', body: '{}'}); renderConnection(); renderGatt(); showToast('BLE 已断开'); } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+      });
+      root.querySelector('#bt-apply-gatt').addEventListener('click', async event => {
+        event.currentTarget.disabled = true;
+        try {
+          latestStatus = await api('/api/hardware/ble/workbench/configure', {method: 'POST', body: JSON.stringify(connectionPayload())});
+          renderConnection();
+          showToast('GATT 配置已应用');
+        } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
+        finally { applyLease(); }
+      });
+      gattTree.addEventListener('click', event => {
+        if (leaseActive()) return;
+        const writeButton = event.target.closest('[data-gatt-write]');
+        const notifyButton = event.target.closest('[data-gatt-notify]');
+        const button = writeButton || notifyButton;
+        if (!button) return;
+        serviceUuid.value = button.dataset.gattService || serviceUuid.value;
+        if (writeButton) writeUuid.value = writeButton.dataset.gattWrite || '';
+        if (notifyButton) notifyUuid.value = notifyButton.dataset.gattNotify || '';
       });
       root.querySelectorAll('[data-bt-preset]').forEach(button => button.addEventListener('click', () => {
         const preset = button.dataset.btPreset;
         cmd.value = preset === 'find' ? '02' : '04';
         key.value = preset === 'find' ? '3B' : '05';
-        rawData.value = preset === 'find' ? '' : preset === 'calc' ? calculatorData : buttonData;
+        data579.value = preset === 'find' ? '' : preset === 'calc' ? calculatorData : buttonData;
         preview().catch(error => showToast(error.message, 'error'));
       }));
       root.querySelector('#bt-preview').addEventListener('click', () => preview().catch(error => showToast(error.message, 'error')));
@@ -6058,13 +6488,26 @@ function BluetoothPage() {
         event.currentTarget.disabled = true;
         try {
           await preview();
-          const result = await api('/api/hardware/579/send', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: rawData.value})});
-          showToast(result.transport_acked ? '收到 L1 ACK；请人工确认手表业务现象' : '未收到 L1 ACK', result.transport_acked ? 'success' : 'warning');
+          const is579 = profile.value === '579';
+          const result = is579
+            ? await api('/api/hardware/579/send', {method: 'POST', body: JSON.stringify({cmd: cmd.value, key: key.value, data: data579.value})})
+            : await api('/api/hardware/ble/workbench/send', {method: 'POST', body: JSON.stringify({encoding: rawEncoding.value, data: rawData.value, write_with_response: writeResponse.value === 'true'})});
+          showToast(is579 ? (result.transport_acked ? '收到 L1 ACK；请继续确认业务效果' : '未收到 L1 ACK') : '原始数据已写入；这不代表设备业务效果成功', result.transport_acked || result.gatt_write_completed ? 'success' : 'warning');
         } catch (error) { showToast(error.message, error.status === 409 ? 'warning' : 'error'); }
         finally { applyLease(); }
       });
       root.querySelector('#bt-clear-log').addEventListener('click', () => { events = []; renderEvents(); });
+      if (latestStatus?.connected) {
+        if (latestStatus.service_uuid) serviceUuid.value = latestStatus.service_uuid;
+        if (latestStatus.write_uuid) writeUuid.value = latestStatus.write_uuid;
+        if (latestStatus.notify_uuid) notifyUuid.value = latestStatus.notify_uuid;
+        writeResponse.value = String(latestStatus.write_with_response !== false);
+      } else {
+        applyProfileDefaults();
+      }
+      renderProfile();
       renderConnection();
+      renderGatt();
       void poll();
     },
     destroy() {
@@ -6119,8 +6562,8 @@ function EnvironmentPage(project = currentProject()) {
         const canManage = Boolean(data.environments.data);
         const is579Ble = profile.preflight_adapter === 'watch_579_ble';
         const advancedSettings = is579Ble
-          ? `<div class='environment-advanced-note'><p>579 不使用 W30 真机运行档案；设备地址和连接由蓝牙工作台统一管理。</p><a class='button button-secondary' href='${escapeHtml(pageUrl('/bluetooth'))}'>前往蓝牙工作台</a></div>`
-          : `${project === '6202_W5230' ? `<label><span>SuperCom 管道</span><input type='text' value='${escapeHtml(profile.pipe_name || `\\\\.\\pipe\\SuperCom.AgentBridge.${cfg.hardware?.port || 'COM端口'}`)}' readonly></label>` : ''}${isHardware ? `<label><span>运行档案目录</span><input name='profile_root' type='text' value='${escapeHtml(runtimeProfileRoot)}' placeholder='例如 D:\\Agent-loop\\profiles' ${canManage ? '' : 'readonly'}></label><label><span>档案版本</span><input name='profile_version' type='text' value='${escapeHtml(runtimeProfileVersion)}' placeholder='留空自动选择' ${canManage ? '' : 'readonly'}></label>` : `<label><span>源码目录</span><input name='source_root' type='text' value='${escapeHtml(sourceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>工作区目录</span><input name='workspace_root' type='text' value='${escapeHtml(workspaceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>`}${profile.execution_target === 'simulator' ? `<label><span>构建目录</span><input name='build_directory' type='text' value='${escapeHtml(buildDirectory)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>模拟器程序</span><input name='artifact_path' type='text' value='${escapeHtml(artifactPath)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>` : ''}`;
+          ? `<div class='environment-advanced-note'><p>579 不使用 W30 真机运行档案；设备地址和连接在系统设置中统一管理。</p><button class='button button-secondary' type='button' data-open-bluetooth-settings>打开蓝牙设置</button></div>`
+          : `${isHardware && profile.platform_id === 'w30' ? `<label><span>SuperCom 管道</span><input type='text' value='${escapeHtml(profile.pipe_name || `\\\\.\\pipe\\SuperCom.AgentBridge.${cfg.hardware?.port || 'COM端口'}`)}' readonly></label>` : ''}${isHardware ? `<label><span>运行档案目录</span><input name='profile_root' type='text' value='${escapeHtml(runtimeProfileRoot)}' placeholder='例如 D:\\Agent-loop\\profiles' ${canManage ? '' : 'readonly'}></label><label><span>档案版本</span><input name='profile_version' type='text' value='${escapeHtml(runtimeProfileVersion)}' placeholder='留空自动选择' ${canManage ? '' : 'readonly'}></label>` : `<label><span>源码目录</span><input name='source_root' type='text' value='${escapeHtml(sourceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>工作区目录</span><input name='workspace_root' type='text' value='${escapeHtml(workspaceRoot || '')}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>`}${profile.execution_target === 'simulator' ? `<label><span>构建目录</span><input name='build_directory' type='text' value='${escapeHtml(buildDirectory)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label><label><span>模拟器程序</span><input name='artifact_path' type='text' value='${escapeHtml(artifactPath)}' placeholder='尚未配置' ${canManage ? '' : 'readonly'}></label>` : ''}`;
         const formActions = is579Ble
           ? ''
           : `<div class='environment-form-actions'><button class='button button-secondary' type='reset'>恢复当前值</button><button class='button' type='submit' ${canManage ? '' : 'disabled title="暂不支持修改环境配置"'}>保存配置</button></div>`;
@@ -6178,6 +6621,9 @@ function EnvironmentPage(project = currentProject()) {
         route();
       }));
       root.querySelectorAll('[data-open-settings]').forEach(button => button.addEventListener('click', () => document.querySelector('#open-system-settings')?.click()));
+      root.querySelector('[data-open-bluetooth-settings]')?.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('agent-loop:open-settings', {detail: {tab: 'bluetooth'}}));
+      });
       root.querySelector('[data-open-update]')?.addEventListener('click', () => document.querySelector('#update-badge')?.click());
       const form = root.querySelector('#environment-config-form');
       form?.addEventListener('submit', async event => {
@@ -6229,6 +6675,7 @@ async function route() {
     stopRepairRestore();
     stopTestPolling();
     stopBatchTestPolling();
+    stopPrdCasesPolling();
     app.onclick = null;
     initGlobalTargetSwitcher();
     let parts = location.pathname.split('/').filter(Boolean).map(decodeURIComponent);
@@ -6249,6 +6696,7 @@ async function route() {
       history.replaceState({}, '', `/cases${location.search}`);
       return await renderTests();
     }
+    if (parts[0] === 'prd-cases' && parts.length === 1) return await renderPrdCases();
     if (parts[0] === 'cases' && parts.length === 1) return await renderTests();
     if (parts[0] === 'runs' && parts.length === 1) {
       setActiveNav('runs');
@@ -6267,9 +6715,12 @@ async function route() {
       return await mountPageController(EnvironmentPage(project));
     }
     if (parts[0] === 'bluetooth' && parts.length === 1) {
-      setActiveNav('bluetooth');
-      document.title = '蓝牙工作台 · Agent-loop';
-      return await mountPageController(BluetoothPage());
+      history.replaceState({}, '', pageUrl('/overview', project));
+      setActiveNav('overview');
+      document.title = '项目总览 · Agent-loop';
+      await mountPageController(OverviewPage(project));
+      document.dispatchEvent(new CustomEvent('agent-loop:open-settings', {detail: {tab: 'bluetooth'}}));
+      return;
     }
     if (parts[0] === 'test' && parts[1] && parts[2] && parts.length === 3) return await renderTest(parts[1], parts[2]);
     if (parts[0] === 'test-batch' && parts[1] && parts.length === 2) return await renderTestBatch(parts[1]);

@@ -28,6 +28,18 @@ class HardwareRuntimeProfileTests(unittest.TestCase):
         profile_version.start()
         self.addCleanup(profile_version.stop)
 
+    def test_bundled_620f_profile_is_hash_verified_and_source_free(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        profile = load_hardware_runtime_profile(
+            project="620F_W7830",
+            profiles_root=root / "profiles",
+        )
+
+        self.assertEqual(profile.version, "v2.6.3-agentloop.2")
+        self.assertEqual(profile.firmware_sha256, "402C3CD82EBD06F9B3383BF583C02A572D035CFD06CB6241011F2B0D5B8CC1E5")
+        self.assertEqual(len(profile.command_capabilities), 84)
+        self.assertIn("GAME_WOODEN_FISH_GAME", profile.page_catalog)
+
     def _publish(self, base: Path, *, version: str = "v30-test.1") -> Path:
         project = "6202_W5230"
         profile_root = base / "profiles" / project
