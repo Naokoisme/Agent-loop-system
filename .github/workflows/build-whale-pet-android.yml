@@ -6,11 +6,14 @@ on:
       - 'whale-pet/android/**'
       - '.github/workflows/build-whale-pet-android.yml'
   workflow_dispatch:
+concurrency:
+  group: whale-pet-android-build
+  cancel-in-progress: true
 jobs:
   build-apk:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -30,3 +33,15 @@ jobs:
           name: whale-pet-debug-apk
           path: whale-pet/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Copy APK into downloadable branch path
+        if: success()
+        continue-on-error: true
+        run: |
+          mkdir -p whale-pet/download
+          cp whale-pet/android/app/build/outputs/apk/debug/app-debug.apk whale-pet/download/whale-pet-debug.apk
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add whale-pet/download/whale-pet-debug.apk
+          git diff --cached --quiet && exit 0
+          git commit -m "build(whale): publish installable debug APK [skip ci]"
+          git push origin HEAD:whale-pet-android
