@@ -14,3 +14,19 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+
+ 
+// Restore the nine original chibi PNG frames from text-safe asset files.
+tasks.register("restoreWhaleSprites") {
+    inputs.dir(file("$rootDir/artwork"))
+    outputs.dir(file("$projectDir/src/main/res/drawable-nodpi"))
+    doLast {
+        def destination = file("$projectDir/src/main/res/drawable-nodpi")
+        destination.mkdirs()
+        fileTree("$rootDir/artwork").matching { include '*.b64' }.each { encoded ->
+            def png = new File(destination, encoded.name.replace('.b64', '.png'))
+            png.bytes = encoded.getText('UTF-8').trim().decodeBase64()
+        }
+    }
+}
+tasks.named("preBuild") { dependsOn("restoreWhaleSprites") }
