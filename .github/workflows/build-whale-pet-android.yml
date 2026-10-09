@@ -24,6 +24,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Restore nine chibi sprite PNGs
+        run: |
+          set -euo pipefail
+          out=whale-pet/android/app/src/main/res/drawable-nodpi
+          mkdir -p "$out"
+          for source in whale-pet/android/artwork/*.b64; do
+            name="$(basename "$source" .b64)"
+            base64 --decode "$source" > "$out/$name.png"
+          done
+          test "$(find "$out" -maxdepth 1 -name '*.png' | wc -l)" -eq 9
       - name: Build
         working-directory: whale-pet/android
         run: gradle --no-daemon :app:assembleDebug
