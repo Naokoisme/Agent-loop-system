@@ -2,6 +2,9 @@ package com.example.whalepet;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.RectF;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -11,7 +14,11 @@ import android.view.View;
 public class PetArtView extends View {
     private final Paint pen = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int pose = 0;
-    public PetArtView(Context context){ super(context); setLayerType(View.LAYER_TYPE_SOFTWARE, null); }
+    private final Bitmap[] sprites = new Bitmap[9];
+    private final int[] spriteResources = { R.drawable.idle, R.drawable.eat, R.drawable.wave, R.drawable.surprise, R.drawable.shy, R.drawable.sleep, R.drawable.walk_right, R.drawable.walk_left, R.drawable.jump };
+    public PetArtView(Context context){ super(context); setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        for(int i=0;i<sprites.length;i++)sprites[i]=BitmapFactory.decodeResource(getResources(),spriteResources[i]);
+    }
     public void setPose(int value){ pose=value; invalidate(); }
     private void color(int argb){ pen.setColor(argb); pen.setStyle(Paint.Style.FILL); pen.setStrokeWidth(1); }
     private void ellipse(Canvas c,float l,float t,float r,float b,int col){
@@ -22,6 +29,8 @@ public class PetArtView extends View {
     }
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);
+        Bitmap current=sprites[Math.max(0,Math.min(pose,sprites.length-1))];
+        if(current!=null){c.drawBitmap(current,null,new RectF(0,getHeight()*0.04f,getWidth(),getHeight()),pen);return;}
         c.save();
         c.scale(getWidth()/200f,getHeight()/210f);
         int ink=Color.rgb(38,91,147), sea=Color.rgb(60,156,219), hair=Color.rgb(72,167,239);
