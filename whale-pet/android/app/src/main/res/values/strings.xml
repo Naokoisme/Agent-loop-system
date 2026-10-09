@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="accessibility_help">小鯨鯨手機控制功能只會喺你主動按下按鈕時執行返回、回桌面、滑動或者點擊指定可見文字。唔會儲存或者上傳畫面內容。請勿用於支付或密碼頁面。</string>
+</resources>
