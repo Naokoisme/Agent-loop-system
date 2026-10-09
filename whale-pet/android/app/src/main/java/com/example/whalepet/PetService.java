@@ -24,7 +24,7 @@ public class PetService extends Service {
   private float startX,startY;
   private int originalX,originalY,cycle=0;
   private long downAt;
-  private final String[] messages={"跳跳！","食飯時間！","你好呀～","哇！","害羞了～","好眼瞓～","散步中～"};
+  private final String[] messages={"等你陪我～","食飯時間！","你好呀～","哇！","害羞了～","好眼瞓～","散步中～","散步中～","跳跳！"};
   @Override public void onCreate(){
     super.onCreate();
     NotificationManager nm=getSystemService(NotificationManager.class);
@@ -84,7 +84,7 @@ public class PetService extends Service {
         case MotionEvent.ACTION_UP:
           if(!dragging){
             if(System.currentTimeMillis()-downAt>650)react(5,2500);
-            else{int next=cycle++%5;react(next,1250);if(next==0)hop();}
+            else{int[] poses={8,1,2,3,4};int next=poses[cycle++%poses.length];react(next,1250);if(next==8)hop();}
           }else react(4,650);
           dragging=false;return true;
         default:return true;
